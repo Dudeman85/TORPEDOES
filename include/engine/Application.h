@@ -4,11 +4,10 @@
 //ECS modules
 #include <engine/ECS.h>	
 #include <engine/Sprite.h>
-#include <engine/Model.h>
+#include <engine/ModelSystem.h>
 #include <engine/Transform.h>
 #include <engine/Physics.h>
 #include <engine/Collision.h>
-#include <engine/UserInterface.h>
 #include <engine/TextRender.h>
 #include <engine/Primitive.h>
 
@@ -22,14 +21,14 @@
 
 namespace engine
 {
-	#ifdef _DEBUG
-	#ifdef PROJECT_NAME
+#ifdef _DEBUG
+#ifdef PROJECT_NAME
 	const std::string assetPath = PROJECT_NAME;
-	#endif
+#endif
 
-	#else
+#else
 
-	#endif
+#endif
 
 	//Set this to true to not use OpenAL
 	bool NO_OPENAL = false;
@@ -65,10 +64,14 @@ namespace engine
 		collisionSystem = ecs::GetSystem<CollisionSystem>();
 		physicsSystem = ecs::GetSystem<PhysicsSystem>();
 		modelRenderSystem = ecs::GetSystem<ModelRenderSystem>();
+		modelRenderSystem->Init();
 		animationSystem = ecs::GetSystem<AnimationSystem>();
 		spriteRenderSystem = ecs::GetSystem<SpriteRenderSystem>();
+		spriteRenderSystem->Init();
 		textRenderSystem = ecs::GetSystem<TextRenderSystem>();
+		textRenderSystem->Init();
 		primitiveRenderSystem = ecs::GetSystem<PrimitiveRenderSystem>();
+		primitiveRenderSystem->Init();
 		transformSystem = ecs::GetSystem<TransformSystem>();
 	}
 

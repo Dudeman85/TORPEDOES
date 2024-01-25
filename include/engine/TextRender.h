@@ -5,6 +5,7 @@
 namespace engine
 {
 	// TextRenderer component
+	ECS_REGISTER_COMPONENT(TextRenderer)
 	struct TextRenderer : ecs::Component
 	{
 		Font* font;
@@ -17,11 +18,12 @@ namespace engine
 	};
 
 	// TextRenderSystem requires components TextRenderer component and transform component
+	ECS_REGISTER_SYSTEM(TextRenderSystem, Transform, TextRenderer)
 	class TextRenderSystem : public ecs::System
 	{
 	public:
 		// Constructor
-		TextRenderSystem()
+		void Init()
 		{
 			m_shader = new Shader(
 				R"(

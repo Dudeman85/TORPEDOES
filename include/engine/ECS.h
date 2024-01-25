@@ -22,7 +22,7 @@ struct COMPONENT; \
 inline bool COMPONENT##Registered = ( ecs::RegisterComponent<COMPONENT>(), true );
 
 //Macro to register a system and its components outside main
-#define ECS_RESIGTER_SYSTEM(SYSTEM, ...) \
+#define ECS_REGISTER_SYSTEM(SYSTEM, ...) \
 class SYSTEM; \
 inline bool SYSTEM##Registered = ( ecs::RegisterSystem<SYSTEM, __VA_ARGS__>(), true );
 
@@ -39,7 +39,7 @@ namespace engine::ecs
 	//Signatures as bitsets, where each component has its own bit
 	using Signature = std::bitset<ECS_MAX_COMPONENTS>;
 
-	
+
 	//ENTITY MANAGEMENT DATA
 
 	//All currently available and used Entity IDs
@@ -55,7 +55,7 @@ namespace engine::ecs
 	//Base struct all components inherit from
 	struct Component {};
 	//A map of every components name to it's corresponding component array
-	std::unordered_map<const char*, std::vector<Component>> componentArrays;
+	std::unordered_map<const char*, std::vector<Component*>> componentArrays;
 	//Maps from Entities to their component indexed in component arrays
 	std::unordered_map<const char*, std::unordered_map<Entity, uint32_t>> entityToIndex;
 	std::unordered_map<const char*, std::unordered_map<uint32_t, Entity>> indexToEntity;
@@ -161,7 +161,7 @@ namespace engine::ecs
 	{
 		const char* componentType = typeid(T).name();
 
-		#ifdef _DEBUG
+#ifdef _DEBUG
 		//Make sure the component has not been previously registered
 		if (componentArrays.count(componentType) != 0)
 		{
@@ -175,12 +175,12 @@ namespace engine::ecs
 				<< ECS_MAX_COMPONENTS << ". Consider including \"#define ECS_MAX_COMPONENTS num\" before you include ECS.h!" << normalFormat << std::endl;
 			throw std::runtime_error("ECS ERROR: Too many registered components!");
 		}
-		#endif
+#endif
 
 		//Assigns an ID and makes a new component array for the registered component type
 		componentTypeToID[componentType] = componentCount;
 		componentIDToType[componentCount] = componentType;
-		componentArrays[componentType] = std::vector<Component>();
+		componentArrays[componentType] = std::vector<Component*>();
 
 		componentCount++;
 	}
@@ -201,7 +201,7 @@ namespace engine::ecs
 	{
 		const char* componentType = typeid(T).name();
 
-		#ifdef _DEBUG
+#ifdef _DEBUG
 		//Make sure the entity exists
 		if (!EntityExists(entity))
 		{
@@ -214,12 +214,13 @@ namespace engine::ecs
 			std::cout << errorFormat << "ECS ERROR in GetComponent(): Entity does not have the desired component!" << normalFormat << std::endl;
 			throw std::runtime_error("ECS ERROR: Entity does not have the desired component!");
 		}
-		#endif
+#endif
 
 		//Get the entity's component of type T
-		Component& c = componentArrays[componentType][entityToIndex[componentType][entity]];
+		Component* c = componentArrays[componentType][entityToIndex[componentType][entity]];
+
 		//Cast it to the desired component type
-		return static_cast<T&>(c);
+		return *static_cast<T*>(c);
 	}
 
 	//Get the ID of a component
@@ -228,25 +229,25 @@ namespace engine::ecs
 	{
 		const char* componentType = typeid(T).name();
 
-		#ifdef _DEBUG
+#ifdef _DEBUG
 		//Make sure the component has been registered
 		if (componentArrays.count(componentType) == 0)
 		{
 			std::cout << errorFormat << "ECS ERROR in GetComponentID(): The component has not been registered!" << normalFormat << std::endl;
 			throw std::runtime_error("ECS ERROR: Component not registered!");
 		}
-		#endif
+#endif
 
 		return componentTypeToID[componentType];
 	}
 
 	//Add a component to entity. Returns a reference to that component
 	template<typename T>
-	T& AddComponent(Entity entity, T component)
+	T& AddComponent(Entity entity, T* component)
 	{
 		const char* componentType = typeid(T).name();
 
-		#ifdef _DEBUG
+#ifdef _DEBUG
 		//Make sure the entity exists
 		if (!EntityExists(entity))
 		{
@@ -259,7 +260,7 @@ namespace engine::ecs
 			std::cout << warningFormat << "ECS WARNING in AddComponent(): Entity already has the component you are trying to add!" << normalFormat << std::endl;
 			return GetComponent<T>(entity);
 		}
-		#endif
+#endif
 
 		//Update entity and index maps to include new entity at the back
 		entityToIndex[componentType][entity] = componentArrays[componentType].size();
@@ -272,7 +273,7 @@ namespace engine::ecs
 
 		_OnEntitySignatureChanged(entity);
 
-		return component;
+		return *component;
 	}
 
 	//Remove a component of type T from entity
@@ -281,7 +282,7 @@ namespace engine::ecs
 	{
 		const char* componentType = typeid(T).name();
 
-		#ifdef _DEBUG
+#ifdef _DEBUG
 		//Make sure the entity exists
 		if (!EntityExists(entity))
 		{
@@ -294,7 +295,7 @@ namespace engine::ecs
 			std::cout << warningFormat << "ECS WARNING in RemoveComponent(): Entity does not have the component you are trying to remove!" << normalFormat << std::endl;
 			return;
 		}
-		#endif
+#endif
 
 		_RemoveComponentByName(entity, componentType);
 	}
@@ -302,14 +303,14 @@ namespace engine::ecs
 	//Returns a new entity with no components
 	Entity NewEntity()
 	{
-		#ifdef _DEBUG
+#ifdef _DEBUG
 		//Make sure there are not too many entities
 		if (entityCount > UINT32_MAX)
 		{
 			std::cout << errorFormat << "ECS ERROR in NewEntity(): Too many Entities!" << normalFormat << std::endl;
 			throw std::runtime_error("ECS ERROR: Too many Entities!");
 		}
-		#endif
+#endif
 
 		entityCount++;
 
@@ -334,14 +335,14 @@ namespace engine::ecs
 	//Delete an entity and all of its components
 	void DestroyEntity(Entity entity)
 	{
-		#ifdef _DEBUG
+#ifdef _DEBUG
 		//Make sure the entity exists
 		if (!EntityExists(entity))
 		{
 			std::cout << warningFormat << "ECS WARNING in DestroyEntity(): The Entity you are trying to destroy does not exist!" << normalFormat << std::endl;
 			return;
 		}
-		#endif
+#endif
 
 		//Delete all components
 		for (uint16_t i = 0; i < componentCount; i++)
@@ -369,14 +370,14 @@ namespace engine::ecs
 	{
 		const char* systemType = typeid(T).name();
 
-		#ifdef _DEBUG
+#ifdef _DEBUG
 		//Make sure the system has been registered
 		if (systems.count(systemType) == 0)
 		{
 			std::cout << errorFormat << "ECS ERROR in GetSystem(): The system has not been registered!" << normalFormat << std::endl;
 			throw std::runtime_error("ECS ERROR: System not registered!");
 		}
-		#endif
+#endif
 
 		return std::static_pointer_cast<T>(systems[systemType]);
 	}
@@ -387,14 +388,14 @@ namespace engine::ecs
 	{
 		const char* systemType = typeid(Sys).name();
 
-		#ifdef _DEBUG
+#ifdef _DEBUG
 		//Make sure the system has not been registered
 		if (systems.count(systemType) != 0)
 		{
 			std::cout << warningFormat << "ECS WARNING in RegisterSystem(): The system has already been registered!" << normalFormat << std::endl;
 			return GetSystem<Sys>();
 		}
-		#endif
+#endif
 
 		//Make the signature and system
 		systemSignatures[systemType] = _MakeSignature<Comps...>();

@@ -32,6 +32,7 @@ namespace engine
 	};
 
 	//Polygon Collider component
+	ECS_REGISTER_COMPONENT(PolygonCollider)
 	struct PolygonCollider : ecs::Component
 	{
 		//The vertices of the polygon making up the collider, going clockwise
@@ -53,6 +54,7 @@ namespace engine
 
 	//Collision System
 	//Requires Transform and PolygonCollider
+	ECS_REGISTER_SYSTEM(CollisionSystem, Transform, PolygonCollider)
 	class CollisionSystem : public ecs::System
 	{
 	public:

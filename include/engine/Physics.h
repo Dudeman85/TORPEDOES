@@ -11,6 +11,7 @@ namespace engine
 	enum Direction { up = 0, right = 1, down = 2, left = 3 };
 
 	//Rigidbody component
+	ECS_REGISTER_COMPONENT(Rigidbody)
 	struct Rigidbody : ecs::Component
 	{
 		Vector3 velocity;
@@ -32,6 +33,7 @@ namespace engine
 
 	//Physics System
 	//Requires Rigidbody and Transform components
+	ECS_REGISTER_SYSTEM(PhysicsSystem, Transform, Rigidbody)
 	class PhysicsSystem : public ecs::System
 	{
 	public:
@@ -146,7 +148,7 @@ namespace engine
 				}
 
 				//Check collision again
-				collisions = collisionSystem->CheckTilemapCollision(a);
+				collisions = ecs::GetSystem<CollisionSystem>()->CheckTilemapCollision(a);
 
 				i++;
 			} while (collisions.size() > 0 && i < tilemapIterationLimit);
@@ -179,8 +181,8 @@ namespace engine
 				{
 					CollisionSystem::UpdateAABB(entity);
 					//Check entity and tilemap collision
-					std::vector<Collision> collisions = collisionSystem->CheckCollision(entity);
-					std::vector<Collision> tilemapCollisions = collisionSystem->CheckTilemapCollision(entity);
+					std::vector<Collision> collisions = ecs::GetSystem<CollisionSystem>()->CheckCollision(entity);
+					std::vector<Collision> tilemapCollisions = ecs::GetSystem<CollisionSystem>()->CheckTilemapCollision(entity);
 
 					//Solve each entity collision
 					for (Collision& collision : collisions)
@@ -209,14 +211,11 @@ namespace engine
 		//How many steps should be used for movements, bigger is more accurate but slower
 		int step = 1;
 		Vector3 gravity;
-		//The collision system, needs to be static to keep Move() static
-		static std::shared_ptr<CollisionSystem> collisionSystem;
 		static const int tilemapIterationLimit = 10;
 	private:
 		static std::map<unsigned int, TileProperty> tileProperties;
 	};
 
 	//I don't really get static members
-	std::shared_ptr<CollisionSystem> PhysicsSystem::collisionSystem = collisionSystem;
 	std::map<unsigned int, TileProperty> PhysicsSystem::tileProperties = tileProperties;
 }

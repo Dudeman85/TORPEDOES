@@ -10,6 +10,7 @@
 namespace engine
 {
 	//Transform component
+	ECS_REGISTER_COMPONENT(Transform)
 	struct Transform : ecs::Component
 	{
 		Vector3 position;
@@ -29,6 +30,7 @@ namespace engine
 
 	//Transform system
 	//Requires Transform component
+	ECS_REGISTER_SYSTEM(TransformSystem, Transform)
 	class TransformSystem : public ecs::System
 	{
 	public:

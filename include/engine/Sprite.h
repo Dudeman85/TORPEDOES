@@ -22,6 +22,7 @@
 namespace engine
 {
 	//2D Sprite Renderer component
+	ECS_REGISTER_COMPONENT(SpriteRenderer)
 	struct SpriteRenderer : ecs::Component
 	{
 		Texture* texture = nullptr;
@@ -47,6 +48,7 @@ namespace engine
 	};
 
 	//Animator component
+	ECS_REGISTER_COMPONENT(Animator)
 	struct Animator : ecs::Component
 	{
 		std::map<std::string, Animation> animations;
@@ -61,10 +63,18 @@ namespace engine
 
 	//2D Sprite Render system
 	//Requires SpriteRenderer and Transform
+	ECS_REGISTER_SYSTEM(SpriteRenderSystem, SpriteRenderer, Transform)
 	class SpriteRenderSystem : public ecs::System
 	{
 	public:
-		SpriteRenderSystem()
+		~SpriteRenderSystem()
+		{
+			glDeleteVertexArrays(1, &VAO);
+			glDeleteVertexArrays(1, &VBO);
+			glDeleteVertexArrays(1, &EBO);
+		}
+
+		void Init()
 		{
 			//Set the screen clear color to black
 			glClearColor(0, 0, 0, 1.0f);
@@ -145,13 +155,6 @@ namespace engine
 			glBindVertexArray(0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		}
-
-		~SpriteRenderSystem()
-		{
-			glDeleteVertexArrays(1, &VAO);
-			glDeleteVertexArrays(1, &VBO);
-			glDeleteVertexArrays(1, &EBO);
 		}
 
 		//Renders everything. Call this every frame
@@ -302,7 +305,8 @@ namespace engine
 	};
 
 	//Animator system
-	//Requires Animator and Sprite
+	//Requires Animator and SpriteRenderer
+	ECS_REGISTER_SYSTEM(AnimationSystem, Animator, SpriteRenderer)
 	class AnimationSystem : public ecs::System
 	{
 	public:

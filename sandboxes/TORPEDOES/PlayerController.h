@@ -4,6 +4,7 @@
 // Declaration of the entity component system (ECS) instance
 using namespace engine;
 
+ECS_REGISTER_COMPONENT(Player)
 struct Player : ecs::Component
 {
 	float projectileSpeed = 500;  // Attack state
@@ -26,11 +27,13 @@ struct Player : ecs::Component
 	string playername;
 	string playerLap;
 };
+ECS_REGISTER_COMPONENT(CheckPoint)
 struct CheckPoint: ecs::Component
 {
 	int checkPointID = 0;
 	bool Finish_line = false;
 };
+ECS_REGISTER_COMPONENT(Projectile)
 struct Projectile : ecs::Component
 {
 	int ownerID = 0;
@@ -39,6 +42,7 @@ struct Projectile : ecs::Component
 bool HAS_WON = false;
 
 // Player controller System. Requires Player , Tranform , Rigidbody , PolygonCollider &  ModelRenderer
+ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonCollider, ModelRenderer)
 class PlayerController : public ecs::System
 {
 	Model* torpedomodel;
@@ -46,12 +50,12 @@ class PlayerController : public ecs::System
 	{
 
 		ecs::Entity projectile = ecs::NewEntity();
-		ecs::AddComponent(projectile, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
-		ecs::AddComponent(projectile, Rigidbody{ .velocity = direction * projectileSpeed });
-		ecs::AddComponent(projectile, ModelRenderer{ .model = torpedomodel });
+		ecs::AddComponent(projectile, new Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
+		ecs::AddComponent(projectile, new Rigidbody{ .velocity = direction * projectileSpeed });
+		ecs::AddComponent(projectile, new ModelRenderer{ .model = torpedomodel });
 		std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-		ecs::AddComponent(projectile, PolygonCollider{ .vertices = Torpedoverts, .callback = PlayerController::OnprojectilCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
-		ecs::AddComponent(projectile, Projectile{ .ownerID = owerID });
+		ecs::AddComponent(projectile, new PolygonCollider{ .vertices = Torpedoverts, .callback = PlayerController::OnprojectilCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
+		ecs::AddComponent(projectile, new Projectile{ .ownerID = owerID });
 
 
 
@@ -60,9 +64,9 @@ class PlayerController : public ecs::System
 	{
 		ecs::Entity projecAnim = ecs::NewEntity();
 		animPosition.z += 100;
-		ecs::AddComponent(projecAnim, Transform{ .position = animPosition,  .scale = Vector3(20) });
-		ecs::AddComponent(projecAnim, SpriteRenderer{ });
-		ecs::AddComponent(projecAnim, Animator{});
+		ecs::AddComponent(projecAnim, new Transform{ .position = animPosition,  .scale = Vector3(20) });
+		ecs::AddComponent(projecAnim, new SpriteRenderer{ });
+		ecs::AddComponent(projecAnim, new Animator{});
 		AnimationSystem::AddAnimation(projecAnim, *ExplosionAnim, "explosion");
 		AnimationSystem::PlayAnimation(projecAnim, "explosion", false);
 
@@ -73,10 +77,9 @@ public:
 
 
 	static Animation* ExplosionAnim;
-	PlayerController()
+	void Init()
 	{
 		torpedomodel = new Model("assets/torpedo.obj");
-
 	}
 	~PlayerController()
 	{

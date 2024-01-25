@@ -1,10 +1,11 @@
 #pragma once
 
-
+#error Dont use this!
 
 namespace engine
 {
 	//UI Element struct
+	ECS_REGISTER_COMPONENT(UIElement)
 	struct UIElement : ecs::Component
 	{
 		bool relativeToCamera = true;
@@ -13,6 +14,7 @@ namespace engine
 
 	//2D UI element system
 	//Requires UIElement, and Transform
+	ECS_REGISTER_SYSTEM(UISystem, Transform, UIElement)
 	class UISystem : public ecs::System
 	{
 	public:
