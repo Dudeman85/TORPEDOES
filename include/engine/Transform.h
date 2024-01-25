@@ -1,20 +1,16 @@
 #pragma once
+#include <engine/ECS.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <engine/ECS.h>
 #include <engine/Vector.h>
 #include <vector>
 #include <set>
-
-#include "engine/Component.h"
-
 
 
 namespace engine
 {
 	//Transform component
-	///------>ECS_REGISTER_COMPONENT(Transform) makkro
-	struct Transform
+	struct Transform : ecs::Component
 	{
 		Vector3 position;
 		Vector3 rotation;
@@ -33,7 +29,6 @@ namespace engine
 
 	//Transform system
 	//Requires Transform component
-	//---->ECS_REQUIRED_COMPONENTS(TransformSystem, "struct engine::Transform"); makro
 	class TransformSystem : public ecs::System
 	{
 	public:

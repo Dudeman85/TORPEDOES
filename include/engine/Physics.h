@@ -6,15 +6,12 @@
 #include <vector>
 #include <array>
 
-#include "engine/Component.h"
-
 namespace engine
 {
 	enum Direction { up = 0, right = 1, down = 2, left = 3 };
 
 	//Rigidbody component
-	///------>ECS_REGISTER_COMPONENT(Rigidbody); makro
-	struct Rigidbody
+	struct Rigidbody : ecs::Component
 	{
 		Vector3 velocity;
 		float mass = 1;
@@ -35,7 +32,6 @@ namespace engine
 
 	//Physics System
 	//Requires Rigidbody and Transform components
-	//ECS_REQUIRED_COMPONENTS(PhysicsSystem, { "struct engine::Transform", "struct engine::Rigidbody" })
 	class PhysicsSystem : public ecs::System
 	{
 	public:
@@ -107,7 +103,7 @@ namespace engine
 
 		//Solve a collision between two colliders
 		//Returns 0 on success, >0 on trigger, and <0 on failure 
-		static int SolveTilemapCollision(vector<Collision> collisions)
+		static int SolveTilemapCollision(std::vector<Collision> collisions)
 		{
 			//No collision, nothing needs to be done
 			if (collisions.empty())
@@ -183,8 +179,8 @@ namespace engine
 				{
 					CollisionSystem::UpdateAABB(entity);
 					//Check entity and tilemap collision
-					vector<Collision> collisions = collisionSystem->CheckCollision(entity);
-					vector<Collision> tilemapCollisions = collisionSystem->CheckTilemapCollision(entity);
+					std::vector<Collision> collisions = collisionSystem->CheckCollision(entity);
+					std::vector<Collision> tilemapCollisions = collisionSystem->CheckTilemapCollision(entity);
 
 					//Solve each entity collision
 					for (Collision& collision : collisions)
@@ -214,13 +210,13 @@ namespace engine
 		int step = 1;
 		Vector3 gravity;
 		//The collision system, needs to be static to keep Move() static
-		static shared_ptr<CollisionSystem> collisionSystem;
+		static std::shared_ptr<CollisionSystem> collisionSystem;
 		static const int tilemapIterationLimit = 10;
 	private:
-		static map<unsigned int, TileProperty> tileProperties;
+		static std::map<unsigned int, TileProperty> tileProperties;
 	};
 
 	//I don't really get static members
-	shared_ptr<CollisionSystem> PhysicsSystem::collisionSystem = collisionSystem;
-	map<unsigned int, TileProperty> PhysicsSystem::tileProperties = tileProperties;
+	std::shared_ptr<CollisionSystem> PhysicsSystem::collisionSystem = collisionSystem;
+	std::map<unsigned int, TileProperty> PhysicsSystem::tileProperties = tileProperties;
 }

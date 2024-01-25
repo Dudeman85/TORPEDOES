@@ -8,8 +8,6 @@
 #include <functional>
 #include <unordered_set>
 
-
-
 namespace engine
 {
 	//Collision Event struct, not a component
@@ -34,8 +32,7 @@ namespace engine
 	};
 
 	//Polygon Collider component
-	///------->ECS_REGISTER_COMPONENT(PolygonCollider) makro
-	struct PolygonCollider
+	struct PolygonCollider : ecs::Component
 	{
 		//The vertices of the polygon making up the collider, going clockwise
 		//The vertices must form a convex polygon
@@ -56,7 +53,6 @@ namespace engine
 
 	//Collision System
 	//Requires Transform and PolygonCollider
-	//ECS_REQUIRED_COMPONENTS(CollisionSystem, { "struct engine::Transform", "struct engine::PolygonCollider" })
 	class CollisionSystem : public ecs::System
 	{
 	public:
@@ -88,9 +84,9 @@ namespace engine
 				{
 					//Calculate the vertices of the collision and bounding boxes in world coordinates 
 					float rotation = collider.rotationOverride >= 0 ? collider.rotationOverride : transform.rotation.z;
-					vector<Vector2> colliderVerts = TransformSystem::ApplyTransforms2D(collider.vertices, rotation, transform.scale, transform.position);
+					std::vector<Vector2> colliderVerts = TransformSystem::ApplyTransforms2D(collider.vertices, rotation, transform.scale, transform.position);
 					Primitive colliderPrimitive = Primitive::Polygon(colliderVerts);
-					vector<Vector2> boundingBoxVerts{ Vector2(collider.bounds[3], collider.bounds[0]), Vector2(collider.bounds[1], collider.bounds[0]), Vector2(collider.bounds[1], collider.bounds[2]), Vector2(collider.bounds[3], collider.bounds[2]) };
+					std::vector<Vector2> boundingBoxVerts{ Vector2(collider.bounds[3], collider.bounds[0]), Vector2(collider.bounds[1], collider.bounds[0]), Vector2(collider.bounds[1], collider.bounds[2]), Vector2(collider.bounds[3], collider.bounds[2]) };
 					Primitive boundingBoxPrimitive = Primitive::Polygon(boundingBoxVerts);
 
 					//Draw those vertices
@@ -102,7 +98,7 @@ namespace engine
 
 		//Checks collision between entity a and every other entity
 		//Returns the collisions from the perspective of a
-		vector<Collision> CheckCollision(ecs::Entity a)
+		std::vector<Collision> CheckCollision(ecs::Entity a)
 		{
 			Transform& aTransform = ecs::GetComponent<Transform>(a);
 			PolygonCollider& aCollider = ecs::GetComponent<PolygonCollider>(a);
@@ -129,27 +125,27 @@ namespace engine
 		}
 
 		//Checks for collision between a tilemap collision layer and an entity
-		vector<Collision> CheckTilemapCollision(ecs:: Entity entity)
+		std::vector<Collision> CheckTilemapCollision(ecs:: Entity entity)
 		{
 			//If no tilemap collision layer is set return no collisions
 			if (!tilemap)
-				return vector<Collision>();
+				return std::vector<Collision>();
 
 			Transform& transform = ecs::GetComponent<Transform>(entity);
 			PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
 
 			//Log the collisions
-			vector<Collision> collisions;
+			std::vector<Collision> collisions;
 
 			//Find collider tiles inside bounding box
-			vector<Vector2> possibleCollisions = tilemap->CheckCollisionBox(Vector2(collider.bounds[3], collider.bounds[0]), Vector2(collider.bounds[1], collider.bounds[2]));
+			std::vector<Vector2> possibleCollisions = tilemap->CheckCollisionBox(Vector2(collider.bounds[3], collider.bounds[0]), Vector2(collider.bounds[1], collider.bounds[2]));
 
 			//Apply transforms to entity verts
 			float rotation = collider.rotationOverride >= 0 ? collider.rotationOverride : transform.rotation.z;
-			vector<Vector2> entityVerts = TransformSystem::ApplyTransforms2D(collider.vertices, rotation, transform.scale, transform.position);
+			std::vector<Vector2> entityVerts = TransformSystem::ApplyTransforms2D(collider.vertices, rotation, transform.scale, transform.position);
 
 			//Vertices of a tile
-			vector<Vector2> tileVerts{
+			std::vector<Vector2> tileVerts{
 				Vector2(-((float)tilemap->tileSize.x / 2), (float)tilemap->tileSize.y / 2), //Top-Left
 				Vector2((float)tilemap->tileSize.x / 2, (float)tilemap->tileSize.y / 2),  //Top-Right
 				Vector2((float)tilemap->tileSize.x / 2, -((float)tilemap->tileSize.y / 2)), //Bottom-Right
@@ -163,7 +159,7 @@ namespace engine
 			{
 				//Move the tile verts to position
 				Vector2 tilePosition = tilemap->GetTilePosition(possibleCollisions[i].x, possibleCollisions[i].y); 
-				vector<Vector2> transformedTileVerts = TransformSystem::ApplyTransforms2D(tileVerts, 0, 1, tilePosition);
+				std::vector<Vector2> transformedTileVerts = TransformSystem::ApplyTransforms2D(tileVerts, 0, 1, tilePosition);
 				//Check entity-tile collision
 				Collision collision = SATIntersect(entityVerts, transformedTileVerts);
 
@@ -212,10 +208,10 @@ namespace engine
 
 			//Rotate and scale every vertex of a, movement is handled later
 			float aRotation = aCollider.rotationOverride >= 0 ? aCollider.rotationOverride : aTransform.rotation.z;
-			vector<Vector2> aVerts = TransformSystem::ApplyTransforms2D(aCollider.vertices, aRotation, aTransform.scale, aTransform.position);
+			std::vector<Vector2> aVerts = TransformSystem::ApplyTransforms2D(aCollider.vertices, aRotation, aTransform.scale, aTransform.position);
 			//Rotate and scale every vertex of b, movement is handled later
 			float bRotation = bCollider.rotationOverride >= 0 ? bCollider.rotationOverride : bTransform.rotation.z;
-			vector<Vector2> bVerts = TransformSystem::ApplyTransforms2D(bCollider.vertices, bRotation, bTransform.scale, bTransform.position);
+			std::vector<Vector2> bVerts = TransformSystem::ApplyTransforms2D(bCollider.vertices, bRotation, bTransform.scale, bTransform.position);
 
 			//Check SAT collision
 			Collision collision = SATIntersect(aVerts, bVerts);
@@ -259,10 +255,10 @@ namespace engine
 
 		//Check SAT intersection between two convex polygons
 		//Expects Vertices to have Transforms applied
-		static Collision SATIntersect(vector<Vector2> aVerts, vector<Vector2> bVerts)
+		static Collision SATIntersect(std::vector<Vector2> aVerts, std::vector<Vector2> bVerts)
 		{
 			//Calculate all axes to check
-			vector<Vector2> axes;
+			std::vector<Vector2> axes;
 			//For each vertice in a
 			for (int i = 0; i < aVerts.size(); i++)
 			{
@@ -300,7 +296,7 @@ namespace engine
 				//Project each vertice of a to axis and calculate it's bounds
 				float aMin = INFINITY;
 				float aMax = -INFINITY;
-				vector<float> aProjections;
+				std::vector<float> aProjections;
 				for (Vector2& vertice : aVerts)
 				{
 					//Project to axis
@@ -316,7 +312,7 @@ namespace engine
 				//Project each vertice of b to axis and calculate it's bounds
 				float bMin = INFINITY;
 				float bMax = -INFINITY;
-				vector<float> bProjections;
+				std::vector<float> bProjections;
 				for (Vector2& vertice : bVerts)
 				{
 					//Project to axis
@@ -342,7 +338,7 @@ namespace engine
 					//Vertice is intersecting b bounds
 					if (aProjection < bMax && aProjection > bMin)
 					{
-						float overlap = min(abs(aProjection - bMin), abs(aProjection - bMax));
+						float overlap = std::min(abs(aProjection - bMin), abs(aProjection - bMax));
 
 						//Hit confirmed
 						hit = true;
@@ -358,7 +354,7 @@ namespace engine
 					//Vertice is intersecting b bounds
 					if (bProjection < aMax && bProjection > aMin)
 					{
-						float overlap = min(abs(bProjection - aMin), abs(bProjection - aMax));
+						float overlap = std::min(abs(bProjection - aMin), abs(bProjection - aMax));
 
 						//Hit confirmed
 						hit = true;
@@ -441,7 +437,7 @@ namespace engine
 		{
 			if (collisionTilemap->collisionLayer.empty())
 			{
-				cout << "WARNING: No collision layer in this tilemap!\n";
+				std::cout << "WARNING: No collision layer in this tilemap!\n";
 			}
 			else
 			{

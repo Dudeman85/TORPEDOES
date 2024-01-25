@@ -1,8 +1,6 @@
-#include <engine/Application.h>
 #include <engine/Tilemap.h>
 #include "PlayerController.h"
 
-using namespace engine;
 
 int checkPointNumber = 0;
 
@@ -12,7 +10,7 @@ void createChepoint(Vector3 position, Vector3 rotation, Vector3 scale, Model& ch
 
 	ecs::AddComponent(checkpoint, Transform{ .position = position , .rotation = rotation , .scale = scale });
 	ecs::AddComponent(checkpoint, ModelRenderer{ .model = &checkPointModel });
-	ecs::AddComponent(checkpoint, CheckPoint{ checkPointNumber , finish_line });
+	ecs::AddComponent(checkpoint, CheckPoint{ .checkPointID = checkPointNumber , .Finish_line = finish_line });
 	std::vector<Vector2> CheckpointcolliderVerts{ Vector2(4, 8), Vector2(4, -8), Vector2(-4, -8), Vector2(-4, 8) };
 	ecs::AddComponent(checkpoint, PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = false, .rotationOverride = hitboxrotation }));
 
@@ -63,6 +61,7 @@ int main()
 	TextRenderer& winText = ecs::AddComponent(playerWin, TextRenderer{ .font = &stencilFont, .text = "", .offset = Vector3(-1.0f, 1.1f, 1.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 	ecs::AddComponent(playerWin, SpriteRenderer{ .texture = winSprite, .enabled = false, .uiElement = true });
 	ecs::AddComponent(playerWin, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(0.5f) });
+	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
 	PlayerController::playerWin = playerWin;
 
 	ecs::Entity pFont1 = ecs::NewEntity();

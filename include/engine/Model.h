@@ -16,17 +16,13 @@
 #include <engine/GL/Camera.h>
 #include <engine/GL/Mesh.h>
 
-#include "engine/Component.h"
-
-
-
 namespace engine
 {
 	//A class to store 3D model vertex and texture data, as well as handle model loading
 	class Model
 	{
 	public:
-		Model(const char* path)
+		Model(std::string path)
 		{
 			LoadModel(path);
 		}
@@ -54,15 +50,13 @@ namespace engine
 	};
 
 	//3D Model Renderer component
-	//ECS_REGISTER_COMPONENT(ModelRenderer)
-	struct ModelRenderer
+	struct ModelRenderer : ecs::Component
 	{
 		Model* model;
 		Shader* shader;
 	};
 
 	//3D Model Render System, requires Transform and ModelRenderer
-	//ECS_REQUIRED_COMPONENTS(ModelRenderSystem, { "struct engine::Transform", "struct engine::ModelRenderer" })
 	class ModelRenderSystem : public ecs::System
 	{
 	public:
@@ -135,13 +129,10 @@ namespace engine
 			for (auto itr = entities.begin(); itr != entities.end();)
 			{
 				ecs::Entity entity = *itr++;
-				//Get relevant components
 
+				//Get relevant components
 				Transform transform = ecs::GetComponent<Transform>(entity);
 				ModelRenderer& modelRenderer = ecs::GetComponent<ModelRenderer>(entity);
-
-				
-
 
 				//If a shader has been specified for this sprite use it, else use the default
 				Shader* shader = defaultShader;

@@ -1,4 +1,3 @@
-
 #pragma once
 #include <bitset>
 #include <stack>
@@ -27,6 +26,7 @@ inline bool COMPONENT##Registered = ( ecs::RegisterComponent<COMPONENT>(), true 
 class SYSTEM; \
 inline bool SYSTEM##Registered = ( ecs::RegisterSystem<SYSTEM, __VA_ARGS__>(), true );
 
+
 namespace engine::ecs
 {
 	//Define colors for errors and warnings
@@ -39,7 +39,7 @@ namespace engine::ecs
 	//Signatures as bitsets, where each component has its own bit
 	using Signature = std::bitset<ECS_MAX_COMPONENTS>;
 
-
+	
 	//ENTITY MANAGEMENT DATA
 
 	//All currently available and used Entity IDs

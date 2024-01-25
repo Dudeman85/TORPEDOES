@@ -1,8 +1,6 @@
 #pragma once 
 #include <engine/Application.h>
 
-#include <engine/Component.h>
-
 // Declaration of the entity component system (ECS) instance
 using namespace engine;
 
@@ -49,7 +47,7 @@ class PlayerController : public ecs::System
 
 		ecs::Entity projectile = ecs::NewEntity();
 		ecs::AddComponent(projectile, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
-		ecs::AddComponent(projectile, Rigidbody{ direction * projectileSpeed });
+		ecs::AddComponent(projectile, Rigidbody{ .velocity = direction * projectileSpeed });
 		ecs::AddComponent(projectile, ModelRenderer{ .model = torpedomodel });
 		std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
 		ecs::AddComponent(projectile, PolygonCollider{ .vertices = Torpedoverts, .callback = PlayerController::OnprojectilCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });

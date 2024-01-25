@@ -215,8 +215,7 @@ namespace engine
 
 	//Primitive Renderer Component
 	//They consist of only a primitive shape and a color, no texture
-	//---->ECS_REGISTER_COMPONENT(PrimitiveRenderer) makro need check
-	struct PrimitiveRenderer
+	struct PrimitiveRenderer : ecs::Component
 	{
 		Primitive* primitive = nullptr;
 		Vector3 color;
@@ -228,7 +227,6 @@ namespace engine
 
 	//Primitive Render system
 	//Requires PrimitiveRenderer and Transform
-	///--->ECS_REQUIRED_COMPONENTS(PrimitiveRenderSystem, { "struct engine::Transform", "struct engine::PrimitiveRenderer" })
 	class PrimitiveRenderSystem : public ecs::System
 	{
 	public:

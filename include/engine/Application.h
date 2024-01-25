@@ -22,6 +22,15 @@
 
 namespace engine
 {
+	#ifdef _DEBUG
+	#ifdef PROJECT_NAME
+	const std::string assetPath = PROJECT_NAME;
+	#endif
+
+	#else
+
+	#endif
+
 	//Set this to true to not use OpenAL
 	bool NO_OPENAL = false;
 
@@ -46,7 +55,7 @@ namespace engine
 		_lastFrame = chrono::high_resolution_clock::now();
 
 		//Make sure OpenGL context has been created
-		assert(OPENGL_INITIALIZED && "OpenGL has not been initialized! Create a window, or manually create the OpenGL context before initializing EngineLib!");
+		assert(OPENGL_INITIALIZED && "OpenGL has not been initialized! Create a window, or manually create the OpenGL context before calling EngineInit!");
 
 		//OpenAL can be disabled if desired, no sound will play
 		if (!NO_OPENAL)
