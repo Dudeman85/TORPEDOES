@@ -4,10 +4,9 @@
 #include <engine/Component.h>
 
 // Declaration of the entity component system (ECS) instance
-extern ECS ecs; // (Entity Component system)
 using namespace engine;
 
-ECS_COMPONENT(Player)
+struct Player : ecs::Component
 {
 	float projectileSpeed = 500;  // Attack state
 	bool attackHeld = false;     // Indicates if the attack button is held
@@ -25,59 +24,54 @@ ECS_COMPONENT(Player)
 
 	bool playExlposionSound = false;
 	int playerID = 0;
-	Entity playerFont;
+	ecs::Entity playerFont;
 	string playername;
 	string playerLap;
 };
-ECS_REGISTER_COMPONENT(CheckPoint)
-struct CheckPoint
+struct CheckPoint: ecs::Component
 {
 	int checkPointID = 0;
 	bool Finish_line = false;
-
 };
-ECS_REGISTER_COMPONENT(Projectile)
-struct Projectile
+struct Projectile : ecs::Component
 {
 	int ownerID = 0;
-
-
 };
 
 bool HAS_WON = false;
 
 // Player controller System. Requires Player , Tranform , Rigidbody , PolygonCollider &  ModelRenderer
-class PlayerController : public System
+class PlayerController : public ecs::System
 {
 	Model* torpedomodel;
 	void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 sapawnRotation, int owerID)
 	{
 
-		Entity projectile = ecs.newEntity();
-		ecs.addComponent(projectile, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
-		ecs.addComponent(projectile, Rigidbody{ direction * projectileSpeed });
-		ecs.addComponent(projectile, ModelRenderer{ .model = torpedomodel });
+		ecs::Entity projectile = ecs::NewEntity();
+		ecs::AddComponent(projectile, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
+		ecs::AddComponent(projectile, Rigidbody{ direction * projectileSpeed });
+		ecs::AddComponent(projectile, ModelRenderer{ .model = torpedomodel });
 		std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-		ecs.addComponent(projectile, PolygonCollider{ .vertices = Torpedoverts, .callback = PlayerController::OnprojectilCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
-		ecs.addComponent(projectile, Projectile{ .ownerID = owerID });
+		ecs::AddComponent(projectile, PolygonCollider{ .vertices = Torpedoverts, .callback = PlayerController::OnprojectilCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
+		ecs::AddComponent(projectile, Projectile{ .ownerID = owerID });
 
 
 
 	}
 	static void CreateAnimation(Vector3 animPosition)
 	{
-		Entity projecAnim = ecs.newEntity();
+		ecs::Entity projecAnim = ecs::NewEntity();
 		animPosition.z += 100;
-		ecs.addComponent(projecAnim, Transform{ .position = animPosition,  .scale = Vector3(20) });
-		ecs.addComponent(projecAnim, SpriteRenderer{ });
-		ecs.addComponent(projecAnim, Animator{});
+		ecs::AddComponent(projecAnim, Transform{ .position = animPosition,  .scale = Vector3(20) });
+		ecs::AddComponent(projecAnim, SpriteRenderer{ });
+		ecs::AddComponent(projecAnim, Animator{});
 		AnimationSystem::AddAnimation(projecAnim, *ExplosionAnim, "explosion");
 		AnimationSystem::PlayAnimation(projecAnim, "explosion", false);
 
 	};
 
 public:
-	static Entity playerWin;
+	static ecs::Entity playerWin;
 
 
 	static Animation* ExplosionAnim;
@@ -95,22 +89,22 @@ public:
 	static void OnCollision(Collision collision)
 	{
 		// Get references to the involved components
-		Player& player = ecs.getComponent<Player>(collision.a);  // collision.a on sama kun player entitety eli on sama kuin ( laMuerte) 
-		Transform& playertranform = ecs.getComponent<Transform>(collision.a);
+		Player& player = ecs::GetComponent<Player>(collision.a);  // collision.a on sama kun player entitety eli on sama kuin ( laMuerte) 
+		Transform& playertranform = ecs::GetComponent<Transform>(collision.a);
 
-		PolygonCollider& playerCollider = ecs.getComponent<PolygonCollider>(collision.a);
+		PolygonCollider& playerCollider = ecs::GetComponent<PolygonCollider>(collision.a);
 
 		if (collision.type == Collision::Type::tilemapCollision)
 		{
-			ecs.getComponent<Rigidbody>(collision.a).velocity *= 0.9995f;
+			ecs::GetComponent<Rigidbody>(collision.a).velocity *= 0.9995f;
 
 		}
 		// Check if the collision involves a checkpoint
 
 		// true tai false 
-		if (ecs.hasComponent<CheckPoint>(collision.b)) // varmista onko osuu checkpoint
+		if (ecs::HasComponent<CheckPoint>(collision.b)) // varmista onko osuu checkpoint
 		{
-			CheckPoint& checkpoint = ecs.getComponent<CheckPoint>(collision.b);  // hae checkpoint componenti
+			CheckPoint& checkpoint = ecs::GetComponent<CheckPoint>(collision.b);  // hae checkpoint componenti
 			if (player.previousCheckpoint + 1 == checkpoint.checkPointID)        // tarkista onko pelaja osu oiken checkpoit
 			{
 				player.previousCheckpoint = checkpoint.checkPointID;              // asenta pelaja vimene checkpoin osunut 
@@ -121,8 +115,8 @@ public:
 						if (!HAS_WON)
 						{
 							HAS_WON = true;
-							TextRenderer& winText = ecs.getComponent<TextRenderer>(playerWin);
-							SpriteRenderer& winSprite = ecs.getComponent<SpriteRenderer>(playerWin);
+							TextRenderer& winText = ecs::GetComponent<TextRenderer>(playerWin);
+							SpriteRenderer& winSprite = ecs::GetComponent<SpriteRenderer>(playerWin);
 							winSprite.enabled = true;
 							winText.text = player.playername;
 						}
@@ -136,12 +130,12 @@ public:
 			}
 		}
 		// Check if the collision involves a projectile
-		else if (ecs.hasComponent<Projectile>(collision.b))
+		else if (ecs::HasComponent<Projectile>(collision.b))
 		{
-			Rigidbody& rigidbody = ecs.getComponent<Rigidbody>(collision.b);
-			Transform& projectransfor = ecs.getComponent<Transform>(collision.b);
-			Projectile& projectile = ecs.getComponent<Projectile>(collision.b); // tällä on Entity on collision.b 
-			//Projectile& projectile = ecs.getComponent<Projectile>(collision.a);
+			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(collision.b);
+			Transform& projectransfor = ecs::GetComponent<Transform>(collision.b);
+			Projectile& projectile = ecs::GetComponent<Projectile>(collision.b); // tällä on Entity on collision.b 
+			//Projectile& projectile = ecs::GetComponent<Projectile>(collision.a);
 			if (player.playerID != projectile.ownerID)
 			{
 				player.hitPlayer = true;
@@ -155,7 +149,7 @@ public:
 	// check if projectil collision tilemap Trigger
 	static void OnprojectilCollision(Collision collision)
 	{
-		Transform& projectransfor = ecs.getComponent<Transform>(collision.a);
+		Transform& projectransfor = ecs::GetComponent<Transform>(collision.a);
 		if (collision.type == Collision::Type::tilemapTrigger)
 		{
 			if (collision.b != 1)
@@ -171,13 +165,16 @@ public:
 	void Update(GLFWwindow* window, float dt)
 	{
 		// Iterate through entities in the system
-		for (auto const& entity : entities)
+		for (auto itr = entities.begin(); itr != entities.end();)
 		{
+			//Get the entity and increment the iterator
+			ecs::Entity entity = *itr++;
+
 			// Get player, transform, and rigidbody components
-			Player& player = ecs.getComponent<Player>(entity);
-			Transform& transform = ecs.getComponent<Transform>(entity);
-			Rigidbody& rigidbody = ecs.getComponent<Rigidbody>(entity);
-			PolygonCollider& collider = ecs.getComponent<PolygonCollider>(entity);
+			Player& player = ecs::GetComponent<Player>(entity);
+			Transform& transform = ecs::GetComponent<Transform>(entity);
+			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(entity);
+			PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
 			//initialize input zero 
 			float accelerationInput = 0;
 			float rotateInput = 0;
@@ -332,4 +329,4 @@ public:
 };
 
 Animation* PlayerController::ExplosionAnim = ExplosionAnim;
-Entity PlayerController::playerWin = playerWin;
+ecs::Entity PlayerController::playerWin = playerWin;

@@ -68,6 +68,8 @@ namespace engine
 			for (auto itr = entities.begin(); itr != entities.end();)
 			{
 				ecs::Entity entity = *itr++;
+
+
 				PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
 				Transform& transform = ecs::GetComponent<Transform>(entity);
 
