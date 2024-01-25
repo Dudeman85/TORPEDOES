@@ -12,7 +12,7 @@ void createChepoint(Vector3 position, Vector3 rotation, Vector3 scale, Model& ch
 
 	ecs::AddComponent(checkpoint, Transform{ .position = position , .rotation = rotation , .scale = scale });
 	ecs::AddComponent(checkpoint, ModelRenderer{ .model = &checkPointModel });
-	ecs::AddComponent(checkpoint, CheckPoint{ checkPointNumber , finish_line });
+	ecs::AddComponent(checkpoint, CheckPoint{ .checkPointID=checkPointNumber , .Finish_line=finish_line });
 	std::vector<Vector2> CheckpointcolliderVerts{ Vector2(4, 8), Vector2(4, -8), Vector2(-4, -8), Vector2(-4, 8) };
 	ecs::AddComponent(checkpoint, PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = false, .rotationOverride = hitboxrotation }));
 
