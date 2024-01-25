@@ -27,8 +27,7 @@ inline bool COMPONENT##Registered = ( ecs::RegisterComponent<COMPONENT>(), true 
 class SYSTEM; \
 inline bool SYSTEM##Registered = ( ecs::RegisterSystem<SYSTEM, __VA_ARGS__>(), true );
 
-
-namespace ecs
+namespace engine::ecs
 {
 	//Define colors for errors and warnings
 	constexpr const char* errorFormat = "\033[31m";
