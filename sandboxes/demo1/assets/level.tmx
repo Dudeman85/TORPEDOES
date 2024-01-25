@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="30" height="50" tilewidth="64" tileheight="64" infinite="0" nextlayerid="5" nextobjectid="1">
+ <tileset firstgid="1" source="images/tilemap/tileset03.tsx"/>
+ <layer id="4" name="collider" width="30" height="50">
+  <data encoding="base64" compression="zlib">
+   eJztllkOwCAIRHt1b95fY2TTATcmMemivkJBKF+cCnH9Chc5tFykJD+OciU7Pbnccy8/r+T24ofjWuJOw9dyW340l1p7Olfy52327s5FnP9S/nL3M3qJS9WjHgddf1vuKfkr1Q5q/5PyF6HZcwPBtfYcI1xLHCO59Vqtz0a4nr0KNy+S285Zxa35s/XTwkUNC9dDO3Ajv2EHe6n3iDyycL17M2verfo3qVQqFakfjtd06Q==
+  </data>
+ </layer>
+ <layer id="1" name="Tile Layer 1" width="30" height="50">
+  <properties>
+   <property name="Z" type="float" value="-1"/>
+  </properties>
+  <data encoding="base64" compression="zlib">
+   eJzt1N0KgCAMhuGNMLqtDmP3fz8pCAlReGAu2PvAEEThw5+JxLTlSrm0mdOHtS2te3vWzvCXHPheeXeLdwgMw13GQZ8egz8D4M3hHSCo0ptN7ue/y9W31zrarFAAAADOTk3jAaI=
+  </data>
+ </layer>
+ <layer id="3" name="Tile Layer 2" width="30" height="50">
+  <properties>
+   <property name="Z" type="float" value="1"/>
+  </properties>
+  <data encoding="base64" compression="zlib">
+   eJztlUFuwjAQRb1mSSkVrQoK2cGKqifoDaBUrAlcAMpNeoSuyilrSx5hRrbxjEchgnzpLeLYfrYzckpVXwrN2FLemdfQFeKB6JXCPbuesPfNg8/7LugN1UJx4X2TvBXR7aufmPdR01en2nO92I3bKtS2QXOvA+1uZuq8FvD8Pg9eC8cLgbOpGIS8KXdQwXTGvH3LU8S7Fvb62lvvqe+ewTfBuwz0lUjMu70x75dmEfEeUF+oEYng/X4k9OUkVCuUenbzqhlaRp4xsI/QN+N6U3NAzxTvX4YXh7PfZ8uLgNewSuh71EwsU4YPvjf1nHO9kJ3y35/u2lxvRfTONZ8Z6zOBs7nkdddrxqScpYQXj7mW14xZZAB1T/FC/UggUc+cNMnbuZK3jqR6Byr/Hqd6wSnxD8HeCZo7lTZt2jQjPzXye2f8A39Wtig=
+  </data>
+ </layer>
+</map>
