@@ -2,13 +2,13 @@
 
 ## Downloading game-engine
 
-Engine can be found at https://repo.kamit.fi/ttv21sp_pelimoottoriohjelmointi/tiimi4
+Engine can be found at https://repo.kamit.fi/spring2024_technology_project_2/team5
 
 You can download source files as archive or clone with git.
 
 You need to build the project with CMake before you can use the engine.
-First add filepath to source, and then define path to build folder, for example C:/....filepath.../tiimi4.
-It is recommended to create build folder into your source folder, for example C:/....filepath.../tiimi4/build
+First add filepath to source, and then define path to build folder, for example C:/....filepath
+It is recommended to create build folder into your source folder, for example C:/....filepath.../build
 After defining filepaths, you can first configure the project. CMake asks you to specify the generator for the project. Select Visual Studio compiler you are using. Leave other fields empty or default.
 Once configuration is completed, generate build files and you can open project.
 
