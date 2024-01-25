@@ -1,3 +1,5 @@
+#error REMOVE_OLD_ECS
+
 #pragma once
 
 #include <assert.h>
