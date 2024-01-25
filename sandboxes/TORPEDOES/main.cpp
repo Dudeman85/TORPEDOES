@@ -41,9 +41,6 @@ int main()
 	//engine.physicsSystem->gravity = Vector2(0, -981);
 	collisionSystem->cam = &cam;
 
-	// register component manual 
-	shared_ptr<PlayerController>playerController = ecs::RegisterSystem<PlayerController, Transform, Player, Rigidbody, PolygonCollider, ModelRenderer>();
-
 	Model model("assets/LaMuerte.obj");
 	Model checkPointModel("assets/Checkpoint.obj");
 	Model model2("assets/Finish_line.obj");

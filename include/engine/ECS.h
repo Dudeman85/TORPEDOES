@@ -16,15 +16,15 @@
 #error The maximum possible number of components is 65535
 #endif
 
-//Macto to register a component outside main
+//Macro to register a component outside main
 #define ECS_REGISTER_COMPONENT(COMPONENT) \
 struct COMPONENT; \
-namespace ecs { const bool COMPONENT##Registered = ( ecs::RegisterComponent<COMPONENT>(), true ); }
+inline bool COMPONENT##Registered = ( ecs::_RegisterComponent<COMPONENT>(), true );
 
 //Macro to register a system and its components outside main
 #define ECS_RESIGTER_SYSTEM(SYSTEM, ...) \
 class SYSTEM; \
-namespace ecs { const bool SYSTEM##Registered = ( ecs::RegisterSystem<SYSTEM, __VA_ARGS__>(), true ); }
+inline bool SYSTEM##Registered = ( ecs::_RegisterSystem<SYSTEM, __VA_ARGS__>(), true );
 
 
 namespace ecs
@@ -157,7 +157,7 @@ namespace ecs
 
 	//Register a new component of type T
 	template<typename T>
-	void RegisterComponent()
+	void _RegisterComponent()
 	{
 		const char* componentType = typeid(T).name();
 
@@ -383,7 +383,7 @@ namespace ecs
 
 	//Register a system to require the specified components
 	template<typename Sys, typename... Comps>
-	std::shared_ptr<Sys> RegisterSystem()
+	std::shared_ptr<Sys> _RegisterSystem()
 	{
 		const char* systemType = typeid(Sys).name();
 
