@@ -1,4 +1,3 @@
-
 #include <engine/Application.h>
 #include <engine/Tilemap.h>
 #include <vector>
@@ -7,12 +6,7 @@
 #include <thread>
 #include "PlayerController.h"
 #include "PickupController.h"
-#include "TurretController.h"
-#if defined(_WIN32)
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <enet/enet.h>
-#include <engine/Networking.h>
+#include "Physics.h"
 
 using namespace std;
 using namespace engine;
