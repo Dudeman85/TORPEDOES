@@ -1,3 +1,4 @@
+#if 0
 #include <engine/Application.h>
 #include <engine/Tilemap.h>
 #include "PlayerController.h"
@@ -439,3 +440,4 @@ int main()
 //	glfwTerminate();
 //	return 0;
 //}
+#endif
