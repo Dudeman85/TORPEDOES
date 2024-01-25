@@ -18,8 +18,8 @@ namespace engine
 	};
 
 	// TextRenderSystem requires components TextRenderer component and transform component
-	ECS_REQUIRED_COMPONENTS(TextRenderSystem, { "struct engine::Transform", "struct engine::TextRenderer" })
-	class TextRenderSystem : public System
+	///--->ECS_REQUIRED_COMPONENTS(TextRenderSystem, { "struct engine::Transform", "struct engine::TextRenderer" }) makro
+	class TextRenderSystem : public ecs::System
 	{
 	public:
 		// Constructor
@@ -63,8 +63,8 @@ namespace engine
 		{
 			for (auto const& entity : entities)
 			{
-				Transform& transform = ecs.getComponent<Transform>(entity);
-				TextRenderer& textRenderer = ecs.getComponent<TextRenderer>(entity);
+				Transform& transform = ecs::GetComponent<Transform>(entity);
+				TextRenderer& textRenderer = ecs::GetComponent<TextRenderer>(entity);
 				if (!textRenderer.font)
 				{
 					printf("ERROR: No font given!");

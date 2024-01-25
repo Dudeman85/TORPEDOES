@@ -1,6 +1,6 @@
 #pragma once
 
-extern ECS ecs;
+
 
 namespace engine
 {
@@ -13,7 +13,7 @@ namespace engine
 
 	//2D UI element system
 	//Requires UIElement, and Transform
-	class UISystem : public System
+	class UISystem : public ecs::System
 	{
 	public:
 		//Update the UI system, call this once per frame
@@ -22,8 +22,8 @@ namespace engine
 			for (auto const& entity : entities)
 			{
 				//Get relevant components
-				UIElement& uiElement = ecs.getComponent<UIElement>(entity);
-				Transform& transform = ecs.getComponent<Transform>(entity);
+				UIElement& uiElement = ecs::GetComponent<UIElement>(entity);
+				Transform& transform = ecs::GetComponent<Transform>(entity);
 
 				//If the element should be relative to the camera move it correctly
 				if (uiElement.relativeToCamera)
