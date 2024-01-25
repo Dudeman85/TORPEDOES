@@ -67,8 +67,8 @@ namespace engine
 			//For each entity
 			for (const Entity& entity : entities)
 			{
-				PolygonCollider& collider = ecs.getComponent<PolygonCollider>(entity);
-				Transform& transform = ecs.getComponent<Transform>(entity);
+				PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
+				Transform& transform = ecs::GetComponent<Transform>(entity);
 
 				//Update bounding box if the entity has moved and check collision if it is a trigger 
 				if (transform.staleCache)
@@ -101,8 +101,8 @@ namespace engine
 		//Returns the collisions from the perspective of a
 		vector<Collision> CheckCollision(Entity a)
 		{
-			Transform& aTransform = ecs.getComponent<Transform>(a);
-			PolygonCollider& aCollider = ecs.getComponent<PolygonCollider>(a);
+			Transform& aTransform = ecs::GetComponent<Transform>(a);
+			PolygonCollider& aCollider = ecs::GetComponent<PolygonCollider>(a);
 
 			//Check tilemap collision
 			std::vector<Collision> collisions = CheckTilemapCollision(a);
@@ -132,8 +132,8 @@ namespace engine
 			if (!tilemap)
 				return vector<Collision>();
 
-			Transform& transform = ecs.getComponent<Transform>(entity);
-			PolygonCollider& collider = ecs.getComponent<PolygonCollider>(entity);
+			Transform& transform = ecs::GetComponent<Transform>(entity);
+			PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
 
 			//Log the collisions
 			vector<Collision> collisions;
@@ -199,13 +199,13 @@ namespace engine
 		}
 
 		//Check Entity-Entity collision, this will also call any callbacks
-		static Collision CheckEntityCollision(Entity a, Entity b)
+		static Collision CheckEntityCollision(ecs::Entity a, ecs::Entity b)
 		{
 			//Get relevant components from a and b
-			Transform& aTransform = ecs.getComponent<Transform>(a);
-			PolygonCollider& aCollider = ecs.getComponent<PolygonCollider>(a);
-			Transform& bTransform = ecs.getComponent<Transform>(b);
-			PolygonCollider& bCollider = ecs.getComponent<PolygonCollider>(b);
+			Transform& aTransform = ecs::GetComponent<Transform>(a);
+			PolygonCollider& aCollider = ecs::GetComponent<PolygonCollider>(a);
+			Transform& bTransform = ecs::GetComponent<Transform>(b);
+			PolygonCollider& bCollider = ecs::GetComponent<PolygonCollider>(b);
 
 			//Rotate and scale every vertex of a, movement is handled later
 			float aRotation = aCollider.rotationOverride >= 0 ? aCollider.rotationOverride : aTransform.rotation.z;
@@ -389,21 +389,21 @@ namespace engine
 		}
 
 		//Checks if a and b bounds are intersecting
-		static bool AABBIntersect(Entity a, Entity b)
+		static bool AABBIntersect(ecs::Entity a, ecs::Entity b)
 		{
 			//Get the bounds
-			std::array<float, 4>& aBounds = ecs.getComponent<PolygonCollider>(a).bounds;
-			std::array<float, 4>& bBounds = ecs.getComponent<PolygonCollider>(b).bounds;
+			std::array<float, 4>& aBounds = ecs::GetComponent<PolygonCollider>(a).bounds;
+			std::array<float, 4>& bBounds = ecs::GetComponent<PolygonCollider>(b).bounds;
 
 			//Perform AABB intersect
 			return (aBounds[3] < bBounds[1] && aBounds[1] > bBounds[3] && aBounds[2] < bBounds[0] && aBounds[0] > bBounds[2]);
 		}
 
 		//Update the AABB of the polygon collider
-		static void UpdateAABB(Entity entity)
+		static void UpdateAABB(ecs::Entity entity)
 		{
-			Transform& transform = ecs.getComponent<Transform>(entity);
-			PolygonCollider& collider = ecs.getComponent<PolygonCollider>(entity);
+			Transform& transform = ecs::GetComponent<Transform>(entity);
+			PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
 
 			//Bounds go top, right, bottom, left
 			std::array<float, 4> bounds{ -INFINITY, -INFINITY, INFINITY, INFINITY };

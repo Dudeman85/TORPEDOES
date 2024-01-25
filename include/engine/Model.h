@@ -135,8 +135,8 @@ namespace engine
 			for (const Entity& entity : entities)
 			{
 				//Get relevant components
-				Transform transform = ecs.getComponent<Transform>(entity);
-				ModelRenderer& modelRenderer = ecs.getComponent<ModelRenderer>(entity);
+				Transform transform = ecs::getComponent<Transform>(entity);
+				ModelRenderer& modelRenderer = ecs::getComponent<ModelRenderer>(entity);
 
 				//If a shader has been specified for this sprite use it, else use the default
 				Shader* shader = defaultShader;
