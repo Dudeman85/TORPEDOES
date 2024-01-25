@@ -11,13 +11,12 @@
 #include <math.h>
 
 //Engine
-#include <engine/ECSCore.h>
+#include <engine/ECS.h>
 #include <engine/Transform.h>
 #include <engine/GL/Shader.h>
 #include <engine/GL/Texture.h>
 #include <engine/GL/Camera.h>
 
-extern ECS ecs;
 
 namespace engine
 {
@@ -216,7 +215,7 @@ namespace engine
 
 	//Primitive Renderer Component
 	//They consist of only a primitive shape and a color, no texture
-	ECS_REGISTER_COMPONENT(PrimitiveRenderer)
+	//---->ECS_REGISTER_COMPONENT(PrimitiveRenderer) makro need check
 	struct PrimitiveRenderer
 	{
 		Primitive* primitive = nullptr;
@@ -229,8 +228,8 @@ namespace engine
 
 	//Primitive Render system
 	//Requires PrimitiveRenderer and Transform
-	ECS_REQUIRED_COMPONENTS(PrimitiveRenderSystem, { "struct engine::Transform", "struct engine::PrimitiveRenderer" })
-	class PrimitiveRenderSystem : public System
+	///--->ECS_REQUIRED_COMPONENTS(PrimitiveRenderSystem, { "struct engine::Transform", "struct engine::PrimitiveRenderer" })
+	class PrimitiveRenderSystem : public ecs::System
 	{
 	public:
 		PrimitiveRenderSystem()
@@ -272,11 +271,12 @@ namespace engine
 		void Update(Camera* cam)
 		{
 			//For each entity
-			for (const Entity& entity : entities)
+			for (auto itr = entities.begin(); itr != entities.end();)
 			{
+				ecs::Entity entity = *itr++;
 				//Get relevant components
-				Transform& transform = ecs.getComponent<Transform>(entity);
-				PrimitiveRenderer& primitiveRenderer = ecs.getComponent<PrimitiveRenderer>(entity);
+				Transform& transform = ecs::GetComponent<Transform>(entity);
+				PrimitiveRenderer& primitiveRenderer = ecs::GetComponent<PrimitiveRenderer>(entity);
 
 				if (!primitiveRenderer.enabled)
 					continue;

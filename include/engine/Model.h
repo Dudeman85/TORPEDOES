@@ -9,7 +9,7 @@
 #include <vector>
 
 //Engine
-#include <engine/ECSCore.h>
+#include <engine/ECS.h>
 #include <engine/Transform.h>
 #include <engine/GL/Shader.h>
 #include <engine/GL/Texture.h>
@@ -18,7 +18,7 @@
 
 #include "engine/Component.h"
 
-extern ECS ecs;
+
 
 namespace engine
 {
@@ -54,7 +54,7 @@ namespace engine
 	};
 
 	//3D Model Renderer component
-	ECS_REGISTER_COMPONENT(ModelRenderer)
+	//ECS_REGISTER_COMPONENT(ModelRenderer)
 	struct ModelRenderer
 	{
 		Model* model;
@@ -62,8 +62,8 @@ namespace engine
 	};
 
 	//3D Model Render System, requires Transform and ModelRenderer
-	ECS_REQUIRED_COMPONENTS(ModelRenderSystem, { "struct engine::Transform", "struct engine::ModelRenderer" })
-	class ModelRenderSystem : public System
+	//ECS_REQUIRED_COMPONENTS(ModelRenderSystem, { "struct engine::Transform", "struct engine::ModelRenderer" })
+	class ModelRenderSystem : public ecs::System
 	{
 	public:
 		ModelRenderSystem()
@@ -132,11 +132,12 @@ namespace engine
 		void Update(Camera* cam)
 		{
 			//For each entity
-			for (const Entity& entity : entities)
+			for (auto itr = entities.begin(); itr != entities.end();)
 			{
+				ecs::Entity entity = *itr++;
 				//Get relevant components
-				Transform transform = ecs.getComponent<Transform>(entity);
-				ModelRenderer& modelRenderer = ecs.getComponent<ModelRenderer>(entity);
+				Transform transform = ecs::GetComponent<Transform>(entity);
+				ModelRenderer& modelRenderer = ecs::GetComponent<ModelRenderer>(entity);
 
 				//If a shader has been specified for this sprite use it, else use the default
 				Shader* shader = defaultShader;

@@ -1,5 +1,5 @@
 #pragma once
-#include <engine/ECSCore.h>
+#include <engine/ECS.h>
 #include <engine/Transform.h>
 #include <engine/Collision.h>
 #include <engine/Tilemap.h>
@@ -13,7 +13,7 @@ namespace engine
 	enum Direction { up = 0, right = 1, down = 2, left = 3 };
 
 	//Rigidbody component
-	ECS_REGISTER_COMPONENT(Rigidbody);
+	///------>ECS_REGISTER_COMPONENT(Rigidbody); makro
 	struct Rigidbody
 	{
 		Vector3 velocity;
@@ -35,8 +35,8 @@ namespace engine
 
 	//Physics System
 	//Requires Rigidbody and Transform components
-	ECS_REQUIRED_COMPONENTS(PhysicsSystem, { "struct engine::Transform", "struct engine::Rigidbody" })
-	class PhysicsSystem : public System
+	//ECS_REQUIRED_COMPONENTS(PhysicsSystem, { "struct engine::Transform", "struct engine::Rigidbody" })
+	class PhysicsSystem : public ecs::System
 	{
 	public:
 		//Update the physics system, call this every frame
@@ -46,8 +46,8 @@ namespace engine
 			for (auto const& entity : entities)
 			{
 				//Get required components
-				Transform& transform = ecs.getComponent<Transform>(entity);
-				Rigidbody& rigidbody = ecs.getComponent<Rigidbody>(entity);
+				Transform& transform = ecs::GetComponent<Transform>(entity);
+				Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(entity);
 
 				//Don't apply outside forces to kinematic rigidbodies
 				if (!rigidbody.kinematic)
@@ -75,7 +75,7 @@ namespace engine
 		static int SimpleSolveCollision(Collision collision)
 		{
 			//One of the entities does not have a rigidbody. Return <0 on failure;
-			if (!ecs.hasComponent<Rigidbody>(collision.a) || !ecs.hasComponent<Rigidbody>(collision.b))
+			if (!ecs::HasComponent<Rigidbody>(collision.a) || !ecs::HasComponent<Rigidbody>(collision.b))
 				return -1;
 			//Nothing needs to be done. Return >0 on trigger
 			if (collision.type == Collision::Type::trigger || collision.type == Collision::Type::tilemapTrigger)
@@ -84,12 +84,12 @@ namespace engine
 			if (collision.type == Collision::Type::miss)
 				return 0;
 
-			Rigidbody& rba = ecs.getComponent<Rigidbody>(collision.a);
+			Rigidbody& rba = ecs::GetComponent<Rigidbody>(collision.a);
 
 			//Entity collision
 			if (collision.type == Collision::Type::collision)
 			{
-				Rigidbody& rbb = ecs.getComponent<Rigidbody>(collision.b);
+				Rigidbody& rbb = ecs::GetComponent<Rigidbody>(collision.b);
 
 				//Calculate new velocities
 				float j = -(1 + (rba.restitution + rbb.restitution) / 2) * (rba.velocity - rbb.velocity).Dot(collision.normal) / collision.normal.Dot(collision.normal * (1 / rba.mass + 1 / rbb.mass));
@@ -120,7 +120,7 @@ namespace engine
 			if (collisions.front().type == Collision::Type::miss)
 				return 0;
 
-			Entity a = collisions.front().a;
+			ecs::Entity a = collisions.front().a;
 			Collision maxIntersect = Collision{.mtv = Vector2(0)};
 
 			int i = 0;
@@ -156,7 +156,7 @@ namespace engine
 			} while (collisions.size() > 0 && i < tilemapIterationLimit);
 
 			//Calculate new velocities
-			Rigidbody& rba = ecs.getComponent<Rigidbody>(a);
+			Rigidbody& rba = ecs::GetComponent<Rigidbody>(a);
 			Vector3 newAVeclocity = rba.velocity - maxIntersect.normal * 2 * rba.velocity.Dot(maxIntersect.normal);
 			rba.velocity = newAVeclocity * rba.restitution;
 
@@ -168,9 +168,9 @@ namespace engine
 
 		//TODO return collisions
 		//Move an entity while checking for collision, assuming entity has collider
-		static void Move(Entity entity, Vector3 amount, int steps = 1)
+		static void Move(ecs::Entity entity, Vector3 amount, int steps = 1)
 		{
-			Transform& transform = ecs.getComponent<Transform>(entity);
+			Transform& transform = ecs::GetComponent<Transform>(entity);
 			transform.staleCache = true;
 
 			//Split the movement into steps
@@ -179,7 +179,7 @@ namespace engine
 				TransformSystem::Translate(entity, amount / steps);
 
 				//Check collision if entity has collider
-				if (ecs.hasComponent<PolygonCollider>(entity))
+				if (ecs::HasComponent<PolygonCollider>(entity))
 				{
 					CollisionSystem::UpdateAABB(entity);
 					//Check entity and tilemap collision
@@ -198,9 +198,9 @@ namespace engine
 		}
 
 		//Add velocity to entity, does not include deltaTime
-		static void Impulse(Entity entity, Vector3 velocity)
+		static void Impulse(ecs::Entity entity, Vector3 velocity)
 		{
-			Rigidbody& rigidbody = ecs.getComponent<Rigidbody>(entity);
+			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(entity);
 			rigidbody.velocity += velocity * rigidbody.mass;
 		}
 

@@ -2,12 +2,10 @@
 #include <engine/Transform.h>
 #include <engine/GL/Camera.h>
 
-extern ECS esc;
-
 namespace engine
 {
 	// TextRenderer component
-	ECS_REGISTER_COMPONENT(TextRenderer)
+	///----->ECS_REGISTER_COMPONENT(TextRenderer)makro
 	struct TextRenderer
 	{
 		Font* font;
