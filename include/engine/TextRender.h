@@ -2,13 +2,11 @@
 #include <engine/Transform.h>
 #include <engine/GL/Camera.h>
 
-extern ECS esc;
-
 namespace engine
 {
 	// TextRenderer component
 	ECS_REGISTER_COMPONENT(TextRenderer)
-	struct TextRenderer
+	struct TextRenderer : ecs::Component
 	{
 		Font* font;
 		std::string text = "";
@@ -20,17 +18,13 @@ namespace engine
 	};
 
 	// TextRenderSystem requires components TextRenderer component and transform component
-	ECS_REQUIRED_COMPONENTS(TextRenderSystem, { "struct engine::Transform", "struct engine::TextRenderer" })
-	class TextRenderSystem : public System
+	ECS_REGISTER_SYSTEM(TextRenderSystem, Transform, TextRenderer)
+	class TextRenderSystem : public ecs::System
 	{
 	public:
 		// Constructor
-		TextRenderSystem()
+		void Init()
 		{
-			//glEnable(GL_CULL_FACE);
-			//glEnable(GL_BLEND);
-			//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			
 			m_shader = new Shader(
 				R"(
 					#version 330 core
@@ -58,15 +52,14 @@ namespace engine
 						color = vec4(textColor, 1.0) * sampled;
 					})",
 				false);
-
 		}
 
 		void Update(Camera* cam)
 		{
 			for (auto const& entity : entities)
 			{
-				Transform& transform = ecs.getComponent<Transform>(entity);
-				TextRenderer& textRenderer = ecs.getComponent<TextRenderer>(entity);
+				Transform& transform = ecs::GetComponent<Transform>(entity);
+				TextRenderer& textRenderer = ecs::GetComponent<TextRenderer>(entity);
 				if (!textRenderer.font)
 				{
 					printf("ERROR: No font given!");
@@ -152,6 +145,6 @@ namespace engine
 		}
 
 	private:
-	Shader* m_shader;
+		Shader* m_shader;
 	};
 }

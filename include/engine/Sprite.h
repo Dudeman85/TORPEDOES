@@ -11,24 +11,19 @@
 #include <set>
 
 //Engine
-#include <engine/ECSCore.h>
+#include <engine/ECS.h>
 #include <engine/Transform.h>
 #include <engine/GL/Shader.h>
 #include <engine/GL/Texture.h>
 #include <engine/GL/Camera.h>
 #include <engine/Tilemap.h>
 
-#include "engine/Component.h"
-
-extern ECS ecs;
-
-using namespace std;
 
 namespace engine
 {
 	//2D Sprite Renderer component
 	ECS_REGISTER_COMPONENT(SpriteRenderer)
-	struct SpriteRenderer
+	struct SpriteRenderer : ecs::Component
 	{
 		Texture* texture = nullptr;
 		Shader* shader = nullptr;
@@ -40,25 +35,25 @@ namespace engine
 	struct Animation
 	{
 		Animation() {};
-		Animation(vector<Texture*> animationTextures, vector<int> animationDelays)
+		Animation(std::vector<Texture*> animationTextures, std::vector<int> animationDelays)
 		{
 			assert(animationTextures.size() == animationDelays.size() && "Failed to create animation! Number of frames and delays do not match!");
 			textures = animationTextures;
 			delays = animationDelays;
 			length = animationDelays.size();
 		};
-		vector<Texture*> textures;
-		vector<int> delays;
+		std::vector<Texture*> textures;
+		std::vector<int> delays;
 		unsigned int length = 0;
 	};
 
 	//Animator component
 	ECS_REGISTER_COMPONENT(Animator)
-	struct Animator
+	struct Animator : ecs::Component
 	{
-		map<string, Animation> animations;
+		std::map<std::string, Animation> animations;
 
-		string currentAnimation;
+		std::string currentAnimation;
 		int animationFrame = 0;
 		bool repeatAnimation = false;
 		bool playingAnimation = false;
@@ -68,11 +63,18 @@ namespace engine
 
 	//2D Sprite Render system
 	//Requires SpriteRenderer and Transform
-	ECS_REQUIRED_COMPONENTS(SpriteRenderSystem, {"struct engine::Transform", "struct engine::SpriteRenderer"})
-	class SpriteRenderSystem : public System
+	ECS_REGISTER_SYSTEM(SpriteRenderSystem, SpriteRenderer, Transform)
+	class SpriteRenderSystem : public ecs::System
 	{
 	public:
-		SpriteRenderSystem()
+		~SpriteRenderSystem()
+		{
+			glDeleteVertexArrays(1, &VAO);
+			glDeleteVertexArrays(1, &VBO);
+			glDeleteVertexArrays(1, &EBO);
+		}
+
+		void Init()
 		{
 			//Set the screen clear color to black
 			glClearColor(0, 0, 0, 1.0f);
@@ -155,31 +157,25 @@ namespace engine
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
-		~SpriteRenderSystem()
-		{
-			glDeleteVertexArrays(1, &VAO);
-			glDeleteVertexArrays(1, &VBO);
-			glDeleteVertexArrays(1, &EBO);
-		}
-
 		//Renders everything. Call this every frame
 		void Update(Camera* cam)
 		{
 			//Sort the entities and tilemap by Z
-			set<float> layersToDraw;
-			map<float, vector<Entity>> sortedEntities;
+			std::set<float> layersToDraw;
+			std::map<float, std::vector<ecs::Entity>> sortedEntities;
 			if (tilemap)
 				layersToDraw.insert(tilemap->zLayers.begin(), tilemap->zLayers.end());
 
 			//UI elements are sorted seperately
-			set<float> uiLayersToDraw;
-			map<float, vector<Entity>> sortedUIElements;
+			std::set<float> uiLayersToDraw;
+			std::map<float, std::vector<ecs::Entity>> sortedUIElements;
 
 			//Sort the entities into sprite and UI layers
-			for (const Entity& entity : entities)
+			for (auto itr = entities.begin(); itr != entities.end();)
 			{
-				Transform& transform = ecs.getComponent<Transform>(entity);
-				SpriteRenderer& renderer = ecs.getComponent<SpriteRenderer>(entity);
+				ecs::Entity entity = *itr++;
+				Transform& transform = ecs::GetComponent<Transform>(entity);
+				SpriteRenderer& renderer = ecs::GetComponent<SpriteRenderer>(entity);
 
 				//Seperate sprites and UI elements
 				if (!renderer.uiElement)
@@ -204,7 +200,7 @@ namespace engine
 				glBindVertexArray(VAO);
 
 				//Draw entities for this layer
-				for (const Entity& entity : sortedEntities[layer])
+				for (const ecs::Entity& entity : sortedEntities[layer])
 				{
 					DrawEntity(entity, cam);
 				}
@@ -214,7 +210,7 @@ namespace engine
 			for (const float& layer : uiLayersToDraw)
 			{
 				//Draw entities for this layer
-				for (const Entity& entity : sortedUIElements[layer])
+				for (const ecs::Entity& entity : sortedUIElements[layer])
 				{
 					DrawEntity(entity, cam);
 				}
@@ -225,11 +221,11 @@ namespace engine
 		}
 
 		//Draw an entity to the screen
-		void DrawEntity(Entity entity, Camera* cam)
+		void DrawEntity(ecs::Entity entity, Camera* cam)
 		{
 			//Get relevant components
-			SpriteRenderer& sprite = ecs.getComponent<SpriteRenderer>(entity);
-			Transform& transform = ecs.getComponent<Transform>(entity);
+			SpriteRenderer& sprite = ecs::GetComponent<SpriteRenderer>(entity);
+			Transform& transform = ecs::GetComponent<Transform>(entity);
 
 			if (!sprite.enabled)
 				return;
@@ -309,9 +305,9 @@ namespace engine
 	};
 
 	//Animator system
-	//Requires Animator and Sprite
-	ECS_REQUIRED_COMPONENTS(AnimationSystem, { "struct engine::Animator", "struct engine::SpriteRenderer" })
-	class AnimationSystem : public System
+	//Requires Animator and SpriteRenderer
+	ECS_REGISTER_SYSTEM(AnimationSystem, Animator, SpriteRenderer)
+	class AnimationSystem : public ecs::System
 	{
 	public:
 		//Update every entity with relevant components
@@ -324,7 +320,7 @@ namespace engine
 			for (auto const& entity : entities)
 			{
 				//Get the relevant components from entity
-				Animator& animator = ecs.getComponent<Animator>(entity);
+				Animator& animator = ecs::GetComponent<Animator>(entity);
 
 				//If the entity is currently playing an animation
 				if (animator.playingAnimation)
@@ -341,11 +337,11 @@ namespace engine
 		}
 
 		//Advance to the next animation frame of current animation
-		static void AdvanceFrame(Entity entity)
+		static void AdvanceFrame(ecs::Entity entity)
 		{
 			//Get the relevant components from entity
-			Animator& animator = ecs.getComponent<Animator>(entity);
-			SpriteRenderer& sprite = ecs.getComponent<SpriteRenderer>(entity);
+			Animator& animator = ecs::GetComponent<Animator>(entity);
+			SpriteRenderer& sprite = ecs::GetComponent<SpriteRenderer>(entity);
 
 			//Change Sprites texture
 			sprite.texture = animator.animations[animator.currentAnimation].textures[animator.animationFrame];
@@ -370,12 +366,12 @@ namespace engine
 		}
 
 		//Add animations to entity, they will be accessible by given names
-		static void AddAnimations(Entity entity, vector<Animation> animations, vector<string> names)
+		static void AddAnimations(ecs::Entity entity, std::vector<Animation> animations, std::vector<std::string> names)
 		{
 			if (animations.size() > names.size())
 				throw("Not enough names given for each animation!");
 
-			Animator& animator = ecs.getComponent<Animator>(entity);
+			Animator& animator = ecs::GetComponent<Animator>(entity);
 
 			//For each animation to add
 			for (size_t i = 0; i < animations.size(); i++)
@@ -385,22 +381,22 @@ namespace engine
 		}
 
 		//Add an animation to entity, it will be accessibl by given name
-		static void AddAnimation(Entity entity, Animation animation, string name)
+		static void AddAnimation(ecs::Entity entity, Animation animation, std::string name)
 		{
-			Animator& animator = ecs.getComponent<Animator>(entity);
+			Animator& animator = ecs::GetComponent<Animator>(entity);
 
 			//Add the animation indexed by given name
 			animator.animations.insert({ name, animation });
 		}
 
 		//Play an animation, optionally set it to repeat, if the animation is currently playing don't do anything
-		static void PlayAnimation(Entity entity, string animation, bool repeat = false)
+		static void PlayAnimation(ecs::Entity entity, std::string animation, bool repeat = false)
 		{
-			Animator& animator = ecs.getComponent<Animator>(entity);
+			Animator& animator = ecs::GetComponent<Animator>(entity);
 
 			if (animator.animations.find(animation) == animator.animations.end())
 			{
-				cout << "Warning: No animation named \"" << animation << "\" was found in this entity." << endl;
+				std::cout << "Warning: No animation named \"" << animation << "\" was found in this entity." << std::endl;
 				return;
 			}
 
@@ -418,9 +414,9 @@ namespace engine
 		}
 
 		//Stop an animation, optionally provide the specific animation to stop
-		static void StopAnimation(Entity entity, string animation = "")
+		static void StopAnimation(ecs::Entity entity, std::string animation = "")
 		{
-			Animator& animator = ecs.getComponent<Animator>(entity);
+			Animator& animator = ecs::GetComponent<Animator>(entity);
 
 			//If trying to stop animation that is not playing, return without doing anything
 			if (animation != "")
