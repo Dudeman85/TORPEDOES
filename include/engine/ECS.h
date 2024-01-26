@@ -9,6 +9,8 @@
 #include <iostream>
 #include <memory>
 
+//TODO: FIx component memory leak
+
 //Allow max components to be determined outside this file
 #ifndef ECS_MAX_COMPONENTS
 #define ECS_MAX_COMPONENTS 100
