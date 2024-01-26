@@ -1,16 +1,9 @@
 #include <engine/Application.h>
 #include <engine/Tilemap.h>
 
-
-using namespace engine;
-
-ECS ecs;
-
 int main()
 {
 	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Tiled");
-
-	engine::EngineLib engine;
 
 	engine::Camera cam = engine::Camera(1120, 630);
 	cam.SetPosition(Vector3(0, 0, 1500));
@@ -18,7 +11,7 @@ int main()
 
 	Tilemap map(&cam);
 	map.loadMap("assets/Tiled/tilemaps/TestMap.tmx");
-	engine.spriteRenderSystem->SetTilemap(&map);
+	spriteRenderSystem->SetTilemap(&map);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -27,7 +20,7 @@ int main()
 			glfwSetWindowShouldClose(window, true);
 		}
 
-		engine.Update(&cam);
+		Update(&cam);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
