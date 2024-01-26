@@ -45,6 +45,7 @@ bool HAS_WON = false;
 ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonCollider, ModelRenderer)
 class PlayerController : public ecs::System
 {
+	float starTimer = 10.0; // start Time 
 	Model* torpedomodel;
 	void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 sapawnRotation, int owerID)
 	{
@@ -73,6 +74,11 @@ class PlayerController : public ecs::System
 	};
 
 public:
+	float getTimer() const {
+		return starTimer;
+	}
+
+
 	static ecs::Entity playerWin;
 
 
@@ -171,6 +177,7 @@ public:
 			//Get the entity and increment the iterator
 			ecs::Entity entity = *itr++;
 
+			
 			// Get player, transform, and rigidbody components
 			Player& player = ecs::GetComponent<Player>(entity);
 			Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -180,46 +187,55 @@ public:
 			float accelerationInput = 0;
 			float rotateInput = 0;
 			bool ProjetileInput = 0;
-			// Get keyboard input
-			if (player.playerID == 0)
+			// Starte Time 
+			if (starTimer <= 0)
 			{
-				//Player 0 only gets keyboard input
-				accelerationInput += +glfwGetKey(window, GLFW_KEY_A) - glfwGetKey(window, GLFW_KEY_Z);
-				rotateInput += -glfwGetKey(window, GLFW_KEY_COMMA) + glfwGetKey(window, GLFW_KEY_PERIOD);
-				ProjetileInput = glfwGetKey(window, GLFW_KEY_SPACE);
-			}
-			else
-			{
-				// Check joystick input
-				int present = glfwJoystickPresent(player.playerID - 1);
-				// If the joystick is present, check its state
-				if (present == GLFW_TRUE)
+				accelerationInput = 0;
+				rotateInput = 0;
+				ProjetileInput = 0;
+				// Get keyboard input		 
+				if (player.playerID == 0)
 				{
-					GLFWgamepadstate state;
-					glfwGetGamepadState(player.playerID - 1, &state);
-					// Get joystick input, such as rotation and acceleration
-				   // Also check if the left and right buttons are pressed
-					float rightStickX = state.axes[0];
-					const int buttonLeft = state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT];
-					const int buttonRight = state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT];
-					const int button_A = state.buttons[GLFW_GAMEPAD_BUTTON_A];
-
-					// Calculate acceleration based on joystick values
-					// and check if it's rotating left or right
-					const float ltValue = state.axes[4]; // Left trigger
-					const float rtValue = state.axes[5]; // Right trigger
-					accelerationInput += +rtValue - ltValue;
-					rotateInput += +buttonRight - buttonLeft;
-					ProjetileInput = button_A;
-
-					// Deadzone for the right joystick
-					if (fabs(rightStickX) > 0.2)
+					//Player 0 only gets keyboard input
+					accelerationInput += +glfwGetKey(window, GLFW_KEY_A) - glfwGetKey(window, GLFW_KEY_Z);
+					rotateInput += -glfwGetKey(window, GLFW_KEY_COMMA) + glfwGetKey(window, GLFW_KEY_PERIOD);
+					ProjetileInput = glfwGetKey(window, GLFW_KEY_SPACE);
+				}
+				else
+				{
+					// Check joystick input
+					int present = glfwJoystickPresent(player.playerID - 1);
+					// If the joystick is present, check its state
+					if (present == GLFW_TRUE)
 					{
-						// Set rotation input to rigth sticke 
-						rotateInput += rightStickX;
+						GLFWgamepadstate state;
+						glfwGetGamepadState(player.playerID - 1, &state);
+						// Get joystick input, such as rotation and acceleration
+					   // Also check if the left and right buttons are pressed
+						float rightStickX = state.axes[0];
+						const int buttonLeft = state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT];
+						const int buttonRight = state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT];
+						const int button_A = state.buttons[GLFW_GAMEPAD_BUTTON_A];
+
+						// Calculate acceleration based on joystick values
+						// and check if it's rotating left or right
+						const float ltValue = state.axes[4]; // Left trigger
+						const float rtValue = state.axes[5]; // Right trigger
+						accelerationInput += +rtValue - ltValue;
+						rotateInput += +buttonRight - buttonLeft;
+						ProjetileInput = button_A;
+
+						// Deadzone for the right joystick
+						if (fabs(rightStickX) > 0.2)
+						{
+							// Set rotation input to rigth sticke 
+							rotateInput += rightStickX;
+						}
 					}
 				}
 			}
+			starTimer -= dt;
+			printf("starTimer: %i\n", int(starTimer));
 			// topedo hit logica 
 			if (player.hitPlayer == true)
 			{

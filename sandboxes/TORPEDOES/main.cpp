@@ -21,14 +21,21 @@ int main()
 {
 	NO_OPENAL = true;
 
-	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window");
-
-	EngineInit();
-
 	string username = "";
 	string lap = "1";
 	vector<string> playerNames(4);
 	vector<int> playerCheckpoints(4);
+	for (int i = 0; i < playerNames.size(); ++i)
+	{
+		cout << "Please enter Player's " + to_string(i + 1) + " name: ";
+		cin >> username;
+		playerNames[i] = username;
+	}
+       
+	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window");
+
+	EngineInit();
+
 
 
 	engine::Camera cam = engine::Camera(1120, 630);
@@ -52,12 +59,6 @@ int main()
 	// https://www.dafont.com/stencil-ww-ii.font
 	Font stencilFont("assets/Stencil WW II.ttf", 0, 0, 48);
 
-	for (int i = 0; i < playerNames.size(); ++i)
-	{
-		cout << "Please enter Player's " + to_string(i + 1) + " name: ";
-		cin >> username;
-		playerNames[i] = username;
-	}
 
 	Texture* winSprite = new Texture("assets/winner.png");
 	ecs::Entity playerWin = ecs::NewEntity();
@@ -66,6 +67,7 @@ int main()
 	ecs::AddComponent(playerWin, new Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(0.5f) });
 	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
 	playerController->Init();
+
 	PlayerController::playerWin = playerWin;
 
 	ecs::Entity pFont1 = ecs::NewEntity();
@@ -262,6 +264,11 @@ int main()
 
 		// SetLitght position to Camara position & LitghtColor  
 		modelRenderSystem->SetLight(Vector3(cam.position.x, cam.position.y, 1500), Vector3(255));
+
+		// star Timer 
+		float Timer = playerController->getTimer();
+		std::string timerStr = std::to_string((int)round(Timer)); // round pyörista float arvo lahipakokonais 
+		winText.text = timerStr.c_str();
 		// UI System 				
 
 		p1Win.text = to_string(player.lap) + "/1";
