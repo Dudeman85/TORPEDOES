@@ -199,7 +199,7 @@ namespace engine::ecs
 		if (!EntityExists(entity))
 		{
 			std::cout << warningFormat << "ECS WARNING in SetTags(): The entity does not exist!" << normalFormat << std::endl;
-			return;
+			return {};
 		}
 		#endif
 

@@ -79,7 +79,7 @@ public:
 	static Animation* ExplosionAnim;
 	void Init()
 	{
-		torpedomodel = new Model("assets/torpedo.obj");
+		torpedomodel = new Model("torpedo.obj");
 	}
 	~PlayerController()
 	{

@@ -21,15 +21,6 @@
 
 namespace engine
 {
-#ifdef _DEBUG
-#ifdef PROJECT_NAME
-	const std::string assetPath = PROJECT_NAME;
-#endif
-
-#else
-
-#endif
-
 	//Set this to true to not use OpenAL
 	bool NO_OPENAL = false;
 

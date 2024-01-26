@@ -9,6 +9,7 @@
 #include <vector>
 
 //Engine
+#include <engine/Constants.h>
 #include <engine/GL/Shader.h>
 #include <engine/GL/Texture.h>
 #include <engine/GL/Camera.h>
@@ -22,7 +23,7 @@ namespace engine
 	public:
 		Model(std::string path)
 		{
-			LoadModel(path);
+			LoadModel(assetPath + path);
 		}
 		~Model()
 		{

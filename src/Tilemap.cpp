@@ -26,6 +26,7 @@ source distribution.
 *********************************************************************/
 #define _USE_MATH_DEFINES
 #include <engine/Tilemap.h>
+#include <engine/Constants.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <tmxlite/Map.hpp>
 #include <engine/GL/Shader.h>
@@ -168,7 +169,7 @@ void Tilemap::draw(float layer)
 void Tilemap::loadMap(const std::string ownMap)
 {
 	tmx::Map map;
-	map.load(ownMap);
+	map.load(assetPath + ownMap);
 
 	//create shared resources, shader and tileset textures
 	initGLStuff(map);
@@ -306,7 +307,9 @@ void Tilemap::initGLStuff(const tmx::Map& map)
 	const auto& tilesets = map.getTilesets();
 	for (const auto& ts : tilesets)
 	{
-		auto texture = loadTexture(ts.getImagePath());
+		std::string imagePath = ts.getImagePath();
+		imagePath.erase(imagePath.begin(), imagePath.begin() + 7);
+		auto texture = loadTexture(imagePath);
 		allTextures.push_back(texture);
 	}
 

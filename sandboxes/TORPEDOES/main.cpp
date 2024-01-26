@@ -42,15 +42,15 @@ int main()
 	//engine.physicsSystem->gravity = Vector2(0, -981);
 	collisionSystem->cam = &cam;
 
-	Model model("assets/LaMuerte.obj");
-	Model checkPointModel("assets/Checkpoint.obj");
-	Model model2("assets/Finish_line.obj");
-	Texture GUItexture = Texture("assets/GUI_backround.png");
-	Texture torprldtexture = Texture("assets/torpedoReloading.png");
-	Texture torprdytexture = Texture("assets/torpedoReady.png");
+	Model model("LaMuerte.obj");
+	Model checkPointModel("Checkpoint.obj");
+	Model model2("Finish_line.obj");
+	Texture GUItexture = Texture("GUI_backround.png");
+	Texture torprldtexture = Texture("torpedoReloading.png");
+	Texture torprdytexture = Texture("torpedoReady.png");
 	// Font http address:
 	// https://www.dafont.com/stencil-ww-ii.font
-	Font stencilFont("assets/Stencil WW II.ttf", 0, 0, 48);
+	Font stencilFont("Stencil WW II.ttf", 0, 0, 48);
 
 	for (int i = 0; i < playerNames.size(); ++i)
 	{
@@ -59,7 +59,7 @@ int main()
 		playerNames[i] = username;
 	}
 
-	Texture* winSprite = new Texture("assets/winner.png");
+	Texture* winSprite = new Texture("winner.png");
 	ecs::Entity playerWin = ecs::NewEntity();
 	TextRenderer& winText = ecs::AddComponent(playerWin, new TextRenderer{ .font = &stencilFont, .text = "", .offset = Vector3(-1.0f, 1.1f, 1.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 	ecs::AddComponent(playerWin, new SpriteRenderer{ .texture = winSprite, .enabled = false, .uiElement = true });
@@ -210,10 +210,10 @@ int main()
 
 
 	// create explosion Animation PlayerController 
-	Animation explosionAnim = AnimationsFromSpritesheet("assets/explosion.png", 6, 1, vector<int>(6, 150))[0];
+	Animation explosionAnim = AnimationsFromSpritesheet("explosion.png", 6, 1, vector<int>(6, 150))[0];
 	playerController->ExplosionAnim = &explosionAnim;
 
-	Animation crowdAnims = AnimationsFromSpritesheet("assets/CrowdCheer14.png", 3, 1, vector<int>(3, 150))[0];
+	Animation crowdAnims = AnimationsFromSpritesheet("CrowdCheer14.png", 3, 1, vector<int>(3, 150))[0];
 	ecs::Entity crowd = ecs::NewEntity();
 	ecs::AddComponent(crowd, new Transform{ .position = Vector3(1530, -1700, 10), .scale = Vector3(100, 30, 0) });
 	ecs::AddComponent(crowd, new SpriteRenderer{});
@@ -237,7 +237,7 @@ int main()
 
 	// Loand Map . Tilemap file 
 	Tilemap map(&cam);
-	map.loadMap("assets/torptest.tmx");
+	map.loadMap("torptest.tmx");
 	spriteRenderSystem->SetTilemap(&map);
 	collisionSystem->SetTilemap(&map);
 	PhysicsSystem::SetTileProperty(1, TileProperty{ true });
