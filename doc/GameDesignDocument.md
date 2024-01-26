@@ -1,8 +1,8 @@
 # GameDesignDocument
 
-Boat racing game with nautical weapons. local player versus player, hitting obstacles and going off course slows you down. Torpedo hits make other players spin and slow down. Races take a few laps.
+Boat racing game with nautical weapons. Local player versus player. Going off course slows you down. Levels have terrain obstacles to manouver around. Players need to go through checkpoints in order to win race. Races take a few laps.
 
-Track has collectible speed boosts that appear (semi)randomly around track. 
+Track has collectibles that appear (semi)randomly around track. 
 
 ### Theme
 
@@ -13,7 +13,7 @@ Races take place in different areas, for example ocean, lakes and rivers. Most r
 Each level should have some unique characteristics.
 
 
-### Technical aspects
+## Technical aspects
 
 Game is created with custom game engine. Engine is written in C++ and uses entity component system.
 Since engine does not have editor, everything is made in code.
@@ -37,7 +37,7 @@ Steering and throttle is measured with potentiometer, and turned into input with
 - Menu system
 
 
-### GamePlay
+## GamePlay
 
 Controls are meant to be as simple and intuitive as possible. Throttle and steering, fire and boost buttons.
 For arcade controller, throttle and steering are done with lever and wheel, boost and fire have dedicated buttons.
