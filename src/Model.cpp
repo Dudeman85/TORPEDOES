@@ -1,4 +1,4 @@
-#include <engine/Model.h>
+#include <engine/GL/Model.h>
 
 namespace engine
 {

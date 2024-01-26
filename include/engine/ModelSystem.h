@@ -1,72 +1,24 @@
-#pragma once
-//Assimp
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
-//STL 
-#include <string>
-#include <vector>
-
 //Engine
-#include <engine/ECSCore.h>
+#include <engine/ECS.h>
 #include <engine/Transform.h>
-#include <engine/GL/Shader.h>
-#include <engine/GL/Texture.h>
-#include <engine/GL/Camera.h>
-#include <engine/GL/Mesh.h>
-
-#include "engine/Component.h"
-
-extern ECS ecs;
+#include <engine/GL/Model.h>
 
 namespace engine
 {
-	//A class to store 3D model vertex and texture data, as well as handle model loading
-	class Model
-	{
-	public:
-		Model(const char* path)
-		{
-			LoadModel(path);
-		}
-		~Model()
-		{
-			for (Texture* tex : textures_loaded)
-			{
-				delete tex;
-			}
-		}
-
-		//Model data
-		std::vector<Mesh> meshes;
-
-	private:
-		void LoadModel(std::string path);
-		void ProcessNode(aiNode* node, const aiScene* scene);
-		Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
-		std::vector<Texture*> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
-
-		//Model file path
-		std::string directory;
-		//Store all the already loaded textures for efficiency
-		std::vector<Texture*> textures_loaded;
-	};
-
 	//3D Model Renderer component
 	ECS_REGISTER_COMPONENT(ModelRenderer)
-	struct ModelRenderer
+	struct ModelRenderer : ecs::Component
 	{
 		Model* model;
 		Shader* shader;
 	};
 
 	//3D Model Render System, requires Transform and ModelRenderer
-	ECS_REQUIRED_COMPONENTS(ModelRenderSystem, { "struct engine::Transform", "struct engine::ModelRenderer" })
-	class ModelRenderSystem : public System
+	ECS_REGISTER_SYSTEM(ModelRenderSystem, Transform, ModelRenderer)
+	class ModelRenderSystem : public ecs::System
 	{
 	public:
-		ModelRenderSystem()
+		void Init()
 		{
 			//The default 3D model shader with bling-phong lighting
 			defaultShader = new Shader(
@@ -132,11 +84,13 @@ namespace engine
 		void Update(Camera* cam)
 		{
 			//For each entity
-			for (const Entity& entity : entities)
+			for (auto itr = entities.begin(); itr != entities.end();)
 			{
+				ecs::Entity entity = *itr++;
+
 				//Get relevant components
-				Transform transform = ecs.getComponent<Transform>(entity);
-				ModelRenderer& modelRenderer = ecs.getComponent<ModelRenderer>(entity);
+				Transform transform = ecs::GetComponent<Transform>(entity);
+				ModelRenderer& modelRenderer = ecs::GetComponent<ModelRenderer>(entity);
 
 				//If a shader has been specified for this sprite use it, else use the default
 				Shader* shader = defaultShader;

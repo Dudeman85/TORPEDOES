@@ -4,7 +4,6 @@
 #include <filesystem>
 
 #include "engine/AudioEngine.h"
-#include "engine/AsssetPaths.h"
 
 using namespace std::filesystem;
 
@@ -102,7 +101,8 @@ const bool Audio::getPlaying()
 void Audio::setSound(const std::string& fileName)
 {
 	audioSound = new ma_sound;
-	std::string filename = ASSET_PATH + SOUND_PATH + fileName + ".wav";
+	//TODO: FIX
+	std::string filename = "THIS NEEDS TO BE FIXED" + fileName + ".wav";
 	auto result = ma_sound_init_from_file(&owner->soundEngine, filename.c_str(), 0, NULL, NULL, audioSound);
 	if (result != MA_SUCCESS)
 	{

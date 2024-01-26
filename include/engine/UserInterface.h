@@ -1,11 +1,12 @@
 #pragma once
 
-extern ECS ecs;
+#error Dont use this!
 
 namespace engine
 {
 	//UI Element struct
-	struct UIElement
+	ECS_REGISTER_COMPONENT(UIElement)
+	struct UIElement : ecs::Component
 	{
 		bool relativeToCamera = true;
 		bool enabled = true;
@@ -13,7 +14,8 @@ namespace engine
 
 	//2D UI element system
 	//Requires UIElement, and Transform
-	class UISystem : public System
+	ECS_REGISTER_SYSTEM(UISystem, Transform, UIElement)
+	class UISystem : public ecs::System
 	{
 	public:
 		//Update the UI system, call this once per frame
@@ -22,8 +24,8 @@ namespace engine
 			for (auto const& entity : entities)
 			{
 				//Get relevant components
-				UIElement& uiElement = ecs.getComponent<UIElement>(entity);
-				Transform& transform = ecs.getComponent<Transform>(entity);
+				UIElement& uiElement = ecs::GetComponent<UIElement>(entity);
+				Transform& transform = ecs::GetComponent<Transform>(entity);
 
 				//If the element should be relative to the camera move it correctly
 				if (uiElement.relativeToCamera)

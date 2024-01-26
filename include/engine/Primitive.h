@@ -11,13 +11,12 @@
 #include <math.h>
 
 //Engine
-#include <engine/ECSCore.h>
+#include <engine/ECS.h>
 #include <engine/Transform.h>
 #include <engine/GL/Shader.h>
 #include <engine/GL/Texture.h>
 #include <engine/GL/Camera.h>
 
-extern ECS ecs;
 
 namespace engine
 {
@@ -28,19 +27,19 @@ namespace engine
 		Primitive(std::vector<float> vertices, std::vector<unsigned int> indices)
 		{
 			numVertices = indices.size();
-			
+
 			//Make the Vertex Array Object, Vertex Buffer Object, and Element Buffer Object
 			glGenVertexArrays(1, &VAO);
 			glGenBuffers(1, &VBO);
 			glGenBuffers(1, &EBO);
-			
+
 			//Bind the Vertex Array Object
 			glBindVertexArray(VAO);
 
 			//Bind the Vertex Bufer Object and set vertices
- 			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
-			
+
 			//Bind and set indices to EBO
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), indices.data(), GL_STATIC_DRAW);
@@ -48,7 +47,7 @@ namespace engine
 			//Configure Vertex attribute at location 0 aka position
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 			glEnableVertexAttribArray(0);
-			
+
 			//Unbind all buffers and arrays
 			glBindVertexArray(0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -217,7 +216,7 @@ namespace engine
 	//Primitive Renderer Component
 	//They consist of only a primitive shape and a color, no texture
 	ECS_REGISTER_COMPONENT(PrimitiveRenderer)
-	struct PrimitiveRenderer
+	struct PrimitiveRenderer : ecs::Component
 	{
 		Primitive* primitive = nullptr;
 		Vector3 color;
@@ -229,11 +228,11 @@ namespace engine
 
 	//Primitive Render system
 	//Requires PrimitiveRenderer and Transform
-	ECS_REQUIRED_COMPONENTS(PrimitiveRenderSystem, { "struct engine::Transform", "struct engine::PrimitiveRenderer" })
-	class PrimitiveRenderSystem : public System
+	ECS_REGISTER_SYSTEM(PrimitiveRenderSystem, Transform, PrimitiveRenderer)
+	class PrimitiveRenderSystem : public ecs::System
 	{
 	public:
-		PrimitiveRenderSystem()
+		void Init()
 		{
 			//The default 3D model shader
 			defaultShader = new Shader(
@@ -272,11 +271,12 @@ namespace engine
 		void Update(Camera* cam)
 		{
 			//For each entity
-			for (const Entity& entity : entities)
+			for (auto itr = entities.begin(); itr != entities.end();)
 			{
+				ecs::Entity entity = *itr++;
 				//Get relevant components
-				Transform& transform = ecs.getComponent<Transform>(entity);
-				PrimitiveRenderer& primitiveRenderer = ecs.getComponent<PrimitiveRenderer>(entity);
+				Transform& transform = ecs::GetComponent<Transform>(entity);
+				PrimitiveRenderer& primitiveRenderer = ecs::GetComponent<PrimitiveRenderer>(entity);
 
 				if (!primitiveRenderer.enabled)
 					continue;
