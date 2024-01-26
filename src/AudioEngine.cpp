@@ -3,6 +3,7 @@
 
 #include <filesystem>
 
+#include <engine/Constants.h>
 #include "engine/AudioEngine.h"
 
 using namespace std::filesystem;
@@ -101,8 +102,7 @@ const bool Audio::getPlaying()
 void Audio::setSound(const std::string& fileName)
 {
 	audioSound = new ma_sound;
-	//TODO: FIX
-	std::string filename = "assets/" + fileName;
+	std::string filename = assetPath + fileName;
 	auto result = ma_sound_init_from_file(&owner->soundEngine, filename.c_str(), 0, NULL, NULL, audioSound);
 	if (result != MA_SUCCESS)
 	{

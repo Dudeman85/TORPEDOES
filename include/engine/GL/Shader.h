@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <engine/Constants.h>
 
 namespace engine
 {

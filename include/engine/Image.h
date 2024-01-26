@@ -16,12 +16,12 @@ namespace engine
 	class Image
 	{
 	public:
-		Image(const char* path)
+		Image(std::string path)
 		{
 			//Dont flip the image when loading to an Image
 			stbi_set_flip_vertically_on_load(false);
 			//Load image
-			unsigned char* imageData = stbi_load(path, &width, &height, &channels, 4);
+			unsigned char* imageData = stbi_load((assetPath + path).c_str(), &width, &height, &channels, 4);
 
 			//If the image is loaded successfully
 			if (imageData)
@@ -48,7 +48,7 @@ namespace engine
 			}
 			else
 			{
-				std::cout << "Error loading texture from " << path << std::endl;
+				std::cout << "Error loading texture from " << assetPath + path << std::endl;
 			}
 		}
 		//Construct an image from a 2D vector of pixels

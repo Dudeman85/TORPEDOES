@@ -49,7 +49,6 @@ while (!glfwWindowShouldClose(window))
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 		
-   
     //Update all engine systems, this usually should go last in the game loop
 	//For greater control of system execution, you can update each one manually
 	engine.Update(&cam);

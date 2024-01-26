@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <stb_image.h>
+#include <engine/Constants.h>
 
 namespace engine
 {
@@ -34,13 +35,13 @@ namespace engine
 		}
 
 		//Load a texture from path
-		Texture(const char* path, unsigned int filteringType = GL_NEAREST, bool flip = true)
+		Texture(std::string path, unsigned int filteringType = GL_NEAREST, bool flip = true)
 		{
 			//Flip the image when loading into an OpenGL texture
 			stbi_set_flip_vertically_on_load(flip);
 			//Load image
 			int width, height, nrChannels;
-			unsigned char* imageData = stbi_load(path, &width, &height, &nrChannels, 0);
+			unsigned char* imageData = stbi_load((assetPath + path).c_str(), &width, &height, &nrChannels, 0);
 
 			if (imageData)
 			{
@@ -81,7 +82,7 @@ namespace engine
 			}
 			else
 			{
-				std::cout << "Error loading texture from " << path << std::endl;
+				std::cout << "Error loading texture from " << assetPath + path << std::endl;
 			}
 		}
 		//Declare the constuctor through image. It is defined in Image.h
