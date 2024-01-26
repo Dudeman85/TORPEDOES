@@ -1,8 +1,8 @@
 # GameDesignDocument
 
-Boat racing game with torpedoes. local pvp, hitting obstacles and going off course slows you down. Torpedo hits make other players spin and slow down. Races take a few laps.
+Boat racing game with nautical weapons. Local player versus player. Going off course slows you down. Levels have terrain obstacles to manouver around. Players need to go through checkpoints in order to win race. Races take a few laps.
 
-Track has collectible speed boosts that appear (semi)randomly around track. 
+Track has collectibles that appear (semi)randomly around track. 
 
 ### Theme
 
@@ -13,7 +13,7 @@ Races take place in different areas, for example ocean, lakes and rivers. Most r
 Each level should have some unique characteristics.
 
 
-### Technical aspects
+## Technical aspects
 
 Game is created with custom game engine. Engine is written in C++ and uses entity component system.
 Since engine does not have editor, everything is made in code.
@@ -37,7 +37,7 @@ Steering and throttle is measured with potentiometer, and turned into input with
 - Menu system
 
 
-### GamePlay
+## GamePlay
 
 Controls are meant to be as simple and intuitive as possible. Throttle and steering, fire and boost buttons.
 For arcade controller, throttle and steering are done with lever and wheel, boost and fire have dedicated buttons.
@@ -48,38 +48,55 @@ Racetracks are narrow, but players can go "offroad" to open waters. Going offroa
 To finish a race, players needs to go through every checkpoint in order and cross the finish line.
 Around the level are solid obstacles, fitting for the theme of a level.
 There are ramps around the level that work as shortcuts. These ramps are destructible, and respawn after few seconds.
-Periodically a collectable boost package appears in the racetrack. Players need to drive over it to collect. Boost disappears once collected.
-Boost is activated with button press and is single use.
+
+Periodically a collectable package appears in the racetrack. Players need to drive over it to collect. Collectable disappears once collected. Collectables include speedboosts (and maybe mines and/or fire cooldown reduction)
+Boost and mine is activated with button press and is single use. Cooldown reduction is automatic.
 
 There are several different boats with distinct characteristics. Vessels have different shapes and weapons.
 Designs vary from destroyer escorts to submarines, and as an easter egg, age of sail frigate.
 Different weapon types include torpedos, autocannons, hedgehogs and broadside volleys.
 Torpedoes are fast moving projectiles with long reload. Players hit with torpedo stop and spin around.
 Autocannons are rapidfire weapons, with short cooldown between clips. Hitting players will slow them down.
-Hedgehog is primarily anti-submarine weapon, but in this case direct hits damage surface vessels as well. 
+Hedgehog is primarily anti-submarine weapon, but in this case direct hits damage surface vessels as well. Hedgehog shoots several mortars in an arch and explode when hitting water. getting hit in a blast radius causes same effect as torpedo hit. Area damage is balanced with limited distance.
+Volley is special for frigate. It shoots sideways instead of forward, damage effect is same as torpedo and hedgehog.
+
+Around the map is hostile and neutral objects. These could include fixed turrets that shoot closest players, or fishing boats trawling around the track, possibly blocking players and projectiles.
+These objects can be destroyed with weapons. cannons should take more shots than torpedoes.
+Fishing boat could be destroyed with ramming, but player spins and slows down.
 
 
-- simple controls, acceleration, brake, steering, boost, fire 
+
+- simple controls, acceleration, brake, steering, fire, boost
 
 - Main track is narrow, going off road is an option for players 
+    - Going offroad causes slow down
 
 - Several boats with distinctive driving characteristics (torpedoboat, submarine, pirate ship)
 
 - weapon variety: torpedos, cannons, hedgehogs, side volleys
-
-- Going offroad boat slows down 
+    - torpedos: strong damage, long reload
+    - cannons: low damage, high rate of fire
+    - hedgehog: strong area damage, limited range
+    - volley: strong damage, fires broadside
 
 - collectibles, spawning randomly to track
     - boost
     - mines(?)
+    - fire cooldown reduction(?)
 
 - collectibles are button activated
 
-- Several different game modes
-
-- Destroyable jump ramps around the level works as shortcut
+- Destroyable jump ramps around the level
+    - works as shortcut 
+    - invincibility frames
 
 - destroyable and hostile obstacles
+
+- Several different game modes(?)
+    - single race
+    - tournament(?)
+    - capture the flag(?)
+    - last man standing race(?)
 
 
 ## Core Pillars
@@ -88,7 +105,7 @@ Hedgehog is primarily anti-submarine weapon, but in this case direct hits damage
 
 - local pvp, arcade cabinet/controller
 
-- Chaotic racing 
+- Chaotic racing
 
-- Party game 
+- Party game
 

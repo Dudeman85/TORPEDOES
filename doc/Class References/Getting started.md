@@ -12,51 +12,75 @@ It is recommended to create build folder into your source folder, for example C:
 After defining filepaths, you can first configure the project. CMake asks you to specify the generator for the project. Select Visual Studio compiler you are using. Leave other fields empty or default.
 Once configuration is completed, generate build files and you can open project.
 
-***This engine uses OpenAL. You might need to download OpenAL 1.1 Windows Installer from their website***
 
+## Example Program
 
-## Creating window and game loop
+Testing can be done in a sandbox, which is already set up for building
 
-Create new .cpp file for your game and add following lines at the beginning:
+This example program creates a movable sprite on the screen
+
 ```cpp
 #include <engine/Application.h>
 
-//Creates a global instance of the ECS manager
-ECS ecs;
-```
+//Sanity saver
+using namespace engine;
 
-In your main function:
-```cpp
-//Create the window and OpenGL context before creating EngineLib
-//Parameters define window size(x,y) and name
-GLFWwindow* window = engine::CreateWindow(800, 600, "Window");
-//Initialize the default engine library
-engine::EngineLib engine;
-//Create the camera
-engine::Camera cam = engine::Camera(800, 600);
-
-//changes window backround color, values 0-1, RGB
-engine::RenderSystem::SetBackgroundColor(0, .5, .1);
-```
-
-Once the window is created, you can create the game loop
-
-```cpp
-//Game Loop
-while (!glfwWindowShouldClose(window))
+int main()
 {
-	//Close window when Esc is pressed
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
-		
-    //Update all engine systems, this usually should go last in the game loop
-	//For greater control of system execution, you can update each one manually
-	engine.Update(&cam);
+	//Create the window and OpenGL context before creating EngineLib
+	//Parameters define window size(x,y) and name
+	GLFWwindow* window = CreateGLWindow(800, 600, "Window");
 
-	//OpenGL stuff, goes very last
-	glfwSwapBuffers(window);
-	glfwPollEvents();
+	//Initialize the engine, this must be called after creating a window
+	EngineInit();
+
+	//Create the camera
+	Camera cam = Camera(800, 600);
+
+	//Move the camera back a bit
+	cam.SetPosition(Vector3(0, 0, 10));
+
+	//Set the bacground color
+	SpriteRenderSystem::SetBackgroundColor(0, 150, 0);
+
+	//Load some sprites
+	Texture strawberry("strawberry.png");
+
+	//Create a new entity
+	ecs::Entity entity = ecs::NewEntity();
+	//Add the transform and SpriteRenderer components required for rendering a sprite
+	ecs::AddComponent(entity, new Transform{ .position = Vector3(0, 40, 0), .rotation = Vector3(0, 0, 45), .scale = Vector3(50) });
+	ecs::AddComponent(entity, new SpriteRenderer{ .texture = &strawberry });
+
+	//Game Loop
+	while (!glfwWindowShouldClose(window))
+	{
+		//Close window when Esc is pressed
+		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+			glfwSetWindowShouldClose(window, true);
+
+		//Getting basic input and moving
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+			TransformSystem::Translate(entity, Vector3(0, 1, 0));
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+			TransformSystem::Translate(entity, Vector3(-1, 0, 0));
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+			TransformSystem::Translate(entity, Vector3(0, -1, 0));
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+			TransformSystem::Translate(entity, Vector3(1, 0, 0));
+		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+			TransformSystem::Rotate(entity, Vector3(0, 0, -10));
+		if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+			TransformSystem::Rotate(entity, Vector3(0, 0, 10));
+
+		//Update all engine systems, this usually should go last in the game loop
+		Update(&cam);
+
+		//OpenGL stuff, goes very last
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
+
+	glfwTerminate();
 }
-glfwTerminate();
-
 ```
