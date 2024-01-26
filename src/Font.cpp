@@ -12,7 +12,7 @@ Font::Font(std::string filepathname, FT_Long face_index, FT_UInt pixel_width, FT
 		}
 		if (FT_New_Face(ft, (assetPath + filepathname).c_str(), face_index, &face))
 		{
-			throw runtime_error("Failed to load font from: " + string(filepathname));
+			throw runtime_error("Failed to load font from: " + assetPath + filepathname);
 		}
 
 		else
