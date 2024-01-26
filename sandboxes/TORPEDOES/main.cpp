@@ -42,7 +42,9 @@ int main()
 	cam.SetPosition(Vector3(0, 0, 1500));
 	//cam.perspective = true;
 	cam.SetRotation(Vector3(0, 0, 0));
-	float camScale = 1;
+	float camScale = 1.0;
+	float camScaleMin = 1000.0;
+	float camScaleMax = 1800.0;
 	float aspectRatio = 16 / 9;
 	float camPadding = 100;
 	float camDeadzone = 10;
@@ -424,9 +426,12 @@ int main()
 
 		//Keep the camera in bounds of the tilemap and set it to the average position of the players
 		Vector3 avgPos = playerController->avgPosition / playerController->entities.size();
+
+		// Center the camera on the average position of the players
 		float camPosX = clamp(avgPos.x, map.position.x + cam.width / 2, map.position.x + map.bounds.width - cam.width / 2);
 		float camPosY = clamp(avgPos.y, map.position.y - map.bounds.height + cam.height / 2, map.position.y - cam.height / 2) - cam.height * 0.07;
 		cam.SetPosition(Vector3(camPosX, camPosY, 1500));
+
 
 		//Calculate the camera's bounds
 		std::array<float, 4> camBounds{
@@ -434,21 +439,32 @@ int main()
 				cam.position.x * 2 + cam.width / 2,
 				cam.position.y * 2 - cam.height / 2,
 				cam.position.x * 2 - cam.width / 2 };
+
 		//Calculate the difference between the player and camera bounds
+
 		float topDiff = camBounds[0] - playerController->playerBounds[0];
 		float rightDiff = camBounds[1] - playerController->playerBounds[1];
 		float bottomDiff = playerController->playerBounds[2] - camBounds[2];
 		float leftDiff = playerController->playerBounds[3] - camBounds[3];
 
 		//Zoom out
-		if (topDiff - camPadding < -camDeadzone || rightDiff - camPadding < -camDeadzone || bottomDiff - camPadding < -camDeadzone || leftDiff - camPadding < -camDeadzone)
-			camScale += 10 - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10;
-		//Zoom in
-		else if (topDiff - camPadding > camDeadzone && rightDiff - camPadding > camDeadzone && bottomDiff - camPadding > camDeadzone && leftDiff - camPadding > camDeadzone)
-			camScale -= min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 100;
+		if (topDiff  <- camPadding < -camDeadzone || rightDiff - camPadding < -camDeadzone || bottomDiff - camPadding < -camDeadzone || leftDiff - camPadding < - camDeadzone) 
+		{
+			
+			float zoomOutValue = 10 - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10.0f;
+			camScale = max(camScale + zoomOutValue, camScaleMin);
+			/*camScale += 10 - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10;*/
+		}
+
+		else if (topDiff > camPadding > camDeadzone && rightDiff - camPadding > camDeadzone && bottomDiff - camPadding > camDeadzone && leftDiff - camPadding > camDeadzone) {
+			
+			float zoomInValue = min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 100.0f;
+			camScale = max(camScale - zoomInValue, camScaleMin);  
+		}
 
 		//Clamp the camera zoom between min and max and set it's dimensions
-		camScale = clamp(camScale, 800.f, 1850.f);
+		camScale = clamp(camScale, camScaleMin, camScaleMax);
+
 		cam.height = camScale;
 		cam.width = cam.height * aspectRatio;
 
@@ -470,3 +486,6 @@ int main()
 	glfwTerminate();
 	return 0;
 }
+//Zoom in
+		//else if (topDiff - camPadding > camDeadzone && rightDiff - camPadding > camDeadzone && bottomDiff - camPadding > camDeadzone && leftDiff - camPadding > camDeadzone)
+		//	camScale -=  min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 100;
