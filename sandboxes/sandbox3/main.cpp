@@ -1,40 +1,20 @@
 #include <engine/Application.h>
-
-using namespace std;
-using namespace engine;
-
-ECS ecs;
-
+#include <engine/AudioEngine.h>
 
 int main()
 {
-	NO_OPENAL = true;
-	//Create the window and OpenGL context before creating EngineLib
-	GLFWwindow* window = CreateGLWindow(1250, 1000, "Window");
-	//Create the camera
-	Camera cam = Camera(1250, 1000);
+	AudioEngine ae;
 
-	//Initialize the default engine library
-	EngineLib engine;
+	Audio* testAudio = ae.createAudio("bang_09.wav", true, 1, Vector3(10, 0, 0));
+	Audio* testAudio2 = ae.createAudio("engine_heavy_loop.wav", true, 1, Vector3(-10, 0, 0));
 
-	//Game Loop
+	testAudio->play();
+	testAudio2->play();
 
-	while (!glfwWindowShouldClose(window))
+	while (true)
 	{
-		//Close window when Esc is pressed
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-			glfwSetWindowShouldClose(window, true);
 
-
-		//Update all engine systems, this usually should go last in the game loop
-		//For greater control of system execution, you can update each one manually
-		engine.Update(&cam);
-
-		//OpenGL stuff, goes very last
-		glfwSwapBuffers(window);
-		glfwPollEvents();
 	}
-	glfwTerminate();
 
 	return 0;
 }

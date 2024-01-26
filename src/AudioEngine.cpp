@@ -102,7 +102,7 @@ void Audio::setSound(const std::string& fileName)
 {
 	audioSound = new ma_sound;
 	//TODO: FIX
-	std::string filename = "THIS NEEDS TO BE FIXED" + fileName + ".wav";
+	std::string filename = "assets/" + fileName;
 	auto result = ma_sound_init_from_file(&owner->soundEngine, filename.c_str(), 0, NULL, NULL, audioSound);
 	if (result != MA_SUCCESS)
 	{
