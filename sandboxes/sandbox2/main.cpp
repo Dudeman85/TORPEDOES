@@ -14,7 +14,7 @@ int main()
 	engine::SpriteRenderSystem::SetBackgroundColor(0, 150, 0);
 
 	Tilemap map(&cam);
-	map.loadMap("assets/Tiled/tilemaps/TestMap.tmx");
+	map.loadMap("Tiled/tilemaps/TestMap.tmx");
 	engine::spriteRenderSystem->SetTilemap(&map);
 
 	while (!glfwWindowShouldClose(window))
