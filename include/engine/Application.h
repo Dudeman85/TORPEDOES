@@ -14,10 +14,7 @@
 //Other engine libs
 #include <engine/GL/Window.h>
 #include <engine/Image.h>
-#include <engine/AL/SoundDevice.h>
-#include <engine/AL/SoundSource.h>
-#include <engine/AL/SoundBuffer.h>
-#include <engine/AL/MusicBuffer.h>
+#include <engine/AudioEngine.h>
 
 namespace engine
 {
@@ -30,13 +27,9 @@ namespace engine
 
 #endif
 
-	//Set this to true to not use OpenAL
-	bool NO_OPENAL = false;
-
 	float deltaTime = 0;
 	float programTime = 0;
 	chrono::time_point<chrono::high_resolution_clock> _lastFrame;
-	SoundDevice* soundDevice;
 
 	//Engine system pointers (for peak performance)
 	shared_ptr<CollisionSystem> collisionSystem;
@@ -55,10 +48,6 @@ namespace engine
 
 		//Make sure OpenGL context has been created
 		assert(OPENGL_INITIALIZED && "OpenGL has not been initialized! Create a window, or manually create the OpenGL context before calling EngineInit!");
-
-		//OpenAL can be disabled if desired, no sound will play
-		if (!NO_OPENAL)
-			soundDevice = SoundDevice::getDevice()->getDevice();
 
 		//Get the engine systems
 		collisionSystem = ecs::GetSystem<CollisionSystem>();

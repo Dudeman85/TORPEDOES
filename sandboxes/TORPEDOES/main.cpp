@@ -1,3 +1,4 @@
+#define WIN32_LEAN_AND_MEAN
 #include <engine/Tilemap.h>
 #include "PlayerController.h"
 
@@ -19,8 +20,6 @@ void createChepoint(Vector3 position, Vector3 rotation, Vector3 scale, Model& ch
 
 int main()
 {
-	NO_OPENAL = true;
-
 	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window");
 
 	EngineInit();
@@ -86,26 +85,18 @@ int main()
 	TextRenderer& p4Win = ecs::AddComponent(pSFont4, new TextRenderer{ .font = &stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 	ecs::AddComponent(pSFont4, new Transform{ .position = Vector3(0.75, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
 
-	static SoundSource engineSpeaker;
-	static SoundSource engineSpeaker2;
-	static SoundSource engineSpeaker3;
-	static SoundSource engineSpeaker4;
-	static SoundSource torpSpeaker;
-	static SoundSource torpSpeaker2;
-	static SoundSource torpSpeaker3;
-	static SoundSource torpSpeaker4;
-	static SoundSource torpSpeaker5;
-	static SoundSource torpSpeaker6;
-	static SoundSource torpSpeaker7;
-	static SoundSource torpSpeaker8;
-	static SoundSource explosionSpeaker;
-	static SoundSource cheerSpeaker;
+	/*
+	AudioEngine engineSpeaker;
+	AudioEngine torpSpeaker;
+	AudioEngine cheerSpeaker;
 
-	uint32_t torpedoSound = SoundBuffer::getFile()->addSoundEffect("assets/torpedoshoot.wav");
-	uint32_t explosionSound = SoundBuffer::getFile()->addSoundEffect("assets/explosion.wav");
-	uint32_t engineSound = SoundBuffer::getFile()->addSoundEffect("assets/enginemono.wav");
-	uint32_t cheerSound = SoundBuffer::getFile()->addSoundEffect("assets/cheering.wav");
-
+	Audio* torpedoSound = torpSpeaker.createAudio("torpedoshoot.wav", false, 1, Vector3(0, 0, 0));
+	Audio* explosionSound = torpSpeaker.createAudio("explosion.wav", false, 1, Vector3(0, 0, 0));
+	Audio* engineSound = engineSpeaker.createAudio("enginemono.wav", true, 1, Vector3(0, 0, 0));
+	Audio* cheerSound = cheerSpeaker.createAudio("cheering.wav", true, 1, Vector3(0, 0, 0));
+	*/
+	//TODO: Set audiance cheer distance
+	/*
 	engineSpeaker.setLinearDistance(0.4f, 10.f, 400.f, 0.6f);
 	engineSpeaker2.setLinearDistance(0.4f, 10.f, 400.f, 0.6f);
 	engineSpeaker3.setLinearDistance(0.4f, 10.f, 400.f, 0.6f);
@@ -118,7 +109,7 @@ int main()
 	torpSpeaker6.setLinearDistance(1.0f, 10.f, 500.f, 0.5f);
 	explosionSpeaker.setLinearDistance(1.0f, 10.f, 600.f, 1.f);
 	cheerSpeaker.setLinearDistance(0.5f, 50.f, 350.f, 0.9f);
-
+	*/
 
 	ecs::Entity laMuerte = ecs::NewEntity();
 	ecs::AddComponent(pFont1, new TextRenderer{ .font = &stencilFont, .text = playerNames[0], .offset = Vector3(1.0f, -1.0f, 0), .scale = Vector3(0.5f), .color = Vector3(0.5f, 0.8f, 0.2f) });
@@ -129,8 +120,8 @@ int main()
 	Rigidbody& PlayerRigidbody = ecs::AddComponent(laMuerte, new Rigidbody{ .drag = 0.025f });
 	vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
 	PolygonCollider& collider = ecs::AddComponent(laMuerte, new PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision , .visualise = false });
-	engineSpeaker.Play(engineSound);
-	engineSpeaker.SetLooping(1);
+	//engineSpeaker2.Play(engineSound);
+	//engineSpeaker2.SetLooping(1);
 
 	Transform& test = ecs::GetComponent<Transform>(laMuerte);
 
@@ -143,8 +134,8 @@ int main()
 	ecs::AddComponent(laMuerte2, new ModelRenderer{ .model = &model });
 	Rigidbody& PlayerRigidbody2 = ecs::AddComponent(laMuerte2, new Rigidbody{ .drag = 0.025f });
 	PolygonCollider& collider2 = ecs::AddComponent(laMuerte2, new PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision , .visualise = false });
-	engineSpeaker2.Play(engineSound);
-	engineSpeaker2.SetLooping(1);
+	//engineSpeaker2.Play(engineSound);
+	//engineSpeaker2.SetLooping(1);
 
 
 	ecs::Entity laMuerte3 = ecs::NewEntity();
@@ -156,8 +147,8 @@ int main()
 	ecs::AddComponent(laMuerte3, new ModelRenderer{ .model = &model });
 	Rigidbody& PlayerRigidbody3 = ecs::AddComponent(laMuerte3, new Rigidbody{ .drag = 0.025f });
 	PolygonCollider& collider3 = ecs::AddComponent(laMuerte3, new PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision , .visualise = false });
-	engineSpeaker3.Play(engineSound);
-	engineSpeaker3.SetLooping(1);
+	//engineSpeaker3.Play(engineSound);
+	//engineSpeaker3.SetLooping(1);
 
 
 	ecs::Entity laMuerte4 = ecs::NewEntity();
@@ -169,8 +160,8 @@ int main()
 	ecs::AddComponent(laMuerte4, new ModelRenderer{ .model = &model });
 	Rigidbody& PlayerRigidbody4 = ecs::AddComponent(laMuerte4, new Rigidbody{ .drag = 0.025f });
 	PolygonCollider& collider4 = ecs::AddComponent(laMuerte4, new PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision , .visualise = false });
-	engineSpeaker4.Play(engineSound);
-	engineSpeaker4.SetLooping(1);
+	//engineSpeaker4.Play(engineSound);
+	//engineSpeaker4.SetLooping(1);
 
 	ecs::Entity GUIBackround = ecs::NewEntity();
 	ecs::AddComponent(GUIBackround, new SpriteRenderer{ .texture = &GUItexture, .uiElement = true });
@@ -232,8 +223,8 @@ int main()
 	ecs::AddComponent(crowd2, new Animator{});
 	AnimationSystem::AddAnimation(crowd2, crowdAnims, "Cheer3");
 	AnimationSystem::PlayAnimation(crowd2, "Cheer3", true);
-	cheerSpeaker.Play(cheerSound);
-	cheerSpeaker.SetLooping(1);
+	//cheerSpeaker.Play(cheerSound);
+	//cheerSpeaker.SetLooping(1);
 
 	// Loand Map . Tilemap file 
 	Tilemap map(&cam);
@@ -277,8 +268,8 @@ int main()
 		else
 		{
 			torpicon1.texture = &torprdytexture;
-			torpSpeaker.Play(torpedoSound);
-			soundDevice->SetSourceLocation(torpSpeaker, PlayerTransform.position.x, PlayerTransform.position.y, 0);
+			//torpSpeaker.Play(torpedoSound);
+			//soundDevice->SetSourceLocation(torpSpeaker, PlayerTransform.position.x, PlayerTransform.position.y, 0);
 		}
 		if (player.projectileTime2 > 0)
 		{
@@ -287,8 +278,8 @@ int main()
 		else
 		{
 			torpicon2.texture = &torprdytexture;
-			torpSpeaker2.Play(torpedoSound);
-			soundDevice->SetSourceLocation(torpSpeaker2, PlayerTransform.position.x, PlayerTransform.position.y, 0);
+			//torpSpeaker2.Play(torpedoSound);
+			//soundDevice->SetSourceLocation(torpSpeaker2, PlayerTransform.position.x, PlayerTransform.position.y, 0);
 		}
 
 
@@ -300,8 +291,8 @@ int main()
 		else
 		{
 			torpicon3.texture = &torprdytexture;
-			torpSpeaker3.Play(torpedoSound);
-			soundDevice->SetSourceLocation(torpSpeaker3, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
+			//torpSpeaker3.Play(torpedoSound);
+			//soundDevice->SetSourceLocation(torpSpeaker3, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
 		}
 		if (player2.projectileTime2 > 0)
 		{
@@ -310,8 +301,8 @@ int main()
 		else
 		{
 			torpicon4.texture = &torprdytexture;
-			torpSpeaker4.Play(torpedoSound);
-			soundDevice->SetSourceLocation(torpSpeaker4, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
+			//torpSpeaker4.Play(torpedoSound);
+			//soundDevice->SetSourceLocation(torpSpeaker4, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
 
 		}
 
@@ -323,8 +314,8 @@ int main()
 		else
 		{
 			torpicon5.texture = &torprdytexture;
-			torpSpeaker5.Play(torpedoSound);
-			soundDevice->SetSourceLocation(torpSpeaker5, PlayerTransform3.position.x, PlayerTransform3.position.y, 0);
+			//torpSpeaker5.Play(torpedoSound);
+			//soundDevice->SetSourceLocation(torpSpeaker5, PlayerTransform3.position.x, PlayerTransform3.position.y, 0);
 		}
 		if (player3.projectileTime2 > 0)
 		{
@@ -333,8 +324,8 @@ int main()
 		else
 		{
 			torpicon6.texture = &torprdytexture;
-			torpSpeaker6.Play(torpedoSound);
-			soundDevice->SetSourceLocation(torpSpeaker6, PlayerTransform3.position.x, PlayerTransform3.position.y, 0);
+			//torpSpeaker6.Play(torpedoSound);
+			//soundDevice->SetSourceLocation(torpSpeaker6, PlayerTransform3.position.x, PlayerTransform3.position.y, 0);
 		}
 
 		// palyer 4 
@@ -346,8 +337,8 @@ int main()
 		else
 		{
 			torpicon7.texture = &torprdytexture;
-			torpSpeaker7.Play(torpedoSound);
-			soundDevice->SetSourceLocation(torpSpeaker7, PlayerTransform4.position.x, PlayerTransform4.position.y, 0);
+			//torpSpeaker7.Play(torpedoSound);
+			//soundDevice->SetSourceLocation(torpSpeaker7, PlayerTransform4.position.x, PlayerTransform4.position.y, 0);
 		}
 		if (player4.projectileTime2 > 0)
 		{
@@ -356,61 +347,61 @@ int main()
 		else
 		{
 			torpicon8.texture = &torprdytexture;
-			torpSpeaker8.Play(torpedoSound);
-			soundDevice->SetSourceLocation(torpSpeaker8, PlayerTransform4.position.x, PlayerTransform4.position.y, 0);
+			//torpSpeaker8.Play(torpedoSound);
+			//soundDevice->SetSourceLocation(torpSpeaker8, PlayerTransform4.position.x, PlayerTransform4.position.y, 0);
 		}
 
 		//engine Sounds
-		soundDevice->SetSourceLocation(engineSpeaker, PlayerTransform.position.x, PlayerTransform.position.y, 0);
-		soundDevice->SetSourceLocation(engineSpeaker2, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
-		soundDevice->SetSourceLocation(engineSpeaker3, PlayerTransform3.position.x, PlayerTransform3.position.y, 0);
-		soundDevice->SetSourceLocation(engineSpeaker4, PlayerTransform4.position.x, PlayerTransform4.position.y, 0);
+		//soundDevice->SetSourceLocation(engineSpeaker, PlayerTransform.position.x, PlayerTransform.position.y, 0);
+		//soundDevice->SetSourceLocation(engineSpeaker2, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
+		//soundDevice->SetSourceLocation(engineSpeaker3, PlayerTransform3.position.x, PlayerTransform3.position.y, 0);
+		//soundDevice->SetSourceLocation(engineSpeaker4, PlayerTransform4.position.x, PlayerTransform4.position.y, 0);
 		//adding pitch based on speed
 		float normalizedVelocity = PlayerRigidbody.velocity.Length() / 166.0f;
 		float accLevel = std::lerp(0.0f, 1.5f, normalizedVelocity);
-		engineSpeaker.setPitch(0.5f + accLevel);
+		//engineSpeaker.setPitch(0.5f + accLevel);
 
 		float normalizedVelocity2 = PlayerRigidbody2.velocity.Length() / 166.0f;
 		float accLevel2 = std::lerp(0.0f, 1.5f, normalizedVelocity2);
-		engineSpeaker2.setPitch(0.5f + accLevel2);
+		//engineSpeaker2.setPitch(0.5f + accLevel2);
 
 		float normalizedVelocity3 = PlayerRigidbody3.velocity.Length() / 166.0f;
 		float accLevel3 = std::lerp(0.0f, 1.5f, normalizedVelocity3);
-		engineSpeaker3.setPitch(0.5f + accLevel3);
+		//engineSpeaker3.setPitch(0.5f + accLevel3);
 
 		float normalizedVelocity4 = PlayerRigidbody4.velocity.Length() / 166.0f;
 		float accLevel4 = std::lerp(0.0f, 1.5f, normalizedVelocity4);
-		engineSpeaker4.setPitch(0.5f + accLevel4);
+		//engineSpeaker4.setPitch(0.5f + accLevel4);
 
 
-		soundDevice->SetSourceLocation(cheerSpeaker, 1530, -1700, 1);
+		//soundDevice->SetSourceLocation(cheerSpeaker, 1530, -1700, 1);
 
 		if (player.playExlposionSound)
 		{
 
-			explosionSpeaker.Play(explosionSound);
-			soundDevice->SetSourceLocation(explosionSpeaker, PlayerTransform.position.x, PlayerTransform.position.y, 0);
+			//explosionSpeaker.Play(explosionSound);
+			//soundDevice->SetSourceLocation(explosionSpeaker, PlayerTransform.position.x, PlayerTransform.position.y, 0);
 			player.playExlposionSound = false;
 		}
 		if (player2.playExlposionSound)
 		{
 
-			explosionSpeaker.Play(explosionSound);
-			soundDevice->SetSourceLocation(explosionSpeaker, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
+			//explosionSpeaker.Play(explosionSound);
+			//soundDevice->SetSourceLocation(explosionSpeaker, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
 			player2.playExlposionSound = false;
 		}
 		if (player3.playExlposionSound)
 		{
 
-			explosionSpeaker.Play(explosionSound);
-			soundDevice->SetSourceLocation(explosionSpeaker, PlayerTransform3.position.x, PlayerTransform3.position.y, 0);
+			//explosionSpeaker.Play(explosionSound);
+			//soundDevice->SetSourceLocation(explosionSpeaker, PlayerTransform3.position.x, PlayerTransform3.position.y, 0);
 			player3.playExlposionSound = false;
 		}
 		if (player4.playExlposionSound)
 		{
 
-			explosionSpeaker.Play(explosionSound);
-			soundDevice->SetSourceLocation(explosionSpeaker, PlayerTransform4.position.x, PlayerTransform4.position.y, 0);
+			//explosionSpeaker.Play(explosionSound);
+			//soundDevice->SetSourceLocation(explosionSpeaker, PlayerTransform4.position.x, PlayerTransform4.position.y, 0);
 			player4.playExlposionSound = false;
 		}
 
@@ -449,8 +440,8 @@ int main()
 		playerController->avgPosition = Vector3();
 		playerController->playerBounds = { -INFINITY, -INFINITY, INFINITY, INFINITY };
 
-		soundDevice->SetLocation(camPosX, camPosY, 1);
-		soundDevice->SetOrientation(0.f, 0.f, -1.f, 0.f, 0.f, 1.f);
+		//soundDevice->SetLocation(camPosX, camPosY, 1);
+		//soundDevice->SetOrientation(0.f, 0.f, -1.f, 0.f, 0.f, 1.f);
 
 		Update(&cam);
 
