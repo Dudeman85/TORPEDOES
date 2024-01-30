@@ -99,17 +99,7 @@ namespace engine
 				shader->use();
 
 				//Create the model matrix, this is the same for each mesh so it only needs to be done once
-				glm::mat4 model = glm::mat4(1.0f);
-				//Position
-				model = glm::translate(model, transform.position.ToGlm());
-				//X, Y, Z euler rotations
-				model = glm::rotate(model, glm::radians(transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-				model = glm::rotate(model, glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-				model = glm::rotate(model, glm::radians(transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-				//Scale
-				model = glm::scale(model, transform.scale.ToGlm());
-
-				model = TransformSystem::GetGlobalTransformMatrix(entity);
+				glm::mat4 model = TransformSystem::GetGlobalTransformMatrix(entity);
 
 				//Model matrix
 				unsigned int modelLoc = glGetUniformLocation(shader->ID, "model");
