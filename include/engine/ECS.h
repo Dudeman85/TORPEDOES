@@ -9,7 +9,7 @@
 #include <iostream>
 #include <memory>
 
-//TODO: FIx component memory leak
+//TODO: FIx component memory leak in remove component and tag system
 
 //Allow max components to be determined outside this file
 #ifndef ECS_MAX_COMPONENTS

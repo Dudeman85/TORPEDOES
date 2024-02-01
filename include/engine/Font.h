@@ -9,7 +9,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <engine/GL/Shader.h>
 #include <engine/GL/Camera.h>
-#include <engine/Constants.h>
 #include <map>
 #include <exception>
 
