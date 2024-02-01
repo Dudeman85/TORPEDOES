@@ -17,6 +17,15 @@ struct Bar : public Foo
 
 };
 
+void MakeStuff()
+{
+	for (size_t i = 0; i < 10000; i++)
+	{
+		ecs::Entity e = ecs::NewEntity();
+		ecs::AddComponent(e, Transform{ .position = Vector3(0, 0, -2), .rotation = Vector3(90, 0, 0), .scale = Vector3(0.5) });
+	}
+}
+
 int main()
 {
 	//Create the window and OpenGL context before creating EngineLib
@@ -45,12 +54,11 @@ int main()
 	//Create a new entity
 	ecs::Entity entity = ecs::NewEntity();
 	//Add the transform and SpriteRenderer components required for rendering a sprite
-	Transform& t = ecs::AddComponent(entity, Transform{ .position = Vector3(1, 0, 0), .rotation = Vector3(0, 0, 0), .scale = Vector3(30) });
+	ecs::AddComponent(entity, Transform{ .position = Vector3(1, 0, 0), .rotation = Vector3(0, 0, 0), .scale = Vector3(30) });
 	ecs::AddComponent(entity, SpriteRenderer{ .texture = &strawberry });
 	ecs::AddComponent(entity, ModelRenderer{ .model = &ship });
 
-	std::cout << t.position.ToString();
-
+	Transform& t = ecs::GetComponent<Transform>(entity);
 	//Create a new entity
 	ecs::Entity entity2 = ecs::NewEntity();
 	//Add the transform and SpriteRenderer components required for rendering a sprite
@@ -58,7 +66,9 @@ int main()
 	ecs::AddComponent(entity2, SpriteRenderer{ .texture = &strawberry });
 	ecs::AddComponent(entity2, ModelRenderer{ .model = &ship });
 
-	t = ecs::GetComponent<Transform>(entity);
+	auto ass = ecs::_GetComponentArray<Transform>();
+
+	MakeStuff();
 
 	TransformSystem::AddParent(entity2, entity);
 
@@ -94,17 +104,14 @@ int main()
 
 		//Update all engine systems, this usually should go last in the game loop
 		Update(&cam);
-
-
+				
 		Primitive right = Primitive::Line(t.position, t.position + TransformSystem::RightVector(entity) * 200);
 		right.Draw(&cam, Vector3(0, 0, 255));
 		Primitive up = Primitive::Line(t.position, t.position + TransformSystem::UpVector(entity) * 200);
 		up.Draw(&cam, Vector3(255, 0, 0));
 		Primitive forward = Primitive::Line(t.position, t.position + TransformSystem::ForwardVector(entity) * 200);
 		forward.Draw(&cam, Vector3(0, 0, 0));
-
-		std::cout << t.position.ToString();
-
+		
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
 		glfwPollEvents();

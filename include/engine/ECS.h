@@ -97,6 +97,8 @@ namespace engine::ecs
 	class ComponentArray : public IComponentArray
 	{
 	private:
+		//TODO: Fix problem with dumbass vector moving stuff around
+		//Possibly by splitting the componentArray into fixed size chunks
 		//A vector of each component of type T
 		std::vector<T> components;
 		//Maps from Entities to their component indexed in component arrays
@@ -117,13 +119,11 @@ namespace engine::ecs
 		}
 
 		//Add a component to an entity, returns a reference to that component
-		T& AddComponent(Entity entity, T component)
+		void AddComponent(Entity entity, T component)
 		{
 			entityToIndex[entity] = components.size();
 			indexToEntity[components.size()] = entity;
 			components.push_back(component);
-
-			return components.back();
 		}
 
 		//Removes a component from an entity
@@ -184,15 +184,13 @@ namespace engine::ecs
 
 	//Get a component array of type T
 	template<typename T>
-	ComponentArray<T>* _GetComponentArray()
+	inline ComponentArray<T>* _GetComponentArray()
 	{
-		const char* componentType = typeid(T).name();
-
-		return static_cast<ComponentArray<T>*>(componentArrays[componentType]);
+		return static_cast<ComponentArray<T>*>(componentArrays[typeid(T).name()]);
 	}
 
-	//PUBLIC FUNCTIONS
 
+	//PUBLIC FUNCTIONS
 
 	//Checks if an entity exists
 	inline bool EntityExists(Entity entity)
@@ -371,11 +369,13 @@ namespace engine::ecs
 		}
 		#endif
 
+		_GetComponentArray<T>()->AddComponent(entity, component);
+
 		//Update the entity signature
 		entitySignatures[entity].set(GetComponentID<T>());
 		_OnEntitySignatureChanged(entity);
-		
-		return _GetComponentArray<T>()->AddComponent(entity, component);
+
+		return GetComponent<T>(entity);
 	}
 
 	//Remove a component of type T from entity
