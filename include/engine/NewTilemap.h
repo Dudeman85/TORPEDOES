@@ -24,3 +24,30 @@ and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any
 source distribution.
 *********************************************************************/
+
+#pragma once
+
+#include <tmxlite/Map.hpp>
+#include <vector>
+
+using namespace tmx;
+using namespace std;
+
+class Tilemap final
+{
+public:
+
+	// Constructor
+	Tilemap();
+
+	// Destructor
+	~Tilemap();
+
+private:
+
+	// Function to get values from tilemap (.tmx) and tileset (.tsx).
+	// Also sets the gotten values to pointer variables
+	void getTiledVar();
+
+	Map tMap;
+};

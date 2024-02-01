@@ -24,3 +24,24 @@ and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any
 source distribution.
 *********************************************************************/
+
+#include <engine/NewTilemap.h>
+
+// Constructor
+Tilemap::Tilemap()
+{
+
+}
+
+// Destructor
+Tilemap::~Tilemap()
+{
+
+}
+
+// Function to get values from tilemap (.tmx) and tileset (.tsx).
+// Also sets the gotten values to pointer variables
+void Tilemap::getTiledVar()
+{
+
+}
