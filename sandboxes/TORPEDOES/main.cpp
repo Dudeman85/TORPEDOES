@@ -18,6 +18,9 @@ void createChepoint(Vector3 position, Vector3 rotation, Vector3 scale, Model& ch
 	checkPointNumber++;
 };
 
+
+
+
 int main()
 {
 	string username = "";
@@ -33,6 +36,7 @@ int main()
        
 	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window");
 
+
 	EngineInit();
 
 	engine::Camera cam = engine::Camera(1120, 630);
@@ -40,13 +44,16 @@ int main()
 	//cam.perspective = true;
 	cam.SetRotation(Vector3(0, 0, 0));
 	float camScale = 1.0;
-	float camScaleMin = 1000.0;
-	float camScaleMax = 1800.0;
+	float camScaleMin = 900.0;
+	float camScaleMax = 1700.0;
 	float aspectRatio = 16 / 9;
 	float camPadding = 100;
 	float camDeadzone = 10;
 	//engine.physicsSystem->gravity = Vector2(0, -981);
 	collisionSystem->cam = &cam;
+
+	
+
 
 	Model model("LaMuerte.obj");
 	Model checkPointModel("Checkpoint.obj");
@@ -165,9 +172,9 @@ int main()
 	//engineSpeaker4.Play(engineSound);
 	//engineSpeaker4.SetLooping(1);
 
-	ecs::Entity GUIBackround = ecs::NewEntity();
+	/*ecs::Entity GUIBackround = ecs::NewEntity();
 	ecs::AddComponent(GUIBackround, new SpriteRenderer{ .texture = &GUItexture, .uiElement = true });
-	ecs::AddComponent(GUIBackround, new Transform{ .position = Vector3(0, -0.95, -0.9), .scale = Vector3(1, 0.2, 1) });
+	ecs::AddComponent(GUIBackround, new Transform{ .position = Vector3(0, -0.95, -0.9), .scale = Vector3(1, 0.2, 1) });*/
 
 	ecs::Entity torpIndicator1 = ecs::NewEntity();
 	ecs::AddComponent(torpIndicator1, new TextRenderer{ .font = &stencilFont, .text = playerNames[0], .offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
@@ -230,7 +237,7 @@ int main()
 
 	// Loand Map . Tilemap file 
 	Tilemap map(&cam);
-	map.loadMap("torptest.tmx");
+	map.loadMap("level1.tmx");
 	spriteRenderSystem->SetTilemap(&map);
 	collisionSystem->SetTilemap(&map);
 	PhysicsSystem::SetTileProperty(1, TileProperty{ true });
@@ -412,22 +419,24 @@ int main()
 			player4.playExlposionSound = false;
 		}
 
-
 		//Keep the camera in bounds of the tilemap and set it to the average position of the players
 		Vector3 avgPos = playerController->avgPosition / playerController->entities.size();
 
 		// Center the camera on the average position of the players
 		float camPosX = clamp(avgPos.x, map.position.x + cam.width / 2, map.position.x + map.bounds.width - cam.width / 2);
-		float camPosY = clamp(avgPos.y, map.position.y - map.bounds.height + cam.height / 2, map.position.y - cam.height / 2) - cam.height * 0.07;
+		float camPosY = clamp(avgPos.y, map.position.y - map.bounds.height + cam.height / 2, map.position.y - cam.height / 2) ; 
 		cam.SetPosition(Vector3(camPosX, camPosY, 1500));
 
 
 		//Calculate the camera's bounds
 		std::array<float, 4> camBounds{
-				cam.position.y * 2 + cam.height / 2,
-				cam.position.x * 2 + cam.width / 2,
+				cam.position.y * 2 + cam.height /2,  // ylös pain 
+				cam.position.x * 2 + cam.width / 2,   // leveys 
 				cam.position.y * 2 - cam.height / 2,
 				cam.position.x * 2 - cam.width / 2 };
+		
+		float zoomOutThreshold = -camPadding * 2.5f;
+		float zoomInThreshold = camPadding * 2.0f;
 
 		//Calculate the difference between the player and camera bounds
 
@@ -437,15 +446,19 @@ int main()
 		float leftDiff = playerController->playerBounds[3] - camBounds[3];
 
 		//Zoom out
-		if (topDiff  <- camPadding < -camDeadzone || rightDiff - camPadding < -camDeadzone || bottomDiff - camPadding < -camDeadzone || leftDiff - camPadding < - camDeadzone) 
+		if (playerController->playerBounds[0] < camBounds[0] - zoomOutThreshold ||
+			playerController->playerBounds[1] > camBounds[1] + zoomOutThreshold ||
+			playerController->playerBounds[2] > camBounds[2] + zoomOutThreshold ||
+			playerController->playerBounds[3] < camBounds[3] - zoomOutThreshold)
 		{
 			
 			float zoomOutValue = 10 - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10.0f;
 			camScale = max(camScale + zoomOutValue, camScaleMin);
 			/*camScale += 10 - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10;*/
 		}
-
-		else if (topDiff > camPadding > camDeadzone && rightDiff - camPadding > camDeadzone && bottomDiff - camPadding > camDeadzone && leftDiff - camPadding > camDeadzone) {
+		//Zoom int
+		else if (topDiff > zoomInThreshold && rightDiff > zoomInThreshold && bottomDiff > zoomInThreshold && leftDiff > zoomInThreshold)
+		{
 			
 			float zoomInValue = min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 100.0f;
 			camScale = max(camScale - zoomInValue, camScaleMin);  
@@ -478,3 +491,12 @@ int main()
 //Zoom in
 		//else if (topDiff - camPadding > camDeadzone && rightDiff - camPadding > camDeadzone && bottomDiff - camPadding > camDeadzone && leftDiff - camPadding > camDeadzone)
 		//	camScale -=  min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 100;
+
+
+// Zoom out 
+// (topDiff  <- camPadding < -camDeadzone || rightDiff - camPadding < -camDeadzone || bottomDiff - camPadding < -camDeadzone || leftDiff - camPadding < - camDeadzone) 
+
+
+
+// Zoom in
+// (topDiff > camPadding > camDeadzone && rightDiff - camPadding > camDeadzone && bottomDiff - camPadding > camDeadzone && leftDiff - camPadding > camDeadzone)

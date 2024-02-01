@@ -1,5 +1,7 @@
 #pragma once 
 #include <engine/Application.h>
+#include <GL/gl.h>
+
 
 // Declaration of the entity component system (ECS) instance
 using namespace engine;
@@ -20,7 +22,6 @@ struct Player : ecs::Component
 	int previousCheckpoint = -1;
 	bool hitPlayer = false;
 	float hitPlayerTime = 0;
-
 	bool playExlposionSound = false;
 	int playerID = 0;
 	ecs::Entity playerFont;
@@ -45,6 +46,7 @@ bool HAS_WON = false;
 ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonCollider, ModelRenderer)
 class PlayerController : public ecs::System
 {
+
 	float starTimer = 10.0; // start Time 
 	Model* torpedomodel;
 	void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 sapawnRotation, int owerID)
@@ -174,6 +176,7 @@ public:
 		// Iterate through entities in the system
 		for (auto itr = entities.begin(); itr != entities.end();)
 		{
+			
 			//Get the entity and increment the iterator
 			ecs::Entity entity = *itr++;
 
