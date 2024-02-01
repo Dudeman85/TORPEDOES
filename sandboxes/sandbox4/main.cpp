@@ -1,7 +1,21 @@
 #include <engine/Application.h>
+#include <thread>
 
 //Sanity saver
 using namespace engine;
+
+
+struct Foo
+{
+	int a;
+};
+
+struct Bar : public Foo
+{
+	float b;
+	float* c;
+
+};
 
 int main()
 {
@@ -31,9 +45,22 @@ int main()
 	//Create a new entity
 	ecs::Entity entity = ecs::NewEntity();
 	//Add the transform and SpriteRenderer components required for rendering a sprite
-	Transform& t = ecs::AddComponent(entity, new Transform{ .position = Vector3(0, 0, 0), .rotation = Vector3(0, 0, 0), .scale = Vector3(30) });
-	ecs::AddComponent(entity, new SpriteRenderer{ .texture = &strawberry });
-	ecs::AddComponent(entity, new ModelRenderer{ .model = &ship });
+	Transform& t = ecs::AddComponent(entity, Transform{ .position = Vector3(1, 0, 0), .rotation = Vector3(0, 0, 0), .scale = Vector3(30) });
+	ecs::AddComponent(entity, SpriteRenderer{ .texture = &strawberry });
+	ecs::AddComponent(entity, ModelRenderer{ .model = &ship });
+
+	std::cout << t.position.ToString();
+
+	//Create a new entity
+	ecs::Entity entity2 = ecs::NewEntity();
+	//Add the transform and SpriteRenderer components required for rendering a sprite
+	ecs::AddComponent(entity2, Transform{ .position = Vector3(0, 0, -2), .rotation = Vector3(90, 0, 0), .scale = Vector3(0.5) });
+	ecs::AddComponent(entity2, SpriteRenderer{ .texture = &strawberry });
+	ecs::AddComponent(entity2, ModelRenderer{ .model = &ship });
+
+	t = ecs::GetComponent<Transform>(entity);
+
+	TransformSystem::AddParent(entity2, entity);
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -63,7 +90,7 @@ int main()
 			TransformSystem::Rotate(entity, Vector3(0, 1, 0));
 		if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
 			TransformSystem::Rotate(entity, Vector3(0, -1, 0));
-
+				
 
 		//Update all engine systems, this usually should go last in the game loop
 		Update(&cam);
@@ -76,6 +103,7 @@ int main()
 		Primitive forward = Primitive::Line(t.position, t.position + TransformSystem::ForwardVector(entity) * 200);
 		forward.Draw(&cam, Vector3(0, 0, 0));
 
+		std::cout << t.position.ToString();
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
