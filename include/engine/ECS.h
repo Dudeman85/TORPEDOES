@@ -106,6 +106,12 @@ namespace engine::ecs
 		std::unordered_map<uint32_t, Entity> indexToEntity;
 
 	public:
+		ComponentArray()
+		{
+			//TODO: Fix
+			components.reserve(10000);
+		}
+
 		//Return true if the entity has a component of type T
 		bool HasComponent(Entity entity)
 		{

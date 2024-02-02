@@ -19,7 +19,7 @@ struct Bar : public Foo
 
 void MakeStuff()
 {
-	for (size_t i = 0; i < 10000; i++)
+	for (size_t i = 0; i < 100; i++)
 	{
 		ecs::Entity e = ecs::NewEntity();
 		ecs::AddComponent(e, Transform{ .position = Vector3(0, 0, -2), .rotation = Vector3(90, 0, 0), .scale = Vector3(0.5) });
@@ -59,6 +59,11 @@ int main()
 	ecs::AddComponent(entity, ModelRenderer{ .model = &ship });
 
 	Transform& t = ecs::GetComponent<Transform>(entity);
+	MakeStuff();
+
+std:cout << sizeof(Transform);
+
+
 	//Create a new entity
 	ecs::Entity entity2 = ecs::NewEntity();
 	//Add the transform and SpriteRenderer components required for rendering a sprite
@@ -68,7 +73,6 @@ int main()
 
 	auto ass = ecs::_GetComponentArray<Transform>();
 
-	MakeStuff();
 
 	TransformSystem::AddParent(entity2, entity);
 
