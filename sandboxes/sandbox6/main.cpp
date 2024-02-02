@@ -2,6 +2,7 @@
 #include <engine/Application.h>
 #include <functional>
 #include "BulletSystem.h"
+#include "MenuSystem.h"
 
 
 bool DoActionOnesWhenInputIsDown(int GLFW_KEY, bool& key, GLFWwindow* window, std::function<void(int)> action)
@@ -24,11 +25,18 @@ void OnSpacePressed(int a)
 {
 
 }
-void OnAPressed(int a)
+ static void OnAPressed(int a)  //pause menu
 {
+     printf("HERE IN ON PRESSED P");
+     ecs::GetSystem<PauseSystem>()->ToggleShowUIMenu();
+
 
 }
-
+//void OnEnterPressed(bool& key, auto& window)
+//{
+//    DoActionOnesWhenInputIsDown(GLFW_KEY_ENTER, spacePressed, window, OnSpacePressed);
+//
+//}
 
 
 void KeyActions(int key)
@@ -419,14 +427,14 @@ void KeyActions(int key)
 void shoot(auto& player, auto& bulletTexture, auto PlayerMonster)
 {
 
-    ecs::Entity bullet = ecs::NewEntity();
-    ecs::AddComponent(bullet, new Transform{ .position = player.position + Vector3(0,0,1), .rotation = player.rotation, .scale = Vector3(10) });
-    ecs::AddComponent(bullet, new SpriteRenderer{ .texture = &bulletTexture });
+    ecs::Entity pauseText = ecs::NewEntity();
+    ecs::AddComponent(pauseText, new Transform{ .position = player.position + Vector3(0,0,1), .rotation = player.rotation, .scale = Vector3(10) });
+    ecs::AddComponent(pauseText, new SpriteRenderer{ .texture = &bulletTexture });
 
     vector<Vector2> verts{ Vector2(1,1),Vector2(1,-1),Vector2(-1,-1),Vector2(-1,1) };
-    ecs::AddComponent(bullet, new PolygonCollider{ .vertices = verts });
-    auto bulletPhysics = ecs::AddComponent(bullet, new Rigidbody{ .velocity = TransformSystem::UpVector(PlayerMonster) * 990 / 10, .restitution = 1 });
-    ecs::AddComponent(bullet, new Bullet{.lifeTime = 2});
+    ecs::AddComponent(pauseText, new PolygonCollider{ .vertices = verts });
+    ecs::AddComponent(pauseText, new Rigidbody{ .velocity = TransformSystem::UpVector(PlayerMonster) * 990 / 10, .restitution = 1 });
+    ecs::AddComponent(pauseText, new Pause{.lifeTime = 2});
 }
 int main()
 {
@@ -437,9 +445,11 @@ int main()
     //Parameters define window size(x,y) and name
     GLFWwindow* window = engine::CreateGLWindow(1800, 1600, "Window");
 
-    bool spacePressed = false;
-    DoActionOnesWhenInputIsDown(GLFW_KEY_SPACE, spacePressed, window, OnSpacePressed);
-    DoActionOnesWhenInputIsDown(GLFW_KEY_A, spacePressed, window, OnAPressed);
+    bool OnPPressed  = false;
+    bool spacePressed = false, upArrowPressed = false,downArrowPressed = false;
+
+   // DoActionOnesWhenInputIsDown(GLFW_KEY_SPACE, spacePressed, window, OnSpacePressed);
+   
 
 
     //Initialize the engine, this must be called after creating a window
@@ -458,7 +468,7 @@ int main()
 
     //Load some sprites
     engine::Texture strawberry_Texture("strawberry.png");
-    engine::Texture monsterTexture("character.png");
+    engine::Texture monsterTexture("UI_Booster_Icon.png");
     engine::Texture UI_BG_Test_Texture("UI_BG_Test.png");
     engine::Texture bulletTexture("Torpedo_Test.png");
     engine::Texture wallTexture("UI_Empty_Box.png");
@@ -504,26 +514,27 @@ int main()
     bool readyToShoot = true;
 
     //Add the transform and SpriteRenderer components required for rendering a sprite
-    ecs::AddComponent(strawberry, new Transform{ .position = Vector3(0, 40, 0), .rotation = Vector3(0, 0, 45), .scale = Vector3(10) });
-    ecs::AddComponent(strawberry, new SpriteRenderer{ .texture = &strawberry_Texture });
+    ecs::AddComponent(strawberry, Transform{ .position = Vector3(0, 40, 0), .rotation = Vector3(0, 0, 45), .scale = Vector3(10) });
+    ecs::AddComponent(strawberry, SpriteRenderer{ .texture = &strawberry_Texture });
 
-    Transform& player = ecs::AddComponent(PlayerMonster, new Transform{ .position = Vector3(40, 40, 1), .rotation = Vector3(0, 0, 0), .scale = Vector3(10) });
-    ecs::AddComponent(PlayerMonster, new SpriteRenderer{ .texture = &monsterTexture });
+     ecs::AddComponent(PlayerMonster,Transform{ .position = Vector3(40, 40, 1), .rotation = Vector3(0, 0, 0), .scale = Vector3(10) });
+    ecs::AddComponent(PlayerMonster, SpriteRenderer{ .texture = &monsterTexture });
 
-    ecs::AddComponent(UI_BG_Test, new Transform{ .position = Vector3(0,0,0), .rotation = Vector3(0, 0, 0), .scale = Vector3(500) });
-    ecs::AddComponent(UI_BG_Test, new SpriteRenderer{ .texture = &UI_BG_Test_Texture });
+    ecs::AddComponent(UI_BG_Test, Transform{ .position = Vector3(0,0,0), .rotation = Vector3(0, 0, 0), .scale = Vector3(500) });
+    ecs::AddComponent(UI_BG_Test, SpriteRenderer{ .texture = &UI_BG_Test_Texture });
 
     //wall
-    ecs::AddComponent(wall, new Transform{ .position = Vector3(-10, 40, 1), .rotation = Vector3(0, 0, 0), .scale = Vector3(10,20) });
+    ecs::AddComponent(wall, Transform{ .position = Vector3(-10, 40, 1), .rotation = Vector3(0, 0, 0), .scale = Vector3(10,20) });
     vector<Vector2> wallVerts{ Vector2(2,2),Vector2(2,-2),Vector2(-2,-2),Vector2(-2,2) };
 
-    auto wallPhysics = ecs::AddComponent(wall, new Rigidbody{ .mass = INFINITY, .gravityScale = 0, .restitution = 0, .kinematic = true });
+    ecs::AddComponent(wall,  Rigidbody{ .mass = INFINITY, .gravityScale = 0, .restitution = 0, .kinematic = true });
 
-    ecs::AddComponent(wall, new PolygonCollider{ .vertices = wallVerts,  .visualise = true });
-    ecs::AddComponent(wall, new SpriteRenderer{ .texture = &wallTexture });
+    ecs::AddComponent(wall,  PolygonCollider{ .vertices = wallVerts,  .visualise = true });
+    ecs::AddComponent(wall,  SpriteRenderer{ .texture = &wallTexture });
     //Game Loop
     while (!glfwWindowShouldClose(window))
     {
+        Transform& playerTransform = ecs::GetComponent<Transform>(PlayerMonster);
         //Close window when Esc is pressed
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
@@ -569,8 +580,11 @@ int main()
 
 
 
+        DoActionOnesWhenInputIsDown(GLFW_KEY_P, OnPPressed, window, OnAPressed);
+
+
         ////keyDown LOGIC
-        {
+     /*   {
 
 
             if (upArrowDown && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
@@ -588,25 +602,25 @@ int main()
             else if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_RELEASE)downArrowDown = true;
 
 
-        }
+        }*/
 
         //Zoom in 
         if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
         {
-            TransformSystem::SetScale(PlayerMonster, (player.scale + 1));
+            TransformSystem::SetScale(PlayerMonster, (playerTransform.scale + 1));
 
         }
         //Zoom out
         if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
         {
-            TransformSystem::SetScale(PlayerMonster, (player.scale - 1));
+            TransformSystem::SetScale(PlayerMonster, (playerTransform.scale - 1));
 
         }
 
         //shoot
         if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
         {
-            shoot(player, bulletTexture, PlayerMonster);
+            shoot(playerTransform, bulletTexture, PlayerMonster);
             //	if (readyToShoot) 
             //	{
             //		readyToShoot = false;

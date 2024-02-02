@@ -3,7 +3,7 @@
 
 //Bullet Component
 ECS_REGISTER_COMPONENT(Bullet)
-struct Bullet : ecs::Component
+struct Bullet 
 {
 	float lifeTime = 5;
 };
