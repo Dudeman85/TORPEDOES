@@ -1,5 +1,7 @@
 #pragma once 
 #include <engine/Application.h>
+#include <GL/gl.h>
+
 
 // Declaration of the entity component system (ECS) instance
 using namespace engine;
@@ -20,7 +22,6 @@ struct Player : ecs::Component
 	int previousCheckpoint = -1;
 	bool hitPlayer = false;
 	float hitPlayerTime = 0;
-
 	bool playExlposionSound = false;
 	int playerID = 0;
 	ecs::Entity playerFont;
@@ -45,6 +46,7 @@ bool HAS_WON = false;
 ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonCollider, ModelRenderer)
 class PlayerController : public ecs::System
 {
+
 	float starTimer = 10.0; // start Time 
 	Model* torpedomodel;
 	void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 sapawnRotation, int owerID)
@@ -174,6 +176,7 @@ public:
 		// Iterate through entities in the system
 		for (auto itr = entities.begin(); itr != entities.end();)
 		{
+			
 			//Get the entity and increment the iterator
 			ecs::Entity entity = *itr++;
 
@@ -212,16 +215,40 @@ public:
 						glfwGetGamepadState(player.playerID - 1, &state);
 						// Get joystick input, such as rotation and acceleration
 					   // Also check if the left and right buttons are pressed
-						float rightStickX = state.axes[0];
+						//float rightStickX = state.axes[0];
+
+						// Get joystick axes' values
+						int count;
+						const float* axesStartPointer = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &count);
+						const float* axesStartPointer1 = glfwGetJoystickAxes(GLFW_JOYSTICK_2, &count);
+						// Two first values are same input
+						const float* axesThirdPointer = axesStartPointer + 2;
+						const float* axesThirdPointer1 = axesStartPointer1 + 2;
+						// First value is X input
+						float rightStickX = *axesStartPointer;
+						// Third value is Y input
+						float rightStickY = *axesThirdPointer;
+
+						std::cout << *axesStartPointer1 << "\n";
+
+
+						const float* next = axesStartPointer1 + 1; // Increment the pointer by 1 to move to the next element
+						for (int i = 1; i < count; i++) // Start from 1 since you already printed the first element
+						{
+							std::cout << *next << "\n";
+							next = next + 1; // Increment the pointer by 1 to move to the next element
+						}
+
 						const int buttonLeft = state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT];
 						const int buttonRight = state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT];
 						const int button_A = state.buttons[GLFW_GAMEPAD_BUTTON_A];
 
 						// Calculate acceleration based on joystick values
 						// and check if it's rotating left or right
-						const float ltValue = state.axes[4]; // Left trigger
-						const float rtValue = state.axes[5]; // Right trigger
-						accelerationInput += +rtValue - ltValue;
+						//const float ltValue = state.axes[4]; // Left trigger
+						//const float rtValue = state.axes[5]; // Right trigger
+						//accelerationInput += +rtValue - ltValue;
+						accelerationInput += rightStickY;
 						rotateInput += +buttonRight - buttonLeft;
 						ProjetileInput = button_A;
 
