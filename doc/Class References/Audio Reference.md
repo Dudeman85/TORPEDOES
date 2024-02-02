@@ -25,9 +25,9 @@ Second, you need to load a sound. There is only support for .wav files.
 
 ```cpp
 // Create a new audio for sfxEngine
-Audio jumpAudio = sfxEngine.addAudio(std::string "assets/jump.wav", bool loop, float volume, Vector3 location)
+Audio jumpAudio = sfxEngine.createAudio("assets/jump.wav")
 // Create audio with full initializer list: name, loop, volume, location
-Audio walkAudio = sfxEngine.walkAudio(std::string "assets/walk.wav", true, 0.8, Vector3(1,0,0))
+Audio walkAudio = sfxEngine.createAudio("assets/walk.wav", true, 0.8, Vector3(1,0,0))
 ```
 
 In order to play a loaded sound, you call the appropirate function:
