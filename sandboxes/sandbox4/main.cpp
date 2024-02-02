@@ -58,11 +58,6 @@ int main()
 	ecs::AddComponent(entity, SpriteRenderer{ .texture = &strawberry });
 	ecs::AddComponent(entity, ModelRenderer{ .model = &ship });
 
-	MakeStuff();
-
-std:cout << sizeof(Transform);
-
-
 	//Create a new entity
 	ecs::Entity entity2 = ecs::NewEntity();
 	//Add the transform and SpriteRenderer components required for rendering a sprite
@@ -70,8 +65,7 @@ std:cout << sizeof(Transform);
 	ecs::AddComponent(entity2, SpriteRenderer{ .texture = &strawberry });
 	ecs::AddComponent(entity2, ModelRenderer{ .model = &ship });
 
-	auto ass = ecs::_GetComponentArray<Transform>();
-
+	MakeStuff();
 
 	TransformSystem::AddParent(entity2, entity);
 
