@@ -70,6 +70,7 @@ namespace engine::ecs
 	std::unordered_map<uint16_t, const char*> componentIDToType;
 	//The amount of components registered. Also the next available component ID
 	uint16_t componentCount = 0;
+	constexpr uint16_t componentArraySegmentSize = 100;
 
 	//SYSTEM MANAGEMENT DATA
 
@@ -97,8 +98,6 @@ namespace engine::ecs
 	class ComponentArray : public IComponentArray
 	{
 	private:
-		//TODO: Fix problem with dumbass vector moving stuff around
-		//Possibly by splitting the componentArray into fixed size chunks
 		//A vector of each component of type T
 		std::vector<T> components;
 		//Maps from Entities to their component indexed in component arrays
@@ -106,12 +105,6 @@ namespace engine::ecs
 		std::unordered_map<uint32_t, Entity> indexToEntity;
 
 	public:
-		ComponentArray()
-		{
-			//TODO: Fix
-			components.reserve(10000);
-		}
-
 		//Return true if the entity has a component of type T
 		bool HasComponent(Entity entity)
 		{
@@ -354,9 +347,9 @@ namespace engine::ecs
 		return componentTypeToID[componentType];
 	}
 
-	//Add a component to entity. Returns a reference to that component
+	//Add a component to entity.
 	template<typename T>
-	T& AddComponent(Entity entity, T component)
+	void AddComponent(Entity entity, T component)
 	{
 		const char* componentType = typeid(T).name();
 
@@ -371,7 +364,7 @@ namespace engine::ecs
 		if (HasComponent<T>(entity))
 		{
 			std::cout << warningFormat << "ECS WARNING in AddComponent(): Entity already has the component you are trying to add!" << normalFormat << std::endl;
-			return GetComponent<T>(entity);
+			return;
 		}
 		#endif
 
@@ -380,8 +373,6 @@ namespace engine::ecs
 		//Update the entity signature
 		entitySignatures[entity].set(GetComponentID<T>());
 		_OnEntitySignatureChanged(entity);
-
-		return GetComponent<T>(entity);
 	}
 
 	//Remove a component of type T from entity

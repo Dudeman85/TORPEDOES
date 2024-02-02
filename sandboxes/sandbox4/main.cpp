@@ -58,7 +58,6 @@ int main()
 	ecs::AddComponent(entity, SpriteRenderer{ .texture = &strawberry });
 	ecs::AddComponent(entity, ModelRenderer{ .model = &ship });
 
-	Transform& t = ecs::GetComponent<Transform>(entity);
 	MakeStuff();
 
 std:cout << sizeof(Transform);
@@ -79,6 +78,8 @@ std:cout << sizeof(Transform);
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
+		Transform& t = ecs::GetComponent<Transform>(entity);
+
 		//Close window when Esc is pressed
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
