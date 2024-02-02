@@ -45,9 +45,9 @@ int main()
 	//cam.perspective = true;
 	cam.SetRotation(Vector3(0, 0, 0));
 	float camScale = 1.0;
-	float camScaleMin = 900.0;
-	float camScaleMax = 1700.0;
-	float aspectRatio = 16 / 9;
+	float camScaleMin = 800.0;
+	float camScaleMax = 1600.0;
+	float aspectRatio = 16.0f / 9.0f;
 	float camPadding = 100;
 	float camDeadzone = 10;
 	//engine.physicsSystem->gravity = Vector2(0, -981);
@@ -420,6 +420,34 @@ int main()
 			player4.playExlposionSound = false;
 		}
 
+
+	/*	float minX = std::numeric_limits<float>::infinity();
+		float minY = std::numeric_limits<float>::infinity();
+		float maxX = -std::numeric_limits<float>::infinity();
+		float maxY = -std::numeric_limits<float>::infinity();
+		for (size_t playerId = 0; playerId < 4; ++playerId) {
+			auto playerPosition = players[playerId].position;
+			
+			if (playerPosition.x < minX) {
+				minX = playerPosition.x;
+			}
+			if (playerPosition.y < minY) {
+				minY = playerPosition.y;
+			}
+			if (playerPosition.x > maxX) {
+				maxX = playerPosition.x;
+			}
+			if (playerPosition.y > maxY) {
+				maxY = playerPosition.y;
+			}
+		}
+		auto camSizeX = maxX - minX;
+		auto camSizeY = maxY - minY;
+		auto camX = minX + 0.5f * camSizeX;
+		auto camY = minY + 0.5f * camSizeY;*/
+
+
+
 		//Keep the camera in bounds of the tilemap and set it to the average position of the players
 		Vector3 avgPos = playerController->avgPosition / playerController->entities.size();
 		
@@ -453,7 +481,8 @@ int main()
 			playerController->playerBounds[3] < camBounds[3] - zoomOutThreshold)
 		{
 			
-			float zoomOutValue = 10 - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10.0f;
+			float zoomOutFactor = 10.0f;
+			float zoomOutValue = zoomOutFactor - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10.0f;
 			camScale = max(camScale + zoomOutValue, camScaleMin);
 			/*camScale += 10 - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10;*/
 		}
@@ -471,21 +500,11 @@ int main()
 		cam.height = camScale;
 		cam.width = cam.height * aspectRatio;
 
-		//New implentation 
-
-		for(const auto & player : playerController->entities)
-		{
-			Transform& playerTransform = ecs::GetComponent<Transform>(player);
-			Vector2 playerPos = Vector2(playerTransform.position.x, playerTransform.position.y);
-
-			// Update the coordet min and max 
-
-		}
-	
+		// New implentation 
 		//boundigBoxin center point 
 		float boundingBoxWidth = playerController->playerBounds[1] - playerController->playerBounds[3];
 		float boundingBoxHeight = playerController->playerBounds[0] - playerController->playerBounds[2];
-		Vector2 boundingBoxCenter = (boundingBoxWidth * 0,5, boundingBoxHeight * 0,5);
+		Vector2 boundingBoxCenter = Vector2(playerController->playerBounds[3] + boundingBoxWidth * 0.5f, playerController->playerBounds[2] + boundingBoxHeight * 0.5f);
 
 		 //Ajustar la posición de la cámara según el centro de la bounding box
 		camPosX = clamp(boundingBoxCenter.x, map.position.x + cam.width / 2, map.position.x + map.bounds.width - cam.width / 2);
@@ -493,8 +512,14 @@ int main()
 		cam.SetPosition(Vector3(camPosX, camPosY, 1500));
 
 		// Calcular el zoom deseado y ajustar el zoom de la cámara
-		float desiredZoom = (boundingBoxWidth / cam.width, boundingBoxHeight / cam.height);
-		camScale = (desiredZoom, camScaleMin );
+		float aspectRatio = cam.width / cam.height;
+		float desiredZoom = max(boundingBoxWidth / (cam.width * aspectRatio), boundingBoxHeight / cam.height);
+
+
+		// Ajustar el zoom de la cámara solo si el zoom deseado supera los límites establecidos
+		if (desiredZoom > camScaleMin && desiredZoom < camScaleMax) {
+			camScale = desiredZoom;
+		}
 
 	
 
@@ -528,3 +553,7 @@ int main()
 
 // Zoom in
 // (topDiff > camPadding > camDeadzone && rightDiff - camPadding > camDeadzone && bottomDiff - camPadding > camDeadzone && leftDiff - camPadding > camDeadzone)
+
+//float aspectRation = cam.width / cam.height;
+//float desiredZoom = max(boundingBoxWidth / (cam.width * aspectRatio), boundingBoxHeight / cam.height);
+//camScale = max(desiredZoom, camScaleMin, camScaleMax);
