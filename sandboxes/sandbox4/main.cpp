@@ -19,10 +19,12 @@ struct Bar : public Foo
 
 void MakeStuff()
 {
-	for (size_t i = 0; i < 100; i++)
+	for (size_t i = 0; i < 100000; i++)
 	{
 		ecs::Entity e = ecs::NewEntity();
 		ecs::AddComponent(e, Transform{ .position = Vector3(0, 0, -2), .rotation = Vector3(90, 0, 0), .scale = Vector3(0.5) });
+
+		ecs::DestroyEntity(e);
 	}
 }
 

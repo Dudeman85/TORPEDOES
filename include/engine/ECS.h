@@ -9,10 +9,6 @@
 #include <iostream>
 #include <memory>
 
-//TODO: FIx component memory leak in remove component
-//Need to test how manual stack allocation affects performance
-//Possible fixes: either bring back component array class, or if above is not substantial, make a map to component sizes and manually free the memory
-
 //Allow max components to be determined outside this file
 #ifndef ECS_MAX_COMPONENTS
 #define ECS_MAX_COMPONENTS 100

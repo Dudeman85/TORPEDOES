@@ -15,6 +15,7 @@ namespace engine
 	struct Rigidbody
 	{
 		Vector3 velocity;
+		//Mass of the rigidbody in Danny's
 		float mass = 1;
 		float gravityScale = 1;
 		//How much linear drag should be applied between 0-1 
