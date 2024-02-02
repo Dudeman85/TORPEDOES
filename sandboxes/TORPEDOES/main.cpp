@@ -46,14 +46,11 @@ int main()
 	float camScale = 1.0;
 	float camScaleMin = 900.0;
 	float camScaleMax = 1700.0;
-	float aspectRatio = 16 / 9;
+	float aspectRatio = 16.f / 9.f;
 	float camPadding = 100;
 	float camDeadzone = 10;
 	//engine.physicsSystem->gravity = Vector2(0, -981);
 	collisionSystem->cam = &cam;
-
-
-
 
 	Model model("LaMuerte.obj");
 	Model checkPointModel("Checkpoint.obj");

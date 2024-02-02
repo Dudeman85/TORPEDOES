@@ -8,6 +8,8 @@ Components:
 - [Transform](Transform%20Reference.md)
 - [SpriteRenderer](Sprite%20Reference.md)
 - [ModelRenderer]()
+- [TextRenderer]()
+- [PrimitiveRenderer]()
 - [Animator](Sprite%20Reference.md)
 - [Rigidbody](Physics%20Reference.md)
 - [PolygonCollider](Physics%20Reference.md)
@@ -16,6 +18,8 @@ Systems:
 - [TransformSystem](Physics%20Reference.md): Requires Transform
 - [SpriteRenderSystem](Sprite%20Reference.md): Requires Transform and SpriteRenderer
 - [ModelRenderSystem](): Requires Transform and ModelRenderer
+- [TextRenderSystem](): Requires Transform and TextRenderer
+- [PrimitiveRenderSystem](): Requires Transform and PrimitiveRenderer
 - [AnimationSystem](Sprite%20Reference.md): Requires Sprite and Animator
 - [PhysicsSystem](Physics%20Reference.md): Requires Rigidbody and Transform
 - [CollisionSystem](Physics%20Reference.md): Transform and PolygonCollider
@@ -43,11 +47,20 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		//This will update all default engine systems and return deltaTime
-		double deltaTime = engine.Update(&cam);
+		double deltaTime = engine::Update(&cam);
 		
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 }
+```
+
+Some other useful engine features:
+```cpp
+//A global delta time variable tracking how many seconds the last frame took
+double dt = engine::deltaTime;
+
+//A global program time variable tracking how many seconds have passed since calling EngineInit()
+double pt = engine::programTime;
 ```
