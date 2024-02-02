@@ -40,8 +40,8 @@ int main()
 	//cam.perspective = true;
 	cam.SetRotation(Vector3(0, 0, 0));
 	float camScale = 1.0;
-	float camScaleMin = 1000.0;
-	float camScaleMax = 1800.0;
+	float camScaleMin = 900.0; //MAX 900
+	float camScaleMax = 1900.0; //MAX 1900
 	float aspectRatio = 16 / 9;
 	float camPadding = 100;
 	float camDeadzone = 10;
@@ -228,6 +228,18 @@ int main()
 	//cheerSpeaker.Play(cheerSound);
 	//cheerSpeaker.SetLooping(1);
 
+
+	Animation countdownAnim = AnimationsFromSpritesheet("UI_Countdown_Ver2.png", 5, 1, vector<int>(5, 1000))[0];
+	ecs::Entity countdown = ecs::NewEntity();
+	ecs::AddComponent(countdown, new Transform{ .position = Vector3(1430, -1200, 10), .scale = Vector3(60, 100, 0) });
+	ecs::AddComponent(countdown, new SpriteRenderer{});
+	ecs::AddComponent(countdown, new Animator{});
+	AnimationSystem::AddAnimation(countdown, countdownAnim, "CountDown");
+	AnimationSystem::PlayAnimation(countdown, "CountDown", false);
+	
+	
+	
+
 	// Loand Map . Tilemap file 
 	Tilemap map(&cam);
 	map.loadMap("level1.tmx");
@@ -259,7 +271,12 @@ int main()
 		// star Timer 
 		float Timer = playerController->getTimer();
 		std::string timerStr = std::to_string((int)round(Timer)); // round pyörista float arvo lahipakokonais 
-		winText.text = timerStr.c_str();
+		//if (Timer == 1) {
+		//	Animator
+		//}
+		//winText.text = timerStr.c_str();
+		//AnimationSystem::PlayAnimation(countdown, "CountDown", false);
+		
 		// UI System 				
 
 		p1Win.text = to_string(player.lap) + "/1";
