@@ -222,33 +222,62 @@ public:
 						const float* axesStartPointer = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &count);
 						const float* axesStartPointer1 = glfwGetJoystickAxes(GLFW_JOYSTICK_2, &count);
 						// Two first values are same input
-						const float* axesThirdPointer = axesStartPointer + 2;
-						const float* axesThirdPointer1 = axesStartPointer1 + 2;
+						const float* axesThirdPointer = axesStartPointer + 1;
+						const float* axesThirdPointer1 = axesStartPointer1 + 1;
 						// First value is X input
 						float rightStickX = *axesStartPointer;
 						// Third value is Y input
 						float rightStickY = *axesThirdPointer;
 
-						std::cout << *axesStartPointer1 << "\n";
+						float rightStickX1 = *axesStartPointer1;
+
+						float rightStickY1 = *axesThirdPointer1;
+
+						//std::cout << *axesStartPointer << "\n";
+						
+						const unsigned char* buttonpointer = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &count);
+						const unsigned char* buttonpointer1 = glfwGetJoystickButtons(GLFW_JOYSTICK_2, &count);
+
+						const unsigned char* buttonsecondpointer = buttonpointer + 1;
+						const unsigned char* buttonsecondpointer1 = buttonpointer1 + 1;
+
+						
+
+						std::cout << static_cast<float>(*buttonpointer) << " " << static_cast<float>(*buttonsecondpointer) << "\n";
+						
+						
 
 
-						const float* next = axesStartPointer1 + 1; // Increment the pointer by 1 to move to the next element
+						const float* next = axesStartPointer + 1; // Increment the pointer by 1 to move to the next element
 						for (int i = 1; i < count; i++) // Start from 1 since you already printed the first element
 						{
-							std::cout << *next << "\n";
+							//std::cout << *next << "\n";
 							next = next + 1; // Increment the pointer by 1 to move to the next element
 						}
-
+						
 						const int buttonLeft = state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT];
 						const int buttonRight = state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT];
 						const int button_A = state.buttons[GLFW_GAMEPAD_BUTTON_A];
-
+						
 						// Calculate acceleration based on joystick values
 						// and check if it's rotating left or right
 						//const float ltValue = state.axes[4]; // Left trigger
 						//const float rtValue = state.axes[5]; // Right trigger
 						//accelerationInput += +rtValue - ltValue;
-						accelerationInput += rightStickY;
+						if (player.playerID == 1)
+						{
+							accelerationInput += rightStickY;
+							rotateInput += rightStickX;
+							ProjetileInput = static_cast<float>(*buttonpointer);
+						}
+						else if (player.playerID == 2)
+						{
+							accelerationInput += rightStickY1;
+							rotateInput += rightStickX1;
+							ProjetileInput = static_cast<float>(*buttonpointer1);
+						}
+						
+						/*accelerationInput += rightStickY;
 						rotateInput += +buttonRight - buttonLeft;
 						ProjetileInput = button_A;
 
@@ -257,12 +286,12 @@ public:
 						{
 							// Set rotation input to rigth sticke 
 							rotateInput += rightStickX;
-						}
+						}*/
 					}
 				}
 			}
 			starTimer -= dt;
-			printf("starTimer: %i\n", int(starTimer));
+			//printf("starTimer: %i\n", int(starTimer));
 			// topedo hit logica 
 			if (player.hitPlayer == true)
 			{
