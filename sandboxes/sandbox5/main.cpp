@@ -472,6 +472,16 @@ int main()
 		cam.width = cam.height * aspectRatio;
 
 		//New implentation 
+
+		for(const auto & player : playerController->entities)
+		{
+			Transform& playerTransform = ecs::GetComponent<Transform>(player);
+			Vector2 playerPos = Vector2(playerTransform.position.x, playerTransform.position.y);
+
+			// Update the coordet min and max 
+
+		}
+	
 		//boundigBoxin center point 
 		float boundingBoxWidth = playerController->playerBounds[1] - playerController->playerBounds[3];
 		float boundingBoxHeight = playerController->playerBounds[0] - playerController->playerBounds[2];
@@ -484,7 +494,7 @@ int main()
 
 		// Calcular el zoom deseado y ajustar el zoom de la cámara
 		float desiredZoom = (boundingBoxWidth / cam.width, boundingBoxHeight / cam.height);
-		camScale = (desiredZoom, camScaleMin , camScaleMax);
+		camScale = (desiredZoom, camScaleMin );
 
 	
 
