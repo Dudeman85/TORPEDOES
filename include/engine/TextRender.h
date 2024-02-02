@@ -6,7 +6,7 @@ namespace engine
 {
 	// TextRenderer component
 	ECS_REGISTER_COMPONENT(TextRenderer)
-	struct TextRenderer : ecs::Component
+	struct TextRenderer
 	{
 		Font* font;
 		std::string text = "";

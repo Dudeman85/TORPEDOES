@@ -23,7 +23,7 @@ namespace engine
 {
 	//2D Sprite Renderer component
 	ECS_REGISTER_COMPONENT(SpriteRenderer)
-	struct SpriteRenderer : ecs::Component
+	struct SpriteRenderer
 	{
 		Texture* texture = nullptr;
 		Shader* shader = nullptr;
@@ -49,7 +49,7 @@ namespace engine
 
 	//Animator component
 	ECS_REGISTER_COMPONENT(Animator)
-	struct Animator : ecs::Component
+	struct Animator
 	{
 		std::map<std::string, Animation> animations;
 

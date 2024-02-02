@@ -12,7 +12,7 @@ namespace engine
 
 	//Rigidbody component
 	ECS_REGISTER_COMPONENT(Rigidbody)
-	struct Rigidbody : ecs::Component
+	struct Rigidbody
 	{
 		Vector3 velocity;
 		float mass = 1;

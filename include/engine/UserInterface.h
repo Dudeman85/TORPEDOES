@@ -6,7 +6,7 @@ namespace engine
 {
 	//UI Element struct
 	ECS_REGISTER_COMPONENT(UIElement)
-	struct UIElement : ecs::Component
+	struct UIElement
 	{
 		bool relativeToCamera = true;
 		bool enabled = true;

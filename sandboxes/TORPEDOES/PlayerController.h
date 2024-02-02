@@ -7,7 +7,7 @@
 using namespace engine;
 
 ECS_REGISTER_COMPONENT(Player)
-struct Player : ecs::Component
+struct Player
 {
 	float projectileSpeed = 500;  // Attack state
 	bool attackHeld = false;     // Indicates if the attack button is held
@@ -29,13 +29,13 @@ struct Player : ecs::Component
 	string playerLap;
 };
 ECS_REGISTER_COMPONENT(CheckPoint)
-struct CheckPoint: ecs::Component
+struct CheckPoint
 {
 	int checkPointID = 0;
 	bool Finish_line = false;
 };
 ECS_REGISTER_COMPONENT(Projectile)
-struct Projectile : ecs::Component
+struct Projectile
 {
 	int ownerID = 0;
 };
@@ -53,12 +53,12 @@ class PlayerController : public ecs::System
 	{
 
 		ecs::Entity projectile = ecs::NewEntity();
-		ecs::AddComponent(projectile, new Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
-		ecs::AddComponent(projectile, new Rigidbody{ .velocity = direction * projectileSpeed });
-		ecs::AddComponent(projectile, new ModelRenderer{ .model = torpedomodel });
+		ecs::AddComponent(projectile, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
+		ecs::AddComponent(projectile, Rigidbody{ .velocity = direction * projectileSpeed });
+		ecs::AddComponent(projectile, ModelRenderer{ .model = torpedomodel });
 		std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-		ecs::AddComponent(projectile, new PolygonCollider{ .vertices = Torpedoverts, .callback = PlayerController::OnprojectilCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
-		ecs::AddComponent(projectile, new Projectile{ .ownerID = owerID });
+		ecs::AddComponent(projectile, PolygonCollider{ .vertices = Torpedoverts, .callback = PlayerController::OnprojectilCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
+		ecs::AddComponent(projectile, Projectile{ .ownerID = owerID });
 
 
 
@@ -67,9 +67,9 @@ class PlayerController : public ecs::System
 	{
 		ecs::Entity projecAnim = ecs::NewEntity();
 		animPosition.z += 100;
-		ecs::AddComponent(projecAnim, new Transform{ .position = animPosition,  .scale = Vector3(20) });
-		ecs::AddComponent(projecAnim, new SpriteRenderer{ });
-		ecs::AddComponent(projecAnim, new Animator{});
+		ecs::AddComponent(projecAnim, Transform{ .position = animPosition,  .scale = Vector3(20) });
+		ecs::AddComponent(projecAnim, SpriteRenderer{ });
+		ecs::AddComponent(projecAnim, Animator{});
 		AnimationSystem::AddAnimation(projecAnim, *ExplosionAnim, "explosion");
 		AnimationSystem::PlayAnimation(projecAnim, "explosion", false);
 
@@ -222,20 +222,36 @@ public:
 						const float* axesStartPointer = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &count);
 						const float* axesStartPointer1 = glfwGetJoystickAxes(GLFW_JOYSTICK_2, &count);
 						// Two first values are same input
-						const float* axesThirdPointer = axesStartPointer + 2;
-						const float* axesThirdPointer1 = axesStartPointer1 + 2;
+						const float* axesThirdPointer = axesStartPointer + 1;
+						const float* axesThirdPointer1 = axesStartPointer1 + 1;
 						// First value is X input
 						float rightStickX = *axesStartPointer;
 						// Third value is Y input
 						float rightStickY = *axesThirdPointer;
 
-						std::cout << *axesStartPointer1 << "\n";
+						float rightStickX1 = *axesStartPointer1;
+
+						float rightStickY1 = *axesThirdPointer1;
+
+						//std::cout << *axesStartPointer << "\n";
+
+						const unsigned char* buttonpointer = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &count);
+						const unsigned char* buttonpointer1 = glfwGetJoystickButtons(GLFW_JOYSTICK_2, &count);
+
+						const unsigned char* buttonsecondpointer = buttonpointer + 1;
+						const unsigned char* buttonsecondpointer1 = buttonpointer1 + 1;
 
 
-						const float* next = axesStartPointer1 + 1; // Increment the pointer by 1 to move to the next element
+
+						std::cout << static_cast<float>(*buttonpointer) << " " << static_cast<float>(*buttonsecondpointer) << "\n";
+
+
+
+
+						const float* next = axesStartPointer + 1; // Increment the pointer by 1 to move to the next element
 						for (int i = 1; i < count; i++) // Start from 1 since you already printed the first element
 						{
-							std::cout << *next << "\n";
+							//std::cout << *next << "\n";
 							next = next + 1; // Increment the pointer by 1 to move to the next element
 						}
 
@@ -248,21 +264,34 @@ public:
 						//const float ltValue = state.axes[4]; // Left trigger
 						//const float rtValue = state.axes[5]; // Right trigger
 						//accelerationInput += +rtValue - ltValue;
-						accelerationInput += rightStickY;
+						if (player.playerID == 1)
+						{
+							accelerationInput += rightStickY;
+							rotateInput += rightStickX;
+							ProjetileInput = static_cast<float>(*buttonpointer);
+						}
+						else if (player.playerID == 2)
+						{
+							accelerationInput += rightStickY1;
+							rotateInput += rightStickX1;
+							ProjetileInput = static_cast<float>(*buttonpointer1);
+						}
+
+						/*accelerationInput += rightStickY;
 						rotateInput += +buttonRight - buttonLeft;
 						ProjetileInput = button_A;
 
 						// Deadzone for the right joystick
 						if (fabs(rightStickX) > 0.2)
 						{
-							// Set rotation input to rigth sticke 
+							// Set rotation input to rigth sticke
 							rotateInput += rightStickX;
-						}
+						}*/
 					}
 				}
 			}
 			starTimer -= dt;
-			printf("starTimer: %i\n", int(starTimer));
+			//printf("starTimer: %i\n", int(starTimer));
 			// topedo hit logica 
 			if (player.hitPlayer == true)
 			{

@@ -216,7 +216,7 @@ namespace engine
 	//Primitive Renderer Component
 	//They consist of only a primitive shape and a color, no texture
 	ECS_REGISTER_COMPONENT(PrimitiveRenderer)
-	struct PrimitiveRenderer : ecs::Component
+	struct PrimitiveRenderer
 	{
 		Primitive* primitive = nullptr;
 		Vector3 color;
