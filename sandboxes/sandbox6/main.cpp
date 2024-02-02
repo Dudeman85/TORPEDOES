@@ -1,10 +1,10 @@
 //Author Sauli Hanell 2.1.2024 
 #include <engine/Application.h>
 #include <functional>
+#include "BulletSystem.h"
 
 
-
-template <typename T> T DoActionOnesWhenInputIsDown(int GLFW_KEY, bool& key, T window, T action)
+bool DoActionOnesWhenInputIsDown(int GLFW_KEY, bool& key, GLFWwindow* window, std::function<void(int)> action)
 {
 
     if (key && glfwGetKey(window, GLFW_KEY) == GLFW_PRESS)
@@ -19,6 +19,17 @@ template <typename T> T DoActionOnesWhenInputIsDown(int GLFW_KEY, bool& key, T w
 
     return key;
 }
+
+void OnSpacePressed(int a)
+{
+
+}
+void OnAPressed(int a)
+{
+
+}
+
+
 
 void KeyActions(int key)
 {
@@ -414,18 +425,22 @@ void shoot(auto& player, auto& bulletTexture, auto PlayerMonster)
 
     vector<Vector2> verts{ Vector2(1,1),Vector2(1,-1),Vector2(-1,-1),Vector2(-1,1) };
     ecs::AddComponent(bullet, new PolygonCollider{ .vertices = verts });
-    auto bulletPhysics = ecs::AddComponent(bullet, new Rigidbody{ .velocity = TransformSystem::UpVector(PlayerMonster) * 990, .restitution = 1 });
-
-
+    auto bulletPhysics = ecs::AddComponent(bullet, new Rigidbody{ .velocity = TransformSystem::UpVector(PlayerMonster) * 990 / 10, .restitution = 1 });
+    ecs::AddComponent(bullet, new Bullet{.lifeTime = 2});
 }
 int main()
 {
-    std::function<void(int)>callbackFunc = KeyActions;
+
     //NO_OPENAL = true;
 
     //Create the window and OpenGL context before creating EngineLib
     //Parameters define window size(x,y) and name
     GLFWwindow* window = engine::CreateGLWindow(1800, 1600, "Window");
+
+    bool spacePressed = false;
+    DoActionOnesWhenInputIsDown(GLFW_KEY_SPACE, spacePressed, window, OnSpacePressed);
+    DoActionOnesWhenInputIsDown(GLFW_KEY_A, spacePressed, window, OnAPressed);
+
 
     //Initialize the engine, this must be called after creating a window
     engine::EngineInit();
@@ -492,7 +507,7 @@ int main()
     ecs::AddComponent(strawberry, new Transform{ .position = Vector3(0, 40, 0), .rotation = Vector3(0, 0, 45), .scale = Vector3(10) });
     ecs::AddComponent(strawberry, new SpriteRenderer{ .texture = &strawberry_Texture });
 
-    auto& player = ecs::AddComponent(PlayerMonster, new Transform{ .position = Vector3(40, 40, 1), .rotation = Vector3(0, 0, 0), .scale = Vector3(10) });
+    Transform& player = ecs::AddComponent(PlayerMonster, new Transform{ .position = Vector3(40, 40, 1), .rotation = Vector3(0, 0, 0), .scale = Vector3(10) });
     ecs::AddComponent(PlayerMonster, new SpriteRenderer{ .texture = &monsterTexture });
 
     ecs::AddComponent(UI_BG_Test, new Transform{ .position = Vector3(0,0,0), .rotation = Vector3(0, 0, 0), .scale = Vector3(500) });
@@ -619,16 +634,8 @@ int main()
             if (startTime >= waitTime) readyToShoot = true;
         }
 
-        /*if (5 < bullets.size()) {
+        ecs::GetSystem<BulletSystem>()->Update();
 
-            vector<ecs::Entity>::iterator iter = bullets.begin();
-
-            for (iter; iter < bullets.begin()+5; iter++) {
-                ecs::DestroyEntity(*iter);
-                bullets.erase(iter);
-            }
-
-        }*/
         //Update all engine systems, this usually should go last in the game loop
         //For greater control of system execution, you can update each one manually
         engine::Update(&cam);
