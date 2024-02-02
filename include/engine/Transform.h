@@ -11,35 +11,54 @@ namespace engine
 {
 	//Transform component
 	ECS_REGISTER_COMPONENT(Transform)
-	struct Transform : ecs::Component
+		struct Transform
 	{
+		//The local position, relative to parent
 		Vector3 position;
+		//The local rotation, relative to parent
 		Vector3 rotation;
+		//The local scale, relative to parent
 		Vector3 scale = Vector3(1.0f);
 
 		//The parent entity of this entity
 		//If set this transform will be relative to the parent
-		ecs::Entity parent;
+		ecs::Entity parent = 0;
 		//All the children of this entity
 		std::set<ecs::Entity> children;
 
 		//If true updates all transform based caches, reverts to false next frame
-		//This will not update if transform is manually changed
+		//WARNING: This will not update if transform is manually changed
 		bool staleCache = true;
 	};
 
 	//Transform system
 	//Requires Transform component
 	ECS_REGISTER_SYSTEM(TransformSystem, Transform)
-	class TransformSystem : public ecs::System
+		class TransformSystem : public ecs::System
 	{
 	public:
 		void Update()
 		{
-			for (auto const& entity : entities)
+			for (auto itr = entities.begin(); itr != entities.end();)
 			{
+				//Get the entity and increment the iterator
+				ecs::Entity entity = *itr++;
+
 				Transform& transform = ecs::GetComponent<Transform>(entity);
 				transform.staleCache = false;
+
+				//Verify children, kind of a bad system currently
+				for (ecs::Entity e : transform.children)
+				{
+					if (!ecs::EntityExists(e))
+						transform.children.erase(e);
+				}
+				//Verify parent, kind of a bad system currently
+				if (transform.parent != 0 && !ecs::EntityExists(transform.parent))
+				{
+					//If the parent is deleted delete the entity
+					ecs::DestroyEntity(entity);
+				}
 			}
 		}
 
@@ -79,7 +98,6 @@ namespace engine
 
 			transform.staleCache = true;
 		}
-
 		//Rotate an entity by euler angles dx, dy, and dz
 		static void Rotate(ecs::Entity entity, float dx, float dy, float dz = 0)
 		{
@@ -154,6 +172,26 @@ namespace engine
 			transform.staleCache = true;
 		}
 
+		//Add a parent entity to a child entity
+		static void AddParent(ecs::Entity child, ecs::Entity parent)
+		{
+			Transform& parentTransform = ecs::GetComponent<Transform>(parent);
+			Transform& childTransform = ecs::GetComponent<Transform>(child);
+
+			parentTransform.children.insert(child);
+			childTransform.parent = parent;
+		}
+		//Remove a parent entity from a child entity
+		//This will place the child to root
+		static void RemoveParent(ecs::Entity child, ecs::Entity parent)
+		{
+			Transform& parentTransform = ecs::GetComponent<Transform>(parent);
+			Transform& childTransform = ecs::GetComponent<Transform>(child);
+
+			parentTransform.children.erase(child);
+			childTransform.parent = 0;
+		}
+
 		//Get the right (x) vector of a transform
 		static Vector3 RightVector(ecs::Entity entity)
 		{
@@ -213,7 +251,7 @@ namespace engine
 		}
 
 		//Get the distance between two entities
-		static float Distance(ecs::Entity a, ecs:: Entity b)
+		static float Distance(ecs::Entity a, ecs::Entity b)
 		{
 			Transform& aTransform = ecs::GetComponent<Transform>(a);
 			Transform& bTransform = ecs::GetComponent<Transform>(b);

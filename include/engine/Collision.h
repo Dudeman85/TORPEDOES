@@ -33,7 +33,7 @@ namespace engine
 
 	//Polygon Collider component
 	ECS_REGISTER_COMPONENT(PolygonCollider)
-	struct PolygonCollider : ecs::Component
+	struct PolygonCollider
 	{
 		//The vertices of the polygon making up the collider, going clockwise
 		//The vertices must form a convex polygon

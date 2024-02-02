@@ -173,16 +173,16 @@ int main()
 	//engineSpeaker4.SetLooping(1);
 
 	/*ecs::Entity GUIBackround = ecs::NewEntity();
-	ecs::AddComponent(GUIBackround, new SpriteRenderer{ .texture = &GUItexture, .uiElement = true });
-	ecs::AddComponent(GUIBackround, new Transform{ .position = Vector3(0, -0.95, -0.9), .scale = Vector3(1, 0.2, 1) });
+	ecs::AddComponent(GUIBackround, SpriteRenderer{ .texture = &GUItexture, .uiElement = true });
+	ecs::AddComponent(GUIBackround, Transform{ .position = Vector3(0, -0.95, -0.9), .scale = Vector3(1, 0.2, 1) });*/
 
 	ecs::Entity torpIndicator1 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator1, new TextRenderer{ .font = &stencilFont, .text = playerNames[0], .offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	SpriteRenderer& torpicon1 = ecs::AddComponent(torpIndicator1, new SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator1, new Transform{ .position = Vector3(-0.75, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
+	ecs::AddComponent(torpIndicator1, TextRenderer{ .font = &stencilFont, .text = playerNames[0], .offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
+	ecs::AddComponent(torpIndicator1, SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
+	ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(-0.75, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
 	ecs::Entity torpIndicator2 = ecs::NewEntity();
-	SpriteRenderer& torpicon2 = ecs::AddComponent(torpIndicator2, new SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator2, new Transform{ .position = Vector3(-0.65, -0.9, -0.55), .scale = Vector3(0.05, 0.085, 1) });
+	ecs::AddComponent(torpIndicator2, SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
+	ecs::AddComponent(torpIndicator2, Transform{ .position = Vector3(-0.65, -0.9, -0.55), .scale = Vector3(0.05, 0.085, 1) });
 
 
 	*/
@@ -193,21 +193,21 @@ int main()
 
 	Animation crowdAnims = AnimationsFromSpritesheet("CrowdCheer14.png", 3, 1, vector<int>(3, 150))[0];
 	ecs::Entity crowd = ecs::NewEntity();
-	ecs::AddComponent(crowd, new Transform{ .position = Vector3(1530, -1700, 10), .scale = Vector3(100, 30, 0) });
-	ecs::AddComponent(crowd, new SpriteRenderer{});
-	ecs::AddComponent(crowd, new Animator{});
+	ecs::AddComponent(crowd, Transform{ .position = Vector3(1530, -1700, 10), .scale = Vector3(100, 30, 0) });
+	ecs::AddComponent(crowd, SpriteRenderer{});
+	ecs::AddComponent(crowd, Animator{});
 	AnimationSystem::AddAnimation(crowd, crowdAnims, "CrowdCheer");
 	AnimationSystem::PlayAnimation(crowd, "CrowdCheer", true);
 	ecs::Entity crowd1 = ecs::NewEntity();
-	ecs::AddComponent(crowd1, new Transform{ .position = Vector3(1545, -1715, 11), .scale = Vector3(100, 30, 0) });
-	ecs::AddComponent(crowd1, new SpriteRenderer{});
-	ecs::AddComponent(crowd1, new Animator{});
+	ecs::AddComponent(crowd1, Transform{ .position = Vector3(1545, -1715, 11), .scale = Vector3(100, 30, 0) });
+	ecs::AddComponent(crowd1, SpriteRenderer{});
+	ecs::AddComponent(crowd1, Animator{});
 	AnimationSystem::AddAnimation(crowd1, crowdAnims, "Cheer2");
 	AnimationSystem::PlayAnimation(crowd1, "Cheer2", true);
 	ecs::Entity crowd2 = ecs::NewEntity();
-	ecs::AddComponent(crowd2, new Transform{ .position = Vector3(1520, -1730, 12), .scale = Vector3(100, 30, 0) });
-	ecs::AddComponent(crowd2, new SpriteRenderer{});
-	ecs::AddComponent(crowd2, new Animator{});
+	ecs::AddComponent(crowd2, Transform{ .position = Vector3(1520, -1730, 12), .scale = Vector3(100, 30, 0) });
+	ecs::AddComponent(crowd2, SpriteRenderer{});
+	ecs::AddComponent(crowd2, Animator{});
 	AnimationSystem::AddAnimation(crowd2, crowdAnims, "Cheer3");
 	AnimationSystem::PlayAnimation(crowd2, "Cheer3", true);
 	//cheerSpeaker.Play(cheerSound);
@@ -236,6 +236,16 @@ int main()
 
 	while (!glfwWindowShouldClose(window))
 	{
+		TextRenderer& winText = ecs::GetComponent<TextRenderer>(playerWin);
+		TextRenderer& p1Win = ecs::GetComponent<TextRenderer>(pSFont1);
+		TextRenderer& p2Win = ecs::GetComponent<TextRenderer>(pSFont2);
+		TextRenderer& p3Win = ecs::GetComponent<TextRenderer>(pSFont3);
+		TextRenderer& p4Win = ecs::GetComponent<TextRenderer>(pSFont4);
+		Player& player = ecs::GetComponent<Player>(laMuerte);
+		Player& player2 = ecs::GetComponent<Player>(laMuerte2);
+		Player& player3 = ecs::GetComponent<Player>(laMuerte3);
+		Player& player4 = ecs::GetComponent<Player>(laMuerte4);
+
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 

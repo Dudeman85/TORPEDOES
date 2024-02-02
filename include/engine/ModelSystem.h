@@ -7,7 +7,7 @@ namespace engine
 {
 	//3D Model Renderer component
 	ECS_REGISTER_COMPONENT(ModelRenderer)
-	struct ModelRenderer : ecs::Component
+	struct ModelRenderer
 	{
 		Model* model;
 		Shader* shader;
@@ -89,7 +89,7 @@ namespace engine
 				ecs::Entity entity = *itr++;
 
 				//Get relevant components
-				Transform transform = ecs::GetComponent<Transform>(entity);
+				Transform& transform = ecs::GetComponent<Transform>(entity);
 				ModelRenderer& modelRenderer = ecs::GetComponent<ModelRenderer>(entity);
 
 				//If a shader has been specified for this sprite use it, else use the default
