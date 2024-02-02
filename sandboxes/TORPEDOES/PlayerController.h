@@ -234,18 +234,18 @@ public:
 						float rightStickY1 = *axesThirdPointer1;
 
 						//std::cout << *axesStartPointer << "\n";
-						
+
 						const unsigned char* buttonpointer = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &count);
 						const unsigned char* buttonpointer1 = glfwGetJoystickButtons(GLFW_JOYSTICK_2, &count);
 
 						const unsigned char* buttonsecondpointer = buttonpointer + 1;
 						const unsigned char* buttonsecondpointer1 = buttonpointer1 + 1;
 
-						
+
 
 						std::cout << static_cast<float>(*buttonpointer) << " " << static_cast<float>(*buttonsecondpointer) << "\n";
-						
-						
+
+
 
 
 						const float* next = axesStartPointer + 1; // Increment the pointer by 1 to move to the next element
@@ -254,11 +254,11 @@ public:
 							//std::cout << *next << "\n";
 							next = next + 1; // Increment the pointer by 1 to move to the next element
 						}
-						
+
 						const int buttonLeft = state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT];
 						const int buttonRight = state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT];
 						const int button_A = state.buttons[GLFW_GAMEPAD_BUTTON_A];
-						
+
 						// Calculate acceleration based on joystick values
 						// and check if it's rotating left or right
 						//const float ltValue = state.axes[4]; // Left trigger
@@ -276,7 +276,7 @@ public:
 							rotateInput += rightStickX1;
 							ProjetileInput = static_cast<float>(*buttonpointer1);
 						}
-						
+
 						/*accelerationInput += rightStickY;
 						rotateInput += +buttonRight - buttonLeft;
 						ProjetileInput = button_A;
@@ -284,7 +284,7 @@ public:
 						// Deadzone for the right joystick
 						if (fabs(rightStickX) > 0.2)
 						{
-							// Set rotation input to rigth sticke 
+							// Set rotation input to rigth sticke
 							rotateInput += rightStickX;
 						}*/
 					}
