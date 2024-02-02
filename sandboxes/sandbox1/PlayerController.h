@@ -45,7 +45,7 @@ bool HAS_WON = false;
 ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonCollider, ModelRenderer)
 class PlayerController : public ecs::System
 {
-	float starTimer = 18.0; // start Time 
+	float starTimer = 19.0; // start Time 
 	Model* torpedomodel;
 	void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 sapawnRotation, int owerID)
 	{

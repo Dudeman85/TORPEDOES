@@ -174,7 +174,7 @@ int main()
 
 	/*ecs::Entity GUIBackround = ecs::NewEntity();
 	ecs::AddComponent(GUIBackround, new SpriteRenderer{ .texture = &GUItexture, .uiElement = true });
-	ecs::AddComponent(GUIBackround, new Transform{ .position = Vector3(0, -0.95, -0.9), .scale = Vector3(1, 0.2, 1) });*/
+	ecs::AddComponent(GUIBackround, new Transform{ .position = Vector3(0, -0.95, -0.9), .scale = Vector3(1, 0.2, 1) });
 
 	ecs::Entity torpIndicator1 = ecs::NewEntity();
 	ecs::AddComponent(torpIndicator1, new TextRenderer{ .font = &stencilFont, .text = playerNames[0], .offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
@@ -184,30 +184,8 @@ int main()
 	SpriteRenderer& torpicon2 = ecs::AddComponent(torpIndicator2, new SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
 	ecs::AddComponent(torpIndicator2, new Transform{ .position = Vector3(-0.65, -0.9, -0.55), .scale = Vector3(0.05, 0.085, 1) });
 
-	ecs::Entity torpIndicator3 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator3, new TextRenderer{ .font = &stencilFont, .text = playerNames[1], .offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	SpriteRenderer& torpicon3 = ecs::AddComponent(torpIndicator3, new SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator3, new Transform{ .position = Vector3(-0.25, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
-	ecs::Entity torpIndicator4 = ecs::NewEntity();
-	SpriteRenderer& torpicon4 = ecs::AddComponent(torpIndicator4, new SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator4, new Transform{ .position = Vector3(-0.15, -0.9, -0.55), .scale = Vector3(0.05, 0.085, 1) });
 
-	ecs::Entity torpIndicator5 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator5, new TextRenderer{ .font = &stencilFont, .text = playerNames[2],.offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	SpriteRenderer& torpicon5 = ecs::AddComponent(torpIndicator5, new SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator5, new Transform{ .position = Vector3(0.15, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
-	ecs::Entity torpIndicator6 = ecs::NewEntity();
-	SpriteRenderer& torpicon6 = ecs::AddComponent(torpIndicator6, new SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator6, new Transform{ .position = Vector3(0.25, -0.9, -0.55), .scale = Vector3(0.05, 0.085, 1) });
-
-	ecs::Entity torpIndicator7 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator7, new TextRenderer{ .font = &stencilFont, .text = playerNames[3],.offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	SpriteRenderer& torpicon7 = ecs::AddComponent(torpIndicator7, new SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator7, new Transform{ .position = Vector3(0.65, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
-	ecs::Entity torpIndicator8 = ecs::NewEntity();
-	SpriteRenderer& torpicon8 = ecs::AddComponent(torpIndicator8, new SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator8, new Transform{ .position = Vector3(0.75, -0.9, -0.55), .scale = Vector3(0.05, 0.085, 1) });
-
+	*/
 
 	// create explosion Animation PlayerController 
 	Animation explosionAnim = AnimationsFromSpritesheet("explosion.png", 6, 1, vector<int>(6, 150))[0];
@@ -241,19 +219,20 @@ int main()
 	spriteRenderSystem->SetTilemap(&map);
 	collisionSystem->SetTilemap(&map);
 	PhysicsSystem::SetTileProperty(1, TileProperty{ true });
+	
 	//call the function. createChepoint
 
-	createChepoint(Vector3(2100.226807, -963.837402, 100.000000), Vector3(30.000000, 159.245773, 0.000000), Vector3(17), checkPointModel, 45.0f); // 0
-	createChepoint(Vector3(2957.365723, -828.268005, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), checkPointModel, 45.0f); // 1
-	createChepoint(Vector3(3387.268555, -355.873444, 100.000000), Vector3(45.000000, 99.936874, 0.000000), Vector3(17), checkPointModel, 45.0f); // 2
-	createChepoint(Vector3(3655.793701, -1339.042236, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), checkPointModel, 45.0f); // 3
-	createChepoint(Vector3(2795.650391, -1489.039795, 100.000000), Vector3(45.000000, -368.616577, 0.000000), Vector3(17), checkPointModel, 45.0f); // 4
-	createChepoint(Vector3(2597.463135, -684.973389, 100.000000), Vector3(45.000000, 180.022018, 0.000000), Vector3(17), checkPointModel, 45.0f); // 5
-	createChepoint(Vector3(1668.260010, -990.794373, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), checkPointModel, 45.0f); // 6 
-	createChepoint(Vector3(1043.635132, -875.206543, 100.000000), Vector3(45.000000, 179.241272, 0.000000), Vector3(17), checkPointModel, 45.0f); // 7
-	createChepoint(Vector3(943.931152, -293.566711, 100.000000), Vector3(45.000000, 107.476852, 0.000000), Vector3(17), checkPointModel, 45.0f); // 8
-	createChepoint(Vector3(586.608276, -1249.448486, 100.000000), Vector3(45.000000, 40.070156, 0.000000), Vector3(17), checkPointModel, 90.0f); // 9
-	createChepoint(Vector3(1513.692383, -1462.996187, 50.000000), Vector3(90.000000, 90.901711, 0.000000), Vector3(14), model2, -1, true); // 10
+	//createChepoint(Vector3(2100.226807, -963.837402, 100.000000), Vector3(30.000000, 159.245773, 0.000000), Vector3(17), checkPointModel, 45.0f); // 0
+	//createChepoint(Vector3(2957.365723, -828.268005, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), checkPointModel, 45.0f); // 1
+	//createChepoint(Vector3(3387.268555, -355.873444, 100.000000), Vector3(45.000000, 99.936874, 0.000000), Vector3(17), checkPointModel, 45.0f); // 2
+	//createChepoint(Vector3(3655.793701, -1339.042236, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), checkPointModel, 45.0f); // 3
+	//createChepoint(Vector3(2795.650391, -1489.039795, 100.000000), Vector3(45.000000, -368.616577, 0.000000), Vector3(17), checkPointModel, 45.0f); // 4
+	//createChepoint(Vector3(2597.463135, -684.973389, 100.000000), Vector3(45.000000, 180.022018, 0.000000), Vector3(17), checkPointModel, 45.0f); // 5
+	//createChepoint(Vector3(1668.260010, -990.794373, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), checkPointModel, 45.0f); // 6 
+	//createChepoint(Vector3(1043.635132, -875.206543, 100.000000), Vector3(45.000000, 179.241272, 0.000000), Vector3(17), checkPointModel, 45.0f); // 7
+	//createChepoint(Vector3(943.931152, -293.566711, 100.000000), Vector3(45.000000, 107.476852, 0.000000), Vector3(17), checkPointModel, 45.0f); // 8
+	//createChepoint(Vector3(586.608276, -1249.448486, 100.000000), Vector3(45.000000, 40.070156, 0.000000), Vector3(17), checkPointModel, 90.0f); // 9
+	//createChepoint(Vector3(1513.692383, -1462.996187, 50.000000), Vector3(90.000000, 90.901711, 0.000000), Vector3(14), model2, -1, true); // 10
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -274,96 +253,28 @@ int main()
 		p3Win.text = to_string(player3.lap) + "/1";
 		p4Win.text = to_string(player4.lap) + "/1";
 
-		//player 1
-		if (player.projectileTime1 > 0)
-		{
-			torpicon1.texture = &torprldtexture;
-		}
-		else
-		{
-			torpicon1.texture = &torprdytexture;
-			//torpSpeaker.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker, PlayerTransform.position.x, PlayerTransform.position.y, 0);
-		}
-		if (player.projectileTime2 > 0)
-		{
-			torpicon2.texture = &torprldtexture;
-		}
-		else
-		{
-			torpicon2.texture = &torprdytexture;
-			//torpSpeaker2.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker2, PlayerTransform.position.x, PlayerTransform.position.y, 0);
-		}
+		////player 1
+		//if (player.projectileTime1 > 0)
+		//{
+		//	torpicon1.texture = &torprldtexture;
+		//}
+		//else
+		//{
+		//	torpicon1.texture = &torprdytexture;
+		//	//torpSpeaker.Play(torpedoSound);
+		//	//soundDevice->SetSourceLocation(torpSpeaker, PlayerTransform.position.x, PlayerTransform.position.y, 0);
+		//}
+		//if (player.projectileTime2 > 0)
+		//{
+		//	torpicon2.texture = &torprldtexture;
+		//}
+		//else
+		//{
+		//	torpicon2.texture = &torprdytexture;
+		//	//torpSpeaker2.Play(torpedoSound);
+		//	//soundDevice->SetSourceLocation(torpSpeaker2, PlayerTransform.position.x, PlayerTransform.position.y, 0);
+		//}
 
-
-		/// Player 2
-		if (player2.projectileTime1 > 0)
-		{
-			torpicon3.texture = &torprldtexture;
-		}
-		else
-		{
-			torpicon3.texture = &torprdytexture;
-			//torpSpeaker3.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker3, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
-		}
-		if (player2.projectileTime2 > 0)
-		{
-			torpicon4.texture = &torprldtexture;
-		}
-		else
-		{
-			torpicon4.texture = &torprdytexture;
-			//torpSpeaker4.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker4, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
-
-		}
-
-		// palyer 3
-		if (player3.projectileTime1 > 0)
-		{
-			torpicon5.texture = &torprldtexture;
-		}
-		else
-		{
-			torpicon5.texture = &torprdytexture;
-			//torpSpeaker5.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker5, PlayerTransform3.position.x, PlayerTransform3.position.y, 0);
-		}
-		if (player3.projectileTime2 > 0)
-		{
-			torpicon6.texture = &torprldtexture;
-		}
-		else
-		{
-			torpicon6.texture = &torprdytexture;
-			//torpSpeaker6.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker6, PlayerTransform3.position.x, PlayerTransform3.position.y, 0);
-		}
-
-		// palyer 4 
-
-		if (player4.projectileTime1 > 0)
-		{
-			torpicon7.texture = &torprldtexture;
-		}
-		else
-		{
-			torpicon7.texture = &torprdytexture;
-			//torpSpeaker7.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker7, PlayerTransform4.position.x, PlayerTransform4.position.y, 0);
-		}
-		if (player4.projectileTime2 > 0)
-		{
-			torpicon8.texture = &torprldtexture;
-		}
-		else
-		{
-			torpicon8.texture = &torprdytexture;
-			//torpSpeaker8.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker8, PlayerTransform4.position.x, PlayerTransform4.position.y, 0);
-		}
 
 		//engine Sounds
 		//soundDevice->SetSourceLocation(engineSpeaker, PlayerTransform.position.x, PlayerTransform.position.y, 0);
@@ -371,23 +282,6 @@ int main()
 		//soundDevice->SetSourceLocation(engineSpeaker3, PlayerTransform3.position.x, PlayerTransform3.position.y, 0);
 		//soundDevice->SetSourceLocation(engineSpeaker4, PlayerTransform4.position.x, PlayerTransform4.position.y, 0);
 		//adding pitch based on speed
-		float normalizedVelocity = PlayerRigidbody.velocity.Length() / 166.0f;
-		float accLevel = std::lerp(0.0f, 1.5f, normalizedVelocity);
-		//engineSpeaker.setPitch(0.5f + accLevel);
-
-		float normalizedVelocity2 = PlayerRigidbody2.velocity.Length() / 166.0f;
-		float accLevel2 = std::lerp(0.0f, 1.5f, normalizedVelocity2);
-		//engineSpeaker2.setPitch(0.5f + accLevel2);
-
-		float normalizedVelocity3 = PlayerRigidbody3.velocity.Length() / 166.0f;
-		float accLevel3 = std::lerp(0.0f, 1.5f, normalizedVelocity3);
-		//engineSpeaker3.setPitch(0.5f + accLevel3);
-
-		float normalizedVelocity4 = PlayerRigidbody4.velocity.Length() / 166.0f;
-		float accLevel4 = std::lerp(0.0f, 1.5f, normalizedVelocity4);
-		//engineSpeaker4.setPitch(0.5f + accLevel4);
-
-
 		//soundDevice->SetSourceLocation(cheerSpeaker, 1530, -1700, 1);
 
 		if (player.playExlposionSound)
@@ -477,7 +371,7 @@ int main()
 		//soundDevice->SetLocation(camPosX, camPosY, 1);
 		//soundDevice->SetOrientation(0.f, 0.f, -1.f, 0.f, 0.f, 1.f);
 
-		Update(&cam);
+		engine::Update(&cam);
 
 		// playerControl Update for frame 
 		playerController->Update(window, deltaTime);
