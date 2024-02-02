@@ -28,7 +28,41 @@ source distribution.
 #pragma once
 
 #include <tmxlite/Map.hpp>
-#include <vector>
+#include <engine/Constants.h>
+#include <engine/Vector.h>
+#include <map>
+
+
+struct VarMap
+{
+
+};
+
+struct VarGroup
+{
+
+};
+
+struct VarObject
+{
+
+};
+
+struct VarLayer
+{
+
+};
+
+struct VarSet
+{
+
+};
+
+struct VarTile
+{
+
+};
+
 
 using namespace tmx;
 using namespace std;
@@ -43,11 +77,10 @@ public:
 	// Destructor
 	~Tilemap();
 
-private:
+	// load() Function to load Tilemap and it's tileset
+	void load(const string map);
 
-	// Function to get values from tilemap (.tmx) and tileset (.tsx).
-	// Also sets the gotten values to pointer variables
-	void getTiledVar();
-
-	Map tMap;
+	// draw() Function to go through all layers and
+	// draws them on the screen
+	void draw();
 };

@@ -39,9 +39,16 @@ Tilemap::~Tilemap()
 
 }
 
-// Function to get values from tilemap (.tmx) and tileset (.tsx).
-// Also sets the gotten values to pointer variables
-void Tilemap::getTiledVar()
+// load() Function to load Tilemap and it's tileset
+void load(const string map)
+{
+	Map tiledmap;
+	tiledmap.load(assetPath + map);
+}
+
+// draw() Function to go through all layers and
+// draws them on the screen
+void draw()
 {
 
 }
