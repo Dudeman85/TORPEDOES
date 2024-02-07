@@ -41,6 +41,10 @@ int main()
     }
 
     input::initialize(window);
+    input::InputEvent* shootEvent = new input::InputEvent("shootEvent");
+    // TODO: Make an API for this, so no need to call "new"
+
+    input::bindInput(GLFW_KEY_SPACE, {"shootEvent"});
 
     // Main loop
     while (!glfwWindowShouldClose(window)) 
@@ -51,10 +55,18 @@ int main()
 
         // DONE: Add & test InputButtons
         // DONE: Add InputEvents
+        // DONE: Test inputEvents
+        if (shootEvent->isPressed())
+        {
+            std::cout << "shoot Event presed!\n";
+        }
+        else
+        {
+            std::cout << "shoot Event not presed!\n";
+        }
         
-        // DOING: Test inputEvents
-        
-        // TODO: Add & test InputAxis
+        // DOING: Add & test InputAxis
+       
         // TODO: Add & test InputAxisEvents
         // TODO: Add & test InputCustom
         // TODO: Add & test API functions for easy creation, modification & access of all above
