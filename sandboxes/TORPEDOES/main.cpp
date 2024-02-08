@@ -55,7 +55,6 @@ int main()
 	Model model("LaMuerte.obj");
 	Model checkPointModel("Checkpoint.obj");
 	Model model2("Finish_line.obj");
-	Texture GUItexture = Texture("GUI_backround.png");
 	Texture torprldtexture = Texture("torpedoReloading.png");
 	Texture torprdytexture = Texture("torpedoReady.png");
 	// Font http address:

@@ -48,10 +48,10 @@ int main()
 	SpriteRenderSystem::SetBackgroundColor(0, 150, 0);
 
 	//Load some sprites
-	Texture strawberry("strawberry.png");
+	Texture strawberry("sandbox4/strawberry.png");
 
 	//Load some models
-	Model ship("Achelous.obj");
+	Model ship("sandbox4/Achelous.obj");
 
 	//Create a new entity
 	ecs::Entity entity = ecs::NewEntity();

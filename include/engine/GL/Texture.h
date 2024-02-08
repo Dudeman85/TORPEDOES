@@ -35,13 +35,15 @@ namespace engine
 		}
 
 		//Load a texture from path
-		Texture(std::string path, unsigned int filteringType = GL_NEAREST, bool flip = true)
+		Texture(std::string path, unsigned int filteringType = GL_NEAREST, bool flip = true, bool relativePath = true)
 		{
 			//Flip the image when loading into an OpenGL texture
 			stbi_set_flip_vertically_on_load(flip);
 			//Load image
+			if (relativePath)
+				path = assetPath + path;
 			int width, height, nrChannels;
-			unsigned char* imageData = stbi_load((assetPath + path).c_str(), &width, &height, &nrChannels, 0);
+			unsigned char* imageData = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
 
 			if (imageData)
 			{
@@ -79,12 +81,12 @@ namespace engine
 
 				//Image data is no longer needed
 				stbi_image_free(imageData);
-			}
+		}
 			else
 			{
-				std::cout << "Error loading texture from " << assetPath + path << std::endl;
+				std::cout << "Error loading texture from " << path << std::endl;
 			}
-		}
+	}
 		//Declare the constuctor through image. It is defined in Image.h
 		inline Texture(Image image, unsigned int filteringType = GL_NEAREST);
 
@@ -122,5 +124,5 @@ namespace engine
 		std::string type = "";
 	private:
 		unsigned int id = 0;
-	};
+};
 }
