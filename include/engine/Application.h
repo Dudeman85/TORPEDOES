@@ -19,7 +19,9 @@
 
 namespace engine
 {
+	// TODO: replace with double
 	float deltaTime = 0;
+	// TODO: replace with double
 	float programTime = 0;
 	chrono::time_point<chrono::high_resolution_clock> _lastFrame;
 

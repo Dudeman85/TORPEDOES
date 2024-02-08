@@ -6,10 +6,8 @@
 #include <list>
 #include <cmath>
 
-#include <GLFW/glfw3.h>
 #include "engine/Vector.h"
-
-#include <iostream>
+#include "engine/Application.h"
 
 namespace input
 { 
@@ -50,50 +48,110 @@ namespace input
 		// X is set to the moment a callback to this input is reached. Y is set to value
 		using InputSample = Vector2;
 
-		std::list<Vector2> inputSamples;
+		std::list<InputSample> inputSamples;
 
-		double lastUpdatedTime; // last time the inputValue was updated
+		float lastUpdatedTime; // Last time the inputValue was updated
 
-		void addInputSample(float value)
+		InputValue(float startingValue = 0)
 		{
-			// Called from callback function, add currrent time and value into inputSamples
+			// First sample is 0, we assume the value is not changed
+			inputSamples.push_back({ 0,startingValue });
+			lastUpdatedTime = engine::deltaTime;
+		}
 
-			// Get current time (DeltaTime - lastUpdatedTime)
+		void update()
+		{
+			clearInputSamples();
+			lastUpdatedTime = engine::deltaTime;
+		}
+
+		// Called from a callback function
+		void addInputSample(float addValue)
+		{
+			inputSamples.push_back((engine::deltaTime - lastUpdatedTime, addValue));
 		};
 
-		void clearInputSamples(InputSample)
+		void clearInputSamples()
 		{
 			if (inputSamples.size() <= 0)
 			{
 				return;
 			}
-			// Add last sample
+			// Keep the latest sample
 			InputSample latestSample = *inputSamples.end();
+			// Set the latest sample to be before our 0 time, as it's from the last update iteration
+			latestSample.x = (engine::deltaTime - lastUpdatedTime) - latestSample.x;
 
 			inputSamples.clear();
 
 			inputSamples.push_back(latestSample);
 		};
 
-		const bool findValue(float value)
+		const bool isValue(float targetValue)
 		{
-			// Loop throgh all inputValues to check if ANY have met this value:
-
-			//return findIntersectionTime(inputSamples[0], inputSamples[1], value).has_value();
+			// We need at least 2 samples
+			if (inputSamples.size() > 1)
+			{
+				// Loop throgh all inputValues to check if ANY have met the specified value
+				for (std::list<InputSample>::iterator it = inputSamples.begin(); it != inputSamples.end();)
+				{
+					if (findIntersectionTime(*it, *(++it), targetValue).has_value())
+					{
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 
-		const bool findRange(float minimumValue, float maximumValue)
+		const bool isRange(float minimumValue, float maximumValue)
 		{
-			// Loop throgh all inputValues to check if ANY fall within this range:
+			// We need at least 2 samples
+			if (inputSamples.size() > 1)
+			{
+				// Loop throgh all inputValues to check if ANY have met the specified value
+				for (std::list<InputSample>::iterator it = inputSamples.begin(); it != inputSamples.end();)
+				{
+					InputSample current = *it;
+					InputSample previous = *(++it);
 
-			return (findValue(minimumValue) || findValue(maximumValue));
+					// TODO: Unnecessarily expensive, we can just check InputSamples directly
+					if (findIntersectionTime(current, previous, minimumValue).has_value())
+					{
+						return true;
+					}
+					if(findIntersectionTime(current, previous, minimumValue).has_value())
+					{
+						return true;
+					}
+				}
+			}
+
+			return false;
 		}
 
-		const std::optional<float> findTimeSpent(float value)
+		const float findTimeSpent(float targetValue)
 		{
-			// Loop throgh all inputValues and add their time together:
+			// We need at least 2 samples
+			if (inputSamples.size() > 1)
+			{
+				return 0;
+			}
 
-			//return findIntersectionTimeSpent(inputSamples[0], inputSamples[1], value);
+			float timeSpent = 0;
+
+			// Loop throgh all inputValues and add their spent times together
+			for (std::list<InputSample>::iterator it = inputSamples.begin(); it != inputSamples.end();)
+			{
+				std::optional<float> time = findIntersectionTime(*it, *(++it), targetValue);
+
+				if (time.has_value())
+				{
+					timeSpent += time.value();
+				}
+			}
+
+			return timeSpent;
 		}
 
 		const static std::optional<float> findIntersectionTime(InputSample previousSample, InputSample currentSample, float targetValue)
@@ -104,8 +162,8 @@ namespace input
 
 			float intersectionX = (targetValue - yIntercept) / slope;
 
-			// Value never reaches targetValue
-			if (!std::isfinite(intersectionX))
+			// Value never reaches targetValue, or intersection happened before 0, meaning in the previous update iteration
+			if (!std::isfinite(intersectionX) || intersectionX < 0)
 			{
 				return std::nullopt;
 			}
@@ -115,18 +173,16 @@ namespace input
 		const static std::optional<float> findIntersectionTimeSpent(InputSample previousSample, InputSample currentSample, float targetValue)
 		{
 			std::optional<float> targetX = findIntersectionTime(previousSample, currentSample, targetValue);
-			if (!targetX)
+			if (!targetX.has_value())
 			{
 				return std::nullopt;
 			}
 
-			Vector2 delta = { std::abs(currentSample.x - targetX.value()), std::abs(currentSample.y - targetValue) };
-
-			float distance = delta.Length();
-
-			return distance;
+			return Vector2(std::abs(currentSample.x - targetX.value()), std::abs(currentSample.y - targetValue)).Length();
 		}
 	};
+
+	std::map<inputKey, InputValue*> inputKeytoInputValue;	// All inputButtons
 
 	class InputEvent;
 	// All inputEvents
@@ -385,7 +441,7 @@ namespace input
 	// Function prototype for the key callback
 	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
 	{
-		// Find input button (Yes, this is slow. Yes, it's only way to have buttons pressed and released on same update)
+		// Find input button. Yes, this is slow. Try to create a callback to a non-static function if you dislike it. I dare you.
 		auto it = inputKeyToInputButton.find(key);
 
 		// Call input button's callback logic
