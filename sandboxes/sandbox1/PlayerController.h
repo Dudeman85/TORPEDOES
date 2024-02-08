@@ -5,7 +5,7 @@
 using namespace engine;
 
 ECS_REGISTER_COMPONENT(Player)
-struct Player : ecs::Component
+struct Player
 {
 	float projectileSpeed = 500;  // Attack state
 	bool attackHeld = false;     // Indicates if the attack button is held
@@ -28,13 +28,13 @@ struct Player : ecs::Component
 	string playerLap;
 };
 ECS_REGISTER_COMPONENT(CheckPoint)
-struct CheckPoint: ecs::Component
+struct CheckPoint
 {
 	int checkPointID = 0;
 	bool Finish_line = false;
 };
 ECS_REGISTER_COMPONENT(Projectile)
-struct Projectile : ecs::Component
+struct Projectile
 {
 	int ownerID = 0;
 };
@@ -45,7 +45,10 @@ bool HAS_WON = false;
 ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonCollider, ModelRenderer)
 class PlayerController : public ecs::System
 {
-	float starTimer = 19.0; // start Time 
+
+	float starTimer = 19.0; // start Time ////////////////////////////////////////////
+
+
 	Model* torpedomodel;
 	void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 sapawnRotation, int owerID)
 	{
@@ -235,7 +238,7 @@ public:
 				}
 			}
 			starTimer -= dt;
-			printf("starTimer: %i\n", int(starTimer));
+			//printf("starTimer: %i\n", int(starTimer));
 			// topedo hit logica 
 			if (player.hitPlayer == true)
 			{

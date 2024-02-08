@@ -21,25 +21,32 @@
 
 namespace engine
 {
-	//2D Sprite Renderer component
+	///2D Sprite Renderer component
 	ECS_REGISTER_COMPONENT(SpriteRenderer)
 	struct SpriteRenderer
 	{
+		///Abstraction class for textures
 		Texture* texture = nullptr;
+		///Abstraction class for shaders
 		Shader* shader = nullptr;
+		///Bool to turn on the sprite renderer
 		bool enabled = true;
+		///Bool to turn on the ui elements
 		bool uiElement = false;
 	};
 
-	//Animation struct. Not a component
+	///Animation struct. Not a component
 	struct Animation
 	{
 		Animation() {};
 		Animation(std::vector<Texture*> animationTextures, std::vector<int> animationDelays)
 		{
 			assert(animationTextures.size() == animationDelays.size() && "Failed to create animation! Number of frames and delays do not match!");
+			
 			textures = animationTextures;
+			
 			delays = animationDelays;
+			
 			length = animationDelays.size();
 		};
 		std::vector<Texture*> textures;
@@ -47,7 +54,7 @@ namespace engine
 		unsigned int length = 0;
 	};
 
-	//Animator component
+	///Animator component
 	ECS_REGISTER_COMPONENT(Animator)
 	struct Animator
 	{
@@ -61,8 +68,7 @@ namespace engine
 		float animationTimer = 0;
 	};
 
-	//2D Sprite Render system
-	//Requires SpriteRenderer and Transform
+	///2D Sprite Render system, Requires SpriteRenderer and Transform
 	ECS_REGISTER_SYSTEM(SpriteRenderSystem, SpriteRenderer, Transform)
 	class SpriteRenderSystem : public ecs::System
 	{
@@ -73,7 +79,7 @@ namespace engine
 			glDeleteVertexArrays(1, &VBO);
 			glDeleteVertexArrays(1, &EBO);
 		}
-
+		///Initialize the shaders and clear the screen
 		void Init()
 		{
 			//Set the screen clear color to black
@@ -157,7 +163,7 @@ namespace engine
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
-		//Renders everything. Call this every frame
+		///Renders everything. Call this every frame
 		void Update(Camera* cam)
 		{
 			//Sort the entities and tilemap by Z
@@ -220,7 +226,7 @@ namespace engine
 			glBindVertexArray(0);
 		}
 
-		//Draw an entity to the screen
+		///Draw an entity to the screen
 		void DrawEntity(ecs::Entity entity, Camera* cam)
 		{
 			//Get relevant components
@@ -278,13 +284,13 @@ namespace engine
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
-		//Set the screens clear color to given rgb
+		///Set the screens clear color to given rgb
 		static void SetBackgroundColor(float r, float g, float b)
 		{
 			glClearColor(r / 255, g / 255, b / 255, 1.0f);
 		}
 
-		//Set a tilemap to render
+		///Set a tilemap to render
 		void SetTilemap(Tilemap* map)
 		{
 			tilemap = map;
@@ -301,8 +307,7 @@ namespace engine
 		Tilemap* tilemap = nullptr;
 	};
 
-	//Animator system
-	//Requires Animator and SpriteRenderer
+	///Animator system, Requires Animator and SpriteRenderer
 	ECS_REGISTER_SYSTEM(AnimationSystem, Animator, SpriteRenderer)
 	class AnimationSystem : public ecs::System
 	{
@@ -333,7 +338,7 @@ namespace engine
 			}
 		}
 
-		//Advance to the next animation frame of current animation
+		///Advance to the next animation frame of current animation
 		static void AdvanceFrame(ecs::Entity entity)
 		{
 			//Get the relevant components from entity
@@ -362,7 +367,7 @@ namespace engine
 			}
 		}
 
-		//Add animations to entity, they will be accessible by given names
+		///Add animations to entity, they will be accessible by given names
 		static void AddAnimations(ecs::Entity entity, std::vector<Animation> animations, std::vector<std::string> names)
 		{
 			if (animations.size() > names.size())
@@ -377,7 +382,7 @@ namespace engine
 			}
 		}
 
-		//Add an animation to entity, it will be accessibl by given name
+		///Add an animation to entity, it will be accessibl by given name
 		static void AddAnimation(ecs::Entity entity, Animation animation, std::string name)
 		{
 			Animator& animator = ecs::GetComponent<Animator>(entity);
@@ -386,7 +391,7 @@ namespace engine
 			animator.animations.insert({ name, animation });
 		}
 
-		//Play an animation, optionally set it to repeat, if the animation is currently playing don't do anything
+		///Play an animation, optionally set it to repeat, if the animation is currently playing don't do anything
 		static void PlayAnimation(ecs::Entity entity, std::string animation, bool repeat = false)
 		{
 			Animator& animator = ecs::GetComponent<Animator>(entity);
@@ -410,7 +415,7 @@ namespace engine
 			AdvanceFrame(entity);
 		}
 
-		//Stop an animation, optionally provide the specific animation to stop
+		///Stop an animation, optionally provide the specific animation to stop
 		static void StopAnimation(ecs::Entity entity, std::string animation = "")
 		{
 			Animator& animator = ecs::GetComponent<Animator>(entity);
