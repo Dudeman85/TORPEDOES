@@ -1,4 +1,0 @@
-var struct_assimp_1_1_i_f_c_1_1_schema__4_1_1_ifc_rational_b_spline_surface_with_knots =
-[
-    [ "IfcRationalBSplineSurfaceWithKnots", "struct_assimp_1_1_i_f_c_1_1_schema__4_1_1_ifc_rational_b_spline_surface_with_knots.html#aff0b095e6443e8475e71318c25e7bb71", null ]
-];

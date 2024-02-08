@@ -1,4 +1,0 @@
-var struct_assimp_1_1_step_file_1_1dimension__curve__terminator__to__projection__curve__associativity =
-[
-    [ "dimension_curve_terminator_to_projection_curve_associativity", "struct_assimp_1_1_step_file_1_1dimension__curve__terminator__to__projection__curve__associativity.html#a9eaec7fb889935ccd7e1afdf6fb79a49", null ]
-];

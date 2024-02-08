@@ -1,4 +1,0 @@
-var struct_assimp_1_1_step_file_1_1geometrically__bounded__wireframe__shape__representation =
-[
-    [ "geometrically_bounded_wireframe_shape_representation", "struct_assimp_1_1_step_file_1_1geometrically__bounded__wireframe__shape__representation.html#ade142d895f652098a94a2102d81794e4", null ]
-];

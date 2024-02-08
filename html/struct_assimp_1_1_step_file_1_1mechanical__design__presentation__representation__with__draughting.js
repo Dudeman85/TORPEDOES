@@ -1,4 +1,0 @@
-var struct_assimp_1_1_step_file_1_1mechanical__design__presentation__representation__with__draughting =
-[
-    [ "mechanical_design_presentation_representation_with_draughting", "struct_assimp_1_1_step_file_1_1mechanical__design__presentation__representation__with__draughting.html#a4dd9eab5ef8b7cf468a46f0ac9c2fea7", null ]
-];

@@ -1,4 +1,0 @@
-var struct_assimp_1_1_step_file_1_1mechanical__design__geometric__presentation__representation =
-[
-    [ "mechanical_design_geometric_presentation_representation", "struct_assimp_1_1_step_file_1_1mechanical__design__geometric__presentation__representation.html#a9764de6289f562e95c55dc131f0886dd", null ]
-];

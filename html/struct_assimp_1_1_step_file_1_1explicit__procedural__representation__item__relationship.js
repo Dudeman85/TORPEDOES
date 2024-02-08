@@ -1,4 +1,0 @@
-var struct_assimp_1_1_step_file_1_1explicit__procedural__representation__item__relationship =
-[
-    [ "explicit_procedural_representation_item_relationship", "struct_assimp_1_1_step_file_1_1explicit__procedural__representation__item__relationship.html#ae6fb29c0ddad611bdbfb0c1df0349897", null ]
-];

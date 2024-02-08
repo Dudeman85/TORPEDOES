@@ -1,4 +1,0 @@
-var struct_assimp_1_1_step_file_1_1configuration__item__hierarchical__relationship =
-[
-    [ "configuration_item_hierarchical_relationship", "struct_assimp_1_1_step_file_1_1configuration__item__hierarchical__relationship.html#a20df4b3e316638368ebb46ce8b1bc7b0", null ]
-];

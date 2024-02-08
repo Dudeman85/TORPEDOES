@@ -1,4 +1,0 @@
-var struct_assimp_1_1_step_file_1_1thermodynamic__temperature__measure__with__unit =
-[
-    [ "thermodynamic_temperature_measure_with_unit", "struct_assimp_1_1_step_file_1_1thermodynamic__temperature__measure__with__unit.html#a2bbf3a76c86ca9704cc5c2d148c1ad33", null ]
-];
