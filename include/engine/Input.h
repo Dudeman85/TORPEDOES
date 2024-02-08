@@ -53,6 +53,9 @@ namespace input
 			return newChange;
 		}
 
+		/// 
+		/// Update every frame
+		/// 
 		void update()
 		{
 			InputState newState = InputState::None;
@@ -93,6 +96,7 @@ namespace input
 				}	
 			}
 		}
+	 
 
 	protected:
 		bool pressed = false;	// Whether key is pressed the update before this poll

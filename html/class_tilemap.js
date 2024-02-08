@@ -1,7 +1,6 @@
 var class_tilemap =
 [
     [ "Tilemap", "class_tilemap.html#ac27f37084ba4737825092e6719829514", null ],
-    [ "~Tilemap", "class_tilemap.html#a55034b53884593f379f8475b38e46129", null ],
     [ "checkCollision", "class_tilemap.html#af5839a94d6e8919dc72d879aa8404eaa", null ],
     [ "CheckCollisionBox", "class_tilemap.html#a9fc23508eb3b44cb919013a73cb832e1", null ],
     [ "draw", "class_tilemap.html#ac35ddbbf830a1331a816aea5ec3b2296", null ],

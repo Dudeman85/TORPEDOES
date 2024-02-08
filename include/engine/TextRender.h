@@ -4,25 +4,32 @@
 
 namespace engine
 {
-	// TextRenderer component
+	/// TextRenderer component
 	ECS_REGISTER_COMPONENT(TextRenderer)
 	struct TextRenderer
 	{
+		///The font of the text
 		Font* font;
+		///The text that is printed
 		std::string text = "";
+		///Location of the text on the screen
 		Vector3 offset;
+		///Rotation of the text
 		Vector3 rotation;
+		///Size of the text
 		Vector3 scale = Vector3(1);
+		///Color of the text
 		Vector3 color;
+		///Bool to turn on the ui elements
 		bool uiElement = false;
 	};
 
-	// TextRenderSystem requires components TextRenderer component and transform component
+	/// TextRenderSystem requires components TextRenderer component and transform component
 	ECS_REGISTER_SYSTEM(TextRenderSystem, Transform, TextRenderer)
 	class TextRenderSystem : public ecs::System
 	{
 	public:
-		// Constructor
+		///Initialize the shaders
 		void Init()
 		{
 			m_shader = new Shader(
@@ -53,7 +60,7 @@ namespace engine
 					})",
 				false);
 		}
-
+		///Call this every frame
 		void Update(Camera* cam)
 		{
 			for (auto const& entity : entities)

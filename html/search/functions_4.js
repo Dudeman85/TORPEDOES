@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['ecs_5fcomponent_0',['ECS_COMPONENT',['../_sound_component_8h.html#a4f69ffcab584f917c0d7bb629324db81',1,'SoundComponent.h']]],
-  ['engineinit_1',['EngineInit',['../namespaceengine.html#a308f33c1421de370cc595f78746e634b',1,'engine']]],
-  ['entityexists_2',['EntityExists',['../namespaceengine_1_1ecs.html#abfc14c372fa382bdf191fa3084ce7393',1,'engine::ecs']]]
+  ['getglobaltransformmatrix_0',['GetGlobalTransformMatrix',['../classengine_1_1_transform_system.html#a1c99f4946b231db5534f0527120af615',1,'engine::TransformSystem']]],
+  ['gettileposition_1',['GetTilePosition',['../class_tilemap.html#adaf3a06f572fe0b03770d9cbfc900f50',1,'Tilemap']]]
 ];

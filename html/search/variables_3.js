@@ -1,19 +1,4 @@
 var searchData=
 [
-  ['callback_0',['callback',['../structengine_1_1_polygon_collider.html#ac58c567360e34d3168640e47b7a40ac8',1,'engine::PolygonCollider']]],
-  ['cam_1',['cam',['../classengine_1_1_collision_system.html#a754ef558fb5641e8da38f2e71fd3b16f',1,'engine::CollisionSystem']]],
-  ['chanelid_2',['chanelID',['../structengine_1_1_message.html#a509ee950b048839b4fd915124c1b4911',1,'engine::Message']]],
-  ['characters_3',['characters',['../classengine_1_1_font.html#ad3789bfa3a92c379cbc41437e3c5fd30',1,'engine::Font']]],
-  ['children_4',['children',['../structengine_1_1_transform.html#acce068f957fdaa1c127bc6f41bd4e810',1,'engine::Transform']]],
-  ['closed_5',['closed',['../structengine_1_1_connection.html#aa4251c1b5da4be188d92ac6c65877575',1,'engine::Connection']]],
-  ['collisionlayer_6',['collisionLayer',['../class_tilemap.html#a0e5dd2bb6c6f25237bb5d8c5d40e2c0a',1,'Tilemap']]],
-  ['collisionsystem_7',['collisionSystem',['../namespaceengine.html#a433aeaece21f98e479aea93f702b3a98',1,'engine']]],
-  ['color_8',['color',['../structengine_1_1_primitive_renderer.html#ac6f8e5c99b4d415cf37190443230e563',1,'engine::PrimitiveRenderer::color'],['../structengine_1_1_text_renderer.html#a55567de66e2241bdfbb21f6ed443aeae',1,'engine::TextRenderer::color']]],
-  ['comparisonprecision_9',['comparisonPrecision',['../namespaceengine.html#a5e55616b06cb8e3aae33f71a4e0c8215',1,'engine']]],
-  ['componentarrays_10',['componentArrays',['../namespaceengine_1_1ecs.html#a00d411efff69ff9c447c5156bddc719c',1,'engine::ecs']]],
-  ['componentarraysegmentsize_11',['componentArraySegmentSize',['../namespaceengine_1_1ecs.html#a516fd02d9990f3e928faebbc3ede4603',1,'engine::ecs']]],
-  ['componentcount_12',['componentCount',['../namespaceengine_1_1ecs.html#a80717b20b366def5e2914a9c88c25b4b',1,'engine::ecs']]],
-  ['componentidtotype_13',['componentIDToType',['../namespaceengine_1_1ecs.html#a0a61af13c14c83bdd14cf631a04d8ba9',1,'engine::ecs']]],
-  ['componenttypetoid_14',['componentTypeToID',['../namespaceengine_1_1ecs.html#abe7275be1f62c07d30d19fef2e6f7416',1,'engine::ecs']]],
-  ['currentanimation_15',['currentAnimation',['../structengine_1_1_animator.html#a5623b7599fe177261545b09b4ffd4472',1,'engine::Animator']]]
+  ['enabled_0',['enabled',['../structengine_1_1_sprite_renderer.html#a8b14076b14ca2c791bc5b481f4544de0',1,'engine::SpriteRenderer']]]
 ];

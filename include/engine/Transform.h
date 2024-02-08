@@ -9,34 +9,33 @@
 
 namespace engine
 {
-	//Transform component
+	///Transform component
 	ECS_REGISTER_COMPONENT(Transform)
 	struct Transform
 	{
-		//The local position, relative to parent
+		///The local position, relative to parent
 		Vector3 position;
-		//The local rotation, relative to parent
+		///The local rotation, relative to parent
 		Vector3 rotation;
-		//The local scale, relative to parent
+		///The local scale, relative to parent
 		Vector3 scale = Vector3(1.0f);
 
-		//The parent entity of this entity
-		//If set this transform will be relative to the parent
+		///The parent entity of this entity, If set this transform will be relative to the parent
 		ecs::Entity parent = 0;
-		//All the children of this entity
+		///All the children of this entity
 		std::set<ecs::Entity> children;
 
-		//If true updates all transform based caches, reverts to false next frame
+		///If true updates all transform based caches, reverts to false next frame
 		//WARNING: This will not update if transform is manually changed
 		bool staleCache = true;
 	};
 
-	//Transform system
-	//Requires Transform component
+	///Transform system, Requires Transform component
 	ECS_REGISTER_SYSTEM(TransformSystem, Transform)
 	class TransformSystem : public ecs::System
 	{
 	public:
+		///Call this every frame
 		void Update()
 		{
 			for (auto itr = entities.begin(); itr != entities.end();)
@@ -62,7 +61,7 @@ namespace engine
 			}
 		}
 
-		//Translate an entity by dx, dy, and dz
+		///Translate an entity by dx, dy, and dz
 		static void Translate(ecs::Entity entity, float dx, float dy, float dz = 0)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -72,7 +71,7 @@ namespace engine
 
 			transform.staleCache = true;
 		}
-		//Translate an entity by dt
+		///Translate an entity by dt
 		static void Translate(ecs::Entity entity, Vector3 dt)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -80,7 +79,7 @@ namespace engine
 
 			transform.staleCache = true;
 		}
-		//Set the world position of entity
+		///Set the world position of entity
 		static void SetPosition(ecs::Entity entity, float x, float y, float z = 0)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -90,7 +89,7 @@ namespace engine
 
 			transform.staleCache = true;
 		}
-		//Set the world position of entity
+		///Set the world position of entity
 		static void SetPosition(ecs::Entity entity, Vector3 position)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -98,7 +97,7 @@ namespace engine
 
 			transform.staleCache = true;
 		}
-		//Rotate an entity by euler angles dx, dy, and dz
+		///Rotate an entity by euler angles dx, dy, and dz
 		static void Rotate(ecs::Entity entity, float dx, float dy, float dz = 0)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -108,7 +107,7 @@ namespace engine
 
 			transform.staleCache = true;
 		}
-		//Rotate an entity by euler angles dr
+		///Rotate an entity by euler angles dr
 		static void Rotate(ecs::Entity entity, Vector3 dr)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -116,7 +115,7 @@ namespace engine
 
 			transform.staleCache = true;
 		}
-		//Set the euler rotation of an entity
+		///Set the euler rotation of an entity
 		static void SetRotation(ecs::Entity entity, float x, float y, float z = 0)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -126,7 +125,7 @@ namespace engine
 
 			transform.staleCache = true;
 		}
-		//Set the euler rotation of an entity
+		///Set the euler rotation of an entity
 		static void SetRotation(ecs::Entity entity, Vector3 rotation)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -135,7 +134,7 @@ namespace engine
 			transform.staleCache = true;
 		}
 
-		//Scale an entity by dx, dy, and dz
+		///Scale an entity by dx, dy, and dz
 		static void Scale(ecs::Entity entity, float dx, float dy, float dz = 0)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -145,7 +144,7 @@ namespace engine
 
 			transform.staleCache = true;
 		}
-		//Scale an entity by ds
+		///Scale an entity by ds
 		static void Scale(ecs::Entity entity, Vector3 ds)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -153,7 +152,7 @@ namespace engine
 
 			transform.staleCache = true;
 		}
-		//Set the scale of an entity
+		///Set the scale of an entity
 		static void SetScale(ecs::Entity entity, float x, float y, float z = 0)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -163,7 +162,7 @@ namespace engine
 
 			transform.staleCache = true;
 		}
-		//Set the scale of an entity
+		///Set the scale of an entity
 		static void SetScale(ecs::Entity entity, Vector3 scale)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -172,7 +171,7 @@ namespace engine
 			transform.staleCache = true;
 		}
 
-		//Add a parent entity to a child entity
+		///Add a parent entity to a child entity
 		static void AddParent(ecs::Entity child, ecs::Entity parent)
 		{
 			Transform& parentTransform = ecs::GetComponent<Transform>(parent);
@@ -181,8 +180,7 @@ namespace engine
 			parentTransform.children.insert(child);
 			childTransform.parent = parent;
 		}
-		//Remove a parent entity from a child entity
-		//This will place the child to root
+		///Remove a parent entity from a child entity, This will place the child to root
 		static void RemoveParent(ecs::Entity child, ecs::Entity parent)
 		{
 			Transform& parentTransform = ecs::GetComponent<Transform>(parent);
@@ -192,7 +190,7 @@ namespace engine
 			childTransform.parent = 0;
 		}
 
-		//Get the right (x) vector of a transform
+		///Get the right (x) vector of a transform
 		static Vector3 RightVector(ecs::Entity entity)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -211,7 +209,7 @@ namespace engine
 
 			return Vector3(right.x, right.y, right.z);
 		}
-		//Get the up (y) vector of a transform
+		///Get the up (y) vector of a transform
 		static Vector3 UpVector(ecs::Entity entity)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -230,7 +228,7 @@ namespace engine
 
 			return Vector3(up.x, up.y, up.z);
 		}
-		//Get the forward (z) vector of a transform
+		///Get the forward (z) vector of a transform
 		static Vector3 ForwardVector(ecs::Entity entity)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -250,7 +248,7 @@ namespace engine
 			return Vector3(forward.x, forward.y, forward.z);
 		}
 
-		//Get the distance between two entities
+		///Get the distance between two entities
 		static float Distance(ecs::Entity a, ecs::Entity b)
 		{
 			Transform& aTransform = ecs::GetComponent<Transform>(a);
@@ -259,7 +257,7 @@ namespace engine
 			return sqrt(pow(bTransform.position.x - aTransform.position.x, 2) + pow(bTransform.position.y - aTransform.position.y, 2) + pow(bTransform.position.z - aTransform.position.z, 2));
 		}
 
-		//Get the angle of b with a as the origin
+		///Get the angle of b with a as the origin
 		//TODO Fix this to work in 3D
 		static float Angle(ecs::Entity a, ecs::Entity b)
 		{
@@ -287,7 +285,7 @@ namespace engine
 			return transformMatrix;
 		}
 
-		//Get the global Transform matrix of an entity after all parent transforms have been applied
+		///Get the global Transform matrix of an entity after all parent transforms have been applied
 		static glm::mat4 GetGlobalTransformMatrix(ecs::Entity entity)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -315,7 +313,7 @@ namespace engine
 			return transformMatrix;
 		}
 
-		//Applies transforms to vertices and returns the transformed vertices, takes rotation in degrees
+		///Applies transforms to vertices and returns the transformed vertices, takes rotation in degrees
 		static std::vector<Vector3> ApplyTransforms(std::vector<Vector3> vertices, Vector3 rotation, Vector3 scale, Vector3 position)
 		{
 			//Create the transform matrix
@@ -342,7 +340,7 @@ namespace engine
 			return transformedVerts;
 		}
 
-		//Applies transforms to 2D vertices and returns the transformed vertices, takes rotation in degrees
+		///Applies transforms to 2D vertices and returns the transformed vertices, takes rotation in degrees
 		static std::vector<Vector2> ApplyTransforms2D(std::vector<Vector2> vertices, float rotation, Vector2 scale, Vector2 position)
 		{
 			std::vector<Vector2> transformedVerts;

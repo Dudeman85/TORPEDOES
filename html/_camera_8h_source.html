@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.10.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Tiimi arkade: C:/Users/matiasrek/source/repos/teamarkademoottori/team5/include/engine/GL/Camera.h Source File</title>
+<title>My Project: C:/Users/matiasrek/source/repos/teamarkademoottori/team5/include/engine/GL/Camera.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,7 +27,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Tiimi arkade<span id="projectnumber">&#160;0.1</span>
+   <div id="projectname">My Project<span id="projectnumber">&#160;0.2</span>
    </div>
   </td>
  </tr>
@@ -99,143 +99,107 @@ $(function(){initNavTree('_camera_8h_source.html',''); initResizable(); });
   <div class="headertitle"><div class="title">Camera.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="_camera_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &lt;<a class="code" href="_vector_8h.html">engine/Vector.h</a>&gt;</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &lt;engine/Vector.h&gt;</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;glm/glm.hpp&gt;</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;glm/gtc/matrix_transform.hpp&gt;</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceengine.html">engine</a></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="keyword">namespace </span>engine</div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>{</div>
 <div class="foldopen" id="foldopen00008" data-start="{" data-end="};">
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno"><a class="line" href="classengine_1_1_camera.html">    8</a></span>    <span class="keyword">class </span><a class="code hl_class" href="classengine_1_1_camera.html">Camera</a></div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    {</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>    <span class="keyword">public</span>:</div>
-<div class="foldopen" id="foldopen00011" data-start="{" data-end="}">
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno"><a class="line" href="classengine_1_1_camera.html#a1e3c2b3f5116f352c081633306977b10">   11</a></span>        <a class="code hl_function" href="classengine_1_1_camera.html#a1e3c2b3f5116f352c081633306977b10">Camera</a>(<span class="keywordtype">float</span> w, <span class="keywordtype">float</span> h, glm::vec3 pos = glm::vec3(0.f, 0.f, 0.f), glm::vec3 rot = glm::vec3(0.f, 0.f, 0.f))</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>        <a class="code hl_class" href="classengine_1_1_camera.html">Camera</a>(<span class="keywordtype">float</span> w, <span class="keywordtype">float</span> h, glm::vec3 pos = glm::vec3(0.f, 0.f, 0.f), glm::vec3 rot = glm::vec3(0.f, 0.f, 0.f))</div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>        {</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>            <a class="code hl_variable" href="classengine_1_1_camera.html#a4dc0732d564964937b609ccc4742dfc7">width</a> = w;</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>            <a class="code hl_variable" href="classengine_1_1_camera.html#a68ea7e3b18c2067bbb9fecd3937606ac">height</a> = h;</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>            <a class="code hl_variable" href="classengine_1_1_camera.html#a33029ad172537ed56f3ded251ed40023">position</a> = pos;</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>            <a class="code hl_variable" href="classengine_1_1_camera.html#a0ccaa64b545e51d7dbc0f7d8dc29e3a5">rotation</a> = rot;</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>            width = w;</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>            height = h;</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>            position = pos;</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>            rotation = rot;</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        }</div>
-</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>        <span class="comment">//Sets the camera position in word space</span></div>
-<div class="foldopen" id="foldopen00020" data-start="{" data-end="}">
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="classengine_1_1_camera.html#a0463e6c8ceb39cd05e01de56e712d746">   20</a></span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classengine_1_1_camera.html#a0463e6c8ceb39cd05e01de56e712d746">SetPosition</a>(<a class="code hl_class" href="classengine_1_1_vector3.html">Vector3</a> pos)</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>        <span class="keywordtype">void</span> SetPosition(<a class="code hl_class" href="classengine_1_1_vector3.html">Vector3</a> pos)</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>        {</div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>            <span class="comment">//I really have no idea why these have to be divided by 2, but otherwise the coordinates don&#39;t match the sprites</span></div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>            <a class="code hl_variable" href="classengine_1_1_camera.html#a33029ad172537ed56f3ded251ed40023">position</a>.x = pos.<a class="code hl_variable" href="classengine_1_1_vector3.html#a20e81dc0e9efe7fe7ff3314c956b0a4b">x</a> / 2;</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>            <a class="code hl_variable" href="classengine_1_1_camera.html#a33029ad172537ed56f3ded251ed40023">position</a>.y = pos.<a class="code hl_variable" href="classengine_1_1_vector3.html#ae4d54efb9be1ad8e724964e29f00fa98">y</a> / 2;</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>            <a class="code hl_variable" href="classengine_1_1_camera.html#a33029ad172537ed56f3ded251ed40023">position</a>.z = pos.<a class="code hl_variable" href="classengine_1_1_vector3.html#a2e270bef3fd71cfaa547caa26a93af00">z</a> / 2;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>            position.x = pos.x / 2;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>            position.y = pos.y / 2;</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>            position.z = pos.z / 2;</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>        }</div>
-</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>        <span class="comment">//Move the camera in world space. Camera&#39;s origin is in its center</span></div>
-<div class="foldopen" id="foldopen00029" data-start="{" data-end="}">
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="classengine_1_1_camera.html#a11099b123cf1217192ca529301610b21">   29</a></span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classengine_1_1_camera.html#a11099b123cf1217192ca529301610b21">Translate</a>(<a class="code hl_class" href="classengine_1_1_vector3.html">Vector3</a> dPos = 0.f)</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>        <span class="keywordtype">void</span> Translate(<a class="code hl_class" href="classengine_1_1_vector3.html">Vector3</a> dPos = 0.f)</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>        {</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>            <span class="comment">//I really have no idea why these have to be divided by 2, but otherwise the coordinates don&#39;t match the sprites</span></div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>            <a class="code hl_variable" href="classengine_1_1_camera.html#a33029ad172537ed56f3ded251ed40023">position</a>.x += dPos.x / 2;</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>            <a class="code hl_variable" href="classengine_1_1_camera.html#a33029ad172537ed56f3ded251ed40023">position</a>.y += dPos.y / 2;</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>            <a class="code hl_variable" href="classengine_1_1_camera.html#a33029ad172537ed56f3ded251ed40023">position</a>.z += dPos.z / 2;</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>            position.x += dPos.x / 2;</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>            position.y += dPos.y / 2;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>            position.z += dPos.z / 2;</div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>        }</div>
-</div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>        <span class="comment">//Set the rotation of the camera the camera in world space</span></div>
-<div class="foldopen" id="foldopen00038" data-start="{" data-end="}">
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="classengine_1_1_camera.html#a41593298229c01bb71e6009a341e9baf">   38</a></span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classengine_1_1_camera.html#a41593298229c01bb71e6009a341e9baf">SetRotation</a>(<a class="code hl_class" href="classengine_1_1_vector3.html">Vector3</a> rot)</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>        <span class="keywordtype">void</span> SetRotation(<a class="code hl_class" href="classengine_1_1_vector3.html">Vector3</a> rot)</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>        {</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>            <a class="code hl_variable" href="classengine_1_1_camera.html#a0ccaa64b545e51d7dbc0f7d8dc29e3a5">rotation</a>.x = rot.<a class="code hl_variable" href="classengine_1_1_vector3.html#a20e81dc0e9efe7fe7ff3314c956b0a4b">x</a>;</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>            <a class="code hl_variable" href="classengine_1_1_camera.html#a0ccaa64b545e51d7dbc0f7d8dc29e3a5">rotation</a>.y = rot.<a class="code hl_variable" href="classengine_1_1_vector3.html#ae4d54efb9be1ad8e724964e29f00fa98">y</a>;</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>            <a class="code hl_variable" href="classengine_1_1_camera.html#a0ccaa64b545e51d7dbc0f7d8dc29e3a5">rotation</a>.z = rot.<a class="code hl_variable" href="classengine_1_1_vector3.html#a2e270bef3fd71cfaa547caa26a93af00">z</a>;</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>            rotation.x = rot.x;</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>            rotation.y = rot.y;</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>            rotation.z = rot.z;</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        }</div>
-</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        <span class="comment">//Rotate the camera in world space</span></div>
-<div class="foldopen" id="foldopen00046" data-start="{" data-end="}">
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno"><a class="line" href="classengine_1_1_camera.html#a4890d9815a8d81b05a86b762f110e4a8">   46</a></span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classengine_1_1_camera.html#a4890d9815a8d81b05a86b762f110e4a8">Rotate</a>(<a class="code hl_class" href="classengine_1_1_vector3.html">Vector3</a> dRot)</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        <span class="keywordtype">void</span> Rotate(<a class="code hl_class" href="classengine_1_1_vector3.html">Vector3</a> dRot)</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>        {</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>            <a class="code hl_variable" href="classengine_1_1_camera.html#a0ccaa64b545e51d7dbc0f7d8dc29e3a5">rotation</a>.x += dRot.<a class="code hl_variable" href="classengine_1_1_vector3.html#a20e81dc0e9efe7fe7ff3314c956b0a4b">x</a>;</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>            <a class="code hl_variable" href="classengine_1_1_camera.html#a0ccaa64b545e51d7dbc0f7d8dc29e3a5">rotation</a>.y += dRot.<a class="code hl_variable" href="classengine_1_1_vector3.html#ae4d54efb9be1ad8e724964e29f00fa98">y</a>;</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>            <a class="code hl_variable" href="classengine_1_1_camera.html#a0ccaa64b545e51d7dbc0f7d8dc29e3a5">rotation</a>.z += dRot.<a class="code hl_variable" href="classengine_1_1_vector3.html#a2e270bef3fd71cfaa547caa26a93af00">z</a>;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>            rotation.x += dRot.x;</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>            rotation.y += dRot.y;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>            rotation.z += dRot.z;</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        }</div>
-</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        <span class="comment">//Sets the width and height of the camera</span></div>
-<div class="foldopen" id="foldopen00054" data-start="{" data-end="}">
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno"><a class="line" href="classengine_1_1_camera.html#a013fda784dd6cc5fc32ed5b2d6666caa">   54</a></span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classengine_1_1_camera.html#a013fda784dd6cc5fc32ed5b2d6666caa">SetDimensions</a>(<span class="keywordtype">float</span> w, <span class="keywordtype">float</span> h)</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>        <span class="keywordtype">void</span> SetDimensions(<span class="keywordtype">float</span> w, <span class="keywordtype">float</span> h)</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>        {</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>            <a class="code hl_variable" href="classengine_1_1_camera.html#a4dc0732d564964937b609ccc4742dfc7">width</a> = w;</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>            <a class="code hl_variable" href="classengine_1_1_camera.html#a68ea7e3b18c2067bbb9fecd3937606ac">height</a> = h;</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>            width = w;</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>            height = h;</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>        }</div>
-</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        <span class="comment">//Get the projection matrix for this camera. is perspective is set to true, use perspective projection instead of orthographic</span></div>
-<div class="foldopen" id="foldopen00061" data-start="{" data-end="}">
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno"><a class="line" href="classengine_1_1_camera.html#a791fccca99e6839cd71c5e3e3d387a57">   61</a></span>        glm::mat4 <a class="code hl_function" href="classengine_1_1_camera.html#a791fccca99e6839cd71c5e3e3d387a57">GetProjectionMatrix</a>()</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        glm::mat4 GetProjectionMatrix()</div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>        {</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>            <span class="keywordflow">if</span> (<a class="code hl_variable" href="classengine_1_1_camera.html#aace3a33caf8c7e548222179b07fc28d8">perspective</a>)</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>                <span class="keywordflow">return</span> glm::perspective(glm::radians(<a class="code hl_variable" href="classengine_1_1_camera.html#a3ac0407f9e289a18f25ee583255bf9c3">fov</a>), <a class="code hl_variable" href="classengine_1_1_camera.html#a4dc0732d564964937b609ccc4742dfc7">width</a> / <a class="code hl_variable" href="classengine_1_1_camera.html#a68ea7e3b18c2067bbb9fecd3937606ac">height</a>, 0.01f, <a class="code hl_variable" href="classengine_1_1_camera.html#a39d44331f167ff38f5ccaab869ce661e">farPlane</a>);</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>            <span class="keywordflow">if</span> (perspective)</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>                <span class="keywordflow">return</span> glm::perspective(glm::radians(fov), width / height, 0.01f, farPlane);</div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>            <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>                <span class="keywordflow">return</span> glm::ortho(<a class="code hl_variable" href="classengine_1_1_camera.html#a33029ad172537ed56f3ded251ed40023">position</a>.x - <a class="code hl_variable" href="classengine_1_1_camera.html#a4dc0732d564964937b609ccc4742dfc7">width</a> / 2, <a class="code hl_variable" href="classengine_1_1_camera.html#a33029ad172537ed56f3ded251ed40023">position</a>.x + <a class="code hl_variable" href="classengine_1_1_camera.html#a4dc0732d564964937b609ccc4742dfc7">width</a> / 2, <a class="code hl_variable" href="classengine_1_1_camera.html#a33029ad172537ed56f3ded251ed40023">position</a>.y - <a class="code hl_variable" href="classengine_1_1_camera.html#a68ea7e3b18c2067bbb9fecd3937606ac">height</a> / 2, <a class="code hl_variable" href="classengine_1_1_camera.html#a33029ad172537ed56f3ded251ed40023">position</a>.y + <a class="code hl_variable" href="classengine_1_1_camera.html#a68ea7e3b18c2067bbb9fecd3937606ac">height</a> / 2, 0.01f, <a class="code hl_variable" href="classengine_1_1_camera.html#a39d44331f167ff38f5ccaab869ce661e">farPlane</a>);</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>                <span class="keywordflow">return</span> glm::ortho(position.x - width / 2, position.x + width / 2, position.y - height / 2, position.y + height / 2, 0.01f, farPlane);</div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>        }</div>
-</div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>        <span class="comment">//Get the model matrix for this camera, aka the view matrix</span></div>
-<div class="foldopen" id="foldopen00070" data-start="{" data-end="}">
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno"><a class="line" href="classengine_1_1_camera.html#a2e556014107739e22d0f52bad2d836c1">   70</a></span>        glm::mat4 <a class="code hl_function" href="classengine_1_1_camera.html#a2e556014107739e22d0f52bad2d836c1">GetViewMatrix</a>()</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>        glm::mat4 GetViewMatrix()</div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>        {</div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>            glm::mat4 model = glm::mat4(1.0f);</div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>            <span class="comment">//Position</span></div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>            model = glm::translate(model, -<a class="code hl_variable" href="classengine_1_1_camera.html#a33029ad172537ed56f3ded251ed40023">position</a>);</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>            model = glm::translate(model, -position);</div>
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>            <span class="comment">//X, Y, Z euler rotations</span></div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>            model = glm::rotate(model, glm::radians(<a class="code hl_variable" href="classengine_1_1_camera.html#a0ccaa64b545e51d7dbc0f7d8dc29e3a5">rotation</a>.x), glm::vec3(1.0f, 0.0f, 0.0f));</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>            model = glm::rotate(model, glm::radians(<a class="code hl_variable" href="classengine_1_1_camera.html#a0ccaa64b545e51d7dbc0f7d8dc29e3a5">rotation</a>.y), glm::vec3(0.0f, 1.0f, 0.0f));</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>            model = glm::rotate(model, glm::radians(<a class="code hl_variable" href="classengine_1_1_camera.html#a0ccaa64b545e51d7dbc0f7d8dc29e3a5">rotation</a>.z), glm::vec3(0.0f, 0.0f, 1.0f));</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>            model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>            model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>            model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));</div>
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span> </div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>            <span class="keywordflow">return</span> model;</div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        }</div>
-</div>
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno"><a class="line" href="classengine_1_1_camera.html#a33029ad172537ed56f3ded251ed40023">   83</a></span>        glm::vec3 <a class="code hl_variable" href="classengine_1_1_camera.html#a33029ad172537ed56f3ded251ed40023">position</a>;</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno"><a class="line" href="classengine_1_1_camera.html#a0ccaa64b545e51d7dbc0f7d8dc29e3a5">   84</a></span>        glm::vec3 <a class="code hl_variable" href="classengine_1_1_camera.html#a0ccaa64b545e51d7dbc0f7d8dc29e3a5">rotation</a>;</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="classengine_1_1_camera.html#aace3a33caf8c7e548222179b07fc28d8">   85</a></span>        <span class="keywordtype">bool</span> <a class="code hl_variable" href="classengine_1_1_camera.html#aace3a33caf8c7e548222179b07fc28d8">perspective</a> = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno"><a class="line" href="classengine_1_1_camera.html#a4dc0732d564964937b609ccc4742dfc7">   86</a></span>        <span class="keywordtype">float</span> <a class="code hl_variable" href="classengine_1_1_camera.html#a4dc0732d564964937b609ccc4742dfc7">width</a>;</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno"><a class="line" href="classengine_1_1_camera.html#a68ea7e3b18c2067bbb9fecd3937606ac">   87</a></span>        <span class="keywordtype">float</span> <a class="code hl_variable" href="classengine_1_1_camera.html#a68ea7e3b18c2067bbb9fecd3937606ac">height</a>;</div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno"><a class="line" href="classengine_1_1_camera.html#a39d44331f167ff38f5ccaab869ce661e">   88</a></span>        <span class="keywordtype">float</span> <a class="code hl_variable" href="classengine_1_1_camera.html#a39d44331f167ff38f5ccaab869ce661e">farPlane</a> = 10000;</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno"><a class="line" href="classengine_1_1_camera.html#a3ac0407f9e289a18f25ee583255bf9c3">   89</a></span>        <span class="keywordtype">float</span> <a class="code hl_variable" href="classengine_1_1_camera.html#a3ac0407f9e289a18f25ee583255bf9c3">fov</a> = 45;</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>        glm::vec3 position;</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        glm::vec3 rotation;</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>        <span class="keywordtype">bool</span> perspective = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>        <span class="keywordtype">float</span> width;</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        <span class="keywordtype">float</span> height;</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>        <span class="keywordtype">float</span> farPlane = 10000;</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>        <span class="keywordtype">float</span> fov = 45;</div>
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    };</div>
 </div>
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>}</div>
-<div class="ttc" id="a_vector_8h_html"><div class="ttname"><a href="_vector_8h.html">Vector.h</a></div></div>
 <div class="ttc" id="aclassengine_1_1_camera_html"><div class="ttname"><a href="classengine_1_1_camera.html">engine::Camera</a></div><div class="ttdef"><b>Definition</b> Camera.h:9</div></div>
-<div class="ttc" id="aclassengine_1_1_camera_html_a013fda784dd6cc5fc32ed5b2d6666caa"><div class="ttname"><a href="classengine_1_1_camera.html#a013fda784dd6cc5fc32ed5b2d6666caa">engine::Camera::SetDimensions</a></div><div class="ttdeci">void SetDimensions(float w, float h)</div><div class="ttdef"><b>Definition</b> Camera.h:54</div></div>
-<div class="ttc" id="aclassengine_1_1_camera_html_a0463e6c8ceb39cd05e01de56e712d746"><div class="ttname"><a href="classengine_1_1_camera.html#a0463e6c8ceb39cd05e01de56e712d746">engine::Camera::SetPosition</a></div><div class="ttdeci">void SetPosition(Vector3 pos)</div><div class="ttdef"><b>Definition</b> Camera.h:20</div></div>
-<div class="ttc" id="aclassengine_1_1_camera_html_a0ccaa64b545e51d7dbc0f7d8dc29e3a5"><div class="ttname"><a href="classengine_1_1_camera.html#a0ccaa64b545e51d7dbc0f7d8dc29e3a5">engine::Camera::rotation</a></div><div class="ttdeci">glm::vec3 rotation</div><div class="ttdef"><b>Definition</b> Camera.h:84</div></div>
-<div class="ttc" id="aclassengine_1_1_camera_html_a11099b123cf1217192ca529301610b21"><div class="ttname"><a href="classengine_1_1_camera.html#a11099b123cf1217192ca529301610b21">engine::Camera::Translate</a></div><div class="ttdeci">void Translate(Vector3 dPos=0.f)</div><div class="ttdef"><b>Definition</b> Camera.h:29</div></div>
-<div class="ttc" id="aclassengine_1_1_camera_html_a1e3c2b3f5116f352c081633306977b10"><div class="ttname"><a href="classengine_1_1_camera.html#a1e3c2b3f5116f352c081633306977b10">engine::Camera::Camera</a></div><div class="ttdeci">Camera(float w, float h, glm::vec3 pos=glm::vec3(0.f, 0.f, 0.f), glm::vec3 rot=glm::vec3(0.f, 0.f, 0.f))</div><div class="ttdef"><b>Definition</b> Camera.h:11</div></div>
-<div class="ttc" id="aclassengine_1_1_camera_html_a2e556014107739e22d0f52bad2d836c1"><div class="ttname"><a href="classengine_1_1_camera.html#a2e556014107739e22d0f52bad2d836c1">engine::Camera::GetViewMatrix</a></div><div class="ttdeci">glm::mat4 GetViewMatrix()</div><div class="ttdef"><b>Definition</b> Camera.h:70</div></div>
-<div class="ttc" id="aclassengine_1_1_camera_html_a33029ad172537ed56f3ded251ed40023"><div class="ttname"><a href="classengine_1_1_camera.html#a33029ad172537ed56f3ded251ed40023">engine::Camera::position</a></div><div class="ttdeci">glm::vec3 position</div><div class="ttdef"><b>Definition</b> Camera.h:83</div></div>
-<div class="ttc" id="aclassengine_1_1_camera_html_a39d44331f167ff38f5ccaab869ce661e"><div class="ttname"><a href="classengine_1_1_camera.html#a39d44331f167ff38f5ccaab869ce661e">engine::Camera::farPlane</a></div><div class="ttdeci">float farPlane</div><div class="ttdef"><b>Definition</b> Camera.h:88</div></div>
-<div class="ttc" id="aclassengine_1_1_camera_html_a3ac0407f9e289a18f25ee583255bf9c3"><div class="ttname"><a href="classengine_1_1_camera.html#a3ac0407f9e289a18f25ee583255bf9c3">engine::Camera::fov</a></div><div class="ttdeci">float fov</div><div class="ttdef"><b>Definition</b> Camera.h:89</div></div>
-<div class="ttc" id="aclassengine_1_1_camera_html_a41593298229c01bb71e6009a341e9baf"><div class="ttname"><a href="classengine_1_1_camera.html#a41593298229c01bb71e6009a341e9baf">engine::Camera::SetRotation</a></div><div class="ttdeci">void SetRotation(Vector3 rot)</div><div class="ttdef"><b>Definition</b> Camera.h:38</div></div>
-<div class="ttc" id="aclassengine_1_1_camera_html_a4890d9815a8d81b05a86b762f110e4a8"><div class="ttname"><a href="classengine_1_1_camera.html#a4890d9815a8d81b05a86b762f110e4a8">engine::Camera::Rotate</a></div><div class="ttdeci">void Rotate(Vector3 dRot)</div><div class="ttdef"><b>Definition</b> Camera.h:46</div></div>
-<div class="ttc" id="aclassengine_1_1_camera_html_a4dc0732d564964937b609ccc4742dfc7"><div class="ttname"><a href="classengine_1_1_camera.html#a4dc0732d564964937b609ccc4742dfc7">engine::Camera::width</a></div><div class="ttdeci">float width</div><div class="ttdef"><b>Definition</b> Camera.h:86</div></div>
-<div class="ttc" id="aclassengine_1_1_camera_html_a68ea7e3b18c2067bbb9fecd3937606ac"><div class="ttname"><a href="classengine_1_1_camera.html#a68ea7e3b18c2067bbb9fecd3937606ac">engine::Camera::height</a></div><div class="ttdeci">float height</div><div class="ttdef"><b>Definition</b> Camera.h:87</div></div>
-<div class="ttc" id="aclassengine_1_1_camera_html_a791fccca99e6839cd71c5e3e3d387a57"><div class="ttname"><a href="classengine_1_1_camera.html#a791fccca99e6839cd71c5e3e3d387a57">engine::Camera::GetProjectionMatrix</a></div><div class="ttdeci">glm::mat4 GetProjectionMatrix()</div><div class="ttdef"><b>Definition</b> Camera.h:61</div></div>
-<div class="ttc" id="aclassengine_1_1_camera_html_aace3a33caf8c7e548222179b07fc28d8"><div class="ttname"><a href="classengine_1_1_camera.html#aace3a33caf8c7e548222179b07fc28d8">engine::Camera::perspective</a></div><div class="ttdeci">bool perspective</div><div class="ttdef"><b>Definition</b> Camera.h:85</div></div>
-<div class="ttc" id="aclassengine_1_1_vector3_html"><div class="ttname"><a href="classengine_1_1_vector3.html">engine::Vector3</a></div><div class="ttdef"><b>Definition</b> Vector.h:66</div></div>
-<div class="ttc" id="aclassengine_1_1_vector3_html_a20e81dc0e9efe7fe7ff3314c956b0a4b"><div class="ttname"><a href="classengine_1_1_vector3.html#a20e81dc0e9efe7fe7ff3314c956b0a4b">engine::Vector3::x</a></div><div class="ttdeci">float x</div><div class="ttdef"><b>Definition</b> Vector.h:111</div></div>
-<div class="ttc" id="aclassengine_1_1_vector3_html_a2e270bef3fd71cfaa547caa26a93af00"><div class="ttname"><a href="classengine_1_1_vector3.html#a2e270bef3fd71cfaa547caa26a93af00">engine::Vector3::z</a></div><div class="ttdeci">float z</div><div class="ttdef"><b>Definition</b> Vector.h:111</div></div>
-<div class="ttc" id="aclassengine_1_1_vector3_html_ae4d54efb9be1ad8e724964e29f00fa98"><div class="ttname"><a href="classengine_1_1_vector3.html#ae4d54efb9be1ad8e724964e29f00fa98">engine::Vector3::y</a></div><div class="ttdeci">float y</div><div class="ttdef"><b>Definition</b> Vector.h:111</div></div>
-<div class="ttc" id="anamespaceengine_html"><div class="ttname"><a href="namespaceengine.html">engine</a></div><div class="ttdef"><b>Definition</b> Application.h:21</div></div>
+<div class="ttc" id="aclassengine_1_1_vector3_html"><div class="ttname"><a href="classengine_1_1_vector3.html">engine::Vector3</a></div><div class="ttdoc">Three floats in one.</div><div class="ttdef"><b>Definition</b> Vector.h:66</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_d522931ffa1371640980b621734a4381.html">Users</a></li><li class="navelem"><a class="el" href="dir_cfabb623a5010b4f0c608be143ca0ae1.html">matiasrek</a></li><li class="navelem"><a class="el" href="dir_a1b3132806e2c1ea6314ba5371343513.html">source</a></li><li class="navelem"><a class="el" href="dir_709dd738cfa3ba1bd20ca531cded5854.html">repos</a></li><li class="navelem"><a class="el" href="dir_d62f5215daa1b0e640e4f91cd1bca98e.html">teamarkademoottori</a></li><li class="navelem"><a class="el" href="dir_65cbebb861bbb0f6e83b1a7581dab806.html">team5</a></li><li class="navelem"><a class="el" href="dir_761d445a6b33cefa582fd4a4e9ac3a24.html">include</a></li><li class="navelem"><a class="el" href="dir_ee0f5e77b47cd98ba2bf26459be89735.html">engine</a></li><li class="navelem"><a class="el" href="dir_aa0e70cab1742f1115add701df07d513.html">GL</a></li><li class="navelem"><a class="el" href="_camera_8h.html">Camera.h</a></li>
+    <li class="navelem"><a class="el" href="dir_d522931ffa1371640980b621734a4381.html">Users</a></li><li class="navelem"><a class="el" href="dir_cfabb623a5010b4f0c608be143ca0ae1.html">matiasrek</a></li><li class="navelem"><a class="el" href="dir_a1b3132806e2c1ea6314ba5371343513.html">source</a></li><li class="navelem"><a class="el" href="dir_709dd738cfa3ba1bd20ca531cded5854.html">repos</a></li><li class="navelem"><a class="el" href="dir_d62f5215daa1b0e640e4f91cd1bca98e.html">teamarkademoottori</a></li><li class="navelem"><a class="el" href="dir_65cbebb861bbb0f6e83b1a7581dab806.html">team5</a></li><li class="navelem"><a class="el" href="dir_761d445a6b33cefa582fd4a4e9ac3a24.html">include</a></li><li class="navelem"><a class="el" href="dir_ee0f5e77b47cd98ba2bf26459be89735.html">engine</a></li><li class="navelem"><a class="el" href="dir_aa0e70cab1742f1115add701df07d513.html">GL</a></li><li class="navelem"><b>Camera.h</b></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.10.0 </li>
   </ul>
 </div>

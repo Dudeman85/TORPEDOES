@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.10.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Tiimi arkade: C:/Users/matiasrek/source/repos/teamarkademoottori/team5/include/engine/GL/Window.h Source File</title>
+<title>My Project: C:/Users/matiasrek/source/repos/teamarkademoottori/team5/include/engine/GL/Window.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,7 +27,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Tiimi arkade<span id="projectnumber">&#160;0.1</span>
+   <div id="projectname">My Project<span id="projectnumber">&#160;0.2</span>
    </div>
   </td>
  </tr>
@@ -99,19 +99,17 @@ $(function(){initNavTree('_window_8h_source.html',''); initResizable(); });
   <div class="headertitle"><div class="title">Window.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="_window_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;glad/gl.h&gt;</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;GLFW/glfw3.h&gt;</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;iostream&gt;</span></div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceengine.html">engine</a></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="keyword">namespace </span>engine</div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>{</div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno"><a class="line" href="namespaceengine.html#a43091ed8c346f040eb8641fd7c5275f2">    9</a></span>    <span class="keywordtype">bool</span> <a class="code hl_variable" href="namespaceengine.html#a43091ed8c346f040eb8641fd7c5275f2">OPENGL_INITIALIZED</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    <span class="keywordtype">bool</span> OPENGL_INITIALIZED = <span class="keyword">false</span>;</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    <span class="comment">//Create OpenGL window and context</span></div>
-<div class="foldopen" id="foldopen00012" data-start="{" data-end="}">
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="namespaceengine.html#a110d34ef69acdf013e827f5bf988c079">   12</a></span>    GLFWwindow* <a class="code hl_function" href="namespaceengine.html#a110d34ef69acdf013e827f5bf988c079">CreateGLWindow</a>(<span class="keywordtype">int</span> width, <span class="keywordtype">int</span> height, <span class="keyword">const</span> <span class="keywordtype">char</span>* name)</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    GLFWwindow* CreateGLWindow(<span class="keywordtype">int</span> width, <span class="keywordtype">int</span> height, <span class="keyword">const</span> <span class="keywordtype">char</span>* name)</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    {</div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>        <span class="comment">//Initialize GLFW and set it to require OpenGL 3</span></div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>        glfwInit();</div>
@@ -139,21 +137,17 @@ $(function(){initNavTree('_window_8h_source.html',''); initResizable(); });
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>            }</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>        );</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>        <a class="code hl_variable" href="namespaceengine.html#a43091ed8c346f040eb8641fd7c5275f2">OPENGL_INITIALIZED</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>        OPENGL_INITIALIZED = <span class="keyword">true</span>;</div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        <span class="keywordflow">return</span> window;</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    }</div>
-</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>}</div>
-<div class="ttc" id="anamespaceengine_html"><div class="ttname"><a href="namespaceengine.html">engine</a></div><div class="ttdef"><b>Definition</b> Application.h:21</div></div>
-<div class="ttc" id="anamespaceengine_html_a110d34ef69acdf013e827f5bf988c079"><div class="ttname"><a href="namespaceengine.html#a110d34ef69acdf013e827f5bf988c079">engine::CreateGLWindow</a></div><div class="ttdeci">GLFWwindow * CreateGLWindow(int width, int height, const char *name)</div><div class="ttdef"><b>Definition</b> Window.h:12</div></div>
-<div class="ttc" id="anamespaceengine_html_a43091ed8c346f040eb8641fd7c5275f2"><div class="ttname"><a href="namespaceengine.html#a43091ed8c346f040eb8641fd7c5275f2">engine::OPENGL_INITIALIZED</a></div><div class="ttdeci">bool OPENGL_INITIALIZED</div><div class="ttdef"><b>Definition</b> Window.h:9</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_d522931ffa1371640980b621734a4381.html">Users</a></li><li class="navelem"><a class="el" href="dir_cfabb623a5010b4f0c608be143ca0ae1.html">matiasrek</a></li><li class="navelem"><a class="el" href="dir_a1b3132806e2c1ea6314ba5371343513.html">source</a></li><li class="navelem"><a class="el" href="dir_709dd738cfa3ba1bd20ca531cded5854.html">repos</a></li><li class="navelem"><a class="el" href="dir_d62f5215daa1b0e640e4f91cd1bca98e.html">teamarkademoottori</a></li><li class="navelem"><a class="el" href="dir_65cbebb861bbb0f6e83b1a7581dab806.html">team5</a></li><li class="navelem"><a class="el" href="dir_761d445a6b33cefa582fd4a4e9ac3a24.html">include</a></li><li class="navelem"><a class="el" href="dir_ee0f5e77b47cd98ba2bf26459be89735.html">engine</a></li><li class="navelem"><a class="el" href="dir_aa0e70cab1742f1115add701df07d513.html">GL</a></li><li class="navelem"><a class="el" href="_window_8h.html">Window.h</a></li>
+    <li class="navelem"><a class="el" href="dir_d522931ffa1371640980b621734a4381.html">Users</a></li><li class="navelem"><a class="el" href="dir_cfabb623a5010b4f0c608be143ca0ae1.html">matiasrek</a></li><li class="navelem"><a class="el" href="dir_a1b3132806e2c1ea6314ba5371343513.html">source</a></li><li class="navelem"><a class="el" href="dir_709dd738cfa3ba1bd20ca531cded5854.html">repos</a></li><li class="navelem"><a class="el" href="dir_d62f5215daa1b0e640e4f91cd1bca98e.html">teamarkademoottori</a></li><li class="navelem"><a class="el" href="dir_65cbebb861bbb0f6e83b1a7581dab806.html">team5</a></li><li class="navelem"><a class="el" href="dir_761d445a6b33cefa582fd4a4e9ac3a24.html">include</a></li><li class="navelem"><a class="el" href="dir_ee0f5e77b47cd98ba2bf26459be89735.html">engine</a></li><li class="navelem"><a class="el" href="dir_aa0e70cab1742f1115add701df07d513.html">GL</a></li><li class="navelem"><b>Window.h</b></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.10.0 </li>
   </ul>
 </div>

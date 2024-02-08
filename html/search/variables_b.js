@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['length_0',['length',['../structengine_1_1_animation.html#a3eab24dfb2cbdb168b22c2fdc583da83',1,'engine::Animation']]],
-  ['lockxyrotation_1',['lockXYRotation',['../structengine_1_1_primitive_renderer.html#a773430f40780f43a23ed239e5eed7ebe',1,'engine::PrimitiveRenderer']]]
+  ['restitution_0',['restitution',['../structengine_1_1_rigidbody.html#a527c97d5031c15e2491e3384307279d9',1,'engine::Rigidbody']]],
+  ['rotation_1',['rotation',['../structengine_1_1_text_renderer.html#a55a407bd3528960aed870dc8ab4823bf',1,'engine::TextRenderer::rotation'],['../structengine_1_1_transform.html#a5e48019d97ec20fa9608dcf1ed37bffc',1,'engine::Transform::rotation']]]
 ];

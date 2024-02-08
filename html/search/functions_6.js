@@ -1,18 +1,5 @@
 var searchData=
 [
-  ['getambientvolume_0',['getAmbientVolume',['../class_audio_engine.html#a364056b52e620b4e8c6af13e662584c1',1,'AudioEngine']]],
-  ['getatend_1',['getAtEnd',['../class_audio.html#a0091778df1c62ed728d94efe63d82227',1,'Audio']]],
-  ['getcomponent_2',['GetComponent',['../classengine_1_1ecs_1_1_component_array.html#a69f7c36eceee8e4b9702d9261b04e390',1,'engine::ecs::ComponentArray::GetComponent()'],['../namespaceengine_1_1ecs.html#a44eab4610df42318c6d613ddb5ba4723',1,'engine::ecs::GetComponent(Entity entity)']]],
-  ['getcomponentid_3',['GetComponentID',['../namespaceengine_1_1ecs.html#a45b26cd7b222deeac5f44641718880cb',1,'engine::ecs']]],
-  ['getdirection_4',['getDirection',['../class_audio.html#aea20e2e9109b97c312293e3e403d45f1',1,'Audio']]],
-  ['getglobaltransformmatrix_5',['GetGlobalTransformMatrix',['../classengine_1_1_transform_system.html#a1c99f4946b231db5534f0527120af615',1,'engine::TransformSystem']]],
-  ['getlocaltranformmatrix_6',['GetLocalTranformMatrix',['../classengine_1_1_transform_system.html#a128a2b877bbd5c0f90de68308de44c78',1,'engine::TransformSystem']]],
-  ['getloop_7',['getLoop',['../class_audio.html#a2d8f23f0109abe34702c8af961d91613',1,'Audio']]],
-  ['getplaying_8',['getPlaying',['../class_audio.html#af976cd8c6ded08262462741d37ec2e7a',1,'Audio']]],
-  ['getprojectionmatrix_9',['GetProjectionMatrix',['../classengine_1_1_camera.html#a791fccca99e6839cd71c5e3e3d387a57',1,'engine::Camera']]],
-  ['getsystem_10',['GetSystem',['../namespaceengine_1_1ecs.html#a8d583ccf97f535680b14825c3afc38a0',1,'engine::ecs']]],
-  ['gettags_11',['GetTags',['../namespaceengine_1_1ecs.html#a579ca26c97d5124c020be79e4ee48984',1,'engine::ecs']]],
-  ['gettileposition_12',['GetTilePosition',['../class_tilemap.html#adaf3a06f572fe0b03770d9cbfc900f50',1,'Tilemap']]],
-  ['getviewmatrix_13',['GetViewMatrix',['../classengine_1_1_camera.html#a2e556014107739e22d0f52bad2d836c1',1,'engine::Camera']]],
-  ['getvolume_14',['getVolume',['../class_audio.html#a44bce76507a594fc12429787c255fe35',1,'Audio']]]
+  ['line_0',['Line',['../classengine_1_1_primitive.html#a939e245f3e8fe2c8909984a4fa5046ab',1,'engine::Primitive']]],
+  ['loadmap_1',['loadMap',['../class_tilemap.html#a02d14405947f1d6b2cef5f8acbb18581',1,'Tilemap']]]
 ];

@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['maplayer_0',['MapLayer',['../class_map_layer.html#a2b7cbb079ab6bbc899286486bf386ca2',1,'MapLayer::MapLayer(const tmx::Map &amp;, std::size_t, const std::vector&lt; std::shared_ptr&lt; engine::Texture &gt; &gt; &amp;textures)'],['../class_map_layer.html#af323ddae8da169a64be1e0c216034397',1,'MapLayer::MapLayer(const MapLayer &amp;)=delete']]],
-  ['mesh_1',['Mesh',['../classengine_1_1_mesh.html#a3aa08e0ead4c37521df8b2b3df30a8ab',1,'engine::Mesh']]],
-  ['model_2',['Model',['../classengine_1_1_model.html#a84202e77efca93f64b6d7f4bd88161e3',1,'engine::Model']]],
-  ['move_3',['Move',['../classengine_1_1_physics_system.html#af82df71b0ee656422cca8e82f8a68ed4',1,'engine::PhysicsSystem']]]
+  ['texture_0',['Texture',['../classengine_1_1_texture.html#a545513921ff10bcb0c03adf859d6a08e',1,'engine::Texture::Texture(int sx, int sy, const std::vector&lt; std::uint16_t &gt; &amp;data)'],['../classengine_1_1_texture.html#a99de71de2655bb50d6c93591c2d44494',1,'engine::Texture::Texture(std::string path, unsigned int filteringType=GL_NEAREST, bool flip=true, bool relativePath=true)'],['../classengine_1_1_texture.html#ad4457fee465e39738f4f9f309aedc9d3',1,'engine::Texture::Texture(Image image, unsigned int filteringType=GL_NEAREST)']]],
+  ['tilemap_1',['Tilemap',['../class_tilemap.html#ac27f37084ba4737825092e6719829514',1,'Tilemap']]],
+  ['translate_2',['Translate',['../classengine_1_1_transform_system.html#a61cf104b3a13ad916dc9cb3629ce4039',1,'engine::TransformSystem::Translate(ecs::Entity entity, float dx, float dy, float dz=0)'],['../classengine_1_1_transform_system.html#ab6b408d1cfa4c44d4feaa6821e059ed1',1,'engine::TransformSystem::Translate(ecs::Entity entity, Vector3 dt)']]],
+  ['triangle_3',['Triangle',['../classengine_1_1_primitive.html#a98162593ddac4f954d0654dd6412908b',1,'engine::Primitive']]]
 ];
