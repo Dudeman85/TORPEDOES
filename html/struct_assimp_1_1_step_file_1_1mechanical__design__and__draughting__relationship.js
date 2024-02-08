@@ -1,0 +1,4 @@
+var struct_assimp_1_1_step_file_1_1mechanical__design__and__draughting__relationship =
+[
+    [ "mechanical_design_and_draughting_relationship", "struct_assimp_1_1_step_file_1_1mechanical__design__and__draughting__relationship.html#a34b06fbf3c21d0c354d8e63bc05fa0da", null ]
+];

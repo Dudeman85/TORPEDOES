@@ -1,0 +1,28 @@
+var classgzfilebuf =
+[
+    [ "gzfilebuf", "classgzfilebuf.html#aa08da094521bfa645427c0ae4c851504", null ],
+    [ "~gzfilebuf", "classgzfilebuf.html#a51d564cf535b373940d6cfc19c0710dc", null ],
+    [ "gzfilebuf", "classgzfilebuf.html#aa08da094521bfa645427c0ae4c851504", null ],
+    [ "~gzfilebuf", "classgzfilebuf.html#acb95da35cfe68e16fc85cac62453451d", null ],
+    [ "attach", "classgzfilebuf.html#ae8a47750ca65bc2a43b4768b47f3923a", null ],
+    [ "attach", "classgzfilebuf.html#a3ececdeaa35a8b606182cc23c9908891", null ],
+    [ "close", "classgzfilebuf.html#a18e628926f455f41d7715c2ddd9c0e64", null ],
+    [ "close", "classgzfilebuf.html#a18e628926f455f41d7715c2ddd9c0e64", null ],
+    [ "is_open", "classgzfilebuf.html#af2619b96e3ddea9050be70dd21de4752", null ],
+    [ "is_open", "classgzfilebuf.html#a24dfb3e35c147aaf3a562c1ea4268757", null ],
+    [ "open", "classgzfilebuf.html#ae1fbc989b2dae79dba798556542c147c", null ],
+    [ "open", "classgzfilebuf.html#a9582843a0caa22cb1b4ead1c687dabb2", null ],
+    [ "open_mode", "classgzfilebuf.html#ab0c2c304183e591706681af26add3da2", null ],
+    [ "overflow", "classgzfilebuf.html#a7a10ee573ebe6777c8a64e316569f694", null ],
+    [ "overflow", "classgzfilebuf.html#a425a4b0d1890abff8f83d7a5aae344b4", null ],
+    [ "seekoff", "classgzfilebuf.html#a0ab89070031cbc37679365582180ae3c", null ],
+    [ "setbuf", "classgzfilebuf.html#a856bc21f7cfc6ba43f017c9c3f0d5f81", null ],
+    [ "setcompression", "classgzfilebuf.html#ad109ea4fc4ca7cc19d8014b53375255d", null ],
+    [ "setcompressionlevel", "classgzfilebuf.html#a8bbfda3e29baf20e4330e3a9d7ee4a54", null ],
+    [ "setcompressionstrategy", "classgzfilebuf.html#a47d4b9f1257fd12dd21847b71ad1d49d", null ],
+    [ "showmanyc", "classgzfilebuf.html#afbe2418d8a9c3f4a321cc26aa4ae5f7a", null ],
+    [ "sync", "classgzfilebuf.html#ae537a3f86b37de7bf27d2aff0cded07e", null ],
+    [ "sync", "classgzfilebuf.html#a8fdf6b079487c0034cb920c63c9eaf55", null ],
+    [ "underflow", "classgzfilebuf.html#a2f7159c91a60bee86546283caf8de212", null ],
+    [ "underflow", "classgzfilebuf.html#a23768f9935022e54608c53173f0047c0", null ]
+];

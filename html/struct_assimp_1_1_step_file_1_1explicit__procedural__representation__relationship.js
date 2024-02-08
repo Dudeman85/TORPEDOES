@@ -1,0 +1,4 @@
+var struct_assimp_1_1_step_file_1_1explicit__procedural__representation__relationship =
+[
+    [ "explicit_procedural_representation_relationship", "struct_assimp_1_1_step_file_1_1explicit__procedural__representation__relationship.html#a17f4f6394ff59c3a9d9294de2e515b94", null ]
+];

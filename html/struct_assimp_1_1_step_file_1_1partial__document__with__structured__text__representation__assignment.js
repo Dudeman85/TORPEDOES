@@ -1,0 +1,4 @@
+var struct_assimp_1_1_step_file_1_1partial__document__with__structured__text__representation__assignment =
+[
+    [ "partial_document_with_structured_text_representation_assignment", "struct_assimp_1_1_step_file_1_1partial__document__with__structured__text__representation__assignment.html#a3d67ecefbab51cbe7db722853553f4b8", null ]
+];

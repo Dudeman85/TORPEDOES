@@ -1,0 +1,5 @@
+var struct_assimp_1_1_step_file_1_1solid__with__stepped__round__hole__and__conical__transitions =
+[
+    [ "solid_with_stepped_round_hole_and_conical_transitions", "struct_assimp_1_1_step_file_1_1solid__with__stepped__round__hole__and__conical__transitions.html#aae9737a6476eda0a9aa8b4a5dee4d174", null ],
+    [ "conical_transitions", "struct_assimp_1_1_step_file_1_1solid__with__stepped__round__hole__and__conical__transitions.html#a9eb4e58a11dc628ba33b6659e131207a", null ]
+];

@@ -1,0 +1,4 @@
+var struct_assimp_1_1_s_t_e_p_1_1_intern_generic_convert_3_01std_1_1shared__ptr_3_01const_01_e_x_p_r_e_s_s_1_1_data_type_01_4_01_4 =
+[
+    [ "operator()", "struct_assimp_1_1_s_t_e_p_1_1_intern_generic_convert_3_01std_1_1shared__ptr_3_01const_01_e_x_p_r_e_s_s_1_1_data_type_01_4_01_4.html#a38a20ac7b00fa25d9711b7753fabed3e", null ]
+];

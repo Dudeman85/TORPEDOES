@@ -1,0 +1,25 @@
+var class_assimp_1_1_l_w_o_importer =
+[
+    [ "LWOImporter", "class_assimp_1_1_l_w_o_importer.html#a7996d7dd5a002015c6d3e79b521fa337", null ],
+    [ "~LWOImporter", "class_assimp_1_1_l_w_o_importer.html#ad230b049b0ccdc5a831d39ddf219e69e", null ],
+    [ "CanRead", "class_assimp_1_1_l_w_o_importer.html#a5627cfe7d4f786fe2168a1bb7ddccbdb", null ],
+    [ "GetInfo", "class_assimp_1_1_l_w_o_importer.html#a857717b55deba8ac71233e3c69c974fb", null ],
+    [ "InternReadFile", "class_assimp_1_1_l_w_o_importer.html#a4b3cb778f4d4d49620aa9a0bc44ba1e7", null ],
+    [ "SetupProperties", "class_assimp_1_1_l_w_o_importer.html#a9c930022ee8c5d9816f4cdab0b747195", null ],
+    [ "configLayerIndex", "class_assimp_1_1_l_w_o_importer.html#a510a869ff88dbb10101aeb11b87bc2e1", null ],
+    [ "configLayerName", "class_assimp_1_1_l_w_o_importer.html#a8f2789b53c2e96273ca1103be5bc1cf5", null ],
+    [ "configSpeedFlag", "class_assimp_1_1_l_w_o_importer.html#a5a0eb7f9f08aa4177621b6f297894e31", null ],
+    [ "fileSize", "class_assimp_1_1_l_w_o_importer.html#af3cbffdb7546965aec708172204077ab", null ],
+    [ "hasNamedLayer", "class_assimp_1_1_l_w_o_importer.html#ac742f8720adcaac0e1355f9d1cfe847c", null ],
+    [ "mClips", "class_assimp_1_1_l_w_o_importer.html#acf34094d88a0687d50b8bb3b29daedc3", null ],
+    [ "mCurLayer", "class_assimp_1_1_l_w_o_importer.html#a374ca57f0bcdb7b2c8531aec4880b92a", null ],
+    [ "mEnvelopes", "class_assimp_1_1_l_w_o_importer.html#aa70735485e64f3d1464ed59a1fd66599", null ],
+    [ "mFileBuffer", "class_assimp_1_1_l_w_o_importer.html#a6c2025aee6fb01201ec7e06d57e8b991", null ],
+    [ "mIsLWO2", "class_assimp_1_1_l_w_o_importer.html#aa5df677055718f70b6af72f342879e48", null ],
+    [ "mIsLXOB", "class_assimp_1_1_l_w_o_importer.html#a44c58156ab0b73965435b088678e4660", null ],
+    [ "mLayers", "class_assimp_1_1_l_w_o_importer.html#a7db7299c8200eec4c4cf2f2d38de0a3f", null ],
+    [ "mMapping", "class_assimp_1_1_l_w_o_importer.html#a53e4d9054d066d95cce5298e27ba0e68", null ],
+    [ "mSurfaces", "class_assimp_1_1_l_w_o_importer.html#a6afb05a63b747556808f428455a9b812", null ],
+    [ "mTags", "class_assimp_1_1_l_w_o_importer.html#a7c789687d870766d0fbe48d048a13b38", null ],
+    [ "pScene", "class_assimp_1_1_l_w_o_importer.html#a3d95e70dd9a82a809f3d4d97df2e6d46", null ]
+];

@@ -1,0 +1,4 @@
+var struct_assimp_1_1_step_file_1_1constructive__geometry__representation__relationship =
+[
+    [ "constructive_geometry_representation_relationship", "struct_assimp_1_1_step_file_1_1constructive__geometry__representation__relationship.html#ac62b0ef9dd6f67b928e9503095c07b48", null ]
+];

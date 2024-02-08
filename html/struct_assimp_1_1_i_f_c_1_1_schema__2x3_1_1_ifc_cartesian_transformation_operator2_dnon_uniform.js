@@ -1,0 +1,5 @@
+var struct_assimp_1_1_i_f_c_1_1_schema__2x3_1_1_ifc_cartesian_transformation_operator2_dnon_uniform =
+[
+    [ "IfcCartesianTransformationOperator2DnonUniform", "struct_assimp_1_1_i_f_c_1_1_schema__2x3_1_1_ifc_cartesian_transformation_operator2_dnon_uniform.html#a585459f45fa58b7a1e8d842513b53f03", null ],
+    [ "Scale2", "struct_assimp_1_1_i_f_c_1_1_schema__2x3_1_1_ifc_cartesian_transformation_operator2_dnon_uniform.html#a5fb064b4525e6e2926d244c57e443cf7", null ]
+];

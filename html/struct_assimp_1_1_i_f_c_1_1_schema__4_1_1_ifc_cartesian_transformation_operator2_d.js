@@ -1,0 +1,4 @@
+var struct_assimp_1_1_i_f_c_1_1_schema__4_1_1_ifc_cartesian_transformation_operator2_d =
+[
+    [ "IfcCartesianTransformationOperator2D", "struct_assimp_1_1_i_f_c_1_1_schema__4_1_1_ifc_cartesian_transformation_operator2_d.html#aaa826e43d97743904fac89e6ecb30d68", null ]
+];

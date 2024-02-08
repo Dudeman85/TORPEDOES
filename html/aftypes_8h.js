@@ -1,0 +1,67 @@
+var aftypes_8h =
+[
+    [ "AF_WidthRec_", "struct_a_f___width_rec__.html", "struct_a_f___width_rec__" ],
+    [ "AF_ScalerRec_", "struct_a_f___scaler_rec__.html", "struct_a_f___scaler_rec__" ],
+    [ "AF_WritingSystemClassRec_", "struct_a_f___writing_system_class_rec__.html", "struct_a_f___writing_system_class_rec__" ],
+    [ "AF_Script_UniRangeRec_", "struct_a_f___script___uni_range_rec__.html", "struct_a_f___script___uni_range_rec__" ],
+    [ "AF_ScriptClassRec_", "struct_a_f___script_class_rec__.html", "struct_a_f___script_class_rec__" ],
+    [ "AF_StyleClassRec_", "struct_a_f___style_class_rec__.html", "struct_a_f___style_class_rec__" ],
+    [ "AF_StyleMetricsRec_", "struct_a_f___style_metrics_rec__.html", "struct_a_f___style_metrics_rec__" ],
+    [ "AF_DECLARE_SCRIPT_CLASS", "aftypes_8h.html#a62a220a525bb03e83315f1204b77e8d4", null ],
+    [ "AF_DECLARE_STYLE_CLASS", "aftypes_8h.html#a26064054180e527a0dc625519fe4b003", null ],
+    [ "AF_DECLARE_WRITING_SYSTEM_CLASS", "aftypes_8h.html#a4005b8b40d52dfd251f92dcff857dcb5", null ],
+    [ "AF_DEFINE_SCRIPT_CLASS", "aftypes_8h.html#a240daeaaac188cce69e8203f14978828", null ],
+    [ "AF_DEFINE_STYLE_CLASS", "aftypes_8h.html#a56a1cdcb926b68c3a0a005f39741d604", null ],
+    [ "AF_DEFINE_WRITING_SYSTEM_CLASS", "aftypes_8h.html#ab54d60e2ecad8dfe52a26e7ee4bb544d", null ],
+    [ "AF_HINTING_BOTTOM_TO_TOP", "aftypes_8h.html#a74ab7b835de5630806dd84a56b332a52", null ],
+    [ "AF_HINTING_TOP_TO_BOTTOM", "aftypes_8h.html#a4f0f8b3ac17edc268537bbe597d73bf8", null ],
+    [ "AF_SCALER_EQUAL_SCALES", "aftypes_8h.html#a06ba17f0fdc4d4dc491a23baa840fed5", null ],
+    [ "AF_SCALER_FLAG_NO_ADVANCE", "aftypes_8h.html#a45a80c07106499f37a19e32240b59ae5", null ],
+    [ "AF_SCALER_FLAG_NO_HORIZONTAL", "aftypes_8h.html#adb3806b7c6553de62ab32ec8254e72da", null ],
+    [ "AF_SCALER_FLAG_NO_VERTICAL", "aftypes_8h.html#a89e46c796776c71ffffb33e4cfd2d904", null ],
+    [ "AF_UNIRANGE_REC", "aftypes_8h.html#a5c857e1e3c4bd350f09f988c2f612d46", null ],
+    [ "COVERAGE", "aftypes_8h.html#a23de12811bb8417aedd4745507ba4433", null ],
+    [ "SCRIPT", "aftypes_8h.html#a0432c1b02237661257db1402f77c8e03", null ],
+    [ "STYLE", "aftypes_8h.html#a34351e3ff5cb7a9a37a3d5ccae078a80", null ],
+    [ "WRITING_SYSTEM", "aftypes_8h.html#a482361a4b1ddfa41f47375c0e786d167", null ],
+    [ "AF_Coverage", "aftypes_8h.html#af51012f5b6ff0425466ca3b26fad3be7", null ],
+    [ "AF_FaceGlobals", "aftypes_8h.html#a1638465f2e1e8bbe569303b79a274272", null ],
+    [ "AF_GlyphHints", "aftypes_8h.html#acaa5e55104fdfa0efcd4725b3b09a273", null ],
+    [ "AF_Scaler", "aftypes_8h.html#ab7506fcb8fc5c5570ced820bac5c7ded", null ],
+    [ "AF_ScalerRec", "aftypes_8h.html#acaee6985ba6ed029a785c70e851ecf6f", null ],
+    [ "AF_Script", "aftypes_8h.html#a3c131253946358786653243b4181609b", null ],
+    [ "AF_Script_UniRange", "aftypes_8h.html#a8c70e667f4375427e6c602723ceb0552", null ],
+    [ "AF_Script_UniRangeRec", "aftypes_8h.html#af6fce314bb87828f160f598e0eb13655", null ],
+    [ "AF_ScriptClass", "aftypes_8h.html#a08c0df1956e34a42db8fa065847b100d", null ],
+    [ "AF_ScriptClassRec", "aftypes_8h.html#a3f280b0faa4a4f83d1ec79189301b4a6", null ],
+    [ "AF_Style", "aftypes_8h.html#aa8fd5fac93b136c57b20cffda356de76", null ],
+    [ "AF_StyleClass", "aftypes_8h.html#a128517db02b023f5fe32135bb1906b80", null ],
+    [ "AF_StyleClassRec", "aftypes_8h.html#a756337a7031a87263516c4cabae80a6b", null ],
+    [ "AF_StyleMetrics", "aftypes_8h.html#a059f5b3ec1d52c01cc938bb5d5a7e7b4", null ],
+    [ "AF_StyleMetricsRec", "aftypes_8h.html#a32ccf1824006375cc0097cee4df1fc21", null ],
+    [ "AF_Width", "aftypes_8h.html#a757c754dbb2205e4409e0c65742989b7", null ],
+    [ "AF_WidthRec", "aftypes_8h.html#a5c304b4b1cd42acdec555bc6861d1a36", null ],
+    [ "AF_WritingSystem", "aftypes_8h.html#adf175216d2d04ec4e3f21e14e3fc09d8", null ],
+    [ "AF_WritingSystem_ApplyHintsFunc", "aftypes_8h.html#ac9abf80dba1e7623fd80ec8971c8f128", null ],
+    [ "AF_WritingSystem_DoneMetricsFunc", "aftypes_8h.html#a776efee99531dac10bd8a6564bf12926", null ],
+    [ "AF_WritingSystem_GetStdWidthsFunc", "aftypes_8h.html#afb66433e308a02059c181ad239f90419", null ],
+    [ "AF_WritingSystem_InitHintsFunc", "aftypes_8h.html#aa0d509f85a16dc3413f0d221801af421", null ],
+    [ "AF_WritingSystem_InitMetricsFunc", "aftypes_8h.html#a2f3ca75cb1402590b1e706455fd451a6", null ],
+    [ "AF_WritingSystem_ScaleMetricsFunc", "aftypes_8h.html#a2fab9fed494d86a2564bc61f2a9f34c0", null ],
+    [ "AF_WritingSystemClass", "aftypes_8h.html#a7e4d871bf9068a41eefe3affb5855568", null ],
+    [ "AF_WritingSystemClassRec", "aftypes_8h.html#a51d55c2e1834c368f75c1942f5ecd18e", null ],
+    [ "AF_Coverage_", "aftypes_8h.html#a13a3713dc29f24dad300a78d3b9f42ef", [
+      [ "AF_COVERAGE_DEFAULT", "aftypes_8h.html#a13a3713dc29f24dad300a78d3b9f42efa1a94aa2651e47ee961feaa1a42b5d7ee", null ]
+    ] ],
+    [ "AF_Script_", "aftypes_8h.html#a5d34f6ae37ebfda327a1088a03198214", [
+      [ "AF_SCRIPT_MAX", "aftypes_8h.html#a5d34f6ae37ebfda327a1088a03198214a7ec3905c09765a992c1c5cb91ebd8f13", null ]
+    ] ],
+    [ "AF_Style_", "aftypes_8h.html#a8d0a9a6818b4afad98e28ee671ffc76e", [
+      [ "AF_STYLE_MAX", "aftypes_8h.html#a8d0a9a6818b4afad98e28ee671ffc76ea9e19495ca3c7612de9d55e0fce6dbe8b", null ]
+    ] ],
+    [ "AF_WritingSystem_", "aftypes_8h.html#a2c1a3ffc514435e8c9b8a7740765bd3d", [
+      [ "AF_WRITING_SYSTEM_MAX", "aftypes_8h.html#a2c1a3ffc514435e8c9b8a7740765bd3dada50d8031bf0454f2d5b120766880e01", null ]
+    ] ],
+    [ "af_sort_and_quantize_widths", "aftypes_8h.html#af959dff89db048dc247695dbbb7ac6f0", null ],
+    [ "af_sort_pos", "aftypes_8h.html#a469c97c805bea5f9b18165ffb86c0093", null ]
+];

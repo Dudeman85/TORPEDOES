@@ -1,0 +1,4 @@
+var struct_assimp_1_1_step_file_1_1explicit__procedural__geometric__representation__item__relationship =
+[
+    [ "explicit_procedural_geometric_representation_item_relationship", "struct_assimp_1_1_step_file_1_1explicit__procedural__geometric__representation__item__relationship.html#a523e58b38556c55c6b0b6cbd42d63f90", null ]
+];

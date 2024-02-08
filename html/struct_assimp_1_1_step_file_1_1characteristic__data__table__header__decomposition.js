@@ -1,0 +1,4 @@
+var struct_assimp_1_1_step_file_1_1characteristic__data__table__header__decomposition =
+[
+    [ "characteristic_data_table_header_decomposition", "struct_assimp_1_1_step_file_1_1characteristic__data__table__header__decomposition.html#a2dd811e570f727094af2e5737b06ebbc", null ]
+];

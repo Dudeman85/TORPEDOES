@@ -1,0 +1,4 @@
+var struct_assimp_1_1_step_file_1_1mechanical__design__geometric__presentation__area =
+[
+    [ "mechanical_design_geometric_presentation_area", "struct_assimp_1_1_step_file_1_1mechanical__design__geometric__presentation__area.html#a5e166780c4fe4371026504b3ff4c911b", null ]
+];

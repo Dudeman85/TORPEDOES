@@ -1,0 +1,27 @@
+var pbrmaterial_8h =
+[
+    [ "_AI_MATKEY_GLTF_MAPPINGFILTER_MAG_BASE", "pbrmaterial_8h.html#a94642b4e663dd7bdf9d55f8e0cf5857d", null ],
+    [ "_AI_MATKEY_GLTF_MAPPINGFILTER_MIN_BASE", "pbrmaterial_8h.html#ae21c07f167facbff3dfd9b00278b2e75", null ],
+    [ "_AI_MATKEY_GLTF_MAPPINGID_BASE", "pbrmaterial_8h.html#adf2a0d14eb7a9ef14c0b737bddd41e9d", null ],
+    [ "_AI_MATKEY_GLTF_MAPPINGNAME_BASE", "pbrmaterial_8h.html#a2b44ca26faf1c3010e838f4a34e0e25a", null ],
+    [ "_AI_MATKEY_GLTF_SCALE_BASE", "pbrmaterial_8h.html#a568eab3f7f4421684c3419a51bc5c9fa", null ],
+    [ "_AI_MATKEY_GLTF_STRENGTH_BASE", "pbrmaterial_8h.html#adf3b7556372fc968e5bb10ce11f7822b", null ],
+    [ "_AI_MATKEY_GLTF_TEXTURE_TEXCOORD_BASE", "pbrmaterial_8h.html#acee9763d68953082d5bf2fde60107f73", null ],
+    [ "AI_MATKEY_GLTF_ALPHACUTOFF", "pbrmaterial_8h.html#adda58f37ebbaaa81ef3a20b05be6d8e0", null ],
+    [ "AI_MATKEY_GLTF_ALPHAMODE", "pbrmaterial_8h.html#aa1e95297f0f2f2ea9995dee2e337473d", null ],
+    [ "AI_MATKEY_GLTF_MAPPINGFILTER_MAG", "pbrmaterial_8h.html#a2a36fa736e06cbec99b2609278563a2f", null ],
+    [ "AI_MATKEY_GLTF_MAPPINGFILTER_MIN", "pbrmaterial_8h.html#ae3484e40af3630963bb880fbe16e5a93", null ],
+    [ "AI_MATKEY_GLTF_MAPPINGID", "pbrmaterial_8h.html#a937611dece60c3928311aadaf6002d34", null ],
+    [ "AI_MATKEY_GLTF_MAPPINGNAME", "pbrmaterial_8h.html#a255fa52a83d841db61feb7d37e3b1b76", null ],
+    [ "AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_BASE_COLOR_FACTOR", "pbrmaterial_8h.html#aaec742eb67a3722767d5b714a925e561", null ],
+    [ "AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_BASE_COLOR_TEXTURE", "pbrmaterial_8h.html#af706528d7fa67d9c0a13c4e2f4527be2", null ],
+    [ "AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLIC_FACTOR", "pbrmaterial_8h.html#aabbda7c5ac4a16d6f5fe4b1964aa60da", null ],
+    [ "AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE", "pbrmaterial_8h.html#a8030b47ec2342a1ecd75a4044fe73b8c", null ],
+    [ "AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_ROUGHNESS_FACTOR", "pbrmaterial_8h.html#a5776c78d321a3e9cd1a8bcc0801c2356", null ],
+    [ "AI_MATKEY_GLTF_PBRSPECULARGLOSSINESS", "pbrmaterial_8h.html#a7ccc8f73d6b0006c76a3136872995af8", null ],
+    [ "AI_MATKEY_GLTF_PBRSPECULARGLOSSINESS_GLOSSINESS_FACTOR", "pbrmaterial_8h.html#ae8dc7df86060706872228bf0f26a6d93", null ],
+    [ "AI_MATKEY_GLTF_TEXTURE_SCALE", "pbrmaterial_8h.html#a85b168e8b008d310b58898105c601ee3", null ],
+    [ "AI_MATKEY_GLTF_TEXTURE_STRENGTH", "pbrmaterial_8h.html#a7215ce7e32adebb36c446b5da0fa4482", null ],
+    [ "AI_MATKEY_GLTF_TEXTURE_TEXCOORD", "pbrmaterial_8h.html#a40f1cd00864f590a62811eb1e23e3dd1", null ],
+    [ "AI_MATKEY_GLTF_UNLIT", "pbrmaterial_8h.html#ab9118b0b3af90a8c14a9347217cb3b4c", null ]
+];

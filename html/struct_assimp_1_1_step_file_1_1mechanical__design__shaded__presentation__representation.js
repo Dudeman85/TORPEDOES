@@ -1,0 +1,4 @@
+var struct_assimp_1_1_step_file_1_1mechanical__design__shaded__presentation__representation =
+[
+    [ "mechanical_design_shaded_presentation_representation", "struct_assimp_1_1_step_file_1_1mechanical__design__shaded__presentation__representation.html#ac7d09fd623d000298f6d561b705bdbae", null ]
+];

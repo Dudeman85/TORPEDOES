@@ -1,0 +1,26 @@
+var struct_assimp_1_1_blender_1_1_image =
+[
+    [ "Image", "struct_assimp_1_1_blender_1_1_image.html#a14f6017eb7e09951e5fcdd2932f614f3", null ],
+    [ "animspeed", "struct_assimp_1_1_blender_1_1_image.html#ade50d6d567f14404cca5e36d530e7a49", null ],
+    [ "FAIL", "struct_assimp_1_1_blender_1_1_image.html#a8b086421548125d18e5108c4999a472d", null ],
+    [ "flag", "struct_assimp_1_1_blender_1_1_image.html#a24b9c87d74ee220252c6180fddb7f6b2", null ],
+    [ "gen_type", "struct_assimp_1_1_blender_1_1_image.html#a413de86172bfc4d4cc5c174f841846ef", null ],
+    [ "gen_x", "struct_assimp_1_1_blender_1_1_image.html#a56f13ea714777f2a945cf619de3c89e1", null ],
+    [ "gen_y", "struct_assimp_1_1_blender_1_1_image.html#a8db5031406a065fed97644aa789920ff", null ],
+    [ "lastframe", "struct_assimp_1_1_blender_1_1_image.html#a0907a58a08cdcd8edc8999247802d93a", null ],
+    [ "lastupdate", "struct_assimp_1_1_blender_1_1_image.html#a2146ddb567bdd6462b7762da9b66635f", null ],
+    [ "lastused", "struct_assimp_1_1_blender_1_1_image.html#a716d9a931121652c76d2e88b02d8b12b", null ],
+    [ "ok", "struct_assimp_1_1_blender_1_1_image.html#a15c1bde365cc2f7a65d696bd7fcf4bb4", null ],
+    [ "packedfile", "struct_assimp_1_1_blender_1_1_image.html#aeb972ab4ecf9bc176e0bc03214c7f853", null ],
+    [ "pad", "struct_assimp_1_1_blender_1_1_image.html#a64a41071b76a379a5a266df1db09838c", null ],
+    [ "pad1", "struct_assimp_1_1_blender_1_1_image.html#a9d374e48922e064fc2a2952397254966", null ],
+    [ "source", "struct_assimp_1_1_blender_1_1_image.html#aa5ea61030ef4acc76fee35daa61e8edc", null ],
+    [ "totbind", "struct_assimp_1_1_blender_1_1_image.html#a9b30576a92ce3d64ea6038de40a0247d", null ],
+    [ "tpageflag", "struct_assimp_1_1_blender_1_1_image.html#a523edfdcdf7858895b22a1c80bc13828", null ],
+    [ "twend", "struct_assimp_1_1_blender_1_1_image.html#a24db43d0b5583f7ad48db9ded3aa2fd1", null ],
+    [ "twsta", "struct_assimp_1_1_blender_1_1_image.html#a23bd6341e5f5fe4977a0517e2055d60f", null ],
+    [ "type", "struct_assimp_1_1_blender_1_1_image.html#adc713178629bd2894edfd95849f9863a", null ],
+    [ "WARN", "struct_assimp_1_1_blender_1_1_image.html#a8ecb03a50e0be44f0f85dcb4577719de", null ],
+    [ "xrep", "struct_assimp_1_1_blender_1_1_image.html#a4b163e9c31ca2ecd393b14fe446ce130", null ],
+    [ "yrep", "struct_assimp_1_1_blender_1_1_image.html#affdd53c85e88a8c51c1a071525ea22cb", null ]
+];

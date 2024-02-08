@@ -1,0 +1,26 @@
+var _m_d3_file_data_8h =
+[
+    [ "Assimp::MD3::Header", "struct_assimp_1_1_m_d3_1_1_header.html", "struct_assimp_1_1_m_d3_1_1_header" ],
+    [ "Assimp::MD3::Frame", "struct_assimp_1_1_m_d3_1_1_frame.html", "struct_assimp_1_1_m_d3_1_1_frame" ],
+    [ "Assimp::MD3::Tag", "struct_assimp_1_1_m_d3_1_1_tag.html", "struct_assimp_1_1_m_d3_1_1_tag" ],
+    [ "Assimp::MD3::Surface", "struct_assimp_1_1_m_d3_1_1_surface.html", "struct_assimp_1_1_m_d3_1_1_surface" ],
+    [ "Assimp::MD3::Shader", "struct_assimp_1_1_m_d3_1_1_shader.html", "struct_assimp_1_1_m_d3_1_1_shader" ],
+    [ "Assimp::MD3::Triangle", "struct_assimp_1_1_m_d3_1_1_triangle.html", "struct_assimp_1_1_m_d3_1_1_triangle" ],
+    [ "Assimp::MD3::TexCoord", "struct_assimp_1_1_m_d3_1_1_tex_coord.html", "struct_assimp_1_1_m_d3_1_1_tex_coord" ],
+    [ "Assimp::MD3::Vertex", "struct_assimp_1_1_m_d3_1_1_vertex.html", "struct_assimp_1_1_m_d3_1_1_vertex" ],
+    [ "AI_MD3_MAGIC_NUMBER_BE", "_m_d3_file_data_8h.html#a020b578536f6e8806e0a3b760184a407", null ],
+    [ "AI_MD3_MAGIC_NUMBER_LE", "_m_d3_file_data_8h.html#ac6f1007e90efc6cc96b6714133dd8ccc", null ],
+    [ "AI_MD3_MAX_FRAMES", "_m_d3_file_data_8h.html#aa734fdd974e4ea8e709a1ce91241509e", null ],
+    [ "AI_MD3_MAX_SHADERS", "_m_d3_file_data_8h.html#aeb39df2b5bbb2c7dbef2e76f20fdf587", null ],
+    [ "AI_MD3_MAX_SURFACES", "_m_d3_file_data_8h.html#a80476fa3d275ecdc730b25190f63c885", null ],
+    [ "AI_MD3_MAX_TAGS", "_m_d3_file_data_8h.html#a9ed9eceac18446941287553dced494df", null ],
+    [ "AI_MD3_MAX_TRIANGLES", "_m_d3_file_data_8h.html#a15c6e3f9d7e4c565765c39910fc5b9ff", null ],
+    [ "AI_MD3_MAX_VERTS", "_m_d3_file_data_8h.html#a3a6f774950d715c02e248035c1161607", null ],
+    [ "AI_MD3_MAXFRAME", "_m_d3_file_data_8h.html#a86a23c1eacba1c77965664d71f3b73a3", null ],
+    [ "AI_MD3_MAXQPATH", "_m_d3_file_data_8h.html#a1418da441d3ced9a025663706f9100b7", null ],
+    [ "AI_MD3_VERSION", "_m_d3_file_data_8h.html#a07e56cc8111275ffa991930bdb39467c", null ],
+    [ "AI_MD3_XYZ_SCALE", "_m_d3_file_data_8h.html#a62a6b760043c08abc6c84547b6df1963", null ],
+    [ "LatLngNormalToVec3", "_m_d3_file_data_8h.html#a767ad80883b0bf63576b1be1dbf31ea8", null ],
+    [ "Vec3NormalToLatLng", "_m_d3_file_data_8h.html#aa221c9ebbc37de23fc6e25ed66f1114c", null ],
+    [ "PACK_STRUCT", "_m_d3_file_data_8h.html#a52dfc9b4db83a5cdedd87a613ab3f76c", null ]
+];

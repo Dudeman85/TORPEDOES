@@ -1,0 +1,27 @@
+var iowin32_8c =
+[
+    [ "WIN32FILE_IOWIN", "struct_w_i_n32_f_i_l_e___i_o_w_i_n.html", "struct_w_i_n32_f_i_l_e___i_o_w_i_n" ],
+    [ "INVALID_HANDLE_VALUE", "iowin32_8c.html#a5fdc7facea201bfce4ad308105f88d0c", null ],
+    [ "INVALID_SET_FILE_POINTER", "iowin32_8c.html#a3242e600d18ba66007c0c24c04e701e2", null ],
+    [ "fill_win32_filefunc", "iowin32_8c.html#a7582cba1f2f6a4619c701790ff19ed2e", null ],
+    [ "fill_win32_filefunc64", "iowin32_8c.html#a16fa89a419f0b3afa7533bcd99213b7d", null ],
+    [ "fill_win32_filefunc64A", "iowin32_8c.html#ae0c137742c83d11641b6e40190e99723", null ],
+    [ "fill_win32_filefunc64W", "iowin32_8c.html#a3cb250002eabc68eec7e9b1f95b9d562", null ],
+    [ "OF", "iowin32_8c.html#adc39c2c35617965ed2820fe7f5f3f829", null ],
+    [ "OF", "iowin32_8c.html#a30377f537629cf18d127d3bd4926fe6e", null ],
+    [ "OF", "iowin32_8c.html#a9521f6690e93ca5a7c26f80e8302ad6a", null ],
+    [ "OF", "iowin32_8c.html#a5f0abb8a12fbd4e45c3ee755a0d8ec94", null ],
+    [ "OF", "iowin32_8c.html#ab1cfe5785ca3455ce6d712237da4a0c2", null ],
+    [ "win32_close_file_func", "iowin32_8c.html#a4abef8d35a00d0aea6e870824f65939f", null ],
+    [ "win32_error_file_func", "iowin32_8c.html#a963ad2b88335fb421cdcf44f1ff934ab", null ],
+    [ "win32_open64_file_func", "iowin32_8c.html#aae2b762268d58c6af77b0c6a4ea962df", null ],
+    [ "win32_open64_file_funcA", "iowin32_8c.html#a172b460a9d63e7e260bb4ee4a6113651", null ],
+    [ "win32_open64_file_funcW", "iowin32_8c.html#ae92ac7193d47c4608f2c815bb8ea2991", null ],
+    [ "win32_open_file_func", "iowin32_8c.html#ac2360caf05f404cb355c9e62729e6a68", null ],
+    [ "win32_read_file_func", "iowin32_8c.html#ae530010792cfc3977a96c558b0f35927", null ],
+    [ "win32_seek64_file_func", "iowin32_8c.html#a8841aa134a890cdd2e2a45bc7a65e5a1", null ],
+    [ "win32_seek_file_func", "iowin32_8c.html#a1725ad4eb6ab5e42ebae6e7c5287ba0f", null ],
+    [ "win32_tell64_file_func", "iowin32_8c.html#a803a598c8af0481b6399b98784124676", null ],
+    [ "win32_tell_file_func", "iowin32_8c.html#a94fb49ed0d78c28ebeff67bab967cba8", null ],
+    [ "win32_write_file_func", "iowin32_8c.html#a61fc03073d37f8d8cb849b3c038c4e65", null ]
+];

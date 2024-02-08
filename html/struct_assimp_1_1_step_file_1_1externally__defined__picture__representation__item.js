@@ -1,0 +1,4 @@
+var struct_assimp_1_1_step_file_1_1externally__defined__picture__representation__item =
+[
+    [ "externally_defined_picture_representation_item", "struct_assimp_1_1_step_file_1_1externally__defined__picture__representation__item.html#ae9e11eb65b9e6499c819123590e2d9b3", null ]
+];

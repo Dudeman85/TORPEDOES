@@ -1,0 +1,4 @@
+var struct_assimp_1_1_step_file_1_1definitional__representation__relationship__with__same__context =
+[
+    [ "definitional_representation_relationship_with_same_context", "struct_assimp_1_1_step_file_1_1definitional__representation__relationship__with__same__context.html#a7a076cbb8658ed4724a93e108e8b2bcf", null ]
+];

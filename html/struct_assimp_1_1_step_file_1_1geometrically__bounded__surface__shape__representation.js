@@ -1,0 +1,4 @@
+var struct_assimp_1_1_step_file_1_1geometrically__bounded__surface__shape__representation =
+[
+    [ "geometrically_bounded_surface_shape_representation", "struct_assimp_1_1_step_file_1_1geometrically__bounded__surface__shape__representation.html#af9575a1aa5f1d8009b6b551fd071d100", null ]
+];

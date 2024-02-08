@@ -1,0 +1,27 @@
+var structsgen_8py =
+[
+    [ "GetType", "structsgen_8py.html#a3f7975c961cb957d4f7ed46df4e73178", null ],
+    [ "restructure", "structsgen_8py.html#a08a1cc1f7c421985a444656034ad99e1", null ],
+    [ "Structify", "structsgen_8py.html#a58f6eb545b963da992e6025ac3bdde3f", null ],
+    [ "complex", "structsgen_8py.html#ae21d91c7d548e3599acaf2914b1c23e3", null ],
+    [ "file", "structsgen_8py.html#ab6871b2f378e250090f93f72bb47e817", null ],
+    [ "files", "structsgen_8py.html#a8a516bb1f594ec1788b7c8bb322043de", null ],
+    [ "path", "structsgen_8py.html#a3aac6a7bec95ce34d2fecc6d9aa9cd39", null ],
+    [ "primitive", "structsgen_8py.html#a74cee29784ce7a254b743755e861cb35", null ],
+    [ "REdefine", "structsgen_8py.html#ad2f6a6e351c3ba3bf41cfa2afceb5430", null ],
+    [ "REdesc", "structsgen_8py.html#a19a6f6ce7f5a0390097b0273f7f7ceb6", null ],
+    [ "RErestruc", "structsgen_8py.html#ae6bf680eaee3d5af0a30c6294a801ce9", null ],
+    [ "RErmifdef", "structsgen_8py.html#a14fb4b7d29e6fe9c7aaf918a3f964856", null ],
+    [ "RErpcom", "structsgen_8py.html#ab0dd90a799ecce80e2dfa16ed96e32c9", null ],
+    [ "REstructs", "structsgen_8py.html#abe3c5755dce8038d690abb35cf845d91", null ],
+    [ "skiplist", "structsgen_8py.html#a08c4212a9696b38b53eb8b47427115b3", null ],
+    [ "sr", "structsgen_8py.html#abf25e32aebc4da964f9db74afe58394e", null ],
+    [ "struct", "structsgen_8py.html#a7df9cff4abff1c7ed887e1cce8929b0a", null ],
+    [ "structs1", "structsgen_8py.html#ab532a20e5250a37537256e62f5e3391d", null ],
+    [ "structs2", "structsgen_8py.html#a9607562dd4214b050162593bf772baf1", null ],
+    [ "structs3", "structsgen_8py.html#a344e8042cfe67623b3d3131ae36e9aee", null ],
+    [ "structs4", "structsgen_8py.html#a4a2993447c14de371adfdf8953a786c6", null ],
+    [ "template", "structsgen_8py.html#a1c38b0273a27f48eceaf983a022c69c3", null ],
+    [ "templateSR", "structsgen_8py.html#a185d883f206ee0c218c01b8539adf717", null ],
+    [ "text", "structsgen_8py.html#acc4268aea02581f55418e2f9a5dce7af", null ]
+];
