@@ -3,8 +3,12 @@
 #include <optional>
 #include <map>
 #include <vector>
+#include <list>
+#include <cmath>
 
 #include <GLFW/glfw3.h>
+#include "engine/Vector.h"
+
 #include <iostream>
 
 namespace input
@@ -24,9 +28,118 @@ namespace input
 		// Each update, only one press and one release input is reported; It is unnecessary to report more
 	};
 
+	enum class eventStates
+	{
+		Not,	// This staate is (still not on
+		On,		// This state is (still) on
+		NewOn	// This state was turned on
+	};
+
+	using engine::Vector2;
+
+	// Handles a specified input's values by saving all values and timestamps in InputSamples.
+	// From this, we can calculate whether input has been in a specified value range within an update iteration.
+	// We can also calculate the time an input has spent in the specified value range.
+	// The InputSamples are written to from input callbacks.
+	// The old update iteration's InputSamples are cleared upon an update iteration start.
+	struct InputValue
+	{
+		// X is timestamp in relation to latest update iteration
+		// Y is value
+		// X starts out as 0 for first InputValue.
+		// X is set to the moment a callback to this input is reached. Y is set to value
+		using InputSample = Vector2;
+
+		std::list<Vector2> inputSamples;
+
+		double lastUpdatedTime; // last time the inputValue was updated
+
+		void addInputSample(float value)
+		{
+			// Called from callback function, add currrent time and value into inputSamples
+
+			// Get current time (DeltaTime - lastUpdatedTime)
+		};
+
+		void clearInputSamples(InputSample)
+		{
+			if (inputSamples.size() <= 0)
+			{
+				return;
+			}
+			// Add last sample
+			InputSample latestSample = *inputSamples.end();
+
+			inputSamples.clear();
+
+			inputSamples.push_back(latestSample);
+		};
+
+		const bool findValue(float value)
+		{
+			// Loop throgh all inputValues to check if ANY have met this value:
+
+			//return findIntersectionTime(inputSamples[0], inputSamples[1], value).has_value();
+		}
+
+		const bool findRange(float minimumValue, float maximumValue)
+		{
+			// Loop throgh all inputValues to check if ANY fall within this range:
+
+			return (findValue(minimumValue) || findValue(maximumValue));
+		}
+
+		const std::optional<float> findTimeSpent(float value)
+		{
+			// Loop throgh all inputValues and add their time together:
+
+			//return findIntersectionTimeSpent(inputSamples[0], inputSamples[1], value);
+		}
+
+		const static std::optional<float> findIntersectionTime(InputSample previousSample, InputSample currentSample, float targetValue)
+		{
+			float slope = (currentSample.y - previousSample.y) / (currentSample.x - previousSample.x);
+
+			float yIntercept = previousSample.y - (previousSample.x * slope);
+
+			float intersectionX = (targetValue - yIntercept) / slope;
+
+			// Value never reaches targetValue
+			if (!std::isfinite(intersectionX))
+			{
+				return std::nullopt;
+			}
+
+			return intersectionX;
+		}
+		const static std::optional<float> findIntersectionTimeSpent(InputSample previousSample, InputSample currentSample, float targetValue)
+		{
+			std::optional<float> targetX = findIntersectionTime(previousSample, currentSample, targetValue);
+			if (!targetX)
+			{
+				return std::nullopt;
+			}
+
+			Vector2 delta = { std::abs(currentSample.x - targetX.value()), std::abs(currentSample.y - targetValue) };
+
+			float distance = delta.Length();
+
+			return distance;
+		}
+	};
+
+	class InputEvent;
+	// All inputEvents
+	std::map<std::string, InputEvent*> nameToInputEvent;
+
 	class InputEvent
 	{
 	public:
+		InputEvent(std::string inputName) : name(inputName)
+		{
+			nameToInputEvent[name] = this;
+		}
+
 		std::string name;
 
 		// Every output state of InputButton this is binded to
@@ -34,89 +147,97 @@ namespace input
 
 		const bool isPressed()
 		{
-			return pressed;
+			return pressed != eventStates::Not;
 		}
 		const bool isReleased()
 		{
-			return released;
+			return released != eventStates::Not;
 		}
 		const bool isNewPress()
 		{
-			return (isPressed() && newChange);
+			return (pressed == eventStates::NewOn);
 		}
 		const bool isNewRelease()
 		{
-			return (isReleased() && newChange);
+			return (released == eventStates::NewOn);
 		}
 		const bool isChanged()
 		{
-			return newChange;
+			return (isNewPress() || isNewRelease());
 		}
 
 		void update()
 		{
 			InputState newState = InputState::None;
-			pressed = false;
-			released = false;
-			newChange = false;
+			pressed = eventStates::Not;
+			released = eventStates::Not;
 
 			for (auto outputState : outputStates)
 			{
 				switch (*outputState)
 				{
 				case input::InputState::Released:
-					pressed = true;
+					if (released != eventStates::NewOn)
+					{ 
+						released = eventStates::On;
+					}
 					break;
 				case input::InputState::Pressed:
-					released = true;
+					if (pressed != eventStates::NewOn)
+					{
+						pressed = eventStates::On;
+					}
 					break;
 				case input::InputState::NewRelease:
-					released = true;
-					newChange = true;
+					released = eventStates::NewOn;
+					if (pressed == eventStates::NewOn)
+					{
+						return; // All states are on, testing cannot wield any changes
+					}
+					break;
 				case input::InputState::NewPress:
-					pressed = true;
-					newChange = true;
-				break;
+					pressed = eventStates::NewOn;
+					if (released == eventStates::NewOn)
+					{
+						return; // All states are on, testing cannot wield any changes
+					}
+					break;
 				case input::InputState::NewReleaseNewPress:
 				case input::InputState::NewPressNewRelease:
 					// Key was newly released and newly pressed last update
-					pressed = true;
-					released = true;
-					newChange = true;
+					pressed = eventStates::NewOn;
+					released = eventStates::NewOn;
+					return; // All states are on, testing cannot wield any changes
 					break;
 				default:
 					break;
 				}
-				if (newChange && pressed && released)
-				{
-					return; // All states are true, testing cannot wield any changes
-				}	
 			}
+
+			std::cout << "button state is: " << (int)pressed << ": " << (int)released << "\n";
 		}
 
 	protected:
-		bool pressed = false;	// Whether key is pressed the update before this poll
-		bool released = false;	// Whether key is released the update before this poll
-		bool newChange = false;	// Whether key was changed the update before this poll
+		eventStates pressed = eventStates::Not;		// Whether key is pressed the update before this poll
+		eventStates released = eventStates::Not;	// Whether key is released the update before this poll
 	};
 
-	std::map<std::string, InputEvent*> nameToInputEvent;
-
-	class InputButton;
-	static std::vector<InputButton*> inputButtons;	// All inputButtons
+	class InputButton;	
+	std::map<inputKey, InputButton*> inputKeyToInputButton;	// All inputButtons
 
 	class InputButton
 	{
 	public:
-		InputButton()
+		InputButton(inputKey key)
 		{
-			inputButtons.push_back(this);
+			//inputButtons.push_back(this);
+			inputKeyToInputButton[key] = this;
 		}
 
 		InputState buttonInputState = InputState::Released;		// Callback inputted state of key
 		InputState buttonOutputState = InputState::Released;	// Pollable state of key
 
-		// Polls the change in the key, returns whether to poll next update
+		// Checks the change in the key
 		void update()
 		{
 			if (buttonInputState == InputState::None)
@@ -200,14 +321,14 @@ namespace input
 		}
 	};
 
-	std::map<inputKey, InputButton*> inputKeyToInputButton;
-
 	static void unbindInput(InputButton* inputButton)
 	{
 		// TODO:
 
 		// Find all events that use the button's buttonOutputState.
 		// Remove the button from them
+
+		// If inputButton has no uses, delete it (not necessary, if engine restarts, the button will not be initialized anymore)
 	}
 
 	static void bindInput(InputButton* inputButton, std::vector<InputEvent*> inputEvents)
@@ -228,6 +349,11 @@ namespace input
 		{
 			bindInput(it->second, inputEvents);
 		}
+		else
+		{
+			// Construct a new inputButton to bind
+			bindInput(new InputButton(key), inputEvents);
+		}
 	}
 	static void bindInput(inputKey key, std::vector<std::string> inputEventNames)
 	{
@@ -241,7 +367,6 @@ namespace input
 			// Check if the inputEvent's name exists in the map
 			if (it != nameToInputEvent.end()) 
 			{
-				std::cout << "Found matching InputEvent for " << inputEventName << std::endl;
 				inputEventsToBind.push_back(it->second);
 			}
 			else 
@@ -254,10 +379,7 @@ namespace input
 	}
 
 	// Function prototype for the key callback
-	void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-
-	// Your custom key callback function
-	void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
+	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
 	{
 		// Find input button (Yes, this is slow. Yes, it's only way to have buttons pressed and released on same update)
 		auto it = inputKeyToInputButton.find(key);
@@ -267,11 +389,11 @@ namespace input
 		{
 			it->second->callback(action != GLFW_RELEASE);
 		}
-
-		std::cout << "Key event: " << key << std::endl;
 	}
 
-	// Sets window with key callbacks, place as late into initialization as possible to increase load times while pressing keys
+	// Sets window with key callbacks
+	// Place as late into initialization as possible to increase load times while pressing keys
+	// Should be a singleton, lazy-evaluation calls this late as possible
 	static void initialize(GLFWwindow* window)
 	{
 		// Set the key callback function
@@ -280,18 +402,30 @@ namespace input
 	// Updates all inputs. Call AFTER polling GLFW events, but BEFORE polling input events (such as before gameloop)
 	static void update(GLFWwindow* window)
 	{
-		for (auto UpdatableinputButton : inputButtons)
+		for (auto it = inputKeyToInputButton.begin(); it != inputKeyToInputButton.end(); ++it)
 		{
-			UpdatableinputButton->update();
+			it->second->update();
+		}
+
+		for (auto it = nameToInputEvent.begin(); it != nameToInputEvent.end(); ++it)
+		{
+			it->second->update();
 		}
 	}
-	// Frees up  memory used by the input system
+	// Frees memory used by the input system
 	static void uninitialize()
 	{
-		for (int i = inputButtons.size() - 1; i >= 0; --i)
+		// Free inputButtons
+		for (auto it = inputKeyToInputButton.begin(); it != inputKeyToInputButton.end(); ++it)
 		{
-			delete inputButtons[i];
-			inputButtons.erase(inputButtons.begin() + i);
+			delete it->second;
 		}
+
+		// Free inputEvents
+		for (auto it = nameToInputEvent.begin(); it != nameToInputEvent.end(); ++it) 
+		{
+			delete it->second;
+		}
+		nameToInputEvent.clear();
 	}
 }
