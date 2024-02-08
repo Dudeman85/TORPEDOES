@@ -210,21 +210,21 @@ int main()
 
 	Animation crowdAnims = AnimationsFromSpritesheet("CrowdCheer14.png", 3, 1, vector<int>(3, 150))[0];
 	ecs::Entity crowd = ecs::NewEntity();
-	ecs::AddComponent(crowd, new Transform{ .position = Vector3(1530, -1700, 10), .scale = Vector3(100, 30, 0) });
-	ecs::AddComponent(crowd, new SpriteRenderer{});
-	ecs::AddComponent(crowd, new Animator{});
+	ecs::AddComponent(crowd, Transform{ .position = Vector3(1530, -1700, 10), .scale = Vector3(100, 30, 0) });
+	ecs::AddComponent(crowd, SpriteRenderer{});
+	ecs::AddComponent(crowd, Animator{});
 	AnimationSystem::AddAnimation(crowd, crowdAnims, "CrowdCheer");
 	AnimationSystem::PlayAnimation(crowd, "CrowdCheer", true);
 	ecs::Entity crowd1 = ecs::NewEntity();
-	ecs::AddComponent(crowd1, new Transform{ .position = Vector3(1545, -1715, 11), .scale = Vector3(100, 30, 0) });
-	ecs::AddComponent(crowd1, new SpriteRenderer{});
-	ecs::AddComponent(crowd1, new Animator{});
+	ecs::AddComponent(crowd1, Transform{ .position = Vector3(1545, -1715, 11), .scale = Vector3(100, 30, 0) });
+	ecs::AddComponent(crowd1, SpriteRenderer{});
+	ecs::AddComponent(crowd1, Animator{});
 	AnimationSystem::AddAnimation(crowd1, crowdAnims, "Cheer2");
 	AnimationSystem::PlayAnimation(crowd1, "Cheer2", true);
 	ecs::Entity crowd2 = ecs::NewEntity();
-	ecs::AddComponent(crowd2, new Transform{ .position = Vector3(1520, -1730, 12), .scale = Vector3(100, 30, 0) });
-	ecs::AddComponent(crowd2, new SpriteRenderer{});
-	ecs::AddComponent(crowd2, new Animator{});
+	ecs::AddComponent(crowd2, Transform{ .position = Vector3(1520, -1730, 12), .scale = Vector3(100, 30, 0) });
+	ecs::AddComponent(crowd2, SpriteRenderer{});
+	ecs::AddComponent(crowd2, Animator{});
 	AnimationSystem::AddAnimation(crowd2, crowdAnims, "Cheer3");
 	AnimationSystem::PlayAnimation(crowd2, "Cheer3", true);
 	//cheerSpeaker.Play(cheerSound);
@@ -233,9 +233,9 @@ int main()
 
 	Animation countdownAnim = AnimationsFromSpritesheet("UI_Countdown_Ver2.png", 5, 1, vector<int>(5, 1000))[0];
 	ecs::Entity countdown = ecs::NewEntity();
-	ecs::AddComponent(countdown, new Transform{ .position = Vector3(1475, -1200, 10), .scale = Vector3(60, 100, 0) });
-	ecs::AddComponent(countdown, new SpriteRenderer{});
-	ecs::AddComponent(countdown, new Animator{});
+	ecs::AddComponent(countdown, Transform{ .position = Vector3(1475, -1200, 10), .scale = Vector3(60, 100, 0) });
+	ecs::AddComponent(countdown, SpriteRenderer{});
+	ecs::AddComponent(countdown, Animator{});
 	AnimationSystem::AddAnimation(countdown, countdownAnim, "CountDown");
 	AnimationSystem::PlayAnimation(countdown, "CountDown", false);
 	

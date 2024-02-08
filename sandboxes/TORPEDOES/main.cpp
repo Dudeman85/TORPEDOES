@@ -231,6 +231,15 @@ int main()
 	//cheerSpeaker.Play(cheerSound);
 	//cheerSpeaker.SetLooping(1);
 
+	Animation countdownAnim = AnimationsFromSpritesheet("UI_Countdown_Ver2.png", 5, 1, vector<int>(5, 1000))[0];
+	ecs::Entity countdown = ecs::NewEntity();
+	ecs::AddComponent(countdown, Transform{ .position = Vector3(1475, -1200, 10), .scale = Vector3(60, 100, 0) });
+	ecs::AddComponent(countdown, SpriteRenderer{});
+	ecs::AddComponent(countdown, Animator{});
+	AnimationSystem::AddAnimation(countdown, countdownAnim, "CountDown");
+	AnimationSystem::PlayAnimation(countdown, "CountDown", false);
+
+
 	// Loand Map . Tilemap file 
 	Tilemap map(&cam);
 	map.loadMap("level1.tmx");
@@ -272,7 +281,7 @@ int main()
 		// star Timer 
 		float Timer = playerController->getTimer();
 		std::string timerStr = std::to_string((int)round(Timer)); // round pyörista float arvo lahipakokonais 
-		winText.text = timerStr.c_str();
+		//winText.text = timerStr.c_str();
 		// UI System 				
 
 		p1Win.text = to_string(player.lap) + "/1";
