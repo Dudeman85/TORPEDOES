@@ -8,7 +8,7 @@ namespace engine
 {
 	bool OPENGL_INITIALIZED = false;
 
-	//Create OpenGL window and context
+	///Create OpenGL window and context
 	GLFWwindow* CreateGLWindow(int width, int height, const char* name)
 	{
 		//Initialize GLFW and set it to require OpenGL 3

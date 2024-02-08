@@ -9,7 +9,9 @@
 #include <iostream>
 #include <memory>
 
-//Allow max components to be determined outside this file
+///
+/// Allow max components to be determined outside this file
+/// 
 #ifndef ECS_MAX_COMPONENTS
 #define ECS_MAX_COMPONENTS 100
 #elif ECS_MAX_COMPONENTS > UINT16_MAX

@@ -166,6 +166,9 @@ namespace input
 			return (isNewPress() || isNewRelease());
 		}
 
+		/// 
+		/// Update every frame
+		/// 
 		void update()
 		{
 			InputState newState = InputState::None;
@@ -216,6 +219,7 @@ namespace input
 
 			std::cout << "button state is: " << (int)pressed << ": " << (int)released << "\n";
 		}
+	 
 
 	protected:
 		eventStates pressed = eventStates::Not;		// Whether key is pressed the update before this poll
