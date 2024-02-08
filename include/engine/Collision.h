@@ -447,6 +447,12 @@ namespace engine
 			}
 		}
 
+		//Removes the tilemap from collision
+		void RemoveTilemap()
+		{
+			tilemap = nullptr;
+		}
+
 		//Camera is needed for visualisation
 		Camera* cam = nullptr;
 

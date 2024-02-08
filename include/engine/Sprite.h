@@ -284,10 +284,15 @@ namespace engine
 			glClearColor(r / 255, g / 255, b / 255, 1.0f);
 		}
 
-		//Set a tilmap to render
+		//Set a tilemap to render
 		void SetTilemap(Tilemap* map)
 		{
 			tilemap = map;
+		}
+		//Remove a tilemap from rendering
+		void RemoveTilemap()
+		{
+			tilemap = nullptr;
 		}
 
 	private:
