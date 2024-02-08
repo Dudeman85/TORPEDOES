@@ -51,20 +51,23 @@ int main()
     while (!glfwWindowShouldClose(window)) 
     {
         // Process events
-        glfwPollEvents();
-        input::update(window);
+        //glfwPollEvents();
+        input::update();
 
         // DONE: Add & test InputButtons
         // DONE: Add InputEvents
         // DONE: Test InputEvents
-        if (shootEvent->isPressed())
+        std::string message = "";
+        if (shootEvent->isNewPress())
         {
-            //std::cout << "shoot Event presed!\n";
+            message = " pressed";
         }
-        else
+        if (shootEvent->isNewRelease())
         {
-            //std::cout << "shoot Event not presed!\n";
+            std::cout << " release";
         }
+        if(message.length() > 3)
+        std::cout << message << "\n";
         // DONE: Add InputValue
         // DOING: Test InputValue
         

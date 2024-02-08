@@ -1,5 +1,6 @@
 #pragma once
 
+#include <thread>
 #include <optional>
 #include <map>
 #include <vector>
@@ -272,8 +273,6 @@ namespace input
 					break;
 				}
 			}
-
-			std::cout << "button state is: " << (int)pressed << ": " << (int)released << "\n";
 		}
 	 
 
@@ -332,51 +331,55 @@ namespace input
 		}
 
 		// Pressed/released logic
-		void callback(bool pressed)
+		void callback(int pressed)
 		{
-			if (pressed)
+			switch(pressed)
 			{
-				// Button is currently being pressed, what about other inputs this update cycle?
-				switch (buttonInputState)
-				{
-				case input::InputState::None:		// No input before: ignore
-				case input::InputState::Released:	// Should not be possible: ignore
-				case input::InputState::Pressed:	// Should not be possible: ignore
-				case input::InputState::NewPress:	// Same input: ignore
-					// There were no conflicting inputs: Set as new press:
-					buttonInputState = InputState::NewPress;
+				case GLFW_PRESS:
+					// Button is currently being pressed, what about other inputs this update cycle?
+					switch (buttonInputState)
+					{
+					case input::InputState::None:		// No input before: ignore
+					case input::InputState::Released:	// Should not be possible: ignore
+					case input::InputState::Pressed:	// Should not be possible: ignore
+					case input::InputState::NewPress:	// Same input: ignore
+						// There were no conflicting inputs: Set as new press:
+						buttonInputState = InputState::NewPress;
+						break;
+					case input::InputState::NewRelease:
+					case input::InputState::NewReleaseNewPress:
+					case input::InputState::NewPressNewRelease:
+						// Both inputs: Set as new new release, then new press:
+						buttonInputState = InputState::NewReleaseNewPress;
+						break;
+					default:
+						break;
+					}
 					break;
-				case input::InputState::NewRelease:
-				case input::InputState::NewReleaseNewPress:
-				case input::InputState::NewPressNewRelease:
-					// Both inputs: Set as new new release, then new press:
-					buttonInputState = InputState::NewReleaseNewPress;
+				case GLFW_RELEASE:
+					// Button is currently not being pressed, what about other inputs this update cycle?
+					switch (buttonInputState)
+					{
+					case input::InputState::None:		// No input before: ignore
+					case input::InputState::Released:	// Should not be possible: ignore
+					case input::InputState::Pressed:	// Should not be possible: ignore
+					case input::InputState::NewRelease:	// Same input: ignore
+						// There were no conflicting inputs: Set as new release:
+						buttonInputState = InputState::NewRelease;
+						break;
+					case input::InputState::NewPress:
+					case input::InputState::NewReleaseNewPress:
+					case input::InputState::NewPressNewRelease:
+						// Both inputs: Set as new new press, then new release:
+						buttonInputState = InputState::NewPressNewRelease;
+						break;
+					default:
+						break;
+					}
 					break;
 				default:
+					// Do not handle GLFW_REPEAT
 					break;
-				}
-			}
-			else
-			{
-				// Button is currently not being pressed, what about other inputs this update cycle?
-				switch (buttonInputState)
-				{
-				case input::InputState::None:		// No input before: ignore
-				case input::InputState::Released:	// Should not be possible: ignore
-				case input::InputState::Pressed:	// Should not be possible: ignore
-				case input::InputState::NewRelease:	// Same input: ignore
-					// There were no conflicting inputs: Set as new release:
-					buttonInputState = InputState::NewRelease;
-					break;
-				case input::InputState::NewPress:
-				case input::InputState::NewReleaseNewPress:
-				case input::InputState::NewPressNewRelease:
-					// Both inputs: Set as new new press, then new release:
-					buttonInputState = InputState::NewPressNewRelease;
-					break;
-				default:
-					break;
-				}
 			}
 		}
 	};
@@ -447,8 +450,12 @@ namespace input
 		// Call input button's callback logic
 		if (it != inputKeyToInputButton.end())
 		{
-			it->second->callback(action != GLFW_RELEASE);
+			it->second->callback(action);
 		}
+	}
+	static void axisCallback(int jid, int axis, float value)
+	{
+		
 	}
 
 	// Sets window with key callbacks
@@ -458,9 +465,11 @@ namespace input
 	{
 		// Set the key callback function
 		glfwSetKeyCallback(window, keyCallback);
+
+		glfwSetAxisCallback(window, axisCallback);
 	}
-	// Updates all inputs. Call AFTER polling GLFW events, but BEFORE polling input events (such as before gameloop)
-	static void update(GLFWwindow* window)
+	// Updates all inputs. Call BEFORE polling input events (such as before gameloop)
+	static void update()
 	{
 		for (auto it = inputKeyToInputButton.begin(); it != inputKeyToInputButton.end(); ++it)
 		{
@@ -471,6 +480,8 @@ namespace input
 		{
 			it->second->update();
 		}
+
+		glfwPollEvents();
 	}
 	// Frees memory used by the input system
 	static void uninitialize()
