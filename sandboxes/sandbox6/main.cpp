@@ -25,9 +25,10 @@ void OnSpacePressed(int a)
 {
 
 }
- static void OnAPressed(int a)  //pause menu
+ static void OnPausePressed(int a)  //pause menu
 {
-     printf("HERE IN ON PRESSED P");
+     printf("HERE IN ON PRESSED P\n");
+
      ecs::GetSystem<PauseSystem>()->ToggleShowUIMenu();
 
 
@@ -427,14 +428,21 @@ void KeyActions(int key)
 void shoot(auto& player, auto& bulletTexture, auto PlayerMonster)
 {
 
-    ecs::Entity pauseText = ecs::NewEntity();
-    ecs::AddComponent(pauseText, new Transform{ .position = player.position + Vector3(0,0,1), .rotation = player.rotation, .scale = Vector3(10) });
-    ecs::AddComponent(pauseText, new SpriteRenderer{ .texture = &bulletTexture });
+    ecs::Entity pause = ecs::NewEntity();
+    ecs::AddComponent(pause, new Transform{ .position = player.position + Vector3(0,0,1), .rotation = player.rotation, .scale = Vector3(10) });
+    ecs::AddComponent(pause, new SpriteRenderer{ .texture = &bulletTexture });
 
     vector<Vector2> verts{ Vector2(1,1),Vector2(1,-1),Vector2(-1,-1),Vector2(-1,1) };
-    ecs::AddComponent(pauseText, new PolygonCollider{ .vertices = verts });
-    ecs::AddComponent(pauseText, new Rigidbody{ .velocity = TransformSystem::UpVector(PlayerMonster) * 990 / 10, .restitution = 1 });
-    ecs::AddComponent(pauseText, new Pause{.lifeTime = 2});
+    ecs::AddComponent(pause, new PolygonCollider{ .vertices = verts });
+    ecs::AddComponent(pause, new Rigidbody{ .velocity = TransformSystem::UpVector(PlayerMonster) * 990 / 10, .restitution = 1 });
+    
+}
+//create points that tell distance to world origin
+void CreatePoints(auto ) 
+{
+    ecs::Entity points = ecs::NewEntity();
+    ecs::AddComponent(points, new Transform{ .position =  Vector3(0,0,0),  .scale = Vector3(10) });
+    //ecs::AddComponent(points, new SpriteRenderer{ .texture = &bulletTexture });
 }
 int main()
 {
@@ -467,7 +475,7 @@ int main()
     engine::SpriteRenderSystem::SetBackgroundColor(0, 150, 255);
 
     //Load some sprites
-    engine::Texture strawberry_Texture("strawberry.png");
+    engine::Texture Selected_Texture("strawberry.png");
     engine::Texture monsterTexture("UI_Booster_Icon.png");
     engine::Texture UI_BG_Test_Texture("UI_BG_Test.png");
     engine::Texture bulletTexture("Torpedo_Test.png");
@@ -511,11 +519,15 @@ int main()
     ecs::AddTag(strawberry, "entity");
 
 
+    std::shared_ptr<PauseSystem> pauseSystem = ecs::GetSystem<PauseSystem>();
+    pauseSystem->Init();
+    ecs::Entity pause = ecs::NewEntity();
+    
     bool readyToShoot = true;
 
     //Add the transform and SpriteRenderer components required for rendering a sprite
     ecs::AddComponent(strawberry, Transform{ .position = Vector3(0, 40, 0), .rotation = Vector3(0, 0, 45), .scale = Vector3(10) });
-    ecs::AddComponent(strawberry, SpriteRenderer{ .texture = &strawberry_Texture });
+    ecs::AddComponent(strawberry, SpriteRenderer{ .texture = &Selected_Texture });
 
      ecs::AddComponent(PlayerMonster,Transform{ .position = Vector3(40, 40, 1), .rotation = Vector3(0, 0, 0), .scale = Vector3(10) });
     ecs::AddComponent(PlayerMonster, SpriteRenderer{ .texture = &monsterTexture });
@@ -580,8 +592,17 @@ int main()
 
 
 
-        DoActionOnesWhenInputIsDown(GLFW_KEY_P, OnPPressed, window, OnAPressed);
+        DoActionOnesWhenInputIsDown(GLFW_KEY_P, OnPPressed, window, OnPausePressed);
 
+
+        if (OnPPressed && GLFW_KEY_UP == GLFW_PRESS)
+        {
+            ecs::GetSystem<PauseSystem>()->MoveUp();
+        }
+        if (OnPPressed && GLFW_KEY_DOWN == GLFW_PRESS)
+        {
+            ecs::GetSystem<PauseSystem>()->MoveLower();
+        }
 
         ////keyDown LOGIC
      /*   {
