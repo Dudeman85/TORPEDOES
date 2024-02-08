@@ -37,7 +37,7 @@ Every component type also must be registered before it can be used.
 ```cpp
 //Example custom component
 ECS_REGISTER_COMPONENT(Position)
-struct Position : ecs::Component
+struct Position
 {
 	float x, y, z;
 };
@@ -45,14 +45,18 @@ struct Position : ecs::Component
 
 Adding and getting components to entities can be done as such:
 ```cpp
-//Add the component to an entity, returns a reference to that component
-Position& position = ecs::AddComponent(player, new Position{ .x = 10.0f, .y = 25.25f, .z = 0.0f});
+//Add the component to an entity
+ecs::AddComponent(player, Position{ .x = 10.0f, .y = 25.25f, .z = 0.0f});
 
-//You can also get any component of any entity whenever
-Position& position = ecs::GetComponent<Position>(player);
+//Make sure the entity has the component, this is usually not necessary if your system is designed properly
+if(ecs::HasComponent<Position>(player))
+{
+	//Get the player entity's position component
+	Position& position = ecs::GetComponent<Position>(player);
 
-//You can read/write to the variables of a component directly
-position.x = 5.1f;
+	//You can read/write to the members of a component directly
+	position.x = 5.1f;
+}
 ```
 
 ---

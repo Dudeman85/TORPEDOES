@@ -13,7 +13,7 @@ The Rigidbody component contain all the physics material properties of the entit
 ```cpp
 //Rigidbody component
 struct Rigidbody
-{
+	{
 	Vector3 velocity;
 	float mass = 1;
 	float gravityScale = 1;

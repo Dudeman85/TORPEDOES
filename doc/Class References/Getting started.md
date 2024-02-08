@@ -15,9 +15,9 @@ Once configuration is completed, generate build files and you can open project.
 
 ## Example Program
 
-Testing can be done in a sandbox, which is already set up for building
+Testing can be done in a sandbox, which is already set up for building.
 
-This example program creates a movable sprite on the screen
+This example program creates a movable sprite on the screen.
 
 ```cpp
 #include <engine/Application.h>
@@ -49,8 +49,8 @@ int main()
 	//Create a new entity
 	ecs::Entity entity = ecs::NewEntity();
 	//Add the transform and SpriteRenderer components required for rendering a sprite
-	ecs::AddComponent(entity, new Transform{ .position = Vector3(0, 40, 0), .rotation = Vector3(0, 0, 45), .scale = Vector3(50) });
-	ecs::AddComponent(entity, new SpriteRenderer{ .texture = &strawberry });
+	ecs::AddComponent(entity, Transform{ .position = Vector3(0, 40, 0), .rotation = Vector3(0, 0, 45), .scale = Vector3(50) });
+	ecs::AddComponent(entity, SpriteRenderer{ .texture = &strawberry });
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
