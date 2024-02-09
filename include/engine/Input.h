@@ -35,7 +35,7 @@ namespace input
 	};
 
 	using engine::Vector2;
-
+	
 	// Handles a specified input's values by saving all values and timestamps in InputSamples.
 	// From this, we can calculate whether input has been in a specified value range within an update iteration.
 	// We can also calculate the time an input has spent in the specified value range.
@@ -182,22 +182,68 @@ namespace input
 			return Vector2(std::abs(currentSample.x - targetX.value()), std::abs(currentSample.y - targetValue)).Length();
 		}
 	};
+	
+	class AnalogInputEvent;
+	class DigitalInputEvent;
+	
+	std::map<std::string, AnalogInputEvent*> nameToAnalogInputEvent;	// All AnalogInputEvents
+	std::map<std::string, DigitalInputEvent*> nameToDigitalInputEvent;	// All DigitalInputEvents
 
-	std::map<inputKey, InputValue*> inputKeytoInputValue;	// All inputButtons
-
-	class InputEvent;
-	// All inputEvents
-	std::map<std::string, InputEvent*> nameToInputEvent;
-
+	// Base InputEvent
 	class InputEvent
 	{
 	public:
 		InputEvent(std::string inputName) : name(inputName)
 		{
-			nameToInputEvent[name] = this;
+
 		}
 
+	protected:
 		std::string name;
+	};
+
+	class AnalogInputEvent : public InputEvent
+	{
+	public:
+		AnalogInputEvent(std::string inputName) : InputEvent(inputName)
+		{
+			nameToAnalogInputEvent[name] = this;
+		}
+
+		std::vector<float*> outputValues;
+		float totalValue = 0;
+		bool totalValueUpdated = false;
+
+		void inputPollingFinished()
+		{
+			// We are not guaranteed to keep same totalValue, as we've finished input polling
+			totalValueUpdated = false;
+		}
+
+		const float getValue()
+		{
+			if (!totalValueUpdated)
+			{
+				// Update total value
+				float output = 0;
+				for (auto outputValue : outputValues)
+				{
+					output += *outputValue;
+				}
+				totalValue = output;
+				totalValueUpdated = true;
+			}
+			return totalValue;
+		}
+	};
+
+	class DigitalInputEvent : public InputEvent
+	{
+	public:
+		DigitalInputEvent(std::string inputName) : InputEvent(inputName)
+		{
+			nameToDigitalInputEvent[name] = this;
+		}
 
 		// Every output state of InputButton this is binded to
 		std::vector<InputState*> outputStates;
@@ -223,10 +269,8 @@ namespace input
 			return (isNewPress() || isNewRelease());
 		}
 
-		/// 
-		/// Update every frame
-		/// 
-		void update()
+		// Before handling new events, we should refresh the event's state
+		void refreshState()
 		{
 			InputState newState = InputState::None;
 			pressed = eventStates::Not;
@@ -281,23 +325,23 @@ namespace input
 		eventStates released = eventStates::Not;	// Whether key is released the update before this poll
 	};
 
-	class InputButton;	
-	std::map<inputKey, InputButton*> inputKeyToInputButton;	// All inputButtons
+	class DigitalInput;
+	std::map<inputKey, DigitalInput*> inputKeytoDigitalInput;	// All DigitalInputs
 
-	class InputButton
+	class DigitalInput
 	{
 	public:
-		InputButton(inputKey key)
+		DigitalInput(inputKey key)
 		{
 			//inputButtons.push_back(this);
-			inputKeyToInputButton[key] = this;
+			inputKeytoDigitalInput[key] = this;
 		}
 
 		InputState buttonInputState = InputState::Released;		// Callback inputted state of key
 		InputState buttonOutputState = InputState::Released;	// Pollable state of key
 
-		// Checks the change in the key
-		void update()
+		// Check and handle the change in state
+		void checkStateChange()
 		{
 			if (buttonInputState == InputState::None)
 			{
@@ -384,7 +428,7 @@ namespace input
 		}
 	};
 
-	static void unbindInput(InputButton* inputButton)
+	static void unbindInput(DigitalInput* inputButton)
 	{
 		// TODO:
 
@@ -394,68 +438,205 @@ namespace input
 		// If inputButton has no uses, delete it (not necessary, if engine restarts, the button will not be initialized anymore)
 	}
 
-	static void bindInput(InputButton* inputButton, std::vector<InputEvent*> inputEvents)
+	static void bindDigitalInput(DigitalInput* inputButton, std::vector<DigitalInputEvent*> inputEvents)
 	{
+		// Bind all specified events to DigitalInput
 		for (auto inputEvent : inputEvents)
 		{
-			// Bind event to button
 			inputEvent->outputStates.push_back(&inputButton->buttonOutputState);
 		}
 	}
-	static void bindInput(inputKey key, std::vector<InputEvent*> inputEvents)
+	static void bindDigitalInput(inputKey key, std::vector<DigitalInputEvent*> inputEvents)
 	{
 		// Find inputKey
-		auto it = inputKeyToInputButton.find(key);
+		auto it = inputKeytoDigitalInput.find(key);
 
 		// Check if the key exists in the map
-		if (it != inputKeyToInputButton.end()) 
+		if (it != inputKeytoDigitalInput.end())
 		{
-			bindInput(it->second, inputEvents);
+			bindDigitalInput(it->second, inputEvents);
 		}
 		else
 		{
 			// Construct a new inputButton to bind
-			bindInput(new InputButton(key), inputEvents);
+			bindDigitalInput(new DigitalInput(key), inputEvents);
 		}
 	}
-	static void bindInput(inputKey key, std::vector<std::string> inputEventNames)
+	static void bindDigitalInput(inputKey key, std::vector<std::string> digitalInputEventNames)
 	{
-		std::vector<InputEvent*> inputEventsToBind;
+		std::vector<DigitalInputEvent*> digitalInputEventsToBind;
 
-		// Find by InputEvent name
-		for (const auto& inputEventName : inputEventNames)
+		// Find by DigitalInputEvent name
+		for (const auto& digitalInputEventName : digitalInputEventNames)
 		{
-			auto it = nameToInputEvent.find(inputEventName);
+			auto it = nameToDigitalInputEvent.find(digitalInputEventName);
 
-			// Check if the inputEvent's name exists in the map
-			if (it != nameToInputEvent.end()) 
+			// Check if the DigitalInputEvent's name exists in the map
+			if (it != nameToDigitalInputEvent.end())
 			{
-				inputEventsToBind.push_back(it->second);
+				digitalInputEventsToBind.push_back(it->second);
 			}
 			else 
 			{
-				std::cout << "WARNING: No matching InputEvent found for " << inputEventName << std::endl;
+				std::cout << "WARNING: No matching DigitalInputEvent found for " << digitalInputEventName << std::endl;
 			}
 		}
 
-		bindInput(key, inputEventsToBind);
+		bindDigitalInput(key, digitalInputEventsToBind);
+	}
+
+	class AnalogInput;
+	std::map<int, AnalogInput*> joystickToAnalogInput;	// All AnalogInputs
+
+	class AnalogInput
+	{
+	public:
+		// n-dimensional analog input
+		std::map<int, float> axisToValue;
+
+		float min = -1;
+		float max = 1;
+
+		AnalogInput(float joystick)
+		{
+			joystickToAnalogInput[joystick] = this;
+		}
+
+		void setAxis(int axis, float value)
+		{
+			axisToValue[axis] = std::clamp(value, min, max);
+		}
+		void setAxis(std::vector<float> values)
+		{
+			int i = 0;
+			for (int value : values)
+			{
+				setAxis(i, value);
+				i++;
+			}
+		}
+		void setAxis(float values[6])
+		{
+			for (size_t i = 0; i < 6; i++)
+			{
+				setAxis(i, values[i]);
+				i++;
+			}
+		}
+		const float getValue(int axis)
+		{
+			return axisToValue[axis];
+		}
+	};
+
+	void bindAnalogInput(AnalogInput* inputButton, std::vector<AnalogInputEvent*> inputEvents, std::vector<int> axes = {0})
+	{
+		// Bind all specified events to AnalogInput
+		for (auto inputEvent : inputEvents)
+		{
+			// Bind all specified axes to event
+			for (int axis : axes)
+			{
+				inputEvent->outputValues.push_back(&inputButton->axisToValue[axis]);
+			}
+		}
+	}
+	static void bindAnalogInput(int joystick, std::vector<AnalogInputEvent*> inputEvents)
+	{
+		// Find inputKey
+		auto it = joystickToAnalogInput.find(joystick);
+
+		// Check if the key exists in the map
+		if (it != joystickToAnalogInput.end())
+		{
+			bindAnalogInput(it->second, inputEvents);
+		}
+		else
+		{
+			// Construct a new AnalogInput to bind
+			bindAnalogInput(new AnalogInput(joystick), inputEvents);
+		}
+	}
+	static void bindAnalogInput(int joystick, std::vector<std::string> analogInputEventNames)
+	{
+		std::vector<AnalogInputEvent*> digitalInputEventsToBind;
+
+		// Find by AnalogInputEvent's name
+		for (const auto& analogInputEventName : analogInputEventNames)
+		{
+			auto it = nameToAnalogInputEvent.find(analogInputEventName);
+
+			// Check if the AnalogInputEvent's name exists in the map
+			if (it != nameToAnalogInputEvent.end())
+			{
+				digitalInputEventsToBind.push_back(it->second);
+			}
+			else
+			{
+				std::cout << "WARNING: No matching AnalogInputEvent found for " << analogInputEventName << std::endl;
+			}
+		}
+
+		bindAnalogInput(joystick, digitalInputEventsToBind);
 	}
 
 	// Function prototype for the key callback
 	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
 	{
-		// Find input button. Yes, this is slow. Try to create a callback to a non-static function if you dislike it. I dare you.
-		auto it = inputKeyToInputButton.find(key);
+		// Find InputButton is O(logN), bruteforce checking through each individually is O(N).
+		// Futhermore, find InputButton happens only when there is a press, bruteforce happens every frame
+		auto it = inputKeytoDigitalInput.find(key);
 
 		// Call input button's callback logic
-		if (it != inputKeyToInputButton.end())
+		if (it != inputKeytoDigitalInput.end())
 		{
 			it->second->callback(action);
 		}
 	}
-	static void axisCallback(int jid, int axis, float value)
+
+	static void gamePadAxisTest(int joystick)
 	{
-		
+		int count;
+
+		// Find joystick
+		auto it = joystickToAnalogInput.find(joystick);
+		if (it == joystickToAnalogInput.end())
+		{
+			return;
+		}
+		// Get joystick state
+		GLFWgamepadstate state;
+		if (glfwGetGamepadState(joystick, &state) != GLFW_TRUE)
+		{
+			return;
+		}
+
+		// Set axis values
+		it->second->setAxis(state.axes);
+	}
+
+	static void customAxisTest(int joystick, int offset = 1)
+	{			
+		int count;
+
+		// Find joystick
+		auto it = joystickToAnalogInput.find(joystick);
+		if (it == joystickToAnalogInput.end())
+		{
+			return;
+		}
+
+		const float* axesStart = glfwGetJoystickAxes(joystick, &count);
+
+		// If controller disconnected, return
+		if (!axesStart)
+		{
+			return;
+		}
+		// There is a cosmic chance that at point, the disconnect happens and game crashes. But oh well
+
+		// Set axis values
+		it->second->setAxis({ *axesStart, *(axesStart + offset) });
 	}
 
 	// Sets window with key callbacks
@@ -465,38 +646,66 @@ namespace input
 	{
 		// Set the key callback function
 		glfwSetKeyCallback(window, keyCallback);
-
-		glfwSetAxisCallback(window, axisCallback);
 	}
 	// Updates all inputs. Call BEFORE polling input events (such as before gameloop)
 	static void update()
 	{
-		for (auto it = inputKeyToInputButton.begin(); it != inputKeyToInputButton.end(); ++it)
-		{
-			it->second->update();
-		}
-
-		for (auto it = nameToInputEvent.begin(); it != nameToInputEvent.end(); ++it)
-		{
-			it->second->update();
-		}
-
+		// Read all new events
 		glfwPollEvents();
+
+		// Update joysticks
+		for (size_t i = 0; i < GLFW_JOYSTICK_LAST; i++)
+		{
+			if (glfwJoystickPresent(i))
+			{
+				// Update joystick analog events
+				if (glfwJoystickIsGamepad(i))
+				{
+					gamePadAxisTest(i);
+				}
+				else
+				{
+					customAxisTest(i);
+				}
+			}
+		}
+
+		// Update binded DigitalInputs
+		for (auto it = inputKeytoDigitalInput.begin(); it != inputKeytoDigitalInput.end(); ++it)
+		{
+			it->second->checkStateChange();
+		}
+		// Update binded AnalogInputEvents
+		for (auto it = nameToAnalogInputEvent.begin(); it != nameToAnalogInputEvent.end(); ++it)
+		{
+			it->second->inputPollingFinished();
+		}
 	}
 	// Frees memory used by the input system
 	static void uninitialize()
 	{
-		// Free inputButtons
-		for (auto it = inputKeyToInputButton.begin(); it != inputKeyToInputButton.end(); ++it)
+		// Free DigitalInputEvents
+		for (auto it = nameToDigitalInputEvent.begin(); it != nameToDigitalInputEvent.end(); ++it)
 		{
 			delete it->second;
 		}
+		nameToDigitalInputEvent.clear();
+		// Free AnalogInputEvents
+		for (auto it = nameToAnalogInputEvent.begin(); it != nameToAnalogInputEvent.end(); ++it)
+		{
+			delete it->second;
+		}
+		nameToAnalogInputEvent.clear();
 
-		// Free inputEvents
-		for (auto it = nameToInputEvent.begin(); it != nameToInputEvent.end(); ++it) 
+		// Free DigitalInputs
+		for (auto it = inputKeytoDigitalInput.begin(); it != inputKeytoDigitalInput.end(); ++it)
 		{
 			delete it->second;
 		}
-		nameToInputEvent.clear();
+		// Free AnalogInputs
+		for (auto it = joystickToAnalogInput.begin(); it != joystickToAnalogInput.end(); ++it)
+		{
+			delete it->second;
+		}
 	}
 }

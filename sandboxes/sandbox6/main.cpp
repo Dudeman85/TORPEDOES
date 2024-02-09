@@ -16,12 +16,14 @@ int main()
 
     // Initialize GLFW and create a window with a key callback
     GLFWwindow* window = initializeGLFW(width, height, title);
-    if (!window) {
+    if (!window) 
+    {
         return -1;
     }
 
     // Main loop
-    while (!glfwWindowShouldClose(window)) {
+    while (!glfwWindowShouldClose(window))
+    {
         // Process events
         glfwPollEvents();
     }
