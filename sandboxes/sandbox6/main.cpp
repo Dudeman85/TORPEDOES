@@ -1,4 +1,4 @@
-//Author Sauli Hanell 2.1.2024 
+//Author Sauli Hanell month.day.year 2.1.2024 
 #include <engine/Application.h>
 #include <functional>
 #include "BulletSystem.h"

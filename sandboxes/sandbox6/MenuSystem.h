@@ -1,3 +1,5 @@
+//Author Sauli Hanell month.day.year 2.9.2024
+
 #pragma once
 #include <engine/Application.h>
 #include <functional>
