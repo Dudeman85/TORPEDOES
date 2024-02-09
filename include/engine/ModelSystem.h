@@ -14,12 +14,11 @@ namespace engine
 		///Stores shader data
 		Shader* shader;
 
-		//std::vector<Texture>* textures; // save multiple textures
-		//Texture* defaultTexture;
-		//ModelRenderer() = default; // now this does nothing
+		std::vector<Texture*> textures; // save multiple textures
+		Texture* defaultTexture;
 
-		
 	};
+	
 
 	///3D Model Render System, requires Transform and ModelRenderer
 	ECS_REGISTER_SYSTEM(ModelRenderSystem, Transform, ModelRenderer)
@@ -89,7 +88,6 @@ namespace engine
 				}
 				)", false);
 		}
-
 	
 		///Call this every frame
 
