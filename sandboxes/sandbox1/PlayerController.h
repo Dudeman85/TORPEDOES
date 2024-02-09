@@ -70,11 +70,15 @@ class PlayerController : public ecs::System
 		animPosition.z += 100;
 		ecs::AddComponent(projecAnim, Transform{ .position = animPosition,  .scale = Vector3(20) });
 		ecs::AddComponent(projecAnim, SpriteRenderer{ });
-		ecs::AddComponent(projecAnim, Animator{});
+		ecs::AddComponent(projecAnim, Animator{.onAnimationEnd = ecs::DestroyEntity});
 		AnimationSystem::AddAnimation(projecAnim, *ExplosionAnim, "explosion");
 		AnimationSystem::PlayAnimation(projecAnim, "explosion", false);
 
 	};
+	/*static void EndExplosionAnimation(ecs::Entity explosionEnd)
+	{
+		ecs::DestroyEntity(explosionEnd);
+	};*/
 
 public:
 	float getTimer() const {

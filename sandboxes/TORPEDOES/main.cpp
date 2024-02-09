@@ -233,9 +233,9 @@ int main()
 
 	Animation countdownAnim = AnimationsFromSpritesheet("UI_Countdown_Ver2.png", 5, 1, vector<int>(5, 1000))[0];
 	ecs::Entity countdown = ecs::NewEntity();
-	ecs::AddComponent(countdown, Transform{ .position = Vector3(1475, -1200, 10), .scale = Vector3(60, 100, 0) });
+	ecs::AddComponent(countdown, Transform{ .position = Vector3(1475, -1270, 10), .scale = Vector3(60, 100, 0) });
 	ecs::AddComponent(countdown, SpriteRenderer{});
-	ecs::AddComponent(countdown, Animator{});
+	ecs::AddComponent(countdown, Animator{ .onAnimationEnd = ecs::DestroyEntity });
 	AnimationSystem::AddAnimation(countdown, countdownAnim, "CountDown");
 	AnimationSystem::PlayAnimation(countdown, "CountDown", false);
 
