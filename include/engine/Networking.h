@@ -16,23 +16,31 @@ namespace engine
 		unsequenced = ENET_PACKET_FLAG_UNSEQUENCED
 	};
 
-	//A packet to send over an enet connection
+	///A packet to send over an enet connection
 	struct Message
 	{
-		//The data in binary form
+		///The data in binary form
 		char* data;
+		///How much data there is for pointer math
 		size_t dataLength = 0;
-		//These are set automatically
+		///These are set automatically
 		int peerID = -1;
+		///These are set automatically
 		int chanelID = 0;
 	};
 
+	///Struct to store connection data
 	struct Connection
 	{
+		///Bool that turns the connection on and off
 		bool closed = true;
+		///Generates a host for the clients to connect to
 		ENetHost* host = 0;
+		///List of the clients
 		std::vector<ENetPeer*> peers;
+		///Reference to the Message struct
 		Message msgBuffer;
+		///Store the address
 		ENetAddress address;
 
 	};

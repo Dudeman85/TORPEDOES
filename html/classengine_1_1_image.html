@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.10.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: engine::Image Class Reference</title>
+<title>Tiimi Arkade: engine::Image Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,8 +27,9 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project<span id="projectnumber">&#160;0.2</span>
+   <div id="projectname">Tiimi Arkade<span id="projectnumber">&#160;0.2</span>
    </div>
+   <div id="projectbrief">TORPEDOES!!! pelimoottori docs</div>
   </td>
  </tr>
  </tbody>
@@ -98,35 +99,48 @@ $(function(){initNavTree('classengine_1_1_image.html',''); initResizable(); });
   <div class="headertitle"><div class="title">engine::Image Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p><a class="el" href="classengine_1_1_image.html" title="Image class basically just a 2d vector of rgba values.">Image</a> class basically just a 2d vector of rgba values.  
+ <a href="#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_image_8h_source.html">Image.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aaeda1e0b0a0d5ee36917a7b9f6ff5274" id="r_aaeda1e0b0a0d5ee36917a7b9f6ff5274"><td class="memItemLeft" align="right" valign="top"><a id="aaeda1e0b0a0d5ee36917a7b9f6ff5274" name="aaeda1e0b0a0d5ee36917a7b9f6ff5274"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>Image</b> (std::string path)</td></tr>
+<tr class="memdesc:aaeda1e0b0a0d5ee36917a7b9f6ff5274"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load the image data from a path. <br /></td></tr>
 <tr class="separator:aaeda1e0b0a0d5ee36917a7b9f6ff5274"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af72da54004405c2f2f7e51b7d066894f" id="r_af72da54004405c2f2f7e51b7d066894f"><td class="memItemLeft" align="right" valign="top"><a id="af72da54004405c2f2f7e51b7d066894f" name="af72da54004405c2f2f7e51b7d066894f"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>Image</b> (vector&lt; vector&lt; <a class="el" href="structengine_1_1_pixel.html">Pixel</a> &gt; &gt; pixels)</td></tr>
+<tr class="memdesc:af72da54004405c2f2f7e51b7d066894f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct an image from a 2D vector of pixels. <br /></td></tr>
 <tr class="separator:af72da54004405c2f2f7e51b7d066894f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2b155a9c6aa7d559f6a85ecfa6c28784" id="r_a2b155a9c6aa7d559f6a85ecfa6c28784"><td class="memItemLeft" align="right" valign="top"><a id="a2b155a9c6aa7d559f6a85ecfa6c28784" name="a2b155a9c6aa7d559f6a85ecfa6c28784"></a>
 vector&lt; <a class="el" href="structengine_1_1_pixel.html">Pixel</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>operator[]</b> (int i)</td></tr>
 <tr class="separator:a2b155a9c6aa7d559f6a85ecfa6c28784"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff485f597be2b1283482f7558a438fae" id="r_aff485f597be2b1283482f7558a438fae"><td class="memItemLeft" align="right" valign="top"><a id="aff485f597be2b1283482f7558a438fae" name="aff485f597be2b1283482f7558a438fae"></a>
 unsigned char *&#160;</td><td class="memItemRight" valign="bottom"><b>data</b> ()</td></tr>
+<tr class="memdesc:aff485f597be2b1283482f7558a438fae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the data of this imge in stbimage friendly format. <br /></td></tr>
 <tr class="separator:aff485f597be2b1283482f7558a438fae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6c44f091f8d67bf2382fcecd8dd7d718" id="r_a6c44f091f8d67bf2382fcecd8dd7d718"><td class="memItemLeft" align="right" valign="top"><a id="a6c44f091f8d67bf2382fcecd8dd7d718" name="a6c44f091f8d67bf2382fcecd8dd7d718"></a>
 <a class="el" href="classengine_1_1_image.html">Image</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Slice</b> (int x1, int y1, int x2, int y2)</td></tr>
+<tr class="memdesc:a6c44f091f8d67bf2382fcecd8dd7d718"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a subsection of pixels from x1 y1 top-left, to x2, y2 bottom-right (inclusive). <br /></td></tr>
 <tr class="separator:a6c44f091f8d67bf2382fcecd8dd7d718"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a9deba67dd5ce7140df8a7d720fa9c8b2" id="r_a9deba67dd5ce7140df8a7d720fa9c8b2"><td class="memItemLeft" align="right" valign="top"><a id="a9deba67dd5ce7140df8a7d720fa9c8b2" name="a9deba67dd5ce7140df8a7d720fa9c8b2"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>width</b></td></tr>
+<tr class="memdesc:a9deba67dd5ce7140df8a7d720fa9c8b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">the width of the image <br /></td></tr>
 <tr class="separator:a9deba67dd5ce7140df8a7d720fa9c8b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2889ae5d7f80bf1385809026576d454" id="r_ac2889ae5d7f80bf1385809026576d454"><td class="memItemLeft" align="right" valign="top"><a id="ac2889ae5d7f80bf1385809026576d454" name="ac2889ae5d7f80bf1385809026576d454"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>height</b></td></tr>
+<tr class="memdesc:ac2889ae5d7f80bf1385809026576d454"><td class="mdescLeft">&#160;</td><td class="mdescRight">the height of the image <br /></td></tr>
 <tr class="separator:ac2889ae5d7f80bf1385809026576d454"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p><a class="el" href="classengine_1_1_image.html" title="Image class basically just a 2d vector of rgba values.">Image</a> class basically just a 2d vector of rgba values. </p>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>C:/Users/matiasrek/source/repos/teamarkademoottori/team5/include/engine/<a class="el" href="_image_8h_source.html">Image.h</a></li>
 </ul>
 </div><!-- contents -->

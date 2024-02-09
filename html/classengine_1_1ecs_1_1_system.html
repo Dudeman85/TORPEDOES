@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.10.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: engine::ecs::System Class Reference</title>
+<title>Tiimi Arkade: engine::ecs::System Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,8 +27,9 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project<span id="projectnumber">&#160;0.2</span>
+   <div id="projectname">Tiimi Arkade<span id="projectnumber">&#160;0.2</span>
    </div>
+   <div id="projectbrief">TORPEDOES!!! pelimoottori docs</div>
   </td>
  </tr>
  </tbody>
@@ -97,6 +98,11 @@ $(function(){initNavTree('classengine_1_1ecs_1_1_system.html',''); initResizable
   <div class="headertitle"><div class="title">engine::ecs::System Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Base class all systems inherit from.  
+ <a href="#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_e_c_s_8h_source.html">ECS.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for engine::ecs::System:</div>
 <div class="dyncontent">
@@ -104,10 +110,10 @@ Inheritance diagram for engine::ecs::System:</div>
   <img src="classengine_1_1ecs_1_1_system.png" usemap="#engine::ecs::System_map" alt=""/>
   <map id="engine::ecs::System_map" name="engine::ecs::System_map">
 <area href="classengine_1_1_animation_system.html" title="Animator system, Requires Animator and SpriteRenderer." alt="engine::AnimationSystem" shape="rect" coords="195,56,380,80"/>
-<area href="classengine_1_1_collision_system.html" alt="engine::CollisionSystem" shape="rect" coords="195,112,380,136"/>
-<area href="classengine_1_1_model_render_system.html" alt="engine::ModelRenderSystem" shape="rect" coords="195,168,380,192"/>
+<area href="classengine_1_1_collision_system.html" title="Collision System, Requires Transform and PolygonCollider." alt="engine::CollisionSystem" shape="rect" coords="195,112,380,136"/>
+<area href="classengine_1_1_model_render_system.html" title="3D Model Render System, requires Transform and ModelRenderer" alt="engine::ModelRenderSystem" shape="rect" coords="195,168,380,192"/>
 <area href="classengine_1_1_physics_system.html" title="Physics System, Requires Rigidbody and Transform components." alt="engine::PhysicsSystem" shape="rect" coords="195,224,380,248"/>
-<area href="classengine_1_1_primitive_render_system.html" alt="engine::PrimitiveRenderSystem" shape="rect" coords="195,280,380,304"/>
+<area href="classengine_1_1_primitive_render_system.html" title="Primitive Render system, Requires PrimitiveRenderer and Transform." alt="engine::PrimitiveRenderSystem" shape="rect" coords="195,280,380,304"/>
 <area href="classengine_1_1_sprite_render_system.html" title="2D Sprite Render system, Requires SpriteRenderer and Transform" alt="engine::SpriteRenderSystem" shape="rect" coords="195,336,380,360"/>
 <area href="classengine_1_1_text_render_system.html" title="TextRenderSystem requires components TextRenderer component and transform component." alt="engine::TextRenderSystem" shape="rect" coords="195,392,380,416"/>
 <area href="classengine_1_1_transform_system.html" title="Transform system, Requires Transform component." alt="engine::TransformSystem" shape="rect" coords="195,448,380,472"/>
@@ -119,9 +125,12 @@ Inheritance diagram for engine::ecs::System:</div>
 Public Attributes</h2></td></tr>
 <tr class="memitem:ae5d785e0f566b1034d218fcdcb5fcf14" id="r_ae5d785e0f566b1034d218fcdcb5fcf14"><td class="memItemLeft" align="right" valign="top"><a id="ae5d785e0f566b1034d218fcdcb5fcf14" name="ae5d785e0f566b1034d218fcdcb5fcf14"></a>
 std::set&lt; Entity &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>entities</b></td></tr>
+<tr class="memdesc:ae5d785e0f566b1034d218fcdcb5fcf14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set of every entity containing the required components for the system. <br /></td></tr>
 <tr class="separator:ae5d785e0f566b1034d218fcdcb5fcf14"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Base class all systems inherit from. </p>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>C:/Users/matiasrek/source/repos/teamarkademoottori/team5/include/engine/<a class="el" href="_e_c_s_8h_source.html">ECS.h</a></li>
 </ul>
 </div><!-- contents -->

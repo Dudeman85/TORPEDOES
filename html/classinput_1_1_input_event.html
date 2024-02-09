@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.10.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: input::InputEvent Class Reference</title>
+<title>Tiimi Arkade: input::InputEvent Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,8 +27,9 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project<span id="projectnumber">&#160;0.2</span>
+   <div id="projectname">Tiimi Arkade<span id="projectnumber">&#160;0.2</span>
    </div>
+   <div id="projectbrief">TORPEDOES!!! pelimoottori docs</div>
   </td>
  </tr>
  </tbody>
@@ -102,6 +103,9 @@ $(function(){initNavTree('classinput_1_1_input_event.html',''); initResizable();
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a07f809074f7bc0f86b05212bebeca0e9" id="r_a07f809074f7bc0f86b05212bebeca0e9"><td class="memItemLeft" align="right" valign="top"><a id="a07f809074f7bc0f86b05212bebeca0e9" name="a07f809074f7bc0f86b05212bebeca0e9"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>InputEvent</b> (std::string inputName)</td></tr>
+<tr class="separator:a07f809074f7bc0f86b05212bebeca0e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abde729bd1c7a8d7059dd16f564e946b6" id="r_abde729bd1c7a8d7059dd16f564e946b6"><td class="memItemLeft" align="right" valign="top"><a id="abde729bd1c7a8d7059dd16f564e946b6" name="abde729bd1c7a8d7059dd16f564e946b6"></a>
 const bool&#160;</td><td class="memItemRight" valign="bottom"><b>isPressed</b> ()</td></tr>
 <tr class="separator:abde729bd1c7a8d7059dd16f564e946b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -131,15 +135,12 @@ std::vector&lt; InputState * &gt;&#160;</td><td class="memItemRight" valign="bot
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:a4a03e513c687c3ded417ccecd3e47c81" id="r_a4a03e513c687c3ded417ccecd3e47c81"><td class="memItemLeft" align="right" valign="top"><a id="a4a03e513c687c3ded417ccecd3e47c81" name="a4a03e513c687c3ded417ccecd3e47c81"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>pressed</b> = false</td></tr>
-<tr class="separator:a4a03e513c687c3ded417ccecd3e47c81"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2153acfab48eb9b5e7e8fffbc5969bb9" id="r_a2153acfab48eb9b5e7e8fffbc5969bb9"><td class="memItemLeft" align="right" valign="top"><a id="a2153acfab48eb9b5e7e8fffbc5969bb9" name="a2153acfab48eb9b5e7e8fffbc5969bb9"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>released</b> = false</td></tr>
-<tr class="separator:a2153acfab48eb9b5e7e8fffbc5969bb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d0985480182fc851396fdce5a353433" id="r_a4d0985480182fc851396fdce5a353433"><td class="memItemLeft" align="right" valign="top"><a id="a4d0985480182fc851396fdce5a353433" name="a4d0985480182fc851396fdce5a353433"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>newChange</b> = false</td></tr>
-<tr class="separator:a4d0985480182fc851396fdce5a353433"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0fd4a6803de7742b7f9cdf63251b5c30" id="r_a0fd4a6803de7742b7f9cdf63251b5c30"><td class="memItemLeft" align="right" valign="top"><a id="a0fd4a6803de7742b7f9cdf63251b5c30" name="a0fd4a6803de7742b7f9cdf63251b5c30"></a>
+eventStates&#160;</td><td class="memItemRight" valign="bottom"><b>pressed</b> = eventStates::Not</td></tr>
+<tr class="separator:a0fd4a6803de7742b7f9cdf63251b5c30"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c2560f8041f5944aa2ec8b9e8807914" id="r_a4c2560f8041f5944aa2ec8b9e8807914"><td class="memItemLeft" align="right" valign="top"><a id="a4c2560f8041f5944aa2ec8b9e8807914" name="a4c2560f8041f5944aa2ec8b9e8807914"></a>
+eventStates&#160;</td><td class="memItemRight" valign="bottom"><b>released</b> = eventStates::Not</td></tr>
+<tr class="separator:a4c2560f8041f5944aa2ec8b9e8807914"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a id="ad6e03347dc87ef3876a177d384f2c2bc" name="ad6e03347dc87ef3876a177d384f2c2bc"></a>
