@@ -5,9 +5,11 @@
 
 namespace engine
 {
+	///Class for creating and storing data for the camera
 	class Camera
 	{
 	public:
+		///Constructor
 		Camera(float w, float h, glm::vec3 pos = glm::vec3(0.f, 0.f, 0.f), glm::vec3 rot = glm::vec3(0.f, 0.f, 0.f))
 		{
 			width = w;
@@ -16,7 +18,7 @@ namespace engine
 			rotation = rot;
 		}
 
-		//Sets the camera position in word space
+		///Sets the camera position in world space
 		void SetPosition(Vector3 pos)
 		{
 			//I really have no idea why these have to be divided by 2, but otherwise the coordinates don't match the sprites
@@ -25,7 +27,7 @@ namespace engine
 			position.z = pos.z / 2;
 		}
 
-		//Move the camera in world space. Camera's origin is in its center
+		///Move the camera in world space. Camera's origin is in its center
 		void Translate(Vector3 dPos = 0.f)
 		{
 			//I really have no idea why these have to be divided by 2, but otherwise the coordinates don't match the sprites
@@ -34,7 +36,7 @@ namespace engine
 			position.z += dPos.z / 2;
 		}
 
-		//Set the rotation of the camera the camera in world space
+		///Set the rotation of the camera the camera in world space
 		void SetRotation(Vector3 rot)
 		{
 			rotation.x = rot.x;
@@ -42,7 +44,7 @@ namespace engine
 			rotation.z = rot.z;
 		}
 
-		//Rotate the camera in world space
+		///Rotate the camera in world space
 		void Rotate(Vector3 dRot)
 		{
 			rotation.x += dRot.x;
@@ -50,14 +52,14 @@ namespace engine
 			rotation.z += dRot.z;
 		}
 
-		//Sets the width and height of the camera
+		///Sets the width and height of the camera
 		void SetDimensions(float w, float h)
 		{
 			width = w;
 			height = h;
 		}
 
-		//Get the projection matrix for this camera. is perspective is set to true, use perspective projection instead of orthographic
+		///Get the projection matrix for this camera. is perspective is set to true, use perspective projection instead of orthographic
 		glm::mat4 GetProjectionMatrix()
 		{
 			if (perspective)
@@ -66,7 +68,7 @@ namespace engine
 				return glm::ortho(position.x - width / 2, position.x + width / 2, position.y - height / 2, position.y + height / 2, 0.01f, farPlane);
 		}
 
-		//Get the model matrix for this camera, aka the view matrix
+		///Get the model matrix for this camera, aka the view matrix
 		glm::mat4 GetViewMatrix()
 		{
 			glm::mat4 model = glm::mat4(1.0f);
@@ -80,12 +82,19 @@ namespace engine
 			return model;
 		}
 
+		///Position of the camera
 		glm::vec3 position;
+		///Rotation of the camera
 		glm::vec3 rotation;
+		///Bool to turn on and of different perspective modes
 		bool perspective = false;
+		///Width of the camera
 		float width;
+		///Height of the camera
 		float height;
+		///Farplane is a location in the final fantasy mmo i guess but also a datapoint for our 3rd perspective camera
 		float farPlane = 10000;
+		///Field of view of the camera
 		float fov = 45;
 	};
 }

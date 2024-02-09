@@ -5,20 +5,28 @@
 
 namespace engine
 {
-	//3D Model Renderer component
+	///3D Model Renderer component
 	ECS_REGISTER_COMPONENT(ModelRenderer)
 	struct ModelRenderer
 	{
+		///Stores vertex data
 		Model* model;
+		///Stores shader data
 		Shader* shader;
-		Model* Texture;
+
+		//std::vector<Texture>* textures; // save multiple textures
+		//Texture* defaultTexture;
+		//ModelRenderer() = default; // now this does nothing
+
+		
 	};
 
-	//3D Model Render System, requires Transform and ModelRenderer
+	///3D Model Render System, requires Transform and ModelRenderer
 	ECS_REGISTER_SYSTEM(ModelRenderSystem, Transform, ModelRenderer)
 	class ModelRenderSystem : public ecs::System
 	{
 	public:
+		///Initialize the shaders
 		void Init()
 		{
 			//The default 3D model shader with bling-phong lighting
@@ -81,6 +89,9 @@ namespace engine
 				}
 				)", false);
 		}
+
+	
+		///Call this every frame
 
 		void Update(Camera* cam)
 		{
@@ -162,7 +173,7 @@ namespace engine
 				}
 			}
 		}
-
+		///Set light position and color
 		void SetLight(Vector3 _lightPos, Vector3 _lightColor)
 		{
 			lightPos = _lightPos;

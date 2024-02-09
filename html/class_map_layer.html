@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.10.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: MapLayer Class Reference</title>
+<title>Tiimi Arkade: MapLayer Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,8 +27,9 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project<span id="projectnumber">&#160;0.2</span>
+   <div id="projectname">Tiimi Arkade<span id="projectnumber">&#160;0.2</span>
    </div>
+   <div id="projectbrief">TORPEDOES!!! pelimoottori docs</div>
   </td>
  </tr>
  </tbody>
@@ -98,11 +99,17 @@ $(function(){initNavTree('class_map_layer.html',''); initResizable(); });
   <div class="headertitle"><div class="title">MapLayer Class Reference<span class="mlabels"><span class="mlabel">final</span></span></div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>A class to create and store data for the tiled map.  
+ <a href="#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_map_layer_8h_source.html">MapLayer.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a2b7cbb079ab6bbc899286486bf386ca2" id="r_a2b7cbb079ab6bbc899286486bf386ca2"><td class="memItemLeft" align="right" valign="top"><a id="a2b7cbb079ab6bbc899286486bf386ca2" name="a2b7cbb079ab6bbc899286486bf386ca2"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>MapLayer</b> (const tmx::Map &amp;, std::size_t, const std::vector&lt; std::shared_ptr&lt; <a class="el" href="classengine_1_1_texture.html">engine::Texture</a> &gt; &gt; &amp;textures)</td></tr>
+<tr class="memdesc:a2b7cbb079ab6bbc899286486bf386ca2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
 <tr class="separator:a2b7cbb079ab6bbc899286486bf386ca2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af323ddae8da169a64be1e0c216034397" id="r_af323ddae8da169a64be1e0c216034397"><td class="memItemLeft" align="right" valign="top"><a id="af323ddae8da169a64be1e0c216034397" name="af323ddae8da169a64be1e0c216034397"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>MapLayer</b> (const <a class="el" href="class_map_layer.html">MapLayer</a> &amp;)=delete</td></tr>
@@ -112,18 +119,23 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:af9ffb2975916c0954ecf834642cb04b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a39d81a89724887b9d5fb8258faa27b63" id="r_a39d81a89724887b9d5fb8258faa27b63"><td class="memItemLeft" align="right" valign="top"><a id="a39d81a89724887b9d5fb8258faa27b63" name="a39d81a89724887b9d5fb8258faa27b63"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>draw</b> (glm::mat4 model, unsigned int modelLoc, unsigned int, unsigned int)</td></tr>
+<tr class="memdesc:a39d81a89724887b9d5fb8258faa27b63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draw the map with the given data. <br /></td></tr>
 <tr class="separator:a39d81a89724887b9d5fb8258faa27b63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a9e87f6a5005d329f0b60f886e87d6bf7" id="r_a9e87f6a5005d329f0b60f886e87d6bf7"><td class="memItemLeft" align="right" valign="top"><a id="a9e87f6a5005d329f0b60f886e87d6bf7" name="a9e87f6a5005d329f0b60f886e87d6bf7"></a>
 float&#160;</td><td class="memItemRight" valign="bottom"><b>zLayer</b> = 0</td></tr>
+<tr class="memdesc:a9e87f6a5005d329f0b60f886e87d6bf7"><td class="mdescLeft">&#160;</td><td class="mdescRight">How many layers are there in the map. <br /></td></tr>
 <tr class="separator:a9e87f6a5005d329f0b60f886e87d6bf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1634b2041c03118452f7eb7517048fa8" id="r_a1634b2041c03118452f7eb7517048fa8"><td class="memItemLeft" align="right" valign="top"><a id="a1634b2041c03118452f7eb7517048fa8" name="a1634b2041c03118452f7eb7517048fa8"></a>
 glm::vec2&#160;</td><td class="memItemRight" valign="bottom"><b>tileSize</b></td></tr>
+<tr class="memdesc:a1634b2041c03118452f7eb7517048fa8"><td class="mdescLeft">&#160;</td><td class="mdescRight">The size of the tiles. <br /></td></tr>
 <tr class="separator:a1634b2041c03118452f7eb7517048fa8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>A class to create and store data for the tiled map. </p>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>C:/Users/matiasrek/source/repos/teamarkademoottori/team5/include/engine/<a class="el" href="_map_layer_8h_source.html">MapLayer.h</a></li>
 </ul>
 </div><!-- contents -->

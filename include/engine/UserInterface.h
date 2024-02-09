@@ -4,8 +4,9 @@
 
 namespace engine
 {
-	//UI Element struct
+	
 	ECS_REGISTER_COMPONENT(UIElement)
+	///UI Element struct
 	struct UIElement
 	{
 		bool relativeToCamera = true;

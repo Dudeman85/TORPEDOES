@@ -1,7 +1,6 @@
 var class_audio =
 [
     [ "Audio", "class_audio.html#a4394ca53c99ba132e4f8abf2047dac9a", null ],
-    [ "~Audio", "class_audio.html#ae8f54deecb5f48511aaab469e80294d6", null ],
     [ "addVolume", "class_audio.html#acbb8e8eb69e2cf33806b37b5064fddf2", null ],
     [ "getAtEnd", "class_audio.html#a0091778df1c62ed728d94efe63d82227", null ],
     [ "getDirection", "class_audio.html#aea20e2e9109b97c312293e3e403d45f1", null ],
