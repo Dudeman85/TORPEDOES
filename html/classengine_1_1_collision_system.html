@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.10.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: engine::CollisionSystem Class Reference</title>
+<title>Tiimi Arkade: engine::CollisionSystem Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,8 +27,9 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project<span id="projectnumber">&#160;0.2</span>
+   <div id="projectname">Tiimi Arkade<span id="projectnumber">&#160;0.2</span>
    </div>
+   <div id="projectbrief">TORPEDOES!!! pelimoottori docs</div>
   </td>
  </tr>
  </tbody>
@@ -99,13 +100,18 @@ $(function(){initNavTree('classengine_1_1_collision_system.html',''); initResiza
   <div class="headertitle"><div class="title">engine::CollisionSystem Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p><a class="el" href="structengine_1_1_collision.html" title="Collision Event struct, not a component.">Collision</a> System, Requires <a class="el" href="structengine_1_1_transform.html" title="Transform component.">Transform</a> and <a class="el" href="structengine_1_1_polygon_collider.html" title="Polygon Collider component.">PolygonCollider</a>.  
+ <a href="#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_collision_8h_source.html">Collision.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for engine::CollisionSystem:</div>
 <div class="dyncontent">
  <div class="center">
   <img src="classengine_1_1_collision_system.png" usemap="#engine::CollisionSystem_map" alt=""/>
   <map id="engine::CollisionSystem_map" name="engine::CollisionSystem_map">
-<area href="classengine_1_1ecs_1_1_system.html" alt="engine::ecs::System" shape="rect" coords="0,0,144,24"/>
+<area href="classengine_1_1ecs_1_1_system.html" title="Base class all systems inherit from." alt="engine::ecs::System" shape="rect" coords="0,0,144,24"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -113,43 +119,59 @@ Inheritance diagram for engine::CollisionSystem:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ac63cb59ca5a0d7252560c0c98b2d69c3" id="r_ac63cb59ca5a0d7252560c0c98b2d69c3"><td class="memItemLeft" align="right" valign="top"><a id="ac63cb59ca5a0d7252560c0c98b2d69c3" name="ac63cb59ca5a0d7252560c0c98b2d69c3"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>Update</b> ()</td></tr>
+<tr class="memdesc:ac63cb59ca5a0d7252560c0c98b2d69c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called every frame. <br /></td></tr>
 <tr class="separator:ac63cb59ca5a0d7252560c0c98b2d69c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a730e1bd76b4297893c549f1558d4280f" id="r_a730e1bd76b4297893c549f1558d4280f"><td class="memItemLeft" align="right" valign="top"><a id="a730e1bd76b4297893c549f1558d4280f" name="a730e1bd76b4297893c549f1558d4280f"></a>
 std::vector&lt; <a class="el" href="structengine_1_1_collision.html">Collision</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>CheckCollision</b> (ecs::Entity a)</td></tr>
+<tr class="memdesc:a730e1bd76b4297893c549f1558d4280f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks collision between entity a and every other entity, Returns the collisions from the perspective of a. <br /></td></tr>
 <tr class="separator:a730e1bd76b4297893c549f1558d4280f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af94f6a6159fc34b16f9110105f2833d5" id="r_af94f6a6159fc34b16f9110105f2833d5"><td class="memItemLeft" align="right" valign="top"><a id="af94f6a6159fc34b16f9110105f2833d5" name="af94f6a6159fc34b16f9110105f2833d5"></a>
 std::vector&lt; <a class="el" href="structengine_1_1_collision.html">Collision</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>CheckTilemapCollision</b> (ecs::Entity entity)</td></tr>
+<tr class="memdesc:af94f6a6159fc34b16f9110105f2833d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks for collision between a tilemap collision layer and an entity. <br /></td></tr>
 <tr class="separator:af94f6a6159fc34b16f9110105f2833d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9169df686c5b7160f87bccc79af32caf" id="r_a9169df686c5b7160f87bccc79af32caf"><td class="memItemLeft" align="right" valign="top"><a id="a9169df686c5b7160f87bccc79af32caf" name="a9169df686c5b7160f87bccc79af32caf"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetTilemap</b> (<a class="el" href="class_tilemap.html">Tilemap</a> *collisionTilemap)</td></tr>
+<tr class="memdesc:a9169df686c5b7160f87bccc79af32caf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the tilemap collision layer. <br /></td></tr>
 <tr class="separator:a9169df686c5b7160f87bccc79af32caf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc92161ea54e3474343bffe0c4a90bdb" id="r_abc92161ea54e3474343bffe0c4a90bdb"><td class="memItemLeft" align="right" valign="top"><a id="abc92161ea54e3474343bffe0c4a90bdb" name="abc92161ea54e3474343bffe0c4a90bdb"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>RemoveTilemap</b> ()</td></tr>
+<tr class="memdesc:abc92161ea54e3474343bffe0c4a90bdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the tilemap from collision. <br /></td></tr>
+<tr class="separator:abc92161ea54e3474343bffe0c4a90bdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a6cd5b7677209721f9e7118b06075d1f2" id="r_a6cd5b7677209721f9e7118b06075d1f2"><td class="memItemLeft" align="right" valign="top"><a id="a6cd5b7677209721f9e7118b06075d1f2" name="a6cd5b7677209721f9e7118b06075d1f2"></a>
 static <a class="el" href="structengine_1_1_collision.html">Collision</a>&#160;</td><td class="memItemRight" valign="bottom"><b>CheckEntityCollision</b> (ecs::Entity a, ecs::Entity b)</td></tr>
+<tr class="memdesc:a6cd5b7677209721f9e7118b06075d1f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check Entity-Entity collision, this will also call any callbacks. <br /></td></tr>
 <tr class="separator:a6cd5b7677209721f9e7118b06075d1f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa382ee8227370dd8cad5df11c39d1cbe" id="r_aa382ee8227370dd8cad5df11c39d1cbe"><td class="memItemLeft" align="right" valign="top"><a id="aa382ee8227370dd8cad5df11c39d1cbe" name="aa382ee8227370dd8cad5df11c39d1cbe"></a>
 static <a class="el" href="structengine_1_1_collision.html">Collision</a>&#160;</td><td class="memItemRight" valign="bottom"><b>SATIntersect</b> (std::vector&lt; <a class="el" href="classengine_1_1_vector2.html">Vector2</a> &gt; aVerts, std::vector&lt; <a class="el" href="classengine_1_1_vector2.html">Vector2</a> &gt; bVerts)</td></tr>
+<tr class="memdesc:aa382ee8227370dd8cad5df11c39d1cbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check SAT intersection between two convex polygons, Expects Vertices to have Transforms applied. <br /></td></tr>
 <tr class="separator:aa382ee8227370dd8cad5df11c39d1cbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2f8c7c02e94bdccf13fccb1664689d74" id="r_a2f8c7c02e94bdccf13fccb1664689d74"><td class="memItemLeft" align="right" valign="top"><a id="a2f8c7c02e94bdccf13fccb1664689d74" name="a2f8c7c02e94bdccf13fccb1664689d74"></a>
 static bool&#160;</td><td class="memItemRight" valign="bottom"><b>AABBIntersect</b> (ecs::Entity a, ecs::Entity b)</td></tr>
+<tr class="memdesc:a2f8c7c02e94bdccf13fccb1664689d74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if a and b bounds are intersecting. <br /></td></tr>
 <tr class="separator:a2f8c7c02e94bdccf13fccb1664689d74"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaca4c80155081376c011e7ccd51452b9" id="r_aaca4c80155081376c011e7ccd51452b9"><td class="memItemLeft" align="right" valign="top"><a id="aaca4c80155081376c011e7ccd51452b9" name="aaca4c80155081376c011e7ccd51452b9"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdateAABB</b> (ecs::Entity entity)</td></tr>
+<tr class="memdesc:aaca4c80155081376c011e7ccd51452b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the AABB of the polygon collider. <br /></td></tr>
 <tr class="separator:aaca4c80155081376c011e7ccd51452b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a754ef558fb5641e8da38f2e71fd3b16f" id="r_a754ef558fb5641e8da38f2e71fd3b16f"><td class="memItemLeft" align="right" valign="top"><a id="a754ef558fb5641e8da38f2e71fd3b16f" name="a754ef558fb5641e8da38f2e71fd3b16f"></a>
 <a class="el" href="classengine_1_1_camera.html">Camera</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>cam</b> = nullptr</td></tr>
+<tr class="memdesc:a754ef558fb5641e8da38f2e71fd3b16f"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classengine_1_1_camera.html" title="Class for creating and storing data for the camera.">Camera</a> is needed for visualisation. <br /></td></tr>
 <tr class="separator:a754ef558fb5641e8da38f2e71fd3b16f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_attribs_classengine_1_1ecs_1_1_system"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_attribs_classengine_1_1ecs_1_1_system')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classengine_1_1ecs_1_1_system.html">engine::ecs::System</a></td></tr>
 <tr class="memitem:ae5d785e0f566b1034d218fcdcb5fcf14 inherit pub_attribs_classengine_1_1ecs_1_1_system" id="r_ae5d785e0f566b1034d218fcdcb5fcf14"><td class="memItemLeft" align="right" valign="top">
 std::set&lt; Entity &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>entities</b></td></tr>
+<tr class="memdesc:ae5d785e0f566b1034d218fcdcb5fcf14 inherit pub_attribs_classengine_1_1ecs_1_1_system"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set of every entity containing the required components for the system. <br /></td></tr>
 <tr class="separator:ae5d785e0f566b1034d218fcdcb5fcf14 inherit pub_attribs_classengine_1_1ecs_1_1_system"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p><a class="el" href="structengine_1_1_collision.html" title="Collision Event struct, not a component.">Collision</a> System, Requires <a class="el" href="structengine_1_1_transform.html" title="Transform component.">Transform</a> and <a class="el" href="structengine_1_1_polygon_collider.html" title="Polygon Collider component.">PolygonCollider</a>. </p>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>C:/Users/matiasrek/source/repos/teamarkademoottori/team5/include/engine/<a class="el" href="_collision_8h_source.html">Collision.h</a></li>
 </ul>
 </div><!-- contents -->

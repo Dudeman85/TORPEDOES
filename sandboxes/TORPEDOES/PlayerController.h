@@ -47,7 +47,7 @@ ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonColli
 class PlayerController : public ecs::System
 {
 
-	float starTimer = 10.0; // start Time 
+	float starTimer = 19.0; // start Time 
 	Model* torpedomodel;
 	void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 sapawnRotation, int owerID)
 	{

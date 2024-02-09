@@ -44,8 +44,8 @@ int main()
 	//cam.perspective = true;
 	cam.SetRotation(Vector3(0, 0, 0));
 	float camScale = 1.0;
-	float camScaleMin = 900.0;
-	float camScaleMax = 1700.0;
+	float camScaleMin = 600.0f;
+	float camScaleMax = 1650.0f;
 	float aspectRatio = 16.f / 9.f;
 	float camPadding = 100;
 	float camDeadzone = 10;
@@ -231,6 +231,15 @@ int main()
 	//cheerSpeaker.Play(cheerSound);
 	//cheerSpeaker.SetLooping(1);
 
+	Animation countdownAnim = AnimationsFromSpritesheet("UI_Countdown_Ver2.png", 5, 1, vector<int>(5, 1000))[0];
+	ecs::Entity countdown = ecs::NewEntity();
+	ecs::AddComponent(countdown, Transform{ .position = Vector3(1475, -1200, 10), .scale = Vector3(60, 100, 0) });
+	ecs::AddComponent(countdown, SpriteRenderer{});
+	ecs::AddComponent(countdown, Animator{});
+	AnimationSystem::AddAnimation(countdown, countdownAnim, "CountDown");
+	AnimationSystem::PlayAnimation(countdown, "CountDown", false);
+
+
 	// Loand Map . Tilemap file 
 	Tilemap map(&cam);
 	map.loadMap("level1.tmx");
@@ -272,7 +281,7 @@ int main()
 		// star Timer 
 		float Timer = playerController->getTimer();
 		std::string timerStr = std::to_string((int)round(Timer)); // round pyörista float arvo lahipakokonais 
-		winText.text = timerStr.c_str();
+		//winText.text = timerStr.c_str();
 		// UI System 				
 
 		p1Win.text = to_string(player.lap) + "/1";
@@ -424,18 +433,21 @@ int main()
 			player4.playExlposionSound = false;
 		}
 
-		//Keep the camera in bounds of the tilemap and set it to the average position of the players
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+			//Keep the camera in bounds of the tilemap and set it to the average position of the players
 		Vector3 avgPos = playerController->avgPosition / playerController->entities.size();
 
-		// Center the camera on the average position of the players
+		//// Center the camera on the average position of the players
 		float camPosX = clamp(avgPos.x, map.position.x + cam.width / 2, map.position.x + map.bounds.width - cam.width / 2);
 		float camPosY = clamp(avgPos.y, map.position.y - map.bounds.height + cam.height / 2, map.position.y - cam.height / 2);
 		cam.SetPosition(Vector3(camPosX, camPosY, 1500));
 
 
-		//Calculate the camera's bounds
+		//Calculate the Bounding Box
 		std::array<float, 4> camBounds{
-			cam.position.y * 2 + cam.height / 2,  // ylös pain 
+			cam.position.y * 2 + cam.height / 2,  // yls pain 
 				cam.position.x * 2 + cam.width / 2,   // leveys 
 				cam.position.y * 2 - cam.height / 2,
 				cam.position.x * 2 - cam.width / 2 };
@@ -457,7 +469,8 @@ int main()
 			playerController->playerBounds[3] < camBounds[3] - zoomOutThreshold)
 		{
 
-			float zoomOutValue = 10 - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10.0f;
+			float zoomOutFactor = 10.0f;
+			float zoomOutValue = zoomOutFactor - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10.0f;
 			camScale = max(camScale + zoomOutValue, camScaleMin);
 			/*camScale += 10 - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10;*/
 		}
@@ -474,6 +487,30 @@ int main()
 
 		cam.height = camScale;
 		cam.width = cam.height * aspectRatio;
+
+		// New implentation 
+		//boundigBoxin center point 
+		float boundingBoxWidth = playerController->playerBounds[1] - playerController->playerBounds[3];
+		float boundingBoxHeight = playerController->playerBounds[0] - playerController->playerBounds[2];
+		Vector2 boundingBoxCenter = Vector2(playerController->playerBounds[3] + boundingBoxWidth * 0.5f, playerController->playerBounds[2] + boundingBoxHeight * 0.5f);
+
+		//Ajustar la posicin de la cmara segn el centro de la bounding box
+		camPosX = clamp(boundingBoxCenter.x, map.position.x + cam.width / 2, map.position.x + map.bounds.width - cam.width / 2);
+		camPosY = clamp(boundingBoxCenter.y, map.position.y - map.bounds.height + cam.height / 2, map.position.y - cam.height / 2);
+		cam.SetPosition(Vector3(camPosX, camPosY, 1500));
+
+		// Calculate the desired zoom level and adjust the camera zoom.
+		float aspectRatio = cam.width / cam.height;
+		float desiredZoom = max(boundingBoxWidth / (cam.width * aspectRatio), boundingBoxHeight / cam.height);
+
+
+		// Ajustar el zoom de la cmara solo si el zoom deseado supera los lmites establecidos
+		if (desiredZoom > camScaleMin && desiredZoom < camScaleMax) {
+			camScale = desiredZoom;
+		}
+
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		//Reset the average player position data
 		playerController->avgPosition = Vector3();

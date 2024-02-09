@@ -54,12 +54,12 @@ class PlayerController : public ecs::System
 	{
 
 		ecs::Entity projectile = ecs::NewEntity();
-		ecs::AddComponent(projectile, new Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
-		ecs::AddComponent(projectile, new Rigidbody{ .velocity = direction * projectileSpeed });
-		ecs::AddComponent(projectile, new ModelRenderer{ .model = torpedomodel });
+		ecs::AddComponent(projectile, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
+		ecs::AddComponent(projectile, Rigidbody{ .velocity = direction * projectileSpeed });
+		ecs::AddComponent(projectile, ModelRenderer{ .model = torpedomodel });
 		std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-		ecs::AddComponent(projectile, new PolygonCollider{ .vertices = Torpedoverts, .callback = PlayerController::OnprojectilCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
-		ecs::AddComponent(projectile, new Projectile{ .ownerID = owerID });
+		ecs::AddComponent(projectile, PolygonCollider{ .vertices = Torpedoverts, .callback = PlayerController::OnprojectilCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
+		ecs::AddComponent(projectile, Projectile{ .ownerID = owerID });
 
 
 
@@ -68,9 +68,9 @@ class PlayerController : public ecs::System
 	{
 		ecs::Entity projecAnim = ecs::NewEntity();
 		animPosition.z += 100;
-		ecs::AddComponent(projecAnim, new Transform{ .position = animPosition,  .scale = Vector3(20) });
-		ecs::AddComponent(projecAnim, new SpriteRenderer{ });
-		ecs::AddComponent(projecAnim, new Animator{});
+		ecs::AddComponent(projecAnim, Transform{ .position = animPosition,  .scale = Vector3(20) });
+		ecs::AddComponent(projecAnim, SpriteRenderer{ });
+		ecs::AddComponent(projecAnim, Animator{});
 		AnimationSystem::AddAnimation(projecAnim, *ExplosionAnim, "explosion");
 		AnimationSystem::PlayAnimation(projecAnim, "explosion", false);
 

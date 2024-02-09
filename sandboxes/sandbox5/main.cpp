@@ -34,15 +34,15 @@ int main()
     int height = 600;
     const char* title = "GLFW Key Callback Example";
 
-    GLFWwindow* window = CreateGLWindow(800, 600, "Window");
     // Initialize GLFW and create a window with a key callback
-    //GLFWwindow* window = initializeGLFW(width, height, title);
-    if (!window) {
+    GLFWwindow* window = initializeGLFW(width, height, title);
+    if (!window) 
+    {
         return -1;
     }
 
     input::initialize(window);
-   // input::InputEvent* shootEvent = new input::InputEvent("shootEvent");
+    input::InputEvent* shootEvent = new input::InputEvent("shootEvent");
     // TODO: Make an API for this, so no need to call "new"
 
     input::bindInput(GLFW_KEY_SPACE, {"shootEvent"});
@@ -51,23 +51,27 @@ int main()
     while (!glfwWindowShouldClose(window)) 
     {
         // Process events
-        glfwPollEvents();
-        input::update(window);
+        //glfwPollEvents();
+        input::update();
 
         // DONE: Add & test InputButtons
         // DONE: Add InputEvents
-        // DONE: Test inputEvents
-        /*
-        if (shootEvent->isPressed())
+        // DONE: Test InputEvents
+        std::string message = "";
+        if (shootEvent->isNewPress())
         {
-            std::cout << "shoot Event presed!\n";
+            message = " pressed";
         }
-        else
+        if (shootEvent->isNewRelease())
         {
-            std::cout << "shoot Event not presed!\n";
-        }*/
+            std::cout << " release";
+        }
+        if(message.length() > 3)
+        std::cout << message << "\n";
+        // DONE: Add InputValue
+        // DOING: Test InputValue
         
-        // DOING: Add & test InputAxis
+        // TODO: Add & test InputAxis
        
         // TODO: Add & test InputAxisEvents
         // TODO: Add & test InputCustom

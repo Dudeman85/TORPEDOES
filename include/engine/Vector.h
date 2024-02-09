@@ -41,6 +41,7 @@ namespace engine
 		Vector2 operator-(const Vector2& sub);
 		Vector2& operator-=(const Vector2& sub);
 		//Multiply
+		// TODO: Replace use of "float" as templated type
 		Vector2 operator*(const float& mult);
 		Vector2 operator*(const Vector2& mult);
 		Vector2& operator*=(const float& mult);
@@ -50,6 +51,7 @@ namespace engine
 		Vector2 operator/(const Vector2& div);
 		Vector2& operator/=(const float& div);
 
+		// TODO: Add templated return type
 		float Length();
 		Vector2 Normalize();
 		Vector2 LeftNormal();
@@ -58,6 +60,7 @@ namespace engine
 
 		std::string ToString();
 
+		// TODO: Replace "float" as "double"
 		float x, y;
 	};
 

@@ -379,6 +379,11 @@ void _glfwInputJoystick(_GLFWjoystick* js, int event)
 //
 void _glfwInputJoystickAxis(_GLFWjoystick* js, int axis, float value)
 {
+    const int jid = (int)(js - _glfw.joysticks);
+
+    if (_glfw.callbacks.axis)
+        _glfw.callbacks.axis(jid, axis, value);
+
     js->axes[axis] = value;
 }
 
@@ -833,6 +838,16 @@ GLFWAPI GLFWkeyfun glfwSetKeyCallback(GLFWwindow* handle, GLFWkeyfun cbfun)
 
     _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
     _GLFW_SWAP_POINTERS(window->callbacks.key, cbfun);
+    return cbfun;
+}
+
+GLFWAPI GLFWaxisfun glfwSetAxisCallback(GLFWwindow* handle, GLFWaxisfun cbfun)
+{
+    _GLFWwindow* window = (_GLFWwindow*)handle;
+    assert(window != NULL);
+
+    _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
+    _GLFW_SWAP_POINTERS(window->callbacks.axis, cbfun);
     return cbfun;
 }
 

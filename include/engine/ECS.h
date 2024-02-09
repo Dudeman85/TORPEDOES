@@ -10,9 +10,7 @@
 #include <memory>
 #include <functional>
 
-///
 /// Allow max components to be determined outside this file
-/// 
 #ifndef ECS_MAX_COMPONENTS
 #define ECS_MAX_COMPONENTS 100
 #elif ECS_MAX_COMPONENTS > UINT16_MAX
@@ -56,7 +54,7 @@ namespace engine::ecs
 
 	//COMPONENT MANAGEMENT DATA
 
-	//Interface for each component array type
+	///Interface for each component array type
 	class IComponentArray
 	{
 	public:
@@ -73,11 +71,11 @@ namespace engine::ecs
 
 	//SYSTEM MANAGEMENT DATA
 
-	//Base class all systems inherit from
+	///Base class all systems inherit from
 	class System
 	{
 	public:
-		//Set of every entity containing the required components for the system
+		///Set of every entity containing the required components for the system
 		std::set<Entity> entities;
 	};
 	//Map of each system accessible by its type name
@@ -92,7 +90,7 @@ namespace engine::ecs
 
 	//INTERNAL FUNCTIONS
 
-	//Implementation internal class to interface with each type of component array
+	///Implementation internal class to interface with each type of component array
 	template<typename T>
 	class ComponentArray : public IComponentArray
 	{
@@ -117,13 +115,13 @@ namespace engine::ecs
 			return entityToIndex.count(entity);
 		}
 
-		//Get a component from an entity
+		///Get a component from an entity
 		T& GetComponent(Entity entity)
 		{
 			return components[entityToIndex[entity]];
 		}
 
-		//Add a component to an entity, returns a reference to that component
+		///Add a component to an entity, returns a reference to that component
 		void AddComponent(Entity entity, T component)
 		{
 			entityToIndex[entity] = components.size();
@@ -131,7 +129,7 @@ namespace engine::ecs
 			components.push_back(component);
 		}
 
-		//Removes a component from an entity
+		///Removes a component from an entity
 		void RemoveComponent(Entity entity) override
 		{
 			//Call the component destructor

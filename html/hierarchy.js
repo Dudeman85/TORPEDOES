@@ -15,6 +15,7 @@ var hierarchy =
     [ "engine::Image", "classengine_1_1_image.html", null ],
     [ "input::InputButton", "classinput_1_1_input_button.html", null ],
     [ "input::InputEvent", "classinput_1_1_input_event.html", null ],
+    [ "input::InputValue", "structinput_1_1_input_value.html", null ],
     [ "MapLayer", "class_map_layer.html", null ],
     [ "engine::Mesh", "classengine_1_1_mesh.html", null ],
     [ "engine::Message", "structengine_1_1_message.html", null ],

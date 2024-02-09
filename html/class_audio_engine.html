@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.10.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: AudioEngine Class Reference</title>
+<title>Tiimi Arkade: AudioEngine Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,8 +27,9 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project<span id="projectnumber">&#160;0.2</span>
+   <div id="projectname">Tiimi Arkade<span id="projectnumber">&#160;0.2</span>
    </div>
+   <div id="projectbrief">TORPEDOES!!! pelimoottori docs</div>
   </td>
  </tr>
  </tbody>
@@ -98,29 +99,41 @@ $(function(){initNavTree('class_audio_engine.html',''); initResizable(); });
   <div class="headertitle"><div class="title">AudioEngine Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Class to store audio engine data.  
+ <a href="#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_audio_engine_8h_source.html">AudioEngine.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ad57adb54bab3916e003afef99a94d9c5" id="r_ad57adb54bab3916e003afef99a94d9c5"><td class="memItemLeft" align="right" valign="top"><a id="ad57adb54bab3916e003afef99a94d9c5" name="ad57adb54bab3916e003afef99a94d9c5"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>AudioEngine</b> (float ambientVolume=1)</td></tr>
+<tr class="memdesc:ad57adb54bab3916e003afef99a94d9c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
 <tr class="separator:ad57adb54bab3916e003afef99a94d9c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96d4fe15387a80702e8d567ca86ec2dd" id="r_a96d4fe15387a80702e8d567ca86ec2dd"><td class="memItemLeft" align="right" valign="top"><a id="a96d4fe15387a80702e8d567ca86ec2dd" name="a96d4fe15387a80702e8d567ca86ec2dd"></a>
 <a class="el" href="class_audio.html">Audio</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>createAudio</b> (std::string soundName, bool loop=false, float volume=1, <a class="el" href="classengine_1_1_vector3.html">Vector3</a> location={0, 0, 0})</td></tr>
+<tr class="memdesc:a96d4fe15387a80702e8d567ca86ec2dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plays an audio with selected audio file, returns a pointer to the audio. Non-looping audios are removed upon finishing. <br /></td></tr>
 <tr class="separator:a96d4fe15387a80702e8d567ca86ec2dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1da036d7df020bec20e1f6eaebff4d5b" id="r_a1da036d7df020bec20e1f6eaebff4d5b"><td class="memItemLeft" align="right" valign="top"><a id="a1da036d7df020bec20e1f6eaebff4d5b" name="a1da036d7df020bec20e1f6eaebff4d5b"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setAmbientVolume</b> (float newVolume)</td></tr>
+<tr class="memdesc:a1da036d7df020bec20e1f6eaebff4d5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the ambient volume. <br /></td></tr>
 <tr class="separator:a1da036d7df020bec20e1f6eaebff4d5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a364056b52e620b4e8c6af13e662584c1" id="r_a364056b52e620b4e8c6af13e662584c1"><td class="memItemLeft" align="right" valign="top"><a id="a364056b52e620b4e8c6af13e662584c1" name="a364056b52e620b4e8c6af13e662584c1"></a>
 const float&#160;</td><td class="memItemRight" valign="bottom"><b>getAmbientVolume</b> ()</td></tr>
+<tr class="memdesc:a364056b52e620b4e8c6af13e662584c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the ambient volume. <br /></td></tr>
 <tr class="separator:a364056b52e620b4e8c6af13e662584c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a16e32294127f884a66cf40508995c079" id="r_a16e32294127f884a66cf40508995c079"><td class="memItemLeft" align="right" valign="top"><a id="a16e32294127f884a66cf40508995c079" name="a16e32294127f884a66cf40508995c079"></a>
 ma_engine&#160;</td><td class="memItemRight" valign="bottom"><b>soundEngine</b></td></tr>
+<tr class="memdesc:a16e32294127f884a66cf40508995c079"><td class="mdescLeft">&#160;</td><td class="mdescRight">miniaudio engine <br /></td></tr>
 <tr class="separator:a16e32294127f884a66cf40508995c079"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Class to store audio engine data. </p>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>C:/Users/matiasrek/source/repos/teamarkademoottori/team5/include/engine/<a class="el" href="_audio_engine_8h_source.html">AudioEngine.h</a></li>
 </ul>
 </div><!-- contents -->

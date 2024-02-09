@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.10.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: engine::Mesh Class Reference</title>
+<title>Tiimi Arkade: engine::Mesh Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,8 +27,9 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project<span id="projectnumber">&#160;0.2</span>
+   <div id="projectname">Tiimi Arkade<span id="projectnumber">&#160;0.2</span>
    </div>
+   <div id="projectbrief">TORPEDOES!!! pelimoottori docs</div>
   </td>
  </tr>
  </tbody>
@@ -99,28 +100,38 @@ $(function(){initNavTree('classengine_1_1_mesh.html',''); initResizable(); });
   <div class="headertitle"><div class="title">engine::Mesh Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Class for creating and storing meshes.  
+ <a href="#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_mesh_8h_source.html">Mesh.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structengine_1_1_mesh_1_1_vertex.html">Vertex</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Struct to store vertex data.  <a href="structengine_1_1_mesh_1_1_vertex.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a3aa08e0ead4c37521df8b2b3df30a8ab" id="r_a3aa08e0ead4c37521df8b2b3df30a8ab"><td class="memItemLeft" align="right" valign="top"><a id="a3aa08e0ead4c37521df8b2b3df30a8ab" name="a3aa08e0ead4c37521df8b2b3df30a8ab"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Mesh</b> (std::vector&lt; <a class="el" href="structengine_1_1_mesh_1_1_vertex.html">Vertex</a> &gt; vertices, std::vector&lt; unsigned int &gt; indices, std::vector&lt; <a class="el" href="classengine_1_1_texture.html">Texture</a> * &gt; textures)</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Mesh</b> (std::vector&lt; <a class="el" href="structengine_1_1_mesh_1_1_vertex.html">Vertex</a> &gt; <a class="el" href="#a4890df4afefec589e7549715a21ebc73">vertices</a>, std::vector&lt; unsigned int &gt; <a class="el" href="#af48b607240f036c93d11274569ce59f8">indices</a>, std::vector&lt; <a class="el" href="classengine_1_1_texture.html">Texture</a> * &gt; <a class="el" href="#ad0bc21d017d4f8265a7c07ab0db8d795">textures</a>)</td></tr>
+<tr class="memdesc:a3aa08e0ead4c37521df8b2b3df30a8ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector to store mesh data. <br /></td></tr>
 <tr class="separator:a3aa08e0ead4c37521df8b2b3df30a8ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a4890df4afefec589e7549715a21ebc73" id="r_a4890df4afefec589e7549715a21ebc73"><td class="memItemLeft" align="right" valign="top"><a id="a4890df4afefec589e7549715a21ebc73" name="a4890df4afefec589e7549715a21ebc73"></a>
 std::vector&lt; <a class="el" href="structengine_1_1_mesh_1_1_vertex.html">Vertex</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>vertices</b></td></tr>
+<tr class="memdesc:a4890df4afefec589e7549715a21ebc73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Store the meshes vertices. <br /></td></tr>
 <tr class="separator:a4890df4afefec589e7549715a21ebc73"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af48b607240f036c93d11274569ce59f8" id="r_af48b607240f036c93d11274569ce59f8"><td class="memItemLeft" align="right" valign="top"><a id="af48b607240f036c93d11274569ce59f8" name="af48b607240f036c93d11274569ce59f8"></a>
 std::vector&lt; unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>indices</b></td></tr>
+<tr class="memdesc:af48b607240f036c93d11274569ce59f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Store the meshes indices. <br /></td></tr>
 <tr class="separator:af48b607240f036c93d11274569ce59f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad0bc21d017d4f8265a7c07ab0db8d795" id="r_ad0bc21d017d4f8265a7c07ab0db8d795"><td class="memItemLeft" align="right" valign="top"><a id="ad0bc21d017d4f8265a7c07ab0db8d795" name="ad0bc21d017d4f8265a7c07ab0db8d795"></a>
 std::vector&lt; <a class="el" href="classengine_1_1_texture.html">Texture</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>textures</b></td></tr>
+<tr class="memdesc:ad0bc21d017d4f8265a7c07ab0db8d795"><td class="mdescLeft">&#160;</td><td class="mdescRight">Store the meshes textures. <br /></td></tr>
 <tr class="separator:ad0bc21d017d4f8265a7c07ab0db8d795"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af88f9e6cf8541242d10e0a60f8c4c4ec" id="r_af88f9e6cf8541242d10e0a60f8c4c4ec"><td class="memItemLeft" align="right" valign="top"><a id="af88f9e6cf8541242d10e0a60f8c4c4ec" name="af88f9e6cf8541242d10e0a60f8c4c4ec"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>VAO</b></td></tr>
@@ -132,7 +143,9 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>VBO</b></td><
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>EBO</b></td></tr>
 <tr class="separator:a4fe6efa9c5e35b990c5859c16273833c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Class for creating and storing meshes. </p>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>C:/Users/matiasrek/source/repos/teamarkademoottori/team5/include/engine/GL/<a class="el" href="_mesh_8h_source.html">Mesh.h</a></li>
 </ul>
 </div><!-- contents -->

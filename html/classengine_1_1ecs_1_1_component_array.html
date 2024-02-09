@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.10.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: engine::ecs::ComponentArray&lt; T &gt; Class Template Reference</title>
+<title>Tiimi Arkade: engine::ecs::ComponentArray&lt; T &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,8 +27,9 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project<span id="projectnumber">&#160;0.2</span>
+   <div id="projectname">Tiimi Arkade<span id="projectnumber">&#160;0.2</span>
    </div>
+   <div id="projectbrief">TORPEDOES!!! pelimoottori docs</div>
   </td>
  </tr>
  </tbody>
@@ -97,13 +98,18 @@ $(function(){initNavTree('classengine_1_1ecs_1_1_component_array.html',''); init
   <div class="headertitle"><div class="title">engine::ecs::ComponentArray&lt; T &gt; Class Template Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Implementation internal class to interface with each type of component array.  
+ <a href="#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_e_c_s_8h_source.html">ECS.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for engine::ecs::ComponentArray&lt; T &gt;:</div>
 <div class="dyncontent">
  <div class="center">
   <img src="classengine_1_1ecs_1_1_component_array.png" usemap="#engine::ecs::ComponentArray_3C_20T_20_3E_map" alt=""/>
   <map id="engine::ecs::ComponentArray_3C_20T_20_3E_map" name="engine::ecs::ComponentArray_3C_20T_20_3E_map">
-<area href="classengine_1_1ecs_1_1_i_component_array.html" alt="engine::ecs::IComponentArray" shape="rect" coords="0,0,209,24"/>
+<area href="classengine_1_1ecs_1_1_i_component_array.html" title="Interface for each component array type." alt="engine::ecs::IComponentArray" shape="rect" coords="0,0,209,24"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -111,17 +117,24 @@ Inheritance diagram for engine::ecs::ComponentArray&lt; T &gt;:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a3c2c3172fc624a8e6babc05457fc8bef" id="r_a3c2c3172fc624a8e6babc05457fc8bef"><td class="memItemLeft" align="right" valign="top"><a id="a3c2c3172fc624a8e6babc05457fc8bef" name="a3c2c3172fc624a8e6babc05457fc8bef"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>HasComponent</b> (Entity entity)</td></tr>
+<tr class="memdesc:a3c2c3172fc624a8e6babc05457fc8bef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the entity has a component of type T. <br /></td></tr>
 <tr class="separator:a3c2c3172fc624a8e6babc05457fc8bef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a69f7c36eceee8e4b9702d9261b04e390" id="r_a69f7c36eceee8e4b9702d9261b04e390"><td class="memItemLeft" align="right" valign="top"><a id="a69f7c36eceee8e4b9702d9261b04e390" name="a69f7c36eceee8e4b9702d9261b04e390"></a>
 T &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetComponent</b> (Entity entity)</td></tr>
+<tr class="memdesc:a69f7c36eceee8e4b9702d9261b04e390"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a component from an entity. <br /></td></tr>
 <tr class="separator:a69f7c36eceee8e4b9702d9261b04e390"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a32f00ab42d502f536d7dcae2018988bc" id="r_a32f00ab42d502f536d7dcae2018988bc"><td class="memItemLeft" align="right" valign="top"><a id="a32f00ab42d502f536d7dcae2018988bc" name="a32f00ab42d502f536d7dcae2018988bc"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>AddComponent</b> (Entity entity, T component)</td></tr>
+<tr class="memdesc:a32f00ab42d502f536d7dcae2018988bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a component to an entity, returns a reference to that component. <br /></td></tr>
 <tr class="separator:a32f00ab42d502f536d7dcae2018988bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92ab821913744b1d486e584482931e7a" id="r_a92ab821913744b1d486e584482931e7a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a92ab821913744b1d486e584482931e7a">RemoveComponent</a> (Entity entity) override</td></tr>
+<tr class="memdesc:a92ab821913744b1d486e584482931e7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes a component from an entity.  <br /></td></tr>
 <tr class="separator:a92ab821913744b1d486e584482931e7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Function Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;typename T&gt;<br />
+class engine::ecs::ComponentArray&lt; T &gt;</div><p>Implementation internal class to interface with each type of component array. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a92ab821913744b1d486e584482931e7a" name="a92ab821913744b1d486e584482931e7a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a92ab821913744b1d486e584482931e7a">&#9670;&#160;</a></span>RemoveComponent()</h2>
 
@@ -146,6 +159,8 @@ template&lt;typename T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Removes a component from an entity. </p>
 
 <p>Implements <a class="el" href="classengine_1_1ecs_1_1_i_component_array.html">engine::ecs::IComponentArray</a>.</p>
 

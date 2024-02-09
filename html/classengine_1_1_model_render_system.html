@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.10.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: engine::ModelRenderSystem Class Reference</title>
+<title>Tiimi Arkade: engine::ModelRenderSystem Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,8 +27,9 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project<span id="projectnumber">&#160;0.2</span>
+   <div id="projectname">Tiimi Arkade<span id="projectnumber">&#160;0.2</span>
    </div>
+   <div id="projectbrief">TORPEDOES!!! pelimoottori docs</div>
   </td>
  </tr>
  </tbody>
@@ -97,13 +98,18 @@ $(function(){initNavTree('classengine_1_1_model_render_system.html',''); initRes
   <div class="headertitle"><div class="title">engine::ModelRenderSystem Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>3D <a class="el" href="classengine_1_1_model.html" title="A class to store 3D model vertex and texture data, as well as handle model loading.">Model</a> Render System, requires <a class="el" href="structengine_1_1_transform.html" title="Transform component.">Transform</a> and <a class="el" href="structengine_1_1_model_renderer.html" title="3D Model Renderer component">ModelRenderer</a>  
+ <a href="#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_model_system_8h_source.html">ModelSystem.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for engine::ModelRenderSystem:</div>
 <div class="dyncontent">
  <div class="center">
   <img src="classengine_1_1_model_render_system.png" usemap="#engine::ModelRenderSystem_map" alt=""/>
   <map id="engine::ModelRenderSystem_map" name="engine::ModelRenderSystem_map">
-<area href="classengine_1_1ecs_1_1_system.html" alt="engine::ecs::System" shape="rect" coords="0,0,172,24"/>
+<area href="classengine_1_1ecs_1_1_system.html" title="Base class all systems inherit from." alt="engine::ecs::System" shape="rect" coords="0,0,172,24"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -111,12 +117,15 @@ Inheritance diagram for engine::ModelRenderSystem:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a52a459eb50ea72b0516766bd658ce7f6" id="r_a52a459eb50ea72b0516766bd658ce7f6"><td class="memItemLeft" align="right" valign="top"><a id="a52a459eb50ea72b0516766bd658ce7f6" name="a52a459eb50ea72b0516766bd658ce7f6"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>Init</b> ()</td></tr>
+<tr class="memdesc:a52a459eb50ea72b0516766bd658ce7f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the shaders. <br /></td></tr>
 <tr class="separator:a52a459eb50ea72b0516766bd658ce7f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab7589208e1e4cdba0e9e9505a7233c77" id="r_ab7589208e1e4cdba0e9e9505a7233c77"><td class="memItemLeft" align="right" valign="top"><a id="ab7589208e1e4cdba0e9e9505a7233c77" name="ab7589208e1e4cdba0e9e9505a7233c77"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>Update</b> (<a class="el" href="classengine_1_1_camera.html">Camera</a> *cam)</td></tr>
+<tr class="memdesc:ab7589208e1e4cdba0e9e9505a7233c77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Call this every frame. <br /></td></tr>
 <tr class="separator:ab7589208e1e4cdba0e9e9505a7233c77"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3cb3962def354e2a03c36f01f580ddb5" id="r_a3cb3962def354e2a03c36f01f580ddb5"><td class="memItemLeft" align="right" valign="top"><a id="a3cb3962def354e2a03c36f01f580ddb5" name="a3cb3962def354e2a03c36f01f580ddb5"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetLight</b> (<a class="el" href="classengine_1_1_vector3.html">Vector3</a> _lightPos, <a class="el" href="classengine_1_1_vector3.html">Vector3</a> _lightColor)</td></tr>
+<tr class="memdesc:a3cb3962def354e2a03c36f01f580ddb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set light position and color. <br /></td></tr>
 <tr class="separator:a3cb3962def354e2a03c36f01f580ddb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
@@ -124,9 +133,12 @@ Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pub_attribs_classengine_1_1ecs_1_1_system"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_attribs_classengine_1_1ecs_1_1_system')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classengine_1_1ecs_1_1_system.html">engine::ecs::System</a></td></tr>
 <tr class="memitem:ae5d785e0f566b1034d218fcdcb5fcf14 inherit pub_attribs_classengine_1_1ecs_1_1_system" id="r_ae5d785e0f566b1034d218fcdcb5fcf14"><td class="memItemLeft" align="right" valign="top">
 std::set&lt; Entity &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>entities</b></td></tr>
+<tr class="memdesc:ae5d785e0f566b1034d218fcdcb5fcf14 inherit pub_attribs_classengine_1_1ecs_1_1_system"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set of every entity containing the required components for the system. <br /></td></tr>
 <tr class="separator:ae5d785e0f566b1034d218fcdcb5fcf14 inherit pub_attribs_classengine_1_1ecs_1_1_system"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>3D <a class="el" href="classengine_1_1_model.html" title="A class to store 3D model vertex and texture data, as well as handle model loading.">Model</a> Render System, requires <a class="el" href="structengine_1_1_transform.html" title="Transform component.">Transform</a> and <a class="el" href="structengine_1_1_model_renderer.html" title="3D Model Renderer component">ModelRenderer</a> </p>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>C:/Users/matiasrek/source/repos/teamarkademoottori/team5/include/engine/<a class="el" href="_model_system_8h_source.html">ModelSystem.h</a></li>
 </ul>
 </div><!-- contents -->
