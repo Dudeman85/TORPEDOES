@@ -3,8 +3,8 @@
 #include <functional>
 
 //Pause Component
-ECS_REGISTER_COMPONENT(PauseComponent,Texture)
-struct PauseComponent 
+ECS_REGISTER_COMPONENT(PauseComponent, Texture)
+struct PauseComponent
 {
     ecs::Entity upper, lower;
     engine::Texture* Selected_Texture;
@@ -20,37 +20,37 @@ class PauseSystem : public ecs::System
     ecs::Entity optionsButton;
     ecs::Entity menuButton;
     ecs::Entity quitGameButton;
+  
 
     engine::Texture* currentSelected_Texture;
 
     vector<Texture*> allTextures;
 
-  
-     
+
+
 public:
     ~PauseSystem() {
         delete currentSelected_Texture;
         //TODO DELETE ALL TEXTURES
-        for (auto texture : allTextures)
+        for (Texture* texture : allTextures)
         {
-            //is this correct??
-            delete &texture;
+            delete& texture;
         }
     }
     void Update()
     {
-       
+
 
     }
     void Init()
     {
-        ecs::Entity resumeButton = ecs::NewEntity();
-        ecs::Entity optionsButton = ecs::NewEntity();
-        ecs::Entity menuButton = ecs::NewEntity();
-        ecs::Entity quitGameButton = ecs::NewEntity();
-
-        currentSelection = menuButton;         
+        resumeButton = ecs::NewEntity();
+        optionsButton = ecs::NewEntity();
+        menuButton = ecs::NewEntity();
+        quitGameButton = ecs::NewEntity();
         
+        currentSelection = menuButton;
+
         //Odd texture index is always ' _N ' and even is just default name
         allTextures.push_back(new engine::Texture("UI_Resume.png"));
         allTextures.push_back(new engine::Texture("UI_Resume_N.png"));
@@ -60,67 +60,84 @@ public:
         allTextures.push_back(new engine::Texture("UI_BackToMenu_N.png"));
         allTextures.push_back(new engine::Texture("UI_QuitGame.png"));
         allTextures.push_back(new engine::Texture("UI_QuitGame_N.png"));
-       
 
 
-        ecs::AddComponent(resumeButton, Transform{ .position = Vector3(0,0.4f), .scale = Vector3(0.1f)});
+
+        ecs::AddComponent(resumeButton, Transform{ .position = Vector3(0,.6f,-0.5f), .scale = Vector3(0.15f) });
         ecs::AddComponent(resumeButton, SpriteRenderer{ .texture = allTextures[0],  .enabled = false, .uiElement = true });
         ecs::AddComponent(resumeButton, PauseComponent{ .upper = quitGameButton, .lower = optionsButton, .Selected_Texture = allTextures[1], .unSelected_Texture = allTextures[0], .operation = PauseSystem::OnResumePressed });
 
-        ecs::AddComponent(optionsButton, Transform{ .position = Vector3(0,0.1f), .scale = Vector3(0.1f) });
+        ecs::AddComponent(optionsButton, Transform{ .position = Vector3(0,.3,-0.5f), .scale = Vector3(0.15f) });
         ecs::AddComponent(optionsButton, SpriteRenderer{ .texture = allTextures[2],  .enabled = false, .uiElement = true });
         ecs::AddComponent(optionsButton, PauseComponent{ .upper = resumeButton, .lower = menuButton, .Selected_Texture = allTextures[3], .unSelected_Texture = allTextures[2], .operation = PauseSystem::OnOptionsPressed });
 
 
-        ecs::AddComponent(menuButton, Transform{ .position = Vector3(0,-0.1f), .scale = Vector3(0.1f) });
+        ecs::AddComponent(menuButton, Transform{ .position = Vector3(0,0, -0.5f), .scale = Vector3(0.15f) });
         ecs::AddComponent(menuButton, SpriteRenderer{ .texture = allTextures[4],  .enabled = false, .uiElement = true });
         ecs::AddComponent(menuButton, PauseComponent{ .upper = optionsButton, .lower = quitGameButton, .Selected_Texture = allTextures[5], .unSelected_Texture = allTextures[4], .operation = PauseSystem::OnMainMenuPressed });
 
 
-        ecs::AddComponent(quitGameButton, Transform{ .position = Vector3(0,-0.5f), .scale = Vector3(0.1f) });
+        ecs::AddComponent(quitGameButton, Transform{ .position = Vector3(0,-0.7f,-0.5f), .scale = Vector3(0.15f) });
         ecs::AddComponent(quitGameButton, SpriteRenderer{ .texture = allTextures[6],  .enabled = false, .uiElement = true });
-        ecs::AddComponent(quitGameButton, PauseComponent{ .upper = menuButton, .lower = resumeButton, .Selected_Texture = allTextures[7], .unSelected_Texture = allTextures[6], .operation = PauseSystem::OnMainMenuPressed });
+        ecs::AddComponent(quitGameButton, PauseComponent{ .upper = menuButton, .lower = resumeButton, .Selected_Texture = allTextures[7], .unSelected_Texture = allTextures[6], .operation = PauseSystem::OnQuitGamePressed});
 
 
 
     }
 
-    void MoveUp() 
+    void MoveUpper()
     {
+        printf("Move upper\n");
+        PauseComponent& pauseComponent = ecs::GetComponent<PauseComponent>(currentSelection);
+        SpriteRenderer& unselectedSpriteRenderer = ecs::GetComponent<SpriteRenderer>(currentSelection);
+        unselectedSpriteRenderer.texture = pauseComponent.unSelected_Texture;
 
-        PauseComponent&  pauseComponent = ecs::GetComponent<PauseComponent>(currentSelection);        
-        currentSelection = pauseComponent.upper;
+        currentSelection = pauseComponent.upper; 
+        PauseComponent& pauseComponent1 = ecs::GetComponent<PauseComponent>(currentSelection);
+        SpriteRenderer& selectedSpriteRenderer = ecs::GetComponent<SpriteRenderer>(currentSelection);
+        selectedSpriteRenderer.texture = pauseComponent1.Selected_Texture;
+        
     }
     void MoveLower()
     {
+        printf("Move lower\n");
         PauseComponent& pauseComponent = ecs::GetComponent<PauseComponent>(currentSelection);
+        SpriteRenderer& unselectedSpriteRenderer = ecs::GetComponent<SpriteRenderer>(currentSelection);
+        unselectedSpriteRenderer.texture = pauseComponent.unSelected_Texture;
+
         currentSelection = pauseComponent.lower;
-        
+        PauseComponent& pauseComponent1 = ecs::GetComponent<PauseComponent>(currentSelection);
+        SpriteRenderer& selectedSpriteRenderer = ecs::GetComponent<SpriteRenderer>(currentSelection);
+        selectedSpriteRenderer.texture = pauseComponent1.Selected_Texture;
+
     }
-  static  void OnResumePressed()
+    static  void OnResumePressed()
     {
-      printf("OnResumePressed()");
+        printf("OnResumePressed()\n");
     }
-  static  void OnOptionsPressed()
+    static  void OnOptionsPressed()
     {
-      printf("OnOptionsPressed()");
-    
+        printf("OnOptionsPressed()\n");
+
     }
-  static void OnQuitGamePressed()
+    static void OnQuitGamePressed()
     {
-      printf("OnQuitGamePressed()");
+        printf("OnQuitGamePressed()\n");
     }
-  static  void OnMainMenuPressed()
+    static  void OnMainMenuPressed()
     {
-      printf("OnMainMenuPressed()");
+        printf("OnMainMenuPressed()\n");
     }
     void Selected() {
+
         PauseComponent& pauseComponent = ecs::GetComponent<PauseComponent>(currentSelection);
+        SpriteRenderer& pauseSpriteRenderer = ecs::GetComponent<SpriteRenderer>(currentSelection);
+        pauseSpriteRenderer.texture = pauseComponent.Selected_Texture;
         pauseComponent.operation();
 
     }
 
-    void ToggleShowUIMenu() 
+    void ToggleShowUIMenu()
     {
         for (auto itr = entities.begin(); itr != entities.end();)
         {
@@ -128,7 +145,7 @@ public:
             ecs::Entity entity = *itr++;
             bool& enabled = ecs::GetComponent<SpriteRenderer>(entity).enabled;
             enabled = !enabled;
-           
+
         }
     }
 
@@ -270,5 +287,3 @@ public:
 //	}
 //
 //};
-
-
