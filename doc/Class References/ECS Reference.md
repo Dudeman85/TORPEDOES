@@ -59,6 +59,18 @@ if(ecs::HasComponent<Position>(player))
 }
 ```
 
+You can also add a destructor function to a component type. It will be called whenever a component is removed or an entity with that component is destroyed. The function should return void and take an Entity and Component as parameters.
+```cpp
+//Destructor function for Position component
+void OnPositionRemoved(Entity e, Position p)
+{
+	std::cout << "Position component removed" << std::endl;
+}
+
+//Set the destrucor callback
+ecs::SetComponentDestructor<Position>(OnPositionRemoved);
+```
+
 ---
 ## System
 Systems are esentially collections of functions that operate upon data in components. Each system has a list of required components it needs to operate which needs to be given manually, as well as a list of entities with those required components which is automaticaly set by the ECS implementation.
@@ -128,4 +140,25 @@ while(true)
 	//It will automatically operate upon every entity with the Position component
 	gravitySystem->Update();
 }
+```
+
+## Other Features
+
+There is a tagging system where you can add string tags to specific entities. The only predefined tag is "persistent", which prevents the entity from being deleted by DestroyAllEntities.
+```cpp
+//Set the tags of an entity, overrites any previous tags
+ecs::SetTags(entity, { "a", "b" });
+//Add a tag to an entity without affecting others
+ecs::AddTag(entity, "persistent");
+//Removes a specific tag from an entity
+ecs::RemoveTag(entity, "b");
+//Removes all tags from an entity
+ecs::RemoveAllTags(entity);
+//Gets the list of tags of an entity
+std::vector<std::string> tags = ecs::GetTags(entity);
+```
+
+You can also destroy all entities. This is useful when unloading a level
+```cpp
+
 ```

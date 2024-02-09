@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['scale_0',['scale',['../structengine_1_1_text_renderer.html#a47ad5f50676dea200a78ad15955769ad',1,'engine::TextRenderer::scale'],['../structengine_1_1_transform.html#a121d5df2b44c8b04a44f95b79e527bd7',1,'engine::Transform::scale']]],
-  ['shader_1',['shader',['../structengine_1_1_sprite_renderer.html#a3c4505b07ae6dd65c23d5e4188fea674',1,'engine::SpriteRenderer']]],
-  ['stalecache_2',['staleCache',['../structengine_1_1_transform.html#a4a606294164f72f3b82925d411804bc1',1,'engine::Transform']]],
-  ['step_3',['step',['../classengine_1_1_physics_system.html#a2c49a715aae438d897485e7d6b07f463',1,'engine::PhysicsSystem']]]
+  ['normal_0',['Normal',['../structengine_1_1_mesh_1_1_vertex.html#a73b791031586f441695dfc915a5bb178',1,'engine::Mesh::Vertex']]],
+  ['normal_1',['normal',['../structengine_1_1_collision.html#a9bc4f202f2610fd932f511bfb01dfa32',1,'engine::Collision']]],
+  ['numvertices_2',['numVertices',['../classengine_1_1_primitive.html#af40fe9ea2b86f386f5c8a4c776c8d1e2',1,'engine::Primitive']]]
 ];

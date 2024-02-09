@@ -42,8 +42,8 @@ int main()
 	//cam.perspective = true;
 	cam.SetRotation(Vector3(0, 0, 0));
 	float camScale = 1.0;
-	float camScaleMin = 900.0; //MAX 900
-	float camScaleMax = 1900.0; //MAX 1900
+	float camScaleMin = 600.0f; //MAX 900
+	float camScaleMax = 1650.0f; //MAX 1900
 	float aspectRatio = 16.f / 9.f;
 	float camPadding = 100;
 	float camDeadzone = 10;
@@ -54,8 +54,8 @@ int main()
 	Model checkPointModel("Checkpoint.obj");
 	Model model2("Finish_line.obj");
 	//Texture GUItexture = Texture("GUI_backround.png");
-	Texture torprldtexture = Texture("torpedoReloading.png");
-	Texture torprdytexture = Texture("torpedoReady.png");
+	Texture torprldtexture = Texture("UI_Red_Torpedo_Icon.png");
+	Texture torprdytexture = Texture("UI_Green_Torpedo_Icon.png");
 	// Font http address:
 	// https://www.dafont.com/stencil-ww-ii.font
 	Font stencilFont("Stencil WW II.ttf", 0, 0, 48);
@@ -116,7 +116,7 @@ int main()
 	cheerSpeaker.setLinearDistance(0.5f, 50.f, 350.f, 0.9f);
 	*/
 	ecs::Entity laMuerte = ecs::NewEntity();
-	ecs::AddComponent(pFont1, TextRenderer{ .font = &stencilFont, .text = playerNames[0], .offset = Vector3(1.0f, -1.0f, 0), .scale = Vector3(0.5f), .color = Vector3(0.5f, 0.8f, 0.2f) });
+	ecs::AddComponent(pFont1, TextRenderer{ .font = &stencilFont, .text = playerNames[0], .offset = Vector3(-30.0f, -1.0f, 0), .scale = Vector3(0.5f), .color = Vector3(0.5f, 0.8f, 0.2f) });
 	ecs::AddComponent(pFont1, Transform{ .position = Vector3(1434.0f,-1449.0f, 100.0f) });
 	ecs::AddComponent(laMuerte, Transform{ .position = Vector3(1474.321533, -1435.868286, 100.000000), .rotation = Vector3(45.000000, 0.0000, 0.000000), .scale = Vector3(7) });
 	ecs::AddComponent(laMuerte, Player{ .acerationSpeed = 300.0f, .minAceleration = 120.0f, .playerID = 0, .playerFont = pFont1, .playername = playerNames[0], .playerLap = lap });
@@ -172,12 +172,13 @@ int main()
 	//ecs::AddComponent(GUIBackround, new Transform{ .position = Vector3(0, -0.95, -0.9), .scale = Vector3(1, 0.2, 1) });
 
 	ecs::Entity torpIndicator1 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator1, TextRenderer{ .font = &stencilFont, .text = playerNames[0], .offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	ecs::AddComponent(torpIndicator1, SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(-0.75, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
+	//ecs::AddComponent(torpIndicator1, TextRenderer{ .font = &stencilFont, .text = playerNames[0], .offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
+	ecs::AddComponent(torpIndicator1, SpriteRenderer{ .texture = &torprdytexture});
+	ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(15, 15, 8) });
+	
 	ecs::Entity torpIndicator2 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator2, SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator2, Transform{ .position = Vector3(-0.65, -0.9, -0.55), .scale = Vector3(0.05, 0.085, 1) });
+	ecs::AddComponent(torpIndicator2, SpriteRenderer{ .texture = &torprdytexture});
+	ecs::AddComponent(torpIndicator2, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(15, 15, 8) });
 
 	ecs::Entity torpIndicator3 = ecs::NewEntity();
 	ecs::AddComponent(torpIndicator3, TextRenderer{ .font = &stencilFont, .text = playerNames[1], .offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
@@ -233,9 +234,9 @@ int main()
 
 	Animation countdownAnim = AnimationsFromSpritesheet("UI_Countdown_Ver2.png", 5, 1, vector<int>(5, 1000))[0];
 	ecs::Entity countdown = ecs::NewEntity();
-	ecs::AddComponent(countdown, Transform{ .position = Vector3(1475, -1200, 10), .scale = Vector3(60, 100, 0) });
+	ecs::AddComponent(countdown, Transform{ .position = Vector3(1475, -1270, 10), .scale = Vector3(60, 100, 0) });
 	ecs::AddComponent(countdown, SpriteRenderer{});
-	ecs::AddComponent(countdown, Animator{});
+	ecs::AddComponent(countdown, Animator{ .onAnimationEnd = ecs::DestroyEntity });
 	AnimationSystem::AddAnimation(countdown, countdownAnim, "CountDown");
 	AnimationSystem::PlayAnimation(countdown, "CountDown", false);
 	
@@ -279,6 +280,13 @@ int main()
 		//winText.text = timerStr.c_str();
 		//AnimationSystem::PlayAnimation(countdown, "CountDown", false);
 		
+		Transform& p1Transform = ecs::GetComponent<Transform>(laMuerte);
+		Transform& torpIconLoc1 = ecs::GetComponent<Transform>(torpIndicator1);
+		torpIconLoc1.position = Vector3(p1Transform.position.x + 5, p1Transform.position.y-18, 200);
+		Transform& torpIconLoc2 = ecs::GetComponent<Transform>(torpIndicator2);
+		torpIconLoc2.position = Vector3(p1Transform.position.x - 25, p1Transform.position.y - 18, 201);
+		SpriteRenderer& torpIcon1 = ecs::GetComponent<SpriteRenderer>(torpIndicator1);
+		SpriteRenderer& torpIcon2 = ecs::GetComponent<SpriteRenderer>(torpIndicator2);
 		// UI System 				
 
 		TextRenderer& winText = ecs::GetComponent<TextRenderer>(playerWin);
@@ -291,27 +299,27 @@ int main()
 		Player& player3 = ecs::GetComponent<Player>(laMuerte3);
 		Player& player4 = ecs::GetComponent<Player>(laMuerte4);
 
-		////player 1
-		//if (player.projectileTime1 > 0)
-		//{
-		//	torpicon1.texture = &torprldtexture;
-		//}
-		//else
-		//{
-		//	torpicon1.texture = &torprdytexture;
-		//	//torpSpeaker.Play(torpedoSound);
-		//	//soundDevice->SetSourceLocation(torpSpeaker, PlayerTransform.position.x, PlayerTransform.position.y, 0);
-		//}
-		//if (player.projectileTime2 > 0)
-		//{
-		//	torpicon2.texture = &torprldtexture;
-		//}
-		//else
-		//{
-		//	torpicon2.texture = &torprdytexture;
-		//	//torpSpeaker2.Play(torpedoSound);
-		//	//soundDevice->SetSourceLocation(torpSpeaker2, PlayerTransform.position.x, PlayerTransform.position.y, 0);
-		//}
+		//player 1
+		if (player.projectileTime1 > 0)
+		{
+			torpIcon1.texture = &torprldtexture;
+		}
+		else
+		{
+			torpIcon1.texture = &torprdytexture;
+			//torpSpeaker.Play(torpedoSound);
+			//soundDevice->SetSourceLocation(torpSpeaker, PlayerTransform.position.x, PlayerTransform.position.y, 0);
+		}
+		if (player.projectileTime2 > 0)
+		{
+			torpIcon2.texture = &torprldtexture;
+		}
+		else
+		{
+			torpIcon2.texture = &torprdytexture;
+			//torpSpeaker2.Play(torpedoSound);
+			//soundDevice->SetSourceLocation(torpSpeaker2, PlayerTransform.position.x, PlayerTransform.position.y, 0);
+		}
 
 
 		///// Player 2
@@ -440,18 +448,21 @@ int main()
 		//Keep the camera in bounds of the tilemap and set it to the average position of the players
 		Vector3 avgPos = playerController->avgPosition / playerController->entities.size();
 
-		// Center the camera on the average position of the players
+		//// Center the camera on the average position of the players
 		float camPosX = clamp(avgPos.x, map.position.x + cam.width / 2, map.position.x + map.bounds.width - cam.width / 2);
-		float camPosY = clamp(avgPos.y, map.position.y - map.bounds.height + cam.height / 2, map.position.y - cam.height / 2) - cam.height * 0.07;
+		float camPosY = clamp(avgPos.y, map.position.y - map.bounds.height + cam.height / 2, map.position.y - cam.height / 2);
 		cam.SetPosition(Vector3(camPosX, camPosY, 1500));
 
 
-		//Calculate the camera's bounds
+		//Calculate the Bounding Box
 		std::array<float, 4> camBounds{
-			cam.position.y * 2 + cam.height / 2,
-				cam.position.x * 2 + cam.width / 2,
+			cam.position.y * 2 + cam.height / 2,  // yls pain 
+				cam.position.x * 2 + cam.width / 2,   // leveys 
 				cam.position.y * 2 - cam.height / 2,
 				cam.position.x * 2 - cam.width / 2 };
+
+		float zoomOutThreshold = -camPadding * 2.5f;
+		float zoomInThreshold = camPadding * 2.0f;
 
 		//Calculate the difference between the player and camera bounds
 
@@ -461,15 +472,20 @@ int main()
 		float leftDiff = playerController->playerBounds[3] - camBounds[3];
 
 		//Zoom out
-		if (topDiff < -camPadding < -camDeadzone || rightDiff - camPadding < -camDeadzone || bottomDiff - camPadding < -camDeadzone || leftDiff - camPadding < -camDeadzone)
+		if (playerController->playerBounds[0] < camBounds[0] - zoomOutThreshold ||
+			playerController->playerBounds[1] > camBounds[1] + zoomOutThreshold ||
+			playerController->playerBounds[2] > camBounds[2] + zoomOutThreshold ||
+			playerController->playerBounds[3] < camBounds[3] - zoomOutThreshold)
 		{
 
-			float zoomOutValue = 10 - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10.0f;
+			float zoomOutFactor = 10.0f;
+			float zoomOutValue = zoomOutFactor - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10.0f;
 			camScale = max(camScale + zoomOutValue, camScaleMin);
 			/*camScale += 10 - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10;*/
 		}
-
-		else if (topDiff > camPadding > camDeadzone && rightDiff - camPadding > camDeadzone && bottomDiff - camPadding > camDeadzone && leftDiff - camPadding > camDeadzone) {
+		//Zoom int
+		else if (topDiff > zoomInThreshold && rightDiff > zoomInThreshold && bottomDiff > zoomInThreshold && leftDiff > zoomInThreshold)
+		{
 
 			float zoomInValue = min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 100.0f;
 			camScale = max(camScale - zoomInValue, camScaleMin);
@@ -480,6 +496,27 @@ int main()
 
 		cam.height = camScale;
 		cam.width = cam.height * aspectRatio;
+
+		// New implentation 
+		//boundigBoxin center point 
+		float boundingBoxWidth = playerController->playerBounds[1] - playerController->playerBounds[3];
+		float boundingBoxHeight = playerController->playerBounds[0] - playerController->playerBounds[2];
+		Vector2 boundingBoxCenter = Vector2(playerController->playerBounds[3] + boundingBoxWidth * 0.5f, playerController->playerBounds[2] + boundingBoxHeight * 0.5f);
+
+		//Ajustar la posicin de la cmara segn el centro de la bounding box
+		camPosX = clamp(boundingBoxCenter.x, map.position.x + cam.width / 2, map.position.x + map.bounds.width - cam.width / 2);
+		camPosY = clamp(boundingBoxCenter.y, map.position.y - map.bounds.height + cam.height / 2, map.position.y - cam.height / 2);
+		cam.SetPosition(Vector3(camPosX, camPosY, 1500));
+
+		// Calculate the desired zoom level and adjust the camera zoom.
+		float aspectRatio = cam.width / cam.height;
+		float desiredZoom = max(boundingBoxWidth / (cam.width * aspectRatio), boundingBoxHeight / cam.height);
+
+
+		// Ajustar el zoom de la cmara solo si el zoom deseado supera los lmites establecidos
+		if (desiredZoom > camScaleMin && desiredZoom < camScaleMax) {
+			camScale = desiredZoom;
+		}
 
 		//Reset the average player position data
 		playerController->avgPosition = Vector3();

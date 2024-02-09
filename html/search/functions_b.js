@@ -1,7 +1,25 @@
 var searchData=
 [
-  ['texture_0',['Texture',['../classengine_1_1_texture.html#a545513921ff10bcb0c03adf859d6a08e',1,'engine::Texture::Texture(int sx, int sy, const std::vector&lt; std::uint16_t &gt; &amp;data)'],['../classengine_1_1_texture.html#a99de71de2655bb50d6c93591c2d44494',1,'engine::Texture::Texture(std::string path, unsigned int filteringType=GL_NEAREST, bool flip=true, bool relativePath=true)'],['../classengine_1_1_texture.html#ad4457fee465e39738f4f9f309aedc9d3',1,'engine::Texture::Texture(Image image, unsigned int filteringType=GL_NEAREST)']]],
-  ['tilemap_1',['Tilemap',['../class_tilemap.html#ac27f37084ba4737825092e6719829514',1,'Tilemap']]],
-  ['translate_2',['Translate',['../classengine_1_1_transform_system.html#a61cf104b3a13ad916dc9cb3629ce4039',1,'engine::TransformSystem::Translate(ecs::Entity entity, float dx, float dy, float dz=0)'],['../classengine_1_1_transform_system.html#ab6b408d1cfa4c44d4feaa6821e059ed1',1,'engine::TransformSystem::Translate(ecs::Entity entity, Vector3 dt)']]],
-  ['triangle_3',['Triangle',['../classengine_1_1_primitive.html#a98162593ddac4f954d0654dd6412908b',1,'engine::Primitive']]]
+  ['satintersect_0',['SATIntersect',['../classengine_1_1_collision_system.html#aa382ee8227370dd8cad5df11c39d1cbe',1,'engine::CollisionSystem']]],
+  ['scale_1',['Scale',['../classengine_1_1_transform_system.html#a83531f70a58ad8f5d52e9b9f0ff67846',1,'engine::TransformSystem::Scale(ecs::Entity entity, float dx, float dy, float dz=0)'],['../classengine_1_1_transform_system.html#a3aceceefa09c76e17a2bc9bbe8a4807e',1,'engine::TransformSystem::Scale(ecs::Entity entity, Vector3 ds)']]],
+  ['setambientvolume_2',['setAmbientVolume',['../class_audio_engine.html#a1da036d7df020bec20e1f6eaebff4d5b',1,'AudioEngine']]],
+  ['setbackgroundcolor_3',['SetBackgroundColor',['../classengine_1_1_sprite_render_system.html#aae41f94644c9e8b3f2903ec44141d335',1,'engine::SpriteRenderSystem']]],
+  ['setdimensions_4',['SetDimensions',['../classengine_1_1_camera.html#a013fda784dd6cc5fc32ed5b2d6666caa',1,'engine::Camera']]],
+  ['setdirection_5',['setDirection',['../class_audio.html#a8d7d96d023e076c2ae4121e411fb846f',1,'Audio']]],
+  ['setlight_6',['SetLight',['../classengine_1_1_model_render_system.html#a3cb3962def354e2a03c36f01f580ddb5',1,'engine::ModelRenderSystem']]],
+  ['setloop_7',['setLoop',['../class_audio.html#ad2932bbc5648047f1aa2953f1ff22043',1,'Audio']]],
+  ['setposition_8',['SetPosition',['../classengine_1_1_camera.html#a0463e6c8ceb39cd05e01de56e712d746',1,'engine::Camera::SetPosition()'],['../classengine_1_1_transform_system.html#aeea85af1b0e338a3b497342efc655cee',1,'engine::TransformSystem::SetPosition(ecs::Entity entity, float x, float y, float z=0)'],['../classengine_1_1_transform_system.html#adf229e3da7611624c826df65abbe0563',1,'engine::TransformSystem::SetPosition(ecs::Entity entity, Vector3 position)']]],
+  ['setrotation_9',['SetRotation',['../classengine_1_1_camera.html#a41593298229c01bb71e6009a341e9baf',1,'engine::Camera::SetRotation()'],['../classengine_1_1_transform_system.html#a41f82f6d046965257a7909863c9845e5',1,'engine::TransformSystem::SetRotation(ecs::Entity entity, float x, float y, float z=0)'],['../classengine_1_1_transform_system.html#a6d0a3ec463917fb3bbcb25b8dd9c14fe',1,'engine::TransformSystem::SetRotation(ecs::Entity entity, Vector3 rotation)']]],
+  ['setscale_10',['SetScale',['../classengine_1_1_transform_system.html#a9ef478451c2a50f4112a82c89c506667',1,'engine::TransformSystem::SetScale(ecs::Entity entity, float x, float y, float z=0)'],['../classengine_1_1_transform_system.html#ab00bd3afdb11269640e77b0716394b9b',1,'engine::TransformSystem::SetScale(ecs::Entity entity, Vector3 scale)']]],
+  ['setscalingfilter_11',['SetScalingFilter',['../classengine_1_1_texture.html#a927aa3e9d8687c13aa933c6e2c6e6054',1,'engine::Texture']]],
+  ['setsound_12',['setSound',['../class_audio.html#a15373a584f27373c8c0ee1fe4dfdb31b',1,'Audio']]],
+  ['settilemap_13',['SetTilemap',['../classengine_1_1_collision_system.html#a9169df686c5b7160f87bccc79af32caf',1,'engine::CollisionSystem::SetTilemap()'],['../classengine_1_1_sprite_render_system.html#ae65068ee9af7e2876636b484d62ef505',1,'engine::SpriteRenderSystem::SetTilemap()']]],
+  ['settileproperty_14',['SetTileProperty',['../classengine_1_1_physics_system.html#a92656d5eda3cf7ec1c8b12d0ea6c842c',1,'engine::PhysicsSystem']]],
+  ['setvolume_15',['setVolume',['../class_audio.html#a475f6a5159d5ce3c8bf96347f8057cab',1,'Audio']]],
+  ['shader_16',['Shader',['../classengine_1_1_shader.html#a5e29df761759f6bd5a4470aaf0ed921e',1,'engine::Shader']]],
+  ['simplesolvecollision_17',['SimpleSolveCollision',['../classengine_1_1_physics_system.html#a42fc86680ad4374dc08a69cc70971000',1,'engine::PhysicsSystem']]],
+  ['slice_18',['Slice',['../classengine_1_1_image.html#a6c44f091f8d67bf2382fcecd8dd7d718',1,'engine::Image']]],
+  ['solvetilemapcollision_19',['SolveTilemapCollision',['../classengine_1_1_physics_system.html#acd611ce5fe91313edc55aedfa159d784',1,'engine::PhysicsSystem']]],
+  ['stop_20',['stop',['../class_audio.html#af628fdffa4dba3866e6e801fdda123ea',1,'Audio']]],
+  ['stopanimation_21',['StopAnimation',['../classengine_1_1_animation_system.html#ad6b2712826d566bcc61cf26ed8cc7554',1,'engine::AnimationSystem']]]
 ];

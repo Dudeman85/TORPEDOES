@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.10.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: C:/Users/matiasrek/source/repos/teamarkademoottori/team5/include/engine/MapLayer.h Source File</title>
+<title>Tiimi Arkade: C:/Users/matiasrek/source/repos/teamarkademoottori/team5/include/engine/MapLayer.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,8 +27,9 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project<span id="projectnumber">&#160;0.2</span>
+   <div id="projectname">Tiimi Arkade<span id="projectnumber">&#160;0.2</span>
    </div>
+   <div id="projectbrief">TORPEDOES!!! pelimoottori docs</div>
   </td>
  </tr>
  </tbody>
@@ -133,46 +134,50 @@ $(function(){initNavTree('_map_layer_8h_source.html',''); initResizable(); });
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="preprocessor">#include &lt;engine/GL/Texture.h&gt;</span></div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="preprocessor">#include &lt;tmxlite/Map.hpp&gt;</span></div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
-<div class="foldopen" id="foldopen00035" data-start="{" data-end="};">
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="class_map_layer.html">   35</a></span><span class="keyword">class </span><a class="code hl_class" href="class_map_layer.html">MapLayer</a> final</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>{</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    <a class="code hl_class" href="class_map_layer.html">MapLayer</a>(<span class="keyword">const</span> tmx::Map&amp;, std::size_t, <span class="keyword">const</span> std::vector &lt;std::shared_ptr&lt;engine::Texture&gt;&gt;&amp; textures);</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <a class="code hl_class" href="class_map_layer.html">~MapLayer</a>();</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    </div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <a class="code hl_class" href="class_map_layer.html">MapLayer</a>(<span class="keyword">const</span> <a class="code hl_class" href="class_map_layer.html">MapLayer</a>&amp;) = <span class="keyword">delete</span>;</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <a class="code hl_class" href="class_map_layer.html">MapLayer</a>&amp; operator = (<span class="keyword">const</span> <a class="code hl_class" href="class_map_layer.html">MapLayer</a>&amp;) = <span class="keyword">delete</span>;</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    </div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <span class="keywordtype">void</span> draw(glm::mat4 model, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> modelLoc, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>);</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    <span class="keywordtype">float</span> zLayer = 0;</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    glm::vec2 tileSize;</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    std::vector &lt; std::shared_ptr&lt;engine::Texture&gt; &gt; m_allTextures;</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> VAO;</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <span class="comment">//unsigned int tileSize;</span></div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <span class="keyword">struct </span>Subset final</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    {</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>        <span class="keywordtype">float</span> sx;</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>        <span class="keywordtype">float</span> sy;</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>        <span class="keywordtype">unsigned</span> vbo = 0;</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        std::shared_ptr&lt;engine::Texture&gt; texture = 0;</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        std::shared_ptr&lt;engine::Texture&gt; lookup = 0;</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    };</div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    std::vector&lt;Subset&gt; m_subsets;</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <span class="keywordtype">void</span> createSubsets(<span class="keyword">const</span> tmx::Map&amp;, std::size_t);</div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>};</div>
+<div class="foldopen" id="foldopen00036" data-start="{" data-end="};">
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="class_map_layer.html">   36</a></span><span class="keyword">class </span><a class="code hl_class" href="class_map_layer.html">MapLayer</a> final</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>{</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="class_map_layer.html#a2b7cbb079ab6bbc899286486bf386ca2">   40</a></span>    <a class="code hl_function" href="class_map_layer.html#a2b7cbb079ab6bbc899286486bf386ca2">MapLayer</a>(<span class="keyword">const</span> tmx::Map&amp;, std::size_t, <span class="keyword">const</span> std::vector &lt;std::shared_ptr&lt;engine::Texture&gt;&gt;&amp; textures);</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <a class="code hl_class" href="class_map_layer.html">~MapLayer</a>();</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    </div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    <a class="code hl_function" href="class_map_layer.html#a2b7cbb079ab6bbc899286486bf386ca2">MapLayer</a>(<span class="keyword">const</span> <a class="code hl_class" href="class_map_layer.html">MapLayer</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <a class="code hl_class" href="class_map_layer.html">MapLayer</a>&amp; operator = (<span class="keyword">const</span> <a class="code hl_class" href="class_map_layer.html">MapLayer</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    </div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno"><a class="line" href="class_map_layer.html#a39d81a89724887b9d5fb8258faa27b63">   47</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="class_map_layer.html#a39d81a89724887b9d5fb8258faa27b63">draw</a>(glm::mat4 model, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> modelLoc, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>);</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="class_map_layer.html#a9e87f6a5005d329f0b60f886e87d6bf7">   50</a></span>    <span class="keywordtype">float</span> <a class="code hl_variable" href="class_map_layer.html#a9e87f6a5005d329f0b60f886e87d6bf7">zLayer</a> = 0;</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno"><a class="line" href="class_map_layer.html#a1634b2041c03118452f7eb7517048fa8">   52</a></span>    glm::vec2 <a class="code hl_variable" href="class_map_layer.html#a1634b2041c03118452f7eb7517048fa8">tileSize</a>;</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    std::vector &lt; std::shared_ptr&lt;engine::Texture&gt; &gt; m_allTextures;</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> VAO;</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <span class="comment">//unsigned int tileSize;</span></div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <span class="keyword">struct </span>Subset final</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    {</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        <span class="keywordtype">float</span> sx;</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>        <span class="keywordtype">float</span> sy;</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>        <span class="keywordtype">unsigned</span> vbo = 0;</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>        std::shared_ptr&lt;engine::Texture&gt; texture = 0;</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>        std::shared_ptr&lt;engine::Texture&gt; lookup = 0;</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    };</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    std::vector&lt;Subset&gt; m_subsets;</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    <span class="keywordtype">void</span> createSubsets(<span class="keyword">const</span> tmx::Map&amp;, std::size_t);</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>};</div>
 </div>
-<div class="ttc" id="aclass_map_layer_html"><div class="ttname"><a href="class_map_layer.html">MapLayer</a></div><div class="ttdef"><b>Definition</b> MapLayer.h:36</div></div>
+<div class="ttc" id="aclass_map_layer_html"><div class="ttname"><a href="class_map_layer.html">MapLayer</a></div><div class="ttdoc">A class to create and store data for the tiled map.</div><div class="ttdef"><b>Definition</b> MapLayer.h:37</div></div>
+<div class="ttc" id="aclass_map_layer_html_a1634b2041c03118452f7eb7517048fa8"><div class="ttname"><a href="class_map_layer.html#a1634b2041c03118452f7eb7517048fa8">MapLayer::tileSize</a></div><div class="ttdeci">glm::vec2 tileSize</div><div class="ttdoc">The size of the tiles.</div><div class="ttdef"><b>Definition</b> MapLayer.h:52</div></div>
+<div class="ttc" id="aclass_map_layer_html_a2b7cbb079ab6bbc899286486bf386ca2"><div class="ttname"><a href="class_map_layer.html#a2b7cbb079ab6bbc899286486bf386ca2">MapLayer::MapLayer</a></div><div class="ttdeci">MapLayer(const tmx::Map &amp;, std::size_t, const std::vector&lt; std::shared_ptr&lt; engine::Texture &gt; &gt; &amp;textures)</div><div class="ttdoc">Constructor.</div></div>
+<div class="ttc" id="aclass_map_layer_html_a39d81a89724887b9d5fb8258faa27b63"><div class="ttname"><a href="class_map_layer.html#a39d81a89724887b9d5fb8258faa27b63">MapLayer::draw</a></div><div class="ttdeci">void draw(glm::mat4 model, unsigned int modelLoc, unsigned int, unsigned int)</div><div class="ttdoc">Draw the map with the given data.</div></div>
+<div class="ttc" id="aclass_map_layer_html_a9e87f6a5005d329f0b60f886e87d6bf7"><div class="ttname"><a href="class_map_layer.html#a9e87f6a5005d329f0b60f886e87d6bf7">MapLayer::zLayer</a></div><div class="ttdeci">float zLayer</div><div class="ttdoc">How many layers are there in the map.</div><div class="ttdef"><b>Definition</b> MapLayer.h:50</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_d522931ffa1371640980b621734a4381.html">Users</a></li><li class="navelem"><a class="el" href="dir_cfabb623a5010b4f0c608be143ca0ae1.html">matiasrek</a></li><li class="navelem"><a class="el" href="dir_a1b3132806e2c1ea6314ba5371343513.html">source</a></li><li class="navelem"><a class="el" href="dir_709dd738cfa3ba1bd20ca531cded5854.html">repos</a></li><li class="navelem"><a class="el" href="dir_d62f5215daa1b0e640e4f91cd1bca98e.html">teamarkademoottori</a></li><li class="navelem"><a class="el" href="dir_65cbebb861bbb0f6e83b1a7581dab806.html">team5</a></li><li class="navelem"><a class="el" href="dir_761d445a6b33cefa582fd4a4e9ac3a24.html">include</a></li><li class="navelem"><a class="el" href="dir_ee0f5e77b47cd98ba2bf26459be89735.html">engine</a></li><li class="navelem"><b>MapLayer.h</b></li>
+    <li class="navelem"><a class="el" href="dir_b2f33c71d4aa5e7af42a1ca61ff5af1b.html">source</a></li><li class="navelem"><a class="el" href="dir_da92606663f4ecb03aa66c183f15dac3.html">repos</a></li><li class="navelem"><a class="el" href="dir_6f7b7a95e0b3513410180b5df5c4d19e.html">teamarkademoottori</a></li><li class="navelem"><a class="el" href="dir_e0df400b62075fd2a8db929957eaca32.html">team5</a></li><li class="navelem"><a class="el" href="dir_a1fa00eaa8eb3ba57d0e8d84a7cdeb24.html">include</a></li><li class="navelem"><a class="el" href="dir_4d26eecba06970651075c8bff176bcb8.html">engine</a></li><li class="navelem"><b>MapLayer.h</b></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.10.0 </li>
   </ul>
 </div>

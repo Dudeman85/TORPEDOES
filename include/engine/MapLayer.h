@@ -32,18 +32,23 @@ source distribution.
 #include <engine/GL/Texture.h>
 #include <tmxlite/Map.hpp>
 
+///A class to create and store data for the tiled map
 class MapLayer final
 {
 public:
+	///Constructor
 	MapLayer(const tmx::Map&, std::size_t, const std::vector <std::shared_ptr<engine::Texture>>& textures);
 	~MapLayer();
 	
 	MapLayer(const MapLayer&) = delete;
 	MapLayer& operator = (const MapLayer&) = delete;
 	
+	///Draw the map with the given data
 	void draw(glm::mat4 model, unsigned int modelLoc, unsigned int, unsigned int);
 
+	///How many layers are there in the map
 	float zLayer = 0;
+	///The size of the tiles
 	glm::vec2 tileSize;
 private:
 	std::vector < std::shared_ptr<engine::Texture> > m_allTextures;

@@ -8,10 +8,9 @@
 #include <stdexcept>
 #include <iostream>
 #include <memory>
+#include <functional>
 
-///
 /// Allow max components to be determined outside this file
-/// 
 #ifndef ECS_MAX_COMPONENTS
 #define ECS_MAX_COMPONENTS 100
 #elif ECS_MAX_COMPONENTS > UINT16_MAX
@@ -55,7 +54,7 @@ namespace engine::ecs
 
 	//COMPONENT MANAGEMENT DATA
 
-	//Interface for each component array type
+	///Interface for each component array type
 	class IComponentArray
 	{
 	public:
@@ -72,11 +71,11 @@ namespace engine::ecs
 
 	//SYSTEM MANAGEMENT DATA
 
-	//Base class all systems inherit from
+	///Base class all systems inherit from
 	class System
 	{
 	public:
-		//Set of every entity containing the required components for the system
+		///Set of every entity containing the required components for the system
 		std::set<Entity> entities;
 	};
 	//Map of each system accessible by its type name
@@ -91,7 +90,7 @@ namespace engine::ecs
 
 	//INTERNAL FUNCTIONS
 
-	//Implementation internal class to interface with each type of component array
+	///Implementation internal class to interface with each type of component array
 	template<typename T>
 	class ComponentArray : public IComponentArray
 	{
@@ -101,21 +100,28 @@ namespace engine::ecs
 		//Maps from Entities to their component indexed in component arrays
 		std::unordered_map<Entity, uint32_t> entityToIndex;
 		std::unordered_map<uint32_t, Entity> indexToEntity;
+		//Callback funtion to be used as a component destructor
+		std::function<void(Entity, T)> componentDestructor;
 
 	public:
+		void SetDestructor(std::function<void(Entity, T)> destructor)
+		{
+			componentDestructor = destructor;
+		}
+
 		//Return true if the entity has a component of type T
 		bool HasComponent(Entity entity)
 		{
 			return entityToIndex.count(entity);
 		}
 
-		//Get a component from an entity
+		///Get a component from an entity
 		T& GetComponent(Entity entity)
 		{
 			return components[entityToIndex[entity]];
 		}
 
-		//Add a component to an entity, returns a reference to that component
+		///Add a component to an entity, returns a reference to that component
 		void AddComponent(Entity entity, T component)
 		{
 			entityToIndex[entity] = components.size();
@@ -123,9 +129,13 @@ namespace engine::ecs
 			components.push_back(component);
 		}
 
-		//Removes a component from an entity
+		///Removes a component from an entity
 		void RemoveComponent(Entity entity) override
 		{
+			//Call the component destructor
+			if (componentDestructor)
+				componentDestructor(entity, components[entityToIndex[entity]]);
+
 			//Keep track of the deleted component's index, and the entity of the last component in the array
 			uint32_t deletedIndex = entityToIndex[entity];
 			Entity lastEntity = indexToEntity[components.size() - 1];
@@ -217,7 +227,7 @@ namespace engine::ecs
 		//Make sure the entity exists
 		if (!EntityExists(entity))
 		{
-			std::cout << warningFormat << "ECS WARNING in SetTags(): The entity does not exist!" << normalFormat << std::endl;
+			std::cout << warningFormat << "ECS WARNING in AddTag(): The entity does not exist!" << normalFormat << std::endl;
 			return;
 		}
 		#endif
@@ -235,7 +245,7 @@ namespace engine::ecs
 		//Make sure the entity exists
 		if (!EntityExists(entity))
 		{
-			std::cout << warningFormat << "ECS WARNING in SetTags(): The entity does not exist!" << normalFormat << std::endl;
+			std::cout << warningFormat << "ECS WARNING in RemoveTag(): The entity does not exist!" << normalFormat << std::endl;
 			return;
 		}
 		#endif
@@ -250,6 +260,21 @@ namespace engine::ecs
 		}
 	}
 
+	//Removes aevery tag from an entity
+	inline void RemoveAllTags(Entity entity)
+	{
+		#ifdef _DEBUG
+		//Make sure the entity exists
+		if (!EntityExists(entity))
+		{
+			std::cout << warningFormat << "ECS WARNING in RemoveAllTags(): The entity does not exist!" << normalFormat << std::endl;
+			return;
+		}
+		#endif
+
+		entityTags[entity].clear();
+	}
+
 	//Get the list of tags for entity
 	inline std::vector<std::string> GetTags(Entity entity)
 	{
@@ -257,12 +282,27 @@ namespace engine::ecs
 		//Make sure the entity exists
 		if (!EntityExists(entity))
 		{
-			std::cout << warningFormat << "ECS WARNING in SetTags(): The entity does not exist!" << normalFormat << std::endl;
+			std::cout << warningFormat << "ECS WARNING in GetTags(): The entity does not exist!" << normalFormat << std::endl;
 			return {};
 		}
 		#endif
 
 		return entityTags[entity];
+	}
+
+	//Returns true if entity has the specified tag
+	inline bool HasTag(Entity entity, std::string tag)
+	{
+		#ifdef _DEBUG
+		//Make sure the entity exists
+		if (!EntityExists(entity))
+		{
+			std::cout << warningFormat << "ECS WARNING in HasTag(): The entity does not exist!" << normalFormat << std::endl;
+			return false;
+		}
+		#endif
+
+		return std::find(entityTags[entity].begin(), entityTags[entity].end(), tag) != entityTags[entity].end();
 	}
 
 	//Register a new component of type T
@@ -293,6 +333,22 @@ namespace engine::ecs
 		componentArrays[componentType] = new ComponentArray<T>();
 
 		componentCount++;
+	}
+
+	//Add a destructor function to be called when a component is deleted
+	template<typename T>
+	inline void SetComponentDestructor(std::function<void(Entity, T)> destructor)
+	{
+		#ifdef _DEBUG
+		//Make sure the component has been registered
+		if (componentArrays.count(typeid(T).name()) == 0)
+		{
+			std::cout << warningFormat << "ECS WARNING in SetComponentDestructor(): The component you are trying to add a destructor to has not been registered!" << normalFormat << std::endl;
+			return;
+		}
+		#endif
+
+		_GetComponentArray<T>()->SetDestructor(destructor);
 	}
 
 	//Check if the entity has a component
@@ -457,12 +513,33 @@ namespace engine::ecs
 		entitySignatures[entity].reset();
 
 		_OnEntitySignatureChanged(entity);
+		RemoveAllTags(entity);
 
 		//Set the entity as available and update relevant trackers
 		entitySignatures.erase(entity);
 		usedEntities.erase(entity);
 		availableEntities.push(entity);
 		entityCount--;
+	}
+
+	//Destroys all entities without the "persistent" tag along with all their components.
+	//If ignorePersistent is set to true, will also delete "persistent" entities
+	void DestroyAllEntities(bool ignorePersistent = false)
+	{
+		//Make a copy of the entities set to prevent iterator breaking
+		std::set<Entity> usedEntitiesCopy = usedEntities;
+
+		for (auto itr = usedEntitiesCopy.begin(); itr != usedEntitiesCopy.end(); ++itr)
+		{
+			//Get the entity and increment the iterator
+			ecs::Entity entity = *itr;
+
+			//Only delete "persistent" entities when forced
+			if (!HasTag(entity, "persistent") || ignorePersistent)
+			{
+				DestroyEntity(entity);
+			}
+		}
 	}
 
 	//Returns a reference to the desired system

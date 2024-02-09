@@ -434,7 +434,7 @@ int main()
 		}
 
 
-
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 			//Keep the camera in bounds of the tilemap and set it to the average position of the players
 		Vector3 avgPos = playerController->avgPosition / playerController->entities.size();
@@ -509,7 +509,7 @@ int main()
 			camScale = desiredZoom;
 		}
 
-
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		//Reset the average player position data
 		playerController->avgPosition = Vector3();

@@ -11,7 +11,7 @@ namespace engine
 {
 	///Transform component
 	ECS_REGISTER_COMPONENT(Transform)
-	struct Transform
+		struct Transform
 	{
 		///The local position, relative to parent
 		Vector3 position;
@@ -32,7 +32,7 @@ namespace engine
 
 	///Transform system, Requires Transform component
 	ECS_REGISTER_SYSTEM(TransformSystem, Transform)
-	class TransformSystem : public ecs::System
+		class TransformSystem : public ecs::System
 	{
 	public:
 		///Call this every frame
@@ -45,19 +45,23 @@ namespace engine
 
 				Transform& transform = ecs::GetComponent<Transform>(entity);
 				transform.staleCache = false;
+			}
+		}
 
-				//Verify children, kind of a bad system currently
-				for (ecs::Entity e : transform.children)
-				{
-					if (!ecs::EntityExists(e))
-						transform.children.erase(e);
-				}
-				//Verify parent, kind of a bad system currently
-				if (transform.parent != 0 && !ecs::EntityExists(transform.parent))
-				{
-					//If the parent is deleted delete the entity
-					ecs::DestroyEntity(entity);
-				}
+		//Destructor for the Transform component
+		static void OnTransformRemoved(ecs::Entity entity, Transform transform)
+		{
+			//Delete all children
+			for (ecs::Entity e : transform.children)
+			{
+				if (ecs::EntityExists(e))
+					ecs::DestroyEntity(e);
+			}
+			//Remove self from parent's children
+			if (ecs::EntityExists(transform.parent))
+			{
+				Transform& parentTransform = ecs::GetComponent<Transform>(transform.parent);
+				parentTransform.children.erase(entity);
 			}
 		}
 

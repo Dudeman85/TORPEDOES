@@ -203,7 +203,7 @@ namespace engine
 			//Create the primitive object from vertice data
 			return Primitive(vertices, indices);
 		}
-
+		///Number of vertices
 		unsigned int numVertices = 0;
 		unsigned int VAO, VBO, EBO;
 		static Shader* defaultShader;
@@ -211,25 +211,32 @@ namespace engine
 
 	Shader* Primitive::defaultShader = nullptr;
 
-	///Primitive Renderer Component
-	///They consist of only a primitive shape and a color, no texture
+	
 	ECS_REGISTER_COMPONENT(PrimitiveRenderer)
+	///Primitive Renderer Component, They consist of only a primitive shape and a color, no texture
 	struct PrimitiveRenderer
 	{
+		///Pointer
 		Primitive* primitive = nullptr;
+		///Color of the shapes
 		Vector3 color;
+		///Draw wireframes on objects
 		bool wireframe = false;
+		///Lock the X and Y of the shapes
 		bool lockXYRotation = false;
+		///Bool to turn primitive render on and off
 		bool enabled = true;
+		///Bool to turn ui elements on and off
 		bool uiElement = false;
 	};
 
-	///Primitive Render system
-	///Requires PrimitiveRenderer and Transform
+
 	ECS_REGISTER_SYSTEM(PrimitiveRenderSystem, Transform, PrimitiveRenderer)
+	///Primitive Render system, Requires PrimitiveRenderer and Transform
 	class PrimitiveRenderSystem : public ecs::System
 	{
 	public:
+		///Initialize the shaders
 		void Init()
 		{
 			//The default 3D model shader
@@ -265,7 +272,7 @@ namespace engine
 
 			Primitive::defaultShader = defaultShader;
 		}
-
+		///Call this every frame
 		void Update(Camera* cam)
 		{
 			//For each entity
@@ -342,7 +349,7 @@ namespace engine
 			//Unbind vertex array
 			glBindVertexArray(0);
 		}
-
+		///Pointer to store the shader
 		Shader* defaultShader;
 	};
 }

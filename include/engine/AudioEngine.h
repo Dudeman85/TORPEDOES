@@ -6,46 +6,62 @@
 class AudioEngine;
 
 using engine::Vector3;
-
+///Class to create and store audio data
 class Audio
 {
 public:
+	///Constructor
 	Audio(AudioEngine* owningEngine, std::string soundName, bool loop, float volume, Vector3 location);
 	~Audio();
-
-	void play();									// Starts audio from beginning
-	void pause();									// Pauses audio, can be continued
-	void unpause();									// Continues audio from pause
-	void stop();									// Stops the audio completely
-	const bool getPlaying();						// Gets audio playing status
-
-	void setSound(const std::string& fileName);		// Sets audio file to play
-	void setVolume(float NewVolume);				// Sets audio volume
-	const float getVolume();						// Gets audio volume
-	void addVolume(float AddVolume);				// Adds audio volume
-	void setLoop(bool Loop);						// Sets audio looping status
-	const bool getLoop();							// Gets audio looping status
-	const bool getAtEnd();							// Gets audio completion status
-	void setDirection(Vector3 Location);			// Sets the absolute direction the sound is coming from headphone's perspective, distance lowers volume
-	const Vector3 getDirection();					// Gets the absolute direction the sound is coming from headphone's perspective, distance lowers volume
+	///Starts audio from beginning
+	void play();		
+	///Pauses audio, can be continued
+	void pause();	
+	///Continues audio from pause
+	void unpause();			
+	///Stops the audio completely
+	void stop();	
+	///Gets audio playing status
+	const bool getPlaying();						
+	///Sets audio file to play
+	void setSound(const std::string& fileName);		
+	///Sets audio volume
+	void setVolume(float NewVolume);	
+	///Gets audio volume
+	const float getVolume();	
+	///Adds audio volume
+	void addVolume(float AddVolume);		
+	///Sets audio looping status
+	void setLoop(bool Loop);		
+	///Gets audio looping status
+	const bool getLoop();	
+	///Gets audio completion status
+	const bool getAtEnd();	
+	///Sets the absolute direction the sound is coming from headphone's perspective, distance lowers volume
+	void setDirection(Vector3 Location);	
+	///Gets the absolute direction the sound is coming from headphone's perspective, distance lowers volume
+	const Vector3 getDirection();					
 
 private:
 	AudioEngine* owner;								// AudioEngine which owns this audio TODO: Remove
 	ma_sound* audioSound = nullptr;
 };
 
+///Class to store audio engine data
 class AudioEngine
 {
 public:
+	///Constructor
 	AudioEngine(float ambientVolume = 1);
 	~AudioEngine();
-
+	///Plays an audio with selected audio file, returns a pointer to the audio. Non-looping audios are removed upon finishing.
 	Audio* createAudio(std::string soundName, bool loop = false, float volume = 1, Vector3 location = {0,0,0}); // Plays an audio with selected audio file, returns a pointer to the audio. Non-looping audios are removed upon finishing.
-	
-	void setAmbientVolume(float newVolume);			// Sets the ambient volume
-	const float getAmbientVolume();					// Gets the ambient volume
-
-	ma_engine soundEngine;							// miniaudio engine
+	///Sets the ambient volume
+	void setAmbientVolume(float newVolume);
+	///Gets the ambient volume
+	const float getAmbientVolume();					
+	///miniaudio engine
+	ma_engine soundEngine;							
 
 private:
 	float ambientVolume;							// Engine's volume, decrease to affect all audios played from it

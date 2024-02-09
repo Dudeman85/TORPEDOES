@@ -9,6 +9,7 @@
 //STL
 #include <vector>
 #include <set>
+#include <functional>
 
 //Engine
 #include <engine/ECS.h>
@@ -44,9 +45,7 @@ namespace engine
 			assert(animationTextures.size() == animationDelays.size() && "Failed to create animation! Number of frames and delays do not match!");
 			
 			textures = animationTextures;
-			
 			delays = animationDelays;
-			
 			length = animationDelays.size();
 		};
 		std::vector<Texture*> textures;
@@ -66,6 +65,8 @@ namespace engine
 		bool playingAnimation = false;
 
 		float animationTimer = 0;
+
+		std::function<void(ecs::Entity)> onAnimationEnd;
 	};
 
 	///2D Sprite Render system, Requires SpriteRenderer and Transform
@@ -319,8 +320,9 @@ namespace engine
 			deltaTime *= 1000;
 
 			//For each entity that has the required components
-			for (auto const& entity : entities)
+			for (auto itr = entities.begin(); itr != entities.end();)
 			{
+				ecs::Entity entity = *itr++;
 				//Get the relevant components from entity
 				Animator& animator = ecs::GetComponent<Animator>(entity);
 
@@ -362,6 +364,9 @@ namespace engine
 				{
 					animator.playingAnimation = false;
 					animator.currentAnimation = "";
+					//Call callback if applicable
+					if(animator.onAnimationEnd)
+						animator.onAnimationEnd(entity);
 					return;
 				}
 			}

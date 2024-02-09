@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.10.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: engine::Connection Struct Reference</title>
+<title>Tiimi Arkade: engine::Connection Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,8 +27,9 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project<span id="projectnumber">&#160;0.2</span>
+   <div id="projectname">Tiimi Arkade<span id="projectnumber">&#160;0.2</span>
    </div>
+   <div id="projectbrief">TORPEDOES!!! pelimoottori docs</div>
   </td>
  </tr>
  </tbody>
@@ -97,26 +98,38 @@ $(function(){initNavTree('structengine_1_1_connection.html',''); initResizable()
   <div class="headertitle"><div class="title">engine::Connection Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Struct to store connection data.  
+ <a href="#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_networking_8h_source.html">Networking.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:aa4251c1b5da4be188d92ac6c65877575" id="r_aa4251c1b5da4be188d92ac6c65877575"><td class="memItemLeft" align="right" valign="top"><a id="aa4251c1b5da4be188d92ac6c65877575" name="aa4251c1b5da4be188d92ac6c65877575"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>closed</b> = true</td></tr>
+<tr class="memdesc:aa4251c1b5da4be188d92ac6c65877575"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bool that turns the connection on and off. <br /></td></tr>
 <tr class="separator:aa4251c1b5da4be188d92ac6c65877575"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a88844d2ec5ba0dcb4ccc80640a8d34ab" id="r_a88844d2ec5ba0dcb4ccc80640a8d34ab"><td class="memItemLeft" align="right" valign="top"><a id="a88844d2ec5ba0dcb4ccc80640a8d34ab" name="a88844d2ec5ba0dcb4ccc80640a8d34ab"></a>
 ENetHost *&#160;</td><td class="memItemRight" valign="bottom"><b>host</b> = 0</td></tr>
+<tr class="memdesc:a88844d2ec5ba0dcb4ccc80640a8d34ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a host for the clients to connect to. <br /></td></tr>
 <tr class="separator:a88844d2ec5ba0dcb4ccc80640a8d34ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acd8ca25fee87b63d392cd7fbfe39d790" id="r_acd8ca25fee87b63d392cd7fbfe39d790"><td class="memItemLeft" align="right" valign="top"><a id="acd8ca25fee87b63d392cd7fbfe39d790" name="acd8ca25fee87b63d392cd7fbfe39d790"></a>
 std::vector&lt; ENetPeer * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>peers</b></td></tr>
+<tr class="memdesc:acd8ca25fee87b63d392cd7fbfe39d790"><td class="mdescLeft">&#160;</td><td class="mdescRight">List of the clients. <br /></td></tr>
 <tr class="separator:acd8ca25fee87b63d392cd7fbfe39d790"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd4ea1d2479954655aa54afac0087ac5" id="r_abd4ea1d2479954655aa54afac0087ac5"><td class="memItemLeft" align="right" valign="top"><a id="abd4ea1d2479954655aa54afac0087ac5" name="abd4ea1d2479954655aa54afac0087ac5"></a>
 <a class="el" href="structengine_1_1_message.html">Message</a>&#160;</td><td class="memItemRight" valign="bottom"><b>msgBuffer</b></td></tr>
+<tr class="memdesc:abd4ea1d2479954655aa54afac0087ac5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reference to the <a class="el" href="structengine_1_1_message.html" title="A packet to send over an enet connection.">Message</a> struct. <br /></td></tr>
 <tr class="separator:abd4ea1d2479954655aa54afac0087ac5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56c6a578df79a0221b11ec6012b9f0cc" id="r_a56c6a578df79a0221b11ec6012b9f0cc"><td class="memItemLeft" align="right" valign="top"><a id="a56c6a578df79a0221b11ec6012b9f0cc" name="a56c6a578df79a0221b11ec6012b9f0cc"></a>
 ENetAddress&#160;</td><td class="memItemRight" valign="bottom"><b>address</b></td></tr>
+<tr class="memdesc:a56c6a578df79a0221b11ec6012b9f0cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Store the address. <br /></td></tr>
 <tr class="separator:a56c6a578df79a0221b11ec6012b9f0cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/>The documentation for this struct was generated from the following file:<ul>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Struct to store connection data. </p>
+</div><hr/>The documentation for this struct was generated from the following file:<ul>
 <li>C:/Users/matiasrek/source/repos/teamarkademoottori/team5/include/engine/<a class="el" href="_networking_8h_source.html">Networking.h</a></li>
 </ul>
 </div><!-- contents -->
