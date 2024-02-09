@@ -523,7 +523,7 @@ namespace engine::ecs
 	}
 
 	//Destroys all entities without the "persistent" tag along with all their components.
-	//If ignorePersistent is set to true, will also delete "persistent" entities
+	//If ignorePersistent is set to true, will also delete "persistent" entities.
 	void DestroyAllEntities(bool ignorePersistent = false)
 	{
 		//Make a copy of the entities set to prevent iterator breaking

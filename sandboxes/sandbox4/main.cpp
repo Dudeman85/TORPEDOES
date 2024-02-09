@@ -13,7 +13,6 @@ ecs::Entity entity2;
 
 int level = 0;
 
-	//Load some sprites
 Texture* strawberry;
 
 //Load some models

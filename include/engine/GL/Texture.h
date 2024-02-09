@@ -82,12 +82,12 @@ namespace engine
 
 				//Image data is no longer needed
 				stbi_image_free(imageData);
-		}
+			}
 			else
 			{
 				std::cout << "Error loading texture from " << path << std::endl;
 			}
-	}
+		}
 		///Declare the constuctor through image. It is defined in Image.h
 		inline Texture(Image image, unsigned int filteringType = GL_NEAREST);
 
@@ -125,5 +125,5 @@ namespace engine
 		std::string type = "";
 	private:
 		unsigned int id = 0;
-};
+	};
 }
