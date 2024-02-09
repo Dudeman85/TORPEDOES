@@ -174,11 +174,11 @@ int main()
 	ecs::Entity torpIndicator1 = ecs::NewEntity();
 	//ecs::AddComponent(torpIndicator1, TextRenderer{ .font = &stencilFont, .text = playerNames[0], .offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 	ecs::AddComponent(torpIndicator1, SpriteRenderer{ .texture = &torprdytexture});
-	ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(18, 3, 8) });
+	ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(15, 15, 8) });
 	
 	ecs::Entity torpIndicator2 = ecs::NewEntity();
 	ecs::AddComponent(torpIndicator2, SpriteRenderer{ .texture = &torprdytexture});
-	ecs::AddComponent(torpIndicator2, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(18, 3, 8) });
+	ecs::AddComponent(torpIndicator2, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(15, 15, 8) });
 
 	ecs::Entity torpIndicator3 = ecs::NewEntity();
 	ecs::AddComponent(torpIndicator3, TextRenderer{ .font = &stencilFont, .text = playerNames[1], .offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
@@ -236,7 +236,7 @@ int main()
 	ecs::Entity countdown = ecs::NewEntity();
 	ecs::AddComponent(countdown, Transform{ .position = Vector3(1475, -1270, 10), .scale = Vector3(60, 100, 0) });
 	ecs::AddComponent(countdown, SpriteRenderer{});
-	ecs::AddComponent(countdown, Animator{});
+	ecs::AddComponent(countdown, Animator{ .onAnimationEnd = ecs::DestroyEntity });
 	AnimationSystem::AddAnimation(countdown, countdownAnim, "CountDown");
 	AnimationSystem::PlayAnimation(countdown, "CountDown", false);
 	
@@ -282,9 +282,9 @@ int main()
 		
 		Transform& p1Transform = ecs::GetComponent<Transform>(laMuerte);
 		Transform& torpIconLoc1 = ecs::GetComponent<Transform>(torpIndicator1);
-		torpIconLoc1.position = Vector3(p1Transform.position.x - 5, p1Transform.position.y-18, 200);
+		torpIconLoc1.position = Vector3(p1Transform.position.x + 5, p1Transform.position.y-18, 200);
 		Transform& torpIconLoc2 = ecs::GetComponent<Transform>(torpIndicator2);
-		torpIconLoc2.position = Vector3(p1Transform.position.x - 5, p1Transform.position.y - 25, 200);
+		torpIconLoc2.position = Vector3(p1Transform.position.x - 25, p1Transform.position.y - 18, 201);
 		SpriteRenderer& torpIcon1 = ecs::GetComponent<SpriteRenderer>(torpIndicator1);
 		SpriteRenderer& torpIcon2 = ecs::GetComponent<SpriteRenderer>(torpIndicator2);
 		// UI System 				

@@ -320,8 +320,9 @@ namespace engine
 			deltaTime *= 1000;
 
 			//For each entity that has the required components
-			for (auto const& entity : entities)
+			for (auto itr = entities.begin(); itr != entities.end();)
 			{
+				ecs::Entity entity = *itr++;
 				//Get the relevant components from entity
 				Animator& animator = ecs::GetComponent<Animator>(entity);
 
