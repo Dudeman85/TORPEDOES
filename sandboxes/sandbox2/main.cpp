@@ -1,5 +1,7 @@
 #include <engine/Application.h>
 #include <engine/Tilemap.h>
+// tmxlite debugging
+//#include <engine/NewTilemap.h>
 
 int main()
 {
@@ -13,6 +15,9 @@ int main()
 
 	engine::SpriteRenderSystem::SetBackgroundColor(0, 150, 0);
 
+
+	//Tilemap map;
+	//map.setup("Tiled/tilemaps/TestMap.tmx");
 	Tilemap map(&cam);
 	map.loadMap("Tiled/tilemaps/TestMap.tmx");
 	engine::spriteRenderSystem->SetTilemap(&map);
@@ -24,7 +29,7 @@ int main()
 			glfwSetWindowShouldClose(window, true);
 		}
 
-		engine::Update(&cam);
+		//engine::Update(&cam);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

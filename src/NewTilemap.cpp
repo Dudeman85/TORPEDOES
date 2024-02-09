@@ -27,28 +27,17 @@ source distribution.
 
 #include <engine/NewTilemap.h>
 
-// Constructor
-Tilemap::Tilemap()
+void Tilemap::setup(const string tilemap)
 {
-
-}
-
-// Destructor
-Tilemap::~Tilemap()
-{
-
-}
-
-// load() Function to load Tilemap and it's tileset
-void load(const string map)
-{
-	Map tiledmap;
-	tiledmap.load(assetPath + map);
-}
-
-// draw() Function to go through all layers and
-// draws them on the screen
-void draw()
-{
-
+	// map variable for tmx::Map functions
+	tmx::Map map;
+	// load() function to get our tilemap
+	map.load(assetPath + tilemap);
+	// our tilemap properties
+	const auto& tilemapProp = map.getProperties();
+	// printing out all properties
+	for (const auto& prop : tilemapProp)
+	{
+		std::cout << "Tilemaps property: " << prop.getName() << "Timemaps property's value: " << prop.getStringValue() << endl;
+	}
 }
