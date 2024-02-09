@@ -1,22 +1,35 @@
 //Author Sauli Hanell 2.1.2024 
 #include <engine/Application.h>
 #include <functional>
-
 #include "BulletSystem.h"
 #include "MenuSystem.h"
 
-#include "engine/Input.h"
 
+bool DoActionOnesWhenInputIsDown(int GLFW_KEY, bool& key, GLFWwindow* window, std::function<void(int)> action)
+{
+
+    if (key && glfwGetKey(window, GLFW_KEY) == GLFW_PRESS)
+    {
+
+        key = false;
+        action(GLFW_KEY);
+
+    }
+    else if (glfwGetKey(window, GLFW_KEY) == GLFW_RELEASE) key = true;
+
+
+    return key;
+}
 
 void OnSpacePressed(int a)
 {
 
 }
- static void OnPausePressed(int a)  //pause menu
+static void OnPausePressed(int a)  //pause menu
 {
-     printf("HERE IN ON PRESSED P\n");
+    printf("HERE IN ON PRESSED P\n");
 
-     ecs::GetSystem<PauseSystem>()->ToggleShowUIMenu();
+    ecs::GetSystem<PauseSystem>()->ToggleShowUIMenu();
 
 
 }
@@ -422,13 +435,13 @@ void shoot(auto& player, auto& bulletTexture, auto PlayerMonster)
     vector<Vector2> verts{ Vector2(1,1),Vector2(1,-1),Vector2(-1,-1),Vector2(-1,1) };
     ecs::AddComponent(pause, new PolygonCollider{ .vertices = verts });
     ecs::AddComponent(pause, new Rigidbody{ .velocity = TransformSystem::UpVector(PlayerMonster) * 990 / 10, .restitution = 1 });
-    
+
 }
 //create points that tell distance to world origin
-void CreatePoints(auto ) 
+void CreatePoints(auto)
 {
     ecs::Entity points = ecs::NewEntity();
-    ecs::AddComponent(points, new Transform{ .position =  Vector3(0,0,0),  .scale = Vector3(10) });
+    ecs::AddComponent(points, new Transform{ .position = Vector3(0,0,0),  .scale = Vector3(10) });
     //ecs::AddComponent(points, new SpriteRenderer{ .texture = &bulletTexture });
 }
 int main()
@@ -440,14 +453,14 @@ int main()
     //Parameters define window size(x,y) and name
     GLFWwindow* window = engine::CreateGLWindow(1800, 1600, "Window");
 
-    bool OnPPressed  = false;
-    bool spacePressed = false, upArrowPressed = false,downArrowPressed = false;
+    bool OnPPressed = false;
+    bool spacePressed = false, upArrowPressed = false, downArrowPressed = false;
 
-   // DoActionOnesWhenInputIsDown(GLFW_KEY_SPACE, spacePressed, window, OnSpacePressed);
-   
+    // DoActionOnesWhenInputIsDown(GLFW_KEY_SPACE, spacePressed, window, OnSpacePressed);
 
 
-    //Initialize the engine, this must be called after creating a window
+
+     //Initialize the engine, this must be called after creating a window
     engine::EngineInit();
 
     //Create the camera
@@ -509,14 +522,14 @@ int main()
     std::shared_ptr<PauseSystem> pauseSystem = ecs::GetSystem<PauseSystem>();
     pauseSystem->Init();
     ecs::Entity pause = ecs::NewEntity();
-    
+
     bool readyToShoot = true;
 
     //Add the transform and SpriteRenderer components required for rendering a sprite
     ecs::AddComponent(strawberry, Transform{ .position = Vector3(0, 40, 0), .rotation = Vector3(0, 0, 45), .scale = Vector3(10) });
     ecs::AddComponent(strawberry, SpriteRenderer{ .texture = &Selected_Texture });
 
-     ecs::AddComponent(PlayerMonster,Transform{ .position = Vector3(40, 40, 1), .rotation = Vector3(0, 0, 0), .scale = Vector3(10) });
+    ecs::AddComponent(PlayerMonster, Transform{ .position = Vector3(40, 40, 1), .rotation = Vector3(0, 0, 0), .scale = Vector3(10) });
     ecs::AddComponent(PlayerMonster, SpriteRenderer{ .texture = &monsterTexture });
 
     ecs::AddComponent(UI_BG_Test, Transform{ .position = Vector3(0,0,0), .rotation = Vector3(0, 0, 0), .scale = Vector3(500) });
@@ -526,10 +539,10 @@ int main()
     ecs::AddComponent(wall, Transform{ .position = Vector3(-10, 40, 1), .rotation = Vector3(0, 0, 0), .scale = Vector3(10,20) });
     vector<Vector2> wallVerts{ Vector2(2,2),Vector2(2,-2),Vector2(-2,-2),Vector2(-2,2) };
 
-    ecs::AddComponent(wall,  Rigidbody{ .mass = INFINITY, .gravityScale = 0, .restitution = 0, .kinematic = true });
+    ecs::AddComponent(wall, Rigidbody{ .mass = INFINITY, .gravityScale = 0, .restitution = 0, .kinematic = true });
 
-    ecs::AddComponent(wall,  PolygonCollider{ .vertices = wallVerts,  .visualise = true });
-    ecs::AddComponent(wall,  SpriteRenderer{ .texture = &wallTexture });
+    ecs::AddComponent(wall, PolygonCollider{ .vertices = wallVerts,  .visualise = true });
+    ecs::AddComponent(wall, SpriteRenderer{ .texture = &wallTexture });
     //Game Loop
     while (!glfwWindowShouldClose(window))
     {
@@ -667,9 +680,5 @@ int main()
         glfwPollEvents();
     }
 
-    // Clean up GLFW
-    glfwDestroyWindow(window);
     glfwTerminate();
-
-    return 0;
 }
