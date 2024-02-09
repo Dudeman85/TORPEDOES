@@ -11,9 +11,7 @@ namespace engine
 	{
 		Model* model;
 		Shader* shader;
-		//std::vector<Texture>* textures; // save multiple textures
-		//Texture* defaultTexture;
-		//ModelRenderer() = default; // now this does nothing
+		
 	};
 
 	//3D Model Render System, requires Transform and ModelRenderer
