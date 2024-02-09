@@ -156,9 +156,13 @@ ecs::RemoveTag(entity, "b");
 ecs::RemoveAllTags(entity);
 //Gets the list of tags of an entity
 std::vector<std::string> tags = ecs::GetTags(entity);
+//Check if entity has a specific tag
+bool isPersistent = ecs::HasTag(entity, "persistent")
 ```
 
-You can also destroy all entities. This is useful when unloading a level
+You can also destroy all entities. This is useful when unloading a level.
 ```cpp
-
+//Destroys all entities without the "persistent" tag along with all their components.
+//If ignorePersistent is set to true, will also delete "persistent" entities.
+ecs::DestroyAllEntities(false);
 ```
