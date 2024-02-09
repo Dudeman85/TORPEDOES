@@ -13,12 +13,12 @@ namespace engine
 		Model* model;
 		///Stores shader data
 		Shader* shader;
-<<<<<<< HEAD
+
+		//std::vector<Texture>* textures; // save multiple textures
+		//Texture* defaultTexture;
+		//ModelRenderer() = default; // now this does nothing
+
 		
-=======
-		///Stores texture data
-		Model* Texture;
->>>>>>> 2639060e0856724c870c434c96f78ff7d0c2c40c
 	};
 
 	///3D Model Render System, requires Transform and ModelRenderer
@@ -89,13 +89,10 @@ namespace engine
 				}
 				)", false);
 		}
-<<<<<<< HEAD
+
 	
-
-
-=======
 		///Call this every frame
->>>>>>> 2639060e0856724c870c434c96f78ff7d0c2c40c
+
 		void Update(Camera* cam)
 		{
 			//For each entity
