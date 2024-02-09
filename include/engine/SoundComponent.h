@@ -17,7 +17,7 @@ ECS_COMPONENT(SoundComponent)
 {
 	// unnecessary
 };
-
+///Redundant sound system struct
 struct SoundSystem : public System
 {
 private:

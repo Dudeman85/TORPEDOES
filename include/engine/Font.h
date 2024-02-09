@@ -15,26 +15,32 @@
 using namespace std;
 using namespace engine;
 
+///Struct to store data about the characters
 struct Character
 {
+	///Automatic ID for every character
 	unsigned int TextureID;
+	///The size of the characters
 	glm::ivec2 Size;
+	///The rotation of the characters
 	glm::ivec2 Bearing;
 	unsigned int Advance;
 };
 
 namespace engine
 {
+	///Class to create and store data for the font
 	class Font
 	{
 	public:
-		// Constructor
+		/// Constructor
 		Font(std::string filepathname, FT_Long face_index, FT_UInt pixel_width, FT_UInt pixel_height);
 
 		// Destructor
 		~Font();
 
 		unsigned int VAO, VBO;
+		///A map of all the characters
 		map<GLchar, Character> characters;
 
 	private:

@@ -24,13 +24,13 @@
 */
 var NAVTREE =
 [
-  [ "My Project", "index.html", [
+  [ "Tiimi Arkade", "index.html", [
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],
       [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
       [ "Class Members", "functions.html", [
-        [ "All", "functions.html", null ],
+        [ "All", "functions.html", "functions_dup" ],
         [ "Functions", "functions_func.html", null ],
         [ "Variables", "functions_vars.html", null ]
       ] ]
@@ -43,7 +43,8 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"_application_8h_source.html"
+"_application_8h_source.html",
+"structengine_1_1_rigidbody.html#ac6e6fce26e54e8170f63ff205bec8fa8"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

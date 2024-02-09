@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['rectangle_0',['Rectangle',['../classengine_1_1_primitive.html#ac0c433704760f24010ce19fe0c376f9d',1,'engine::Primitive']]],
-  ['removeparent_1',['RemoveParent',['../classengine_1_1_transform_system.html#acd6bba5f6c68c5fb4c00c4834535edfa',1,'engine::TransformSystem']]],
-  ['rightvector_2',['RightVector',['../classengine_1_1_transform_system.html#a75f038696d7a465c822809f7a2c004f7',1,'engine::TransformSystem']]],
-  ['rotate_3',['Rotate',['../classengine_1_1_transform_system.html#a2f297c5f0c789908268f54bddf8bd024',1,'engine::TransformSystem::Rotate(ecs::Entity entity, float dx, float dy, float dz=0)'],['../classengine_1_1_transform_system.html#a418951b43459b5e15721046a76d64a6b',1,'engine::TransformSystem::Rotate(ecs::Entity entity, Vector3 dr)']]]
+  ['pause_0',['pause',['../class_audio.html#a82c1018cf778eccc8819acfb64be53b2',1,'Audio']]],
+  ['play_1',['play',['../class_audio.html#a2916f9015031bee9abb98adf0d83e7ee',1,'Audio']]],
+  ['playanimation_2',['PlayAnimation',['../classengine_1_1_animation_system.html#a736b19f5ce901fda00582fcdd501f247',1,'engine::AnimationSystem']]],
+  ['polygon_3',['Polygon',['../classengine_1_1_primitive.html#af13dbbfbe4303e39521cb12e90010e1e',1,'engine::Primitive::Polygon(std::vector&lt; Vector3 &gt; verts)'],['../classengine_1_1_primitive.html#a012a3a023c3744024b2e5ab002f53887',1,'engine::Primitive::Polygon(std::vector&lt; Vector2 &gt; verts)']]]
 ];
