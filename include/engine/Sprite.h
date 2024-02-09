@@ -9,6 +9,7 @@
 //STL
 #include <vector>
 #include <set>
+#include <functional>
 
 //Engine
 #include <engine/ECS.h>
@@ -44,9 +45,7 @@ namespace engine
 			assert(animationTextures.size() == animationDelays.size() && "Failed to create animation! Number of frames and delays do not match!");
 			
 			textures = animationTextures;
-			
 			delays = animationDelays;
-			
 			length = animationDelays.size();
 		};
 		std::vector<Texture*> textures;
@@ -66,6 +65,8 @@ namespace engine
 		bool playingAnimation = false;
 
 		float animationTimer = 0;
+
+		std::function<void(ecs::Entity)> onAnimationEnd;
 	};
 
 	///2D Sprite Render system, Requires SpriteRenderer and Transform
@@ -362,6 +363,9 @@ namespace engine
 				{
 					animator.playingAnimation = false;
 					animator.currentAnimation = "";
+					//Call callback if applicable
+					if(animator.onAnimationEnd)
+						animator.onAnimationEnd(entity);
 					return;
 				}
 			}

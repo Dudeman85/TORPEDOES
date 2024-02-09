@@ -176,7 +176,6 @@ public:
 		// Iterate through entities in the system
 		for (auto itr = entities.begin(); itr != entities.end();)
 		{
-			
 			//Get the entity and increment the iterator
 			ecs::Entity entity = *itr++;
 

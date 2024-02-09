@@ -34,14 +34,15 @@ int main()
     int height = 600;
     const char* title = "GLFW Key Callback Example";
 
+    GLFWwindow* window = CreateGLWindow(800, 600, "Window");
     // Initialize GLFW and create a window with a key callback
-    GLFWwindow* window = initializeGLFW(width, height, title);
+    //GLFWwindow* window = initializeGLFW(width, height, title);
     if (!window) {
         return -1;
     }
 
     input::initialize(window);
-    input::InputEvent* shootEvent = new input::InputEvent("shootEvent");
+   // input::InputEvent* shootEvent = new input::InputEvent("shootEvent");
     // TODO: Make an API for this, so no need to call "new"
 
     input::bindInput(GLFW_KEY_SPACE, {"shootEvent"});
@@ -56,6 +57,7 @@ int main()
         // DONE: Add & test InputButtons
         // DONE: Add InputEvents
         // DONE: Test inputEvents
+        /*
         if (shootEvent->isPressed())
         {
             std::cout << "shoot Event presed!\n";
@@ -63,7 +65,7 @@ int main()
         else
         {
             std::cout << "shoot Event not presed!\n";
-        }
+        }*/
         
         // DOING: Add & test InputAxis
        

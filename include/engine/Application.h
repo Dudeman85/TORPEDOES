@@ -61,6 +61,7 @@ namespace engine
 		primitiveRenderSystem = ecs::GetSystem<PrimitiveRenderSystem>();
 		primitiveRenderSystem->Init();
 		transformSystem = ecs::GetSystem<TransformSystem>();
+		ecs::SetComponentDestructor<Transform>(TransformSystem::OnTransformRemoved);
 	}
 
 	//Updates all default engine systems, calculates and returns delta time

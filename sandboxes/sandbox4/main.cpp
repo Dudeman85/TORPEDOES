@@ -47,19 +47,10 @@ void CreateLevel1(Camera* cam)
 
 	TransformSystem::AddParent(entity2, entity);
 }
-void DeleteLevel1()
+void UnloadLevel(bool everything = false)
 {
 	level = 0;
-	ecs::DestroyEntity(entity);
-	if (ecs::EntityExists(entity2))
-		ecs::DestroyEntity(entity2);
-	spriteRenderSystem->RemoveTilemap();
-	collisionSystem->RemoveTilemap();
-}
-void DeleteLevel2()
-{
-	level = 0;
-	ecs::DestroyEntity(entity);
+	ecs::DestroyAllEntities(everything);
 	spriteRenderSystem->RemoveTilemap();
 	collisionSystem->RemoveTilemap();
 }
@@ -80,6 +71,13 @@ void CreateLevel2(Camera* cam)
 	ecs::AddComponent(entity, Transform{ .position = Vector3(1, 0, 0), .rotation = Vector3(0, 0, 0), .scale = Vector3(30) });
 	ecs::AddComponent(entity, SpriteRenderer{ .texture = strawberry });
 	ecs::AddComponent(entity, Rigidbody{});
+	
+	//Create a new persistent entity
+	entity2 = ecs::NewEntity();
+	//Add the transform and SpriteRenderer components required for rendering a sprite
+	ecs::AddComponent(entity2, Transform{ .position = Vector3(500, 500, 0), .rotation = Vector3(0, 0, 90), .scale = Vector3(50) });
+	ecs::AddComponent(entity2, SpriteRenderer{ .texture = strawberry });
+	ecs::AddTag(entity2, "persistent");
 }
 
 void LoadModels()
@@ -123,20 +121,17 @@ int main()
 		//Getting basic input and moving
 		if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
 		{
-			DeleteLevel2();
+			UnloadLevel();
 			CreateLevel1(&cam);
 		}
 		if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 		{
-			DeleteLevel1();
+			UnloadLevel();
 			CreateLevel2(&cam);
 		}
 		if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
 		{
-			if(level == 1)
-				DeleteLevel1();
-			if(level == 2)
-				DeleteLevel2();
+			UnloadLevel(true);
 		}
 
 		//Update all engine systems, this usually should go last in the game loop
