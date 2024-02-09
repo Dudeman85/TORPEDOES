@@ -1518,6 +1518,8 @@ typedef void (* GLFWkeyfun)(GLFWwindow*,int,int,int,int);
  *
  *  @ingroup input
  */
+typedef void (*GLFWaxisfun)(int, int, float);
+
 typedef void (* GLFWcharfun)(GLFWwindow*,unsigned int);
 
 /*! @brief The function pointer type for Unicode character with modifiers
@@ -4544,6 +4546,8 @@ GLFWAPI void glfwSetCursor(GLFWwindow* window, GLFWcursor* cursor);
  *  @ingroup input
  */
 GLFWAPI GLFWkeyfun glfwSetKeyCallback(GLFWwindow* window, GLFWkeyfun callback);
+
+GLFWAPI GLFWaxisfun glfwSetAxisCallback(GLFWwindow* window, GLFWaxisfun callback);
 
 /*! @brief Sets the Unicode character callback.
  *

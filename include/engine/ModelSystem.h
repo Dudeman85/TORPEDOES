@@ -11,6 +11,7 @@ namespace engine
 	{
 		Model* model;
 		Shader* shader;
+		Model* Texture;
 	};
 
 	//3D Model Render System, requires Transform and ModelRenderer

@@ -36,7 +36,8 @@ int main()
 
     // Initialize GLFW and create a window with a key callback
     GLFWwindow* window = initializeGLFW(width, height, title);
-    if (!window) {
+    if (!window) 
+    {
         return -1;
     }
 
@@ -50,22 +51,27 @@ int main()
     while (!glfwWindowShouldClose(window)) 
     {
         // Process events
-        glfwPollEvents();
-        input::update(window);
+        //glfwPollEvents();
+        input::update();
 
         // DONE: Add & test InputButtons
         // DONE: Add InputEvents
-        // DONE: Test inputEvents
-        if (shootEvent->isPressed())
+        // DONE: Test InputEvents
+        std::string message = "";
+        if (shootEvent->isNewPress())
         {
-            std::cout << "shoot Event presed!\n";
+            message = " pressed";
         }
-        else
+        if (shootEvent->isNewRelease())
         {
-            std::cout << "shoot Event not presed!\n";
+            std::cout << " release";
         }
+        if(message.length() > 3)
+        std::cout << message << "\n";
+        // DONE: Add InputValue
+        // DOING: Test InputValue
         
-        // DOING: Add & test InputAxis
+        // TODO: Add & test InputAxis
        
         // TODO: Add & test InputAxisEvents
         // TODO: Add & test InputCustom

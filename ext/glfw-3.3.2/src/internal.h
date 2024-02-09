@@ -410,6 +410,7 @@ struct _GLFWwindow
         GLFWcursorenterfun      cursorEnter;
         GLFWscrollfun           scroll;
         GLFWkeyfun              key;
+        GLFWaxisfun             axis;
         GLFWcharfun             character;
         GLFWcharmodsfun         charmods;
         GLFWdropfun             drop;
@@ -569,6 +570,7 @@ struct _GLFWlibrary
     struct {
         GLFWmonitorfun  monitor;
         GLFWjoystickfun joystick;
+        GLFWaxisfun     axis;
     } callbacks;
 
     // This is defined in the window API's platform.h
