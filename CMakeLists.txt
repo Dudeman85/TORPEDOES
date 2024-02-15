@@ -57,13 +57,4 @@ target_include_directories(engine PUBLIC
 # Sandboxes
 if(ENGINE_BUILD_SANDBOXES)
 	add_subdirectory("sandboxes")
-	# Copy Assets
-	file(COPY "./sandboxes/sandbox1/assets" DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/sandboxes/sandbox1)
-	file(COPY "./sandboxes/sandbox2/assets" DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/sandboxes/sandbox2)
-	file(COPY "./sandboxes/sandbox3/assets" DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/sandboxes/sandbox3)
-	file(COPY "./sandboxes/sandbox4/assets" DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/sandboxes/sandbox4)
-	file(COPY "./sandboxes/sandbox5/assets" DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/sandboxes/sandbox5)
-	file(COPY "./sandboxes/sandbox6/assets" DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/sandboxes/sandbox6)
-	file(COPY "./sandboxes/sandbox7/assets" DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/sandboxes/sandbox7)
-	file(COPY "./sandboxes/TORPEDOES/assets" DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/sandboxes/TORPEDOES)
 endif()

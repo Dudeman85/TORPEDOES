@@ -10,56 +10,51 @@
 
 namespace engine
 {
-	//Collision Event struct, not a component
+	///Collision Event struct, not a component
 	struct Collision
 	{
 		enum class Type { miss, collision, trigger, tilemapCollision, tilemapTrigger };
 
 		Type type;
 
-		//The entity which instigated the collision
+		///The entity which instigated the collision
 		ecs::Entity a;
-		//The entity which was subject to the collision
-		//In a tilemap collision this will be the tile ID
+		///The entity which was subject to the collision, In a tilemap collision this will be the tile ID
 		ecs::Entity b;
 
-		//The point of collision, will always be a vertice of one collider
+		///The point of collision, will always be a vertice of one collider
 		Vector3 point;
-		//The normal of the collision surface, will always be the normal of a side of the other collider than point
+		///The normal of the collision surface, will always be the normal of a side of the other collider than point
 		Vector3 normal;
-		//Minimum Translation Vector is the smallest translation needed to end overlap
+		///Minimum Translation Vector is the smallest translation needed to end overlap
 		Vector3 mtv;
 	};
 
-	//Polygon Collider component
+	///Polygon Collider component
 	ECS_REGISTER_COMPONENT(PolygonCollider)
 	struct PolygonCollider
 	{
-		//The vertices of the polygon making up the collider, going clockwise
-		//The vertices must form a convex polygon
+		///The vertices of the polygon making up the collider, going clockwise. The vertices must form a convex polygon
 		std::vector<Vector2> vertices;
-		//Callback function on collision
+		///Callback function on collision
 		std::function<void(Collision)> callback;
-		//Should the collider only act as a trigger
+		///Should the collider only act as a trigger
 		bool trigger = false;
-		//Draw this collider
+		///Draw this collider
 		bool visualise = false;
-		//Override the rotation of the collider, (0-360)degrees
-		//This is useful if attaching a 2D collider to a 3D model
+		///Override the rotation of the collider, (0-360)degrees. This is useful if attaching a 2D collider to a 3D model
 		float rotationOverride = -1;
-		//The axis-aligned bounding box of the collider
-		//This is updated automatically and is set in world coordinates
+		//The axis-aligned bounding box of the collider. This is updated automatically and is set in world coordinates
 		std::array<float, 4> bounds;
 	};
 
-	//Collision System
-	//Requires Transform and PolygonCollider
+	///Collision System, Requires Transform and PolygonCollider
 	ECS_REGISTER_SYSTEM(CollisionSystem, Transform, PolygonCollider)
 	class CollisionSystem : public ecs::System
 	{
 	public:
 
-		//Called every frame
+		///Called every frame
 		void Update()
 		{
 			//For each entity
@@ -98,8 +93,7 @@ namespace engine
 			}
 		}
 
-		//Checks collision between entity a and every other entity
-		//Returns the collisions from the perspective of a
+		///Checks collision between entity a and every other entity, Returns the collisions from the perspective of a
 		std::vector<Collision> CheckCollision(ecs::Entity a)
 		{
 			Transform& aTransform = ecs::GetComponent<Transform>(a);
@@ -126,7 +120,7 @@ namespace engine
 			return collisions;
 		}
 
-		//Checks for collision between a tilemap collision layer and an entity
+		///Checks for collision between a tilemap collision layer and an entity
 		std::vector<Collision> CheckTilemapCollision(ecs:: Entity entity)
 		{
 			//If no tilemap collision layer is set return no collisions
@@ -199,7 +193,7 @@ namespace engine
 			return collisions;
 		}
 
-		//Check Entity-Entity collision, this will also call any callbacks
+		///Check Entity-Entity collision, this will also call any callbacks
 		static Collision CheckEntityCollision(ecs::Entity a, ecs::Entity b)
 		{
 			//Get relevant components from a and b
@@ -255,8 +249,7 @@ namespace engine
 			return Collision{ .type = Collision::Type::miss };
 		}
 
-		//Check SAT intersection between two convex polygons
-		//Expects Vertices to have Transforms applied
+		///Check SAT intersection between two convex polygons, Expects Vertices to have Transforms applied
 		static Collision SATIntersect(std::vector<Vector2> aVerts, std::vector<Vector2> bVerts)
 		{
 			//Calculate all axes to check
@@ -389,7 +382,7 @@ namespace engine
 			return collision;
 		}
 
-		//Checks if a and b bounds are intersecting
+		///Checks if a and b bounds are intersecting
 		static bool AABBIntersect(ecs::Entity a, ecs::Entity b)
 		{
 			//Get the bounds
@@ -400,7 +393,7 @@ namespace engine
 			return (aBounds[3] < bBounds[1] && aBounds[1] > bBounds[3] && aBounds[2] < bBounds[0] && aBounds[0] > bBounds[2]);
 		}
 
-		//Update the AABB of the polygon collider
+		///Update the AABB of the polygon collider
 		static void UpdateAABB(ecs::Entity entity)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -434,7 +427,7 @@ namespace engine
 			collider.bounds = bounds;
 		}
 
-		//Set the tilemap collision layer
+		///Set the tilemap collision layer
 		void SetTilemap(Tilemap* collisionTilemap)
 		{
 			if (collisionTilemap->collisionLayer.empty())
@@ -447,7 +440,13 @@ namespace engine
 			}
 		}
 
-		//Camera is needed for visualisation
+		///Removes the tilemap from collision
+		void RemoveTilemap()
+		{
+			tilemap = nullptr;
+		}
+
+		///Camera is needed for visualisation
 		Camera* cam = nullptr;
 
 	private:

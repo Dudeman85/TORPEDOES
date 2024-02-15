@@ -6,16 +6,17 @@ using namespace std;
 
 namespace engine
 {
-	//Struct representing a pixel's r, g, b, and a values
+	///Struct representing a pixel's Red, Green, Blue, and Alpha values
 	struct Pixel
 	{
 		unsigned char r, g, b, a;
 	};
 
-	//Image class basically just a 2d vector of rgba values
+	///Image class basically just a 2d vector of rgba values
 	class Image
 	{
 	public:
+		///Load the image data from a path
 		Image(std::string path)
 		{
 			//Dont flip the image when loading to an Image
@@ -51,7 +52,7 @@ namespace engine
 				std::cout << "Error loading texture from " << assetPath + path << std::endl;
 			}
 		}
-		//Construct an image from a 2D vector of pixels
+		///Construct an image from a 2D vector of pixels
 		Image(vector<vector<Pixel>> pixels)
 		{
 			width = pixels.size();
@@ -65,7 +66,7 @@ namespace engine
 			return pixmap[i];
 		}
 
-		//Returns the data of this imge in stbimage friendly format
+		///Returns the data of this imge in stbimage friendly format
 		unsigned char* data()
 		{
 			unsigned char* data = new unsigned char[width * height * 4];
@@ -83,7 +84,7 @@ namespace engine
 			return data;
 		}
 
-		//Get a subsection of pixels from x1 y1 top-left, to x2, y2 bottom-right (inclusive).
+		///Get a subsection of pixels from x1 y1 top-left, to x2, y2 bottom-right (inclusive).
 		Image Slice(int x1, int y1, int x2, int y2)
 		{
 			assert(x1 < x2&& y1 < y2 && "x1 and y1 must be less than x2 and y2!");
@@ -112,8 +113,9 @@ namespace engine
 
 			return Image(slice);
 		}
-
+		///the width of the image
 		int width;
+		///the height of the image
 		int height;
 	private:
 		int channels;

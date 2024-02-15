@@ -4,28 +4,87 @@
 //Sanity saver
 using namespace engine;
 
+//Add a deleteAllEntities function to ecs
+//Add an overridable exception to deleteAllEntities in the for of a "persistent" tag which prevents deletion
+//Game programmer defines functions with everything needed to load a level, which they can call after deleteAllEntities
 
-struct Foo
+ecs::Entity entity;
+ecs::Entity entity2;
+
+int level = 0;
+
+Texture* strawberry;
+
+//Load some models
+Model* ship;
+Tilemap* tilemap;
+
+void CreateLevel1(Camera* cam)
 {
-	int a;
-};
+	level = 1;
 
-struct Bar : public Foo
+	delete tilemap;
+	tilemap = new Tilemap(cam);
+	tilemap->loadMap("level1.tmx");
+	spriteRenderSystem->SetTilemap(tilemap);
+	collisionSystem->SetTilemap(tilemap);
+
+	//Create a new entity
+	entity = ecs::NewEntity();
+	//Add the transform and SpriteRenderer components required for rendering a sprite
+	ecs::AddComponent(entity, Transform{ .position = Vector3(10, 10, 0), .rotation = Vector3(54, 45, 0), .scale = Vector3(30) });
+	ecs::AddComponent(entity, SpriteRenderer{ .texture = strawberry });
+	ecs::AddComponent(entity, ModelRenderer{ .model = ship });
+	ecs::AddComponent(entity, Rigidbody{});
+
+	//Create a new entity
+	entity2 = ecs::NewEntity();
+	//Add the transform and SpriteRenderer components required for rendering a sprite
+	ecs::AddComponent(entity2, Transform{ .position = Vector3(0, 0, -10), .rotation = Vector3(90, 0, 0), .scale = Vector3(0.5) });
+	ecs::AddComponent(entity2, SpriteRenderer{ .texture = strawberry });
+	ecs::AddComponent(entity2, ModelRenderer{ .model = ship });
+
+	TransformSystem::AddParent(entity2, entity);
+}
+void UnloadLevel(bool everything = false)
 {
-	float b;
-	float* c;
+	level = 0;
+	ecs::DestroyAllEntities(everything);
+	spriteRenderSystem->RemoveTilemap();
+	collisionSystem->RemoveTilemap();
+}
 
-};
-
-void MakeStuff()
+void CreateLevel2(Camera* cam)
 {
-	for (size_t i = 0; i < 100000; i++)
-	{
-		ecs::Entity e = ecs::NewEntity();
-		ecs::AddComponent(e, Transform{ .position = Vector3(0, 0, -2), .rotation = Vector3(90, 0, 0), .scale = Vector3(0.5) });
+	level = 2;
 
-		ecs::DestroyEntity(e);
-	}
+	delete tilemap;
+	tilemap = new Tilemap(cam);
+	tilemap->loadMap("torptest.tmx");
+	spriteRenderSystem->SetTilemap(tilemap);
+	collisionSystem->SetTilemap(tilemap);
+
+	//Create a new entity
+	entity = ecs::NewEntity();
+	//Add the transform and SpriteRenderer components required for rendering a sprite
+	ecs::AddComponent(entity, Transform{ .position = Vector3(1, 0, 0), .rotation = Vector3(0, 0, 0), .scale = Vector3(30) });
+	ecs::AddComponent(entity, SpriteRenderer{ .texture = strawberry });
+	ecs::AddComponent(entity, Rigidbody{});
+	
+	//Create a new persistent entity
+	entity2 = ecs::NewEntity();
+	//Add the transform and SpriteRenderer components required for rendering a sprite
+	ecs::AddComponent(entity2, Transform{ .position = Vector3(500, 500, 0), .rotation = Vector3(0, 0, 90), .scale = Vector3(50) });
+	ecs::AddComponent(entity2, SpriteRenderer{ .texture = strawberry });
+	ecs::AddTag(entity2, "persistent");
+}
+
+void LoadModels()
+{
+	//Load some sprites
+	strawberry = new Texture("sandbox4/strawberry.png");
+	//Load some models
+	ship = new Model("sandbox4/Achelous.obj");
 }
 
 int main()
@@ -38,8 +97,8 @@ int main()
 	EngineInit();
 
 	//Create the camera
-	Camera cam = Camera(800, 600);
-	cam.perspective = true;
+	Camera cam = Camera(1600 * 4, 1200 * 4);
+	cam.perspective = false;
 
 	//Move the camera back a bit
 	cam.SetPosition(Vector3(0, 0, 1000));
@@ -47,72 +106,36 @@ int main()
 	//Set the bacground color
 	SpriteRenderSystem::SetBackgroundColor(0, 150, 0);
 
-	//Load some sprites
-	Texture strawberry("strawberry.png");
+	LoadModels();
 
-	//Load some models
-	Model ship("Achelous.obj");
-
-	//Create a new entity
-	ecs::Entity entity = ecs::NewEntity();
-	//Add the transform and SpriteRenderer components required for rendering a sprite
-	ecs::AddComponent(entity, Transform{ .position = Vector3(1, 0, 0), .rotation = Vector3(0, 0, 0), .scale = Vector3(30) });
-	ecs::AddComponent(entity, SpriteRenderer{ .texture = &strawberry });
-	ecs::AddComponent(entity, ModelRenderer{ .model = &ship });
-
-	//Create a new entity
-	ecs::Entity entity2 = ecs::NewEntity();
-	//Add the transform and SpriteRenderer components required for rendering a sprite
-	ecs::AddComponent(entity2, Transform{ .position = Vector3(0, 0, -2), .rotation = Vector3(90, 0, 0), .scale = Vector3(0.5) });
-	ecs::AddComponent(entity2, SpriteRenderer{ .texture = &strawberry });
-	ecs::AddComponent(entity2, ModelRenderer{ .model = &ship });
-
-	MakeStuff();
-
-	TransformSystem::AddParent(entity2, entity);
+	CreateLevel1(&cam);
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
-		Transform& t = ecs::GetComponent<Transform>(entity);
-
 		//Close window when Esc is pressed
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
 		//Getting basic input and moving
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-			TransformSystem::Translate(entity, Vector3(0, 2, 0));
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-			TransformSystem::Translate(entity, Vector3(-2, 0, 0));
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-			TransformSystem::Translate(entity, Vector3(0, -2, 0));
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-			TransformSystem::Translate(entity, Vector3(2, 0, 0));
-		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-			TransformSystem::Rotate(entity, Vector3(0, 0, -1));
-		if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-			TransformSystem::Rotate(entity, Vector3(0, 0, 1));
-		if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
-			TransformSystem::Rotate(entity, Vector3(1, 0, 0));
-		if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
-			TransformSystem::Rotate(entity, Vector3(-1, 0, 0));
-		if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
-			TransformSystem::Rotate(entity, Vector3(0, 1, 0));
-		if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
-			TransformSystem::Rotate(entity, Vector3(0, -1, 0));
-				
+		if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+		{
+			UnloadLevel();
+			CreateLevel1(&cam);
+		}
+		if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+		{
+			UnloadLevel();
+			CreateLevel2(&cam);
+		}
+		if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
+		{
+			UnloadLevel(true);
+		}
 
 		//Update all engine systems, this usually should go last in the game loop
 		Update(&cam);
-				
-		Primitive right = Primitive::Line(t.position, t.position + TransformSystem::RightVector(entity) * 200);
-		right.Draw(&cam, Vector3(0, 0, 255));
-		Primitive up = Primitive::Line(t.position, t.position + TransformSystem::UpVector(entity) * 200);
-		up.Draw(&cam, Vector3(255, 0, 0));
-		Primitive forward = Primitive::Line(t.position, t.position + TransformSystem::ForwardVector(entity) * 200);
-		forward.Draw(&cam, Vector3(0, 0, 0));
-		
+
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
 		glfwPollEvents();

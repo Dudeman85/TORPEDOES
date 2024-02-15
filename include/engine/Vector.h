@@ -6,17 +6,17 @@ const double PI = 3.14159265;
 
 namespace engine
 {
-	//Radians to degrees
+	///Radians to degrees
 	float Degrees(float radians);
 
-	//Degrees to radians
+	///Degrees to radians
 	float Radians(float degrees);
 
 	constexpr float comparisonPrecision = 0.0001f;
 
 	class Vector3;
 
-	//Two floats in one
+	///Two floats in one
 	class Vector2
 	{
 	public:
@@ -41,6 +41,7 @@ namespace engine
 		Vector2 operator-(const Vector2& sub);
 		Vector2& operator-=(const Vector2& sub);
 		//Multiply
+		// TODO: Replace use of "float" as templated type
 		Vector2 operator*(const float& mult);
 		Vector2 operator*(const Vector2& mult);
 		Vector2& operator*=(const float& mult);
@@ -50,6 +51,7 @@ namespace engine
 		Vector2 operator/(const Vector2& div);
 		Vector2& operator/=(const float& div);
 
+		// TODO: Add templated return type
 		float Length();
 		Vector2 Normalize();
 		Vector2 LeftNormal();
@@ -58,10 +60,11 @@ namespace engine
 
 		std::string ToString();
 
+		// TODO: Replace "float" as "double"
 		float x, y;
 	};
 
-	//Three floats in one
+	///Three floats in one
 	class Vector3
 	{
 	public:
@@ -111,7 +114,7 @@ namespace engine
 		float x, y, z;
 	};
 
-	//Four floats in one
+	///Four floats in one
 	class Vector4
 	{
 	public:

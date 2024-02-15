@@ -1,11 +1,14 @@
 #pragma once
 
+#include <thread>
 #include <optional>
 #include <map>
 #include <vector>
+#include <list>
+#include <cmath>
 
-#include <GLFW/glfw3.h>
-#include <iostream>
+#include "engine/Vector.h"
+#include "engine/Application.h"
 
 namespace input
 { 
@@ -24,100 +27,321 @@ namespace input
 		// Each update, only one press and one release input is reported; It is unnecessary to report more
 	};
 
+	enum class eventStates
+	{
+		Not,	// This staate is (still not on
+		On,		// This state is (still) on
+		NewOn	// This state was turned on
+	};
+
+	using engine::Vector2;
+	
+	// Handles a specified input's values by saving all values and timestamps in InputSamples.
+	// From this, we can calculate whether input has been in a specified value range within an update iteration.
+	// We can also calculate the time an input has spent in the specified value range.
+	// The InputSamples are written to from input callbacks.
+	// The old update iteration's InputSamples are cleared upon an update iteration start.
+	struct InputValue
+	{
+		// X is timestamp in relation to latest update iteration
+		// Y is value
+		// X starts out as 0 for first InputValue.
+		// X is set to the moment a callback to this input is reached. Y is set to value
+		using InputSample = Vector2;
+
+		std::list<InputSample> inputSamples;
+
+		float lastUpdatedTime; // Last time the inputValue was updated
+
+		InputValue(float startingValue = 0)
+		{
+			// First sample is 0, we assume the value is not changed
+			inputSamples.push_back({ 0,startingValue });
+			lastUpdatedTime = engine::deltaTime;
+		}
+
+		void update()
+		{
+			clearInputSamples();
+			lastUpdatedTime = engine::deltaTime;
+		}
+
+		// Called from a callback function
+		void addInputSample(float addValue)
+		{
+			inputSamples.push_back((engine::deltaTime - lastUpdatedTime, addValue));
+		};
+
+		void clearInputSamples()
+		{
+			if (inputSamples.size() <= 0)
+			{
+				return;
+			}
+			// Keep the latest sample
+			InputSample latestSample = *inputSamples.end();
+			// Set the latest sample to be before our 0 time, as it's from the last update iteration
+			latestSample.x = (engine::deltaTime - lastUpdatedTime) - latestSample.x;
+
+			inputSamples.clear();
+
+			inputSamples.push_back(latestSample);
+		};
+
+		const bool isValue(float targetValue)
+		{
+			// We need at least 2 samples
+			if (inputSamples.size() > 1)
+			{
+				// Loop throgh all inputValues to check if ANY have met the specified value
+				for (std::list<InputSample>::iterator it = inputSamples.begin(); it != inputSamples.end();)
+				{
+					if (findIntersectionTime(*it, *(++it), targetValue).has_value())
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		const bool isRange(float minimumValue, float maximumValue)
+		{
+			// We need at least 2 samples
+			if (inputSamples.size() > 1)
+			{
+				// Loop throgh all inputValues to check if ANY have met the specified value
+				for (std::list<InputSample>::iterator it = inputSamples.begin(); it != inputSamples.end();)
+				{
+					InputSample current = *it;
+					InputSample previous = *(++it);
+
+					// TODO: Unnecessarily expensive, we can just check InputSamples directly
+					if (findIntersectionTime(current, previous, minimumValue).has_value())
+					{
+						return true;
+					}
+					if(findIntersectionTime(current, previous, minimumValue).has_value())
+					{
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+
+		const float findTimeSpent(float targetValue)
+		{
+			// We need at least 2 samples
+			if (inputSamples.size() > 1)
+			{
+				return 0;
+			}
+
+			float timeSpent = 0;
+
+			// Loop throgh all inputValues and add their spent times together
+			for (std::list<InputSample>::iterator it = inputSamples.begin(); it != inputSamples.end();)
+			{
+				std::optional<float> time = findIntersectionTime(*it, *(++it), targetValue);
+
+				if (time.has_value())
+				{
+					timeSpent += time.value();
+				}
+			}
+
+			return timeSpent;
+		}
+
+		const static std::optional<float> findIntersectionTime(InputSample previousSample, InputSample currentSample, float targetValue)
+		{
+			float slope = (currentSample.y - previousSample.y) / (currentSample.x - previousSample.x);
+
+			float yIntercept = previousSample.y - (previousSample.x * slope);
+
+			float intersectionX = (targetValue - yIntercept) / slope;
+
+			// Value never reaches targetValue, or intersection happened before 0, meaning in the previous update iteration
+			if (!std::isfinite(intersectionX) || intersectionX < 0)
+			{
+				return std::nullopt;
+			}
+
+			return intersectionX;
+		}
+		const static std::optional<float> findIntersectionTimeSpent(InputSample previousSample, InputSample currentSample, float targetValue)
+		{
+			std::optional<float> targetX = findIntersectionTime(previousSample, currentSample, targetValue);
+			if (!targetX.has_value())
+			{
+				return std::nullopt;
+			}
+
+			return Vector2(std::abs(currentSample.x - targetX.value()), std::abs(currentSample.y - targetValue)).Length();
+		}
+	};
+	
+	class AnalogInputEvent;
+	class DigitalInputEvent;
+	
+	std::map<std::string, AnalogInputEvent*> nameToAnalogInputEvent;	// All AnalogInputEvents
+	std::map<std::string, DigitalInputEvent*> nameToDigitalInputEvent;	// All DigitalInputEvents
+
+	// Base InputEvent
 	class InputEvent
 	{
 	public:
+		InputEvent(std::string inputName) : name(inputName)
+		{
+
+		}
+
+	protected:
 		std::string name;
+	};
+
+	class AnalogInputEvent : public InputEvent
+	{
+	public:
+		AnalogInputEvent(std::string inputName) : InputEvent(inputName)
+		{
+			nameToAnalogInputEvent[name] = this;
+		}
+
+		std::vector<float*> outputValues;
+		float totalValue = 0;
+		bool totalValueUpdated = false;
+
+		void inputPollingFinished()
+		{
+			// We are not guaranteed to keep same totalValue, as we've finished input polling
+			totalValueUpdated = false;
+		}
+
+		const float getValue()
+		{
+			if (!totalValueUpdated)
+			{
+				// Update total value
+				float output = 0;
+				for (auto outputValue : outputValues)
+				{
+					output += *outputValue;
+				}
+				totalValue = output;
+				totalValueUpdated = true;
+			}
+			return totalValue;
+		}
+	};
+
+	class DigitalInputEvent : public InputEvent
+	{
+	public:
+		DigitalInputEvent(std::string inputName) : InputEvent(inputName)
+		{
+			nameToDigitalInputEvent[name] = this;
+		}
 
 		// Every output state of InputButton this is binded to
 		std::vector<InputState*> outputStates;
 
 		const bool isPressed()
 		{
-			return pressed;
+			return pressed != eventStates::Not;
 		}
 		const bool isReleased()
 		{
-			return released;
+			return released != eventStates::Not;
 		}
 		const bool isNewPress()
 		{
-			return (isPressed() && newChange);
+			return (pressed == eventStates::NewOn);
 		}
 		const bool isNewRelease()
 		{
-			return (isReleased() && newChange);
+			return (released == eventStates::NewOn);
 		}
 		const bool isChanged()
 		{
-			return newChange;
+			return (isNewPress() || isNewRelease());
 		}
 
-		void update()
+		// Before handling new events, we should refresh the event's state
+		void refreshState()
 		{
 			InputState newState = InputState::None;
-			pressed = false;
-			released = false;
-			newChange = false;
+			pressed = eventStates::Not;
+			released = eventStates::Not;
 
 			for (auto outputState : outputStates)
 			{
 				switch (*outputState)
 				{
 				case input::InputState::Released:
-					pressed = true;
+					if (released != eventStates::NewOn)
+					{ 
+						released = eventStates::On;
+					}
 					break;
 				case input::InputState::Pressed:
-					released = true;
+					if (pressed != eventStates::NewOn)
+					{
+						pressed = eventStates::On;
+					}
 					break;
 				case input::InputState::NewRelease:
-					released = true;
-					newChange = true;
+					released = eventStates::NewOn;
+					if (pressed == eventStates::NewOn)
+					{
+						return; // All states are on, testing cannot wield any changes
+					}
+					break;
 				case input::InputState::NewPress:
-					pressed = true;
-					newChange = true;
-				break;
+					pressed = eventStates::NewOn;
+					if (released == eventStates::NewOn)
+					{
+						return; // All states are on, testing cannot wield any changes
+					}
+					break;
 				case input::InputState::NewReleaseNewPress:
 				case input::InputState::NewPressNewRelease:
 					// Key was newly released and newly pressed last update
-					pressed = true;
-					released = true;
-					newChange = true;
+					pressed = eventStates::NewOn;
+					released = eventStates::NewOn;
+					return; // All states are on, testing cannot wield any changes
 					break;
 				default:
 					break;
 				}
-				if (newChange && pressed && released)
-				{
-					return; // All states are true, testing cannot wield any changes
-				}	
 			}
 		}
+	 
 
 	protected:
-		bool pressed = false;	// Whether key is pressed the update before this poll
-		bool released = false;	// Whether key is released the update before this poll
-		bool newChange = false;	// Whether key was changed the update before this poll
+		eventStates pressed = eventStates::Not;		// Whether key is pressed the update before this poll
+		eventStates released = eventStates::Not;	// Whether key is released the update before this poll
 	};
 
-	std::map<std::string, InputEvent*> nameToInputEvent;
+	class DigitalInput;
+	std::map<inputKey, DigitalInput*> inputKeytoDigitalInput;	// All DigitalInputs
 
-	class InputButton;
-	static std::vector<InputButton*> inputButtons;	// All inputButtons
-
-	class InputButton
+	class DigitalInput
 	{
 	public:
-		InputButton()
+		DigitalInput(inputKey key)
 		{
-			inputButtons.push_back(this);
+			//inputButtons.push_back(this);
+			inputKeytoDigitalInput[key] = this;
 		}
 
 		InputState buttonInputState = InputState::Released;		// Callback inputted state of key
 		InputState buttonOutputState = InputState::Released;	// Pollable state of key
 
-		// Polls the change in the key, returns whether to poll next update
-		void update()
+		// Check and handle the change in state
+		void checkStateChange()
 		{
 			if (buttonInputState == InputState::None)
 			{
@@ -151,147 +375,337 @@ namespace input
 		}
 
 		// Pressed/released logic
-		void callback(bool pressed)
+		void callback(int pressed)
 		{
-			if (pressed)
+			switch(pressed)
 			{
-				// Button is currently being pressed, what about other inputs this update cycle?
-				switch (buttonInputState)
-				{
-				case input::InputState::None:		// No input before: ignore
-				case input::InputState::Released:	// Should not be possible: ignore
-				case input::InputState::Pressed:	// Should not be possible: ignore
-				case input::InputState::NewPress:	// Same input: ignore
-					// There were no conflicting inputs: Set as new press:
-					buttonInputState = InputState::NewPress;
+				case GLFW_PRESS:
+					// Button is currently being pressed, what about other inputs this update cycle?
+					switch (buttonInputState)
+					{
+					case input::InputState::None:		// No input before: ignore
+					case input::InputState::Released:	// Should not be possible: ignore
+					case input::InputState::Pressed:	// Should not be possible: ignore
+					case input::InputState::NewPress:	// Same input: ignore
+						// There were no conflicting inputs: Set as new press:
+						buttonInputState = InputState::NewPress;
+						break;
+					case input::InputState::NewRelease:
+					case input::InputState::NewReleaseNewPress:
+					case input::InputState::NewPressNewRelease:
+						// Both inputs: Set as new new release, then new press:
+						buttonInputState = InputState::NewReleaseNewPress;
+						break;
+					default:
+						break;
+					}
 					break;
-				case input::InputState::NewRelease:
-				case input::InputState::NewReleaseNewPress:
-				case input::InputState::NewPressNewRelease:
-					// Both inputs: Set as new new release, then new press:
-					buttonInputState = InputState::NewReleaseNewPress;
+				case GLFW_RELEASE:
+					// Button is currently not being pressed, what about other inputs this update cycle?
+					switch (buttonInputState)
+					{
+					case input::InputState::None:		// No input before: ignore
+					case input::InputState::Released:	// Should not be possible: ignore
+					case input::InputState::Pressed:	// Should not be possible: ignore
+					case input::InputState::NewRelease:	// Same input: ignore
+						// There were no conflicting inputs: Set as new release:
+						buttonInputState = InputState::NewRelease;
+						break;
+					case input::InputState::NewPress:
+					case input::InputState::NewReleaseNewPress:
+					case input::InputState::NewPressNewRelease:
+						// Both inputs: Set as new new press, then new release:
+						buttonInputState = InputState::NewPressNewRelease;
+						break;
+					default:
+						break;
+					}
 					break;
 				default:
+					// Do not handle GLFW_REPEAT
 					break;
-				}
-			}
-			else
-			{
-				// Button is currently not being pressed, what about other inputs this update cycle?
-				switch (buttonInputState)
-				{
-				case input::InputState::None:		// No input before: ignore
-				case input::InputState::Released:	// Should not be possible: ignore
-				case input::InputState::Pressed:	// Should not be possible: ignore
-				case input::InputState::NewRelease:	// Same input: ignore
-					// There were no conflicting inputs: Set as new release:
-					buttonInputState = InputState::NewRelease;
-					break;
-				case input::InputState::NewPress:
-				case input::InputState::NewReleaseNewPress:
-				case input::InputState::NewPressNewRelease:
-					// Both inputs: Set as new new press, then new release:
-					buttonInputState = InputState::NewPressNewRelease;
-					break;
-				default:
-					break;
-				}
 			}
 		}
 	};
 
-	std::map<inputKey, InputButton*> inputKeyToInputButton;
-
-	static void unbindInput(InputButton* inputButton)
+	static void unbindInput(DigitalInput* inputButton)
 	{
 		// TODO:
 
 		// Find all events that use the button's buttonOutputState.
 		// Remove the button from them
+
+		// If inputButton has no uses, delete it (not necessary, if engine restarts, the button will not be initialized anymore)
 	}
 
-	static void bindInput(InputButton* inputButton, std::vector<InputEvent*> inputEvents)
+	static void bindDigitalInput(DigitalInput* inputButton, std::vector<DigitalInputEvent*> inputEvents)
 	{
+		// Bind all specified events to DigitalInput
 		for (auto inputEvent : inputEvents)
 		{
-			// Bind event to button
 			inputEvent->outputStates.push_back(&inputButton->buttonOutputState);
 		}
 	}
-	static void bindInput(inputKey key, std::vector<InputEvent*> inputEvents)
+	static void bindDigitalInput(inputKey key, std::vector<DigitalInputEvent*> inputEvents)
 	{
 		// Find inputKey
-		auto it = inputKeyToInputButton.find(key);
+		auto it = inputKeytoDigitalInput.find(key);
 
 		// Check if the key exists in the map
-		if (it != inputKeyToInputButton.end()) 
+		if (it != inputKeytoDigitalInput.end())
 		{
-			bindInput(it->second, inputEvents);
+			bindDigitalInput(it->second, inputEvents);
+		}
+		else
+		{
+			// Construct a new inputButton to bind
+			bindDigitalInput(new DigitalInput(key), inputEvents);
 		}
 	}
-	static void bindInput(inputKey key, std::vector<std::string> inputEventNames)
+	static void bindDigitalInput(inputKey key, std::vector<std::string> digitalInputEventNames)
 	{
-		std::vector<InputEvent*> inputEventsToBind;
+		std::vector<DigitalInputEvent*> digitalInputEventsToBind;
 
-		// Find by InputEvent name
-		for (const auto& inputEventName : inputEventNames)
+		// Find by DigitalInputEvent name
+		for (const auto& digitalInputEventName : digitalInputEventNames)
 		{
-			auto it = nameToInputEvent.find(inputEventName);
+			auto it = nameToDigitalInputEvent.find(digitalInputEventName);
 
-			// Check if the inputEvent's name exists in the map
-			if (it != nameToInputEvent.end()) 
+			// Check if the DigitalInputEvent's name exists in the map
+			if (it != nameToDigitalInputEvent.end())
 			{
-				std::cout << "Found matching InputEvent for " << inputEventName << std::endl;
-				inputEventsToBind.push_back(it->second);
+				digitalInputEventsToBind.push_back(it->second);
 			}
 			else 
 			{
-				std::cout << "WARNING: No matching InputEvent found for " << inputEventName << std::endl;
+				std::cout << "WARNING: No matching DigitalInputEvent found for " << digitalInputEventName << std::endl;
 			}
 		}
 
-		bindInput(key, inputEventsToBind);
+		bindDigitalInput(key, digitalInputEventsToBind);
+	}
+
+	class AnalogInput;
+	std::map<int, AnalogInput*> joystickToAnalogInput;	// All AnalogInputs
+
+	class AnalogInput
+	{
+	public:
+		// n-dimensional analog input
+		std::map<int, float> axisToValue;
+
+		float min = -1;
+		float max = 1;
+
+		AnalogInput(float joystick)
+		{
+			joystickToAnalogInput[joystick] = this;
+		}
+
+		void setAxis(int axis, float value)
+		{
+			axisToValue[axis] = std::clamp(value, min, max);
+		}
+		void setAxis(std::vector<float> values)
+		{
+			int i = 0;
+			for (int value : values)
+			{
+				setAxis(i, value);
+				i++;
+			}
+		}
+		void setAxis(float values[6])
+		{
+			for (size_t i = 0; i < 6; i++)
+			{
+				setAxis(i, values[i]);
+				i++;
+			}
+		}
+		const float getValue(int axis)
+		{
+			return axisToValue[axis];
+		}
+	};
+
+	void bindAnalogInput(AnalogInput* inputButton, std::vector<AnalogInputEvent*> inputEvents, std::vector<int> axes = {0})
+	{
+		// Bind all specified events to AnalogInput
+		for (auto inputEvent : inputEvents)
+		{
+			// Bind all specified axes to event
+			for (int axis : axes)
+			{
+				inputEvent->outputValues.push_back(&inputButton->axisToValue[axis]);
+			}
+		}
+	}
+	static void bindAnalogInput(int joystick, std::vector<AnalogInputEvent*> inputEvents)
+	{
+		// Find inputKey
+		auto it = joystickToAnalogInput.find(joystick);
+
+		// Check if the key exists in the map
+		if (it != joystickToAnalogInput.end())
+		{
+			bindAnalogInput(it->second, inputEvents);
+		}
+		else
+		{
+			// Construct a new AnalogInput to bind
+			bindAnalogInput(new AnalogInput(joystick), inputEvents);
+		}
+	}
+	static void bindAnalogInput(int joystick, std::vector<std::string> analogInputEventNames)
+	{
+		std::vector<AnalogInputEvent*> digitalInputEventsToBind;
+
+		// Find by AnalogInputEvent's name
+		for (const auto& analogInputEventName : analogInputEventNames)
+		{
+			auto it = nameToAnalogInputEvent.find(analogInputEventName);
+
+			// Check if the AnalogInputEvent's name exists in the map
+			if (it != nameToAnalogInputEvent.end())
+			{
+				digitalInputEventsToBind.push_back(it->second);
+			}
+			else
+			{
+				std::cout << "WARNING: No matching AnalogInputEvent found for " << analogInputEventName << std::endl;
+			}
+		}
+
+		bindAnalogInput(joystick, digitalInputEventsToBind);
 	}
 
 	// Function prototype for the key callback
-	void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-
-	// Your custom key callback function
-	void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
+	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
 	{
-		// Find input button (Yes, this is slow. Yes, it's only way to have buttons pressed and released on same update)
-		auto it = inputKeyToInputButton.find(key);
+		// Find InputButton is O(logN), bruteforce checking through each individually is O(N).
+		// Futhermore, find InputButton happens only when there is a press, bruteforce happens every frame
+		auto it = inputKeytoDigitalInput.find(key);
 
 		// Call input button's callback logic
-		if (it != inputKeyToInputButton.end())
+		if (it != inputKeytoDigitalInput.end())
 		{
-			it->second->callback(action != GLFW_RELEASE);
+			it->second->callback(action);
 		}
-
-		std::cout << "Key event: " << key << std::endl;
 	}
 
-	// Sets window with key callbacks, place as late into initialization as possible to increase load times while pressing keys
+	static void gamePadAxisTest(int joystick)
+	{
+		int count;
+
+		// Find joystick
+		auto it = joystickToAnalogInput.find(joystick);
+		if (it == joystickToAnalogInput.end())
+		{
+			return;
+		}
+		// Get joystick state
+		GLFWgamepadstate state;
+		if (glfwGetGamepadState(joystick, &state) != GLFW_TRUE)
+		{
+			return;
+		}
+
+		// Set axis values
+		it->second->setAxis(state.axes);
+	}
+
+	static void customAxisTest(int joystick, int offset = 1)
+	{			
+		int count;
+
+		// Find joystick
+		auto it = joystickToAnalogInput.find(joystick);
+		if (it == joystickToAnalogInput.end())
+		{
+			return;
+		}
+
+		const float* axesStart = glfwGetJoystickAxes(joystick, &count);
+
+		// If controller disconnected, return
+		if (!axesStart)
+		{
+			return;
+		}
+		// There is a cosmic chance that at point, the disconnect happens and game crashes. But oh well
+
+		// Set axis values
+		it->second->setAxis({ *axesStart, *(axesStart + offset) });
+	}
+
+	// Sets window with key callbacks
+	// Place as late into initialization as possible to increase load times while pressing keys
+	// Should be a singleton, lazy-evaluation calls this late as possible
 	static void initialize(GLFWwindow* window)
 	{
 		// Set the key callback function
 		glfwSetKeyCallback(window, keyCallback);
 	}
-	// Updates all inputs. Call AFTER polling GLFW events, but BEFORE polling input events (such as before gameloop)
-	static void update(GLFWwindow* window)
+	// Updates all inputs. Call BEFORE polling input events (such as before gameloop)
+	static void update()
 	{
-		for (auto UpdatableinputButton : inputButtons)
+		// Read all new events
+		glfwPollEvents();
+
+		// Update joysticks
+		for (size_t i = 0; i < GLFW_JOYSTICK_LAST; i++)
 		{
-			UpdatableinputButton->update();
+			if (glfwJoystickPresent(i))
+			{
+				// Update joystick analog events
+				if (glfwJoystickIsGamepad(i))
+				{
+					gamePadAxisTest(i);
+				}
+				else
+				{
+					customAxisTest(i);
+				}
+			}
+		}
+
+		// Update binded DigitalInputs
+		for (auto it = inputKeytoDigitalInput.begin(); it != inputKeytoDigitalInput.end(); ++it)
+		{
+			it->second->checkStateChange();
+		}
+		// Update binded AnalogInputEvents
+		for (auto it = nameToAnalogInputEvent.begin(); it != nameToAnalogInputEvent.end(); ++it)
+		{
+			it->second->inputPollingFinished();
 		}
 	}
-	// Frees up  memory used by the input system
+	// Frees memory used by the input system
 	static void uninitialize()
 	{
-		for (int i = inputButtons.size() - 1; i >= 0; --i)
+		// Free DigitalInputEvents
+		for (auto it = nameToDigitalInputEvent.begin(); it != nameToDigitalInputEvent.end(); ++it)
 		{
-			delete inputButtons[i];
-			inputButtons.erase(inputButtons.begin() + i);
+			delete it->second;
+		}
+		nameToDigitalInputEvent.clear();
+		// Free AnalogInputEvents
+		for (auto it = nameToAnalogInputEvent.begin(); it != nameToAnalogInputEvent.end(); ++it)
+		{
+			delete it->second;
+		}
+		nameToAnalogInputEvent.clear();
+
+		// Free DigitalInputs
+		for (auto it = inputKeytoDigitalInput.begin(); it != inputKeytoDigitalInput.end(); ++it)
+		{
+			delete it->second;
+		}
+		// Free AnalogInputs
+		for (auto it = joystickToAnalogInput.begin(); it != joystickToAnalogInput.end(); ++it)
+		{
+			delete it->second;
 		}
 	}
 }

@@ -4,21 +4,21 @@
 
 namespace engine
 {
-	//UI Element struct
+	
 	ECS_REGISTER_COMPONENT(UIElement)
+	///UI Element struct
 	struct UIElement
 	{
 		bool relativeToCamera = true;
 		bool enabled = true;
 	};
 
-	//2D UI element system
-	//Requires UIElement, and Transform
+	///2D UI element system, Requires UIElement, and Transform
 	ECS_REGISTER_SYSTEM(UISystem, Transform, UIElement)
 	class UISystem : public ecs::System
 	{
 	public:
-		//Update the UI system, call this once per frame
+		///Update the UI system, call this once per frame
 		void Update(Camera* cam)
 		{
 			for (auto const& entity : entities)
@@ -38,7 +38,7 @@ namespace engine
 				transform.position.z = cam->position.z - 0.01f;
 			}
 		}
-
+		///A pointer to place the shader in
 		Shader* defaultShader;
 	};
 }
