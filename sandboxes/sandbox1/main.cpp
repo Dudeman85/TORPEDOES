@@ -56,6 +56,11 @@ int main()
 	//Texture GUItexture = Texture("GUI_backround.png");
 	Texture torprldtexture = Texture("UI_Red_Torpedo_Icon.png");
 	Texture torprdytexture = Texture("UI_Green_Torpedo_Icon.png");
+	Texture cannonrldtexture = Texture("UI_Red_Cannon_Icon.png");
+	Texture cannonrdytexture = Texture("UI_Green_Cannon_Icon.png");
+	Texture hedgehogrldtexture = Texture("UI_Red_Hedgehog_Icon.png");
+	Texture hedgehogrdytexture = Texture("UI_Green_Hedgehog_Icon.png");
+
 	// Font http address:
 	// https://www.dafont.com/stencil-ww-ii.font
 	Font stencilFont("Stencil WW II.ttf", 0, 0, 48);
@@ -172,7 +177,6 @@ int main()
 	//ecs::AddComponent(GUIBackround, new Transform{ .position = Vector3(0, -0.95, -0.9), .scale = Vector3(1, 0.2, 1) });
 
 	ecs::Entity torpIndicator1 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator1, TextRenderer{ .font = &stencilFont, .text = playerNames[0], .offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 	ecs::AddComponent(torpIndicator1, SpriteRenderer{ .texture = &torprdytexture});
 	ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
 	ecs::Entity torpIndicator2 = ecs::NewEntity();
@@ -180,7 +184,6 @@ int main()
 	ecs::AddComponent(torpIndicator2, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
 
 	ecs::Entity torpIndicator3 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator3, TextRenderer{ .font = &stencilFont, .text = playerNames[1], .offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 	ecs::AddComponent(torpIndicator3, SpriteRenderer{ .texture = &torprdytexture});
 	ecs::AddComponent(torpIndicator3, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
 	ecs::Entity torpIndicator4 = ecs::NewEntity();
@@ -188,7 +191,6 @@ int main()
 	ecs::AddComponent(torpIndicator4, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
 
 	ecs::Entity torpIndicator5 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator5, TextRenderer{ .font = &stencilFont, .text = playerNames[2],.offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 	ecs::AddComponent(torpIndicator5, SpriteRenderer{ .texture = &torprdytexture});
 	ecs::AddComponent(torpIndicator5, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
 	ecs::Entity torpIndicator6 = ecs::NewEntity();
@@ -196,7 +198,6 @@ int main()
 	ecs::AddComponent(torpIndicator6, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
 
 	ecs::Entity torpIndicator7 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator7, TextRenderer{ .font = &stencilFont, .text = playerNames[3],.offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 	ecs::AddComponent(torpIndicator7, SpriteRenderer{ .texture = &torprdytexture});
 	ecs::AddComponent(torpIndicator7, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
 	ecs::Entity torpIndicator8 = ecs::NewEntity();
@@ -292,6 +293,8 @@ int main()
 		Player& player3 = ecs::GetComponent<Player>(laMuerte3);
 		Player& player4 = ecs::GetComponent<Player>(laMuerte4);
 
+
+		//player 1
 		Transform& p1Transform = ecs::GetComponent<Transform>(laMuerte);
 		Transform& torpIconLoc1 = ecs::GetComponent<Transform>(torpIndicator1);
 		torpIconLoc1.position = Vector3(p1Transform.position.x -3, p1Transform.position.y - 16, 200);
@@ -299,7 +302,7 @@ int main()
 		torpIconLoc2.position = Vector3(p1Transform.position.x -3, p1Transform.position.y - 23, 201);
 		SpriteRenderer& torpIcon1 = ecs::GetComponent<SpriteRenderer>(torpIndicator1);
 		SpriteRenderer& torpIcon2 = ecs::GetComponent<SpriteRenderer>(torpIndicator2);
-		//player 1
+		
 		if (player.projectileTime1 > 0)
 		{
 			torpIcon1.texture = &torprldtexture;
