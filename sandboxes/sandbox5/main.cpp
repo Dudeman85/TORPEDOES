@@ -61,11 +61,11 @@ int main()
         std::string message = "";
         if (shootEvent->isNewPress())
         {
-            message = " pressed";
+            message = " x pressed";
         }
         if (shootEvent->isNewRelease())
         {
-            std::cout << " release";
+            std::cout << " x release";
         }
         if(message.length() > 3)
         std::cout << message << "\n";
