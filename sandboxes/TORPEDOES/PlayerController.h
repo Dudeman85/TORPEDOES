@@ -47,7 +47,7 @@ ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonColli
 class PlayerController : public ecs::System
 {
 
-	float starTimer = 19.0; // start Time 
+	float starTimer = 4; // start Time 
 	Model* torpedomodel;
 	void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 sapawnRotation, int owerID)
 	{
@@ -165,6 +165,7 @@ public:
 			{   // Do animation where projectile impact 
 				CreateAnimation(projectransfor.position);
 				projectransfor.position.y += 10000000;
+
 			}
 		}
 	}
@@ -289,7 +290,8 @@ public:
 					}
 				}
 			}
-			starTimer -= dt;
+			if(player.playerID == 0)
+				starTimer -= dt;
 			//printf("starTimer: %i\n", int(starTimer));
 			// topedo hit logica 
 			if (player.hitPlayer == true)
