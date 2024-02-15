@@ -69,8 +69,8 @@ int main()
 	Model model("LaMuerte.obj");
 	Model checkPointModel("Checkpoint.obj");
 	Model model2("Finish_line.obj");
-	Texture torprldtexture = Texture("torpedoReloading.png");
-	Texture torprdytexture = Texture("torpedoReady.png");
+	Texture torprldtexture = Texture("UI_Red_Torpedo_Icon.png");
+	Texture torprdytexture = Texture("UI_Green_Torpedo_Icon.png");
 	// Font http address:
 	// https://www.dafont.com/stencil-ww-ii.font
 	stencilFont = new Font("Stencil WW II.ttf", 0, 0, 48);
@@ -194,92 +194,130 @@ int main()
 		*/
 		/*
 		//player 1
+		Transform& p1Transform = ecs::GetComponent<Transform>(laMuerte);
+		Transform& torpIconLoc1 = ecs::GetComponent<Transform>(torpIndicator1);
+		torpIconLoc1.position = Vector3(p1Transform.position.x - 3, p1Transform.position.y - 16, 200);
+		Transform& torpIconLoc2 = ecs::GetComponent<Transform>(torpIndicator2);
+		torpIconLoc2.position = Vector3(p1Transform.position.x - 3, p1Transform.position.y - 23, 201);
+		SpriteRenderer& torpIcon1 = ecs::GetComponent<SpriteRenderer>(torpIndicator1);
+		SpriteRenderer& torpIcon2 = ecs::GetComponent<SpriteRenderer>(torpIndicator2);
+
 		if (player.projectileTime1 > 0)
 		{
-			torpicon1.texture = &torprldtexture;
+			torpIcon1.texture = &torprldtexture;
 		}
 		else
 		{
-			torpicon1.texture = &torprdytexture;
+			torpIcon1.texture = &torprdytexture;
 			//torpSpeaker.Play(torpedoSound);
 			//soundDevice->SetSourceLocation(torpSpeaker, PlayerTransform.position.x, PlayerTransform.position.y, 0);
 		}
 		if (player.projectileTime2 > 0)
 		{
-			torpicon2.texture = &torprldtexture;
+			torpIcon2.texture = &torprldtexture;
 		}
 		else
 		{
-			torpicon2.texture = &torprdytexture;
+			torpIcon2.texture = &torprdytexture;
 			//torpSpeaker2.Play(torpedoSound);
 			//soundDevice->SetSourceLocation(torpSpeaker2, PlayerTransform.position.x, PlayerTransform.position.y, 0);
 		}
-		/// Player 2
+
+		// Player 2
+		Transform& p2Transform = ecs::GetComponent<Transform>(laMuerte2);
+		Transform& torpIconLoc3 = ecs::GetComponent<Transform>(torpIndicator3);
+		torpIconLoc3.position = Vector3(p2Transform.position.x - 5, p2Transform.position.y - 16, 200);
+		Transform& torpIconLoc4 = ecs::GetComponent<Transform>(torpIndicator4);
+		torpIconLoc4.position = Vector3(p2Transform.position.x - 5, p2Transform.position.y - 24, 201);
+		SpriteRenderer& torpIcon3 = ecs::GetComponent<SpriteRenderer>(torpIndicator3);
+		SpriteRenderer& torpIcon4 = ecs::GetComponent<SpriteRenderer>(torpIndicator4);
+
+
 		if (player2.projectileTime1 > 0)
 		{
-			torpicon3.texture = &torprldtexture;
+			torpIcon3.texture = &torprldtexture;
 		}
 		else
 		{
-			torpicon3.texture = &torprdytexture;
+			torpIcon3.texture = &torprdytexture;
 			//torpSpeaker3.Play(torpedoSound);
 			//soundDevice->SetSourceLocation(torpSpeaker3, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
 		}
 		if (player2.projectileTime2 > 0)
 		{
-			torpicon4.texture = &torprldtexture;
+			torpIcon4.texture = &torprldtexture;
 		}
 		else
 		{
-			torpicon4.texture = &torprdytexture;
+			torpIcon4.texture = &torprdytexture;
 			//torpSpeaker4.Play(torpedoSound);
 			//soundDevice->SetSourceLocation(torpSpeaker4, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
 
 		}
-		// palyer 3
+
+		// Player 3
+		Transform& p3Transform = ecs::GetComponent<Transform>(laMuerte3);
+		Transform& torpIconLoc5 = ecs::GetComponent<Transform>(torpIndicator5);
+		torpIconLoc5.position = Vector3(p3Transform.position.x - 5, p3Transform.position.y - 16, 200);
+		Transform& torpIconLoc6 = ecs::GetComponent<Transform>(torpIndicator6);
+		torpIconLoc6.position = Vector3(p3Transform.position.x - 5, p3Transform.position.y - 24, 201);
+		SpriteRenderer& torpIcon5 = ecs::GetComponent<SpriteRenderer>(torpIndicator5);
+		SpriteRenderer& torpIcon6 = ecs::GetComponent<SpriteRenderer>(torpIndicator6);
+
+
 		if (player3.projectileTime1 > 0)
 		{
-			torpicon5.texture = &torprldtexture;
+			torpIcon5.texture = &torprldtexture;
 		}
 		else
 		{
-			torpicon5.texture = &torprdytexture;
-			//torpSpeaker5.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker5, PlayerTransform3.position.x, PlayerTransform3.position.y, 0);
+			torpIcon5.texture = &torprdytexture;
+			//torpSpeaker3.Play(torpedoSound);
+			//soundDevice->SetSourceLocation(torpSpeaker3, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
 		}
 		if (player3.projectileTime2 > 0)
 		{
-			torpicon6.texture = &torprldtexture;
+			torpIcon6.texture = &torprldtexture;
 		}
 		else
 		{
-			torpicon6.texture = &torprdytexture;
-			//torpSpeaker6.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker6, PlayerTransform3.position.x, PlayerTransform3.position.y, 0);
+			torpIcon6.texture = &torprdytexture;
+			//torpSpeaker4.Play(torpedoSound);
+			//soundDevice->SetSourceLocation(torpSpeaker4, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
+
 		}
-		// palyer 4
+
+		// Player 4
+		Transform& p4Transform = ecs::GetComponent<Transform>(laMuerte4);
+		Transform& torpIconLoc7 = ecs::GetComponent<Transform>(torpIndicator7);
+		torpIconLoc7.position = Vector3(p4Transform.position.x - 5, p4Transform.position.y - 16, 200);
+		Transform& torpIconLoc8 = ecs::GetComponent<Transform>(torpIndicator8);
+		torpIconLoc8.position = Vector3(p4Transform.position.x - 5, p4Transform.position.y - 24, 201);
+		SpriteRenderer& torpIcon7 = ecs::GetComponent<SpriteRenderer>(torpIndicator7);
+		SpriteRenderer& torpIcon8 = ecs::GetComponent<SpriteRenderer>(torpIndicator8);
+
 
 		if (player4.projectileTime1 > 0)
 		{
-			torpicon7.texture = &torprldtexture;
+			torpIcon7.texture = &torprldtexture;
 		}
 		else
 		{
-			torpicon7.texture = &torprdytexture;
-			//torpSpeaker7.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker7, PlayerTransform4.position.x, PlayerTransform4.position.y, 0);
+			torpIcon7.texture = &torprdytexture;
+			//torpSpeaker3.Play(torpedoSound);
+			//soundDevice->SetSourceLocation(torpSpeaker3, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
 		}
 		if (player4.projectileTime2 > 0)
 		{
-			torpicon8.texture = &torprldtexture;
+			torpIcon8.texture = &torprldtexture;
 		}
 		else
 		{
-			torpicon8.texture = &torprdytexture;
-			//torpSpeaker8.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker8, PlayerTransform4.position.x, PlayerTransform4.position.y, 0);
+			torpIcon8.texture = &torprdytexture;
+			//torpSpeaker4.Play(torpedoSound);
+			//soundDevice->SetSourceLocation(torpSpeaker4, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
+
 		}
-		*/
 
 		//engine Sounds
 		//soundDevice->SetSourceLocation(engineSpeaker, PlayerTransform.position.x, PlayerTransform.position.y, 0);
