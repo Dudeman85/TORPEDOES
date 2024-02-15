@@ -27,17 +27,17 @@ void CreatePlayers(int count, Vector2 startPos, Model* defaultModel)
 	{
 		//Create the player name text
 		ecs::Entity playerNameText = ecs::NewEntity();
-		ecs::AddComponent(playerNameText, TextRenderer{ .font = stencilFont, .text = "P" + to_string(i + 1), .offset = Vector3(1, -1, 0), .scale = Vector3(0.5), .color = Vector3(0.5, 0.8, 0.2)});
+		ecs::AddComponent(playerNameText, TextRenderer{ .font = stencilFont, .text = "P" + to_string(i + 1), .offset = Vector3(1, -1, 0), .scale = Vector3(0.5), .color = Vector3(0.5, 0.8, 0.2) });
 		ecs::AddComponent(playerNameText, Transform{ });
 
 		//Create the player entity
 		ecs::Entity player = ecs::NewEntity();
-		ecs::AddComponent(player, Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(45, 0, 0), .scale = Vector3(7)});
-		ecs::AddComponent(player, Player{ .acerationSpeed = 300, .minAceleration = 120, .playerID = i, .playerFont = playerNameText});
+		ecs::AddComponent(player, Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(45, 0, 0), .scale = Vector3(7) });
+		ecs::AddComponent(player, Player{ .acerationSpeed = 300, .minAceleration = 120, .playerID = i, .playerFont = playerNameText });
 		ecs::AddComponent(player, ModelRenderer{ .model = defaultModel });
 		ecs::AddComponent(player, Rigidbody{ .drag = 0.025 });
 		vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
-		ecs::AddComponent(player, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision , .visualise = false });
+		ecs::AddComponent(player, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
 	}
 }
 
@@ -47,14 +47,7 @@ int main()
 	string lap = "1";
 	vector<string> playerNames(4);
 	vector<int> playerCheckpoints(4);
-	/*
-	for (int i = 0; i < playerNames.size(); ++i)
-	{
-		cout << "Please enter Player's " + to_string(i + 1) + " name: ";
-		cin >> username;
-		playerNames[i] = username;
-	}
-	*/
+
 	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window");
 
 
@@ -310,7 +303,7 @@ int main()
 		float normalizedVelocity4 = PlayerRigidbody4.velocity.Length() / 166.0f;
 		float accLevel4 = std::lerp(0.0f, 1.5f, normalizedVelocity4);
 		//engineSpeaker4.setPitch(0.5f + accLevel4);
-		
+
 		//soundDevice->SetSourceLocation(cheerSpeaker, 1530, -1700, 1);
 
 		if (player.playExlposionSound)
@@ -414,7 +407,8 @@ int main()
 
 
 		// Ajustar el zoom de la cmara solo si el zoom deseado supera los lmites establecidos
-		if (desiredZoom > camScaleMin && desiredZoom < camScaleMax) {
+		if (desiredZoom > camScaleMin && desiredZoom < camScaleMax)
+		{
 			camScale = desiredZoom;
 		}
 
