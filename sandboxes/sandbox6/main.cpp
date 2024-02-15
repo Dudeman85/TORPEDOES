@@ -39,19 +39,21 @@ int main()
 
 	EngineInit();
 
-	input::initialize(window);											 // Added by Sauli Hanell
-	ecs::GetSystem<PauseSystem>()->Init();
-	bool isGamePause = false;											 // Added by Sauli Hanell
+	input::initialize(window);										
+	ecs::GetSystem<PauseSystem>()->Init(window);
+	
+	auto& isGamePause = ecs::GetSystem<PauseSystem>()->isGamePause;
 
-	//INPUTS
-	input::InputEvent* upPressed = new input::InputEvent("up");			 // Added by: Sauli	Hanell
-	input::InputEvent* downPressed = new input::InputEvent("down");		 // Added by: Sauli	Hanell
-	input::InputEvent* enterPressed = new input::InputEvent("enter");	 // Added by: Sauli	Hanell
-	input::InputEvent* pButtonPressed = new input::InputEvent("P");		 // Added by: Sauli	Hanell
-	input::bindInput(GLFW_KEY_UP, { "up" });							 // Added by: Sauli	Hanell
-	input::bindInput(GLFW_KEY_DOWN, { "down" });						 // Added by: Sauli	Hanell
-	input::bindInput(GLFW_KEY_ENTER, { "enter" });						 // Added by: Sauli	Hanell
-	input::bindInput(GLFW_KEY_P, { "P" });								 // Added by: Sauli	Hanell
+	//INPUTS  START	
+	input::DigitalInputEvent* moveUp =			new input::DigitalInputEvent("MoveUp");	 
+	input::DigitalInputEvent* moveDown =	    new input::DigitalInputEvent("MoveDown");
+	input::DigitalInputEvent* select =			new input::DigitalInputEvent("Select");	 
+	input::DigitalInputEvent* pause =			new input::DigitalInputEvent("Pause");	
+	input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp" });							 
+	input::bindDigitalInput(GLFW_KEY_DOWN, { "MoveDown" });						 
+	input::bindDigitalInput(GLFW_KEY_ENTER, { "Select" });						 
+	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });								 
+	
 
 	engine::Camera cam = engine::Camera(1120, 630);
 	cam.SetPosition(Vector3(0, 0, 1500));
@@ -75,7 +77,7 @@ int main()
 	// https://www.dafont.com/stencil-ww-ii.font
 	Font stencilFont("Stencil WW II.ttf", 0, 0, 48);
 
-
+	
 	Texture* winSprite = new Texture("winner.png");
 	ecs::Entity playerWin = ecs::NewEntity();
 	ecs::AddComponent(playerWin, TextRenderer{ .font = &stencilFont, .text = "", .offset = Vector3(-1.0f, 1.1f, 1.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
@@ -279,6 +281,7 @@ int main()
 	{
 		input::update();	 //added by: Sauli Hanell
 
+		printf(std::to_string(cam.position.x).c_str(), std::to_string(cam.position.y).c_str());
 		TextRenderer& winText = ecs::GetComponent<TextRenderer>(playerWin);
 		TextRenderer& p1Win = ecs::GetComponent<TextRenderer>(pSFont1);
 		TextRenderer& p2Win = ecs::GetComponent<TextRenderer>(pSFont2);
@@ -527,23 +530,22 @@ int main()
 		}
 
 		/////////////////////////////////////--   PAUSE INPUT STARTS   --//////////////////////////////////////////////
-		if (pButtonPressed->isNewPress())
+		if (pause->isNewPress())
 		{
-			
-			isGamePause =! isGamePause;
+			printf("Pause\n");
+			isGamePause =! isGamePause;		
 			ecs::GetSystem<PauseSystem>()->ToggleShowUIMenu();
 		}
 		
-		if ( upPressed->isNewPress())
-		{
-			printf(" up arrow pressed menu");
+		if (isGamePause && moveUp->isNewPress())
+		{	
 			ecs::GetSystem<PauseSystem>()->MoveUpper();
 		}
-		if (isGamePause && downPressed->isNewPress())
+		if (isGamePause && moveDown->isNewPress())
 		{
 			ecs::GetSystem<PauseSystem>()->MoveLower();
 		}
-		if (isGamePause && enterPressed->isNewPress())
+		if (isGamePause && select->isNewRelease())
 		{
 			ecs::GetSystem<PauseSystem>()->Selected();
 		}
@@ -560,7 +562,11 @@ int main()
 		engine::Update(&cam);
 
 		// playerControl Update for frame 
+		if (!isGamePause) 
+		{
 		playerController->Update(window, deltaTime);
+
+		}
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
