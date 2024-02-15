@@ -4,6 +4,7 @@
 
 
 int checkPointNumber = 0;
+Font* stencilFont = nullptr;
 
 void createChepoint(Vector3 position, Vector3 rotation, Vector3 scale, Model& checkPointModel, float hitboxrotation, bool finish_line = false)
 {
@@ -18,8 +19,27 @@ void createChepoint(Vector3 position, Vector3 rotation, Vector3 scale, Model& ch
 	checkPointNumber++;
 };
 
+//Spawn 1-4 players, all in a line from top to bottom
+void CreatePlayers(int count, Vector2 startPos, Model* defaultModel)
+{
+	Vector2 offset(0, 60);
+	for (int i = 0; i < count; i++)
+	{
+		//Create the player name text
+		ecs::Entity playerNameText = ecs::NewEntity();
+		ecs::AddComponent(playerNameText, TextRenderer{ .font = stencilFont, .text = "P" + to_string(i + 1), .offset = Vector3(1, -1, 0), .scale = Vector3(0.5), .color = Vector3(0.5, 0.8, 0.2)});
+		ecs::AddComponent(playerNameText, Transform{ });
 
-
+		//Create the player entity
+		ecs::Entity player = ecs::NewEntity();
+		ecs::AddComponent(player, Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(45, 0, 0), .scale = Vector3(7)});
+		ecs::AddComponent(player, Player{ .acerationSpeed = 300, .minAceleration = 120, .playerID = i, .playerFont = playerNameText});
+		ecs::AddComponent(player, ModelRenderer{ .model = defaultModel });
+		ecs::AddComponent(player, Rigidbody{ .drag = 0.025 });
+		vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
+		ecs::AddComponent(player, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision , .visualise = false });
+	}
+}
 
 int main()
 {
@@ -27,13 +47,14 @@ int main()
 	string lap = "1";
 	vector<string> playerNames(4);
 	vector<int> playerCheckpoints(4);
+	/*
 	for (int i = 0; i < playerNames.size(); ++i)
 	{
 		cout << "Please enter Player's " + to_string(i + 1) + " name: ";
 		cin >> username;
 		playerNames[i] = username;
 	}
-
+	*/
 	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window");
 
 
@@ -59,12 +80,12 @@ int main()
 	Texture torprdytexture = Texture("torpedoReady.png");
 	// Font http address:
 	// https://www.dafont.com/stencil-ww-ii.font
-	Font stencilFont("Stencil WW II.ttf", 0, 0, 48);
+	stencilFont = new Font("Stencil WW II.ttf", 0, 0, 48);
 
 
 	Texture* winSprite = new Texture("winner.png");
 	ecs::Entity playerWin = ecs::NewEntity();
-	ecs::AddComponent(playerWin, TextRenderer{ .font = &stencilFont, .text = "", .offset = Vector3(-1.0f, 1.1f, 1.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
+	ecs::AddComponent(playerWin, TextRenderer{ .font = stencilFont, .text = "", .offset = Vector3(-1.0f, 1.1f, 1.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 	ecs::AddComponent(playerWin, SpriteRenderer{ .texture = winSprite, .enabled = false, .uiElement = true });
 	ecs::AddComponent(playerWin, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(0.5f) });
 	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
@@ -72,137 +93,22 @@ int main()
 
 	PlayerController::playerWin = playerWin;
 
-	ecs::Entity pFont1 = ecs::NewEntity();
-	ecs::Entity pFont2 = ecs::NewEntity();
-	ecs::Entity pFont3 = ecs::NewEntity();
-	ecs::Entity pFont4 = ecs::NewEntity();
 	ecs::Entity pSFont1 = ecs::NewEntity();
 	ecs::Entity pSFont2 = ecs::NewEntity();
 	ecs::Entity pSFont3 = ecs::NewEntity();
 	ecs::Entity pSFont4 = ecs::NewEntity();
 
-	ecs::AddComponent(pSFont1, TextRenderer{ .font = &stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
+	ecs::AddComponent(pSFont1, TextRenderer{ .font = stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 	ecs::AddComponent(pSFont1, Transform{ .position = Vector3(-0.65, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
-	ecs::AddComponent(pSFont2, TextRenderer{ .font = &stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
+	ecs::AddComponent(pSFont2, TextRenderer{ .font = stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 	ecs::AddComponent(pSFont2, Transform{ .position = Vector3(-0.15, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
-	ecs::AddComponent(pSFont3, TextRenderer{ .font = &stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
+	ecs::AddComponent(pSFont3, TextRenderer{ .font = stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 	ecs::AddComponent(pSFont3, Transform{ .position = Vector3(0.25, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
-	ecs::AddComponent(pSFont4, TextRenderer{ .font = &stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
+	ecs::AddComponent(pSFont4, TextRenderer{ .font = stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 	ecs::AddComponent(pSFont4, Transform{ .position = Vector3(0.75, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
 
-	/*
-	AudioEngine engineSpeaker;
-	AudioEngine torpSpeaker;
-	AudioEngine cheerSpeaker;
 
-	Audio* torpedoSound = torpSpeaker.createAudio("torpedoshoot.wav", false, 1, Vector3(0, 0, 0));
-	Audio* explosionSound = torpSpeaker.createAudio("explosion.wav", false, 1, Vector3(0, 0, 0));
-	Audio* engineSound = engineSpeaker.createAudio("enginemono.wav", true, 1, Vector3(0, 0, 0));
-	Audio* cheerSound = cheerSpeaker.createAudio("cheering.wav", true, 1, Vector3(0, 0, 0));
-	*/
-	//TODO: Set audiance cheer distance
-	/*
-	engineSpeaker.setLinearDistance(0.4f, 10.f, 400.f, 0.6f);
-	engineSpeaker2.setLinearDistance(0.4f, 10.f, 400.f, 0.6f);
-	engineSpeaker3.setLinearDistance(0.4f, 10.f, 400.f, 0.6f);
-	engineSpeaker4.setLinearDistance(0.4f, 10.f, 400.f, 0.6f);
-	torpSpeaker.setLinearDistance(1.0f, 10.f, 500.f, 0.5f);
-	torpSpeaker2.setLinearDistance(1.0f, 10.f, 500.f, 0.5f);
-	torpSpeaker3.setLinearDistance(1.0f, 10.f, 500.f, 0.5f);
-	torpSpeaker4.setLinearDistance(1.0f, 10.f, 500.f, 0.5f);
-	torpSpeaker5.setLinearDistance(1.0f, 10.f, 500.f, 0.5f);
-	torpSpeaker6.setLinearDistance(1.0f, 10.f, 500.f, 0.5f);
-	explosionSpeaker.setLinearDistance(1.0f, 10.f, 600.f, 1.f);
-	cheerSpeaker.setLinearDistance(0.5f, 50.f, 350.f, 0.9f);
-	*/
-
-	ecs::Entity laMuerte = ecs::NewEntity();
-	ecs::AddComponent(pFont1, TextRenderer{ .font = &stencilFont, .text = playerNames[0], .offset = Vector3(1.0f, -1.0f, 0), .scale = Vector3(0.5f), .color = Vector3(0.5f, 0.8f, 0.2f) });
-	ecs::AddComponent(pFont1, Transform{ .position = Vector3(1434.0f,-1449.0f, 100.0f) });
-	ecs::AddComponent(laMuerte, Transform{ .position = Vector3(1474.321533, -1435.868286, 100.000000), .rotation = Vector3(45.000000, 0.0000, 0.000000), .scale = Vector3(7) });
-	ecs::AddComponent(laMuerte, Player{ .acerationSpeed = 300.0f, .minAceleration = 120.0f, .playerID = 0, .playerFont = pFont1, .playername = playerNames[0], .playerLap = lap });
-	ecs::AddComponent(laMuerte, ModelRenderer{ .model = &model });
-	ecs::AddComponent(laMuerte, Rigidbody{ .drag = 0.025f });
-	vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
-	ecs::AddComponent(laMuerte, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision , .visualise = false });
-	//engineSpeaker2.Play(engineSound);
-	//engineSpeaker2.SetLooping(1);
-
-	Transform& test = ecs::GetComponent<Transform>(laMuerte);
-
-	ecs::Entity laMuerte2 = ecs::NewEntity();
-
-	ecs::AddComponent(pFont2, TextRenderer{ .font = &stencilFont, .text = playerNames[1], .offset = Vector3(1.0f, -1.0f, 0), .scale = Vector3(0.5f), .color = Vector3(0.5f, 0.8f, 0.2f) });
-	ecs::AddComponent(pFont2, Transform{ .position = Vector3(1434.0f,-1349.0f, 100.0f) });
-	ecs::AddComponent(laMuerte2, Transform{ .position = Vector3(1474.321533, -1369.868286, 100.000000), .rotation = Vector3(45.000000, 0.0000, 0.000000), .scale = Vector3(7) });
-	ecs::AddComponent(laMuerte2, Player{ .acerationSpeed = 300.0f, .minAceleration = 120.0f, .playerID = 1, .playerFont = pFont2,.playername = playerNames[1], .playerLap = lap });
-	ecs::AddComponent(laMuerte2, ModelRenderer{ .model = &model });
-	ecs::AddComponent(laMuerte2, Rigidbody{ .drag = 0.025f });
-	ecs::AddComponent(laMuerte2, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision , .visualise = false });
-	//engineSpeaker2.Play(engineSound);
-	//engineSpeaker2.SetLooping(1);
-
-
-	ecs::Entity laMuerte3 = ecs::NewEntity();
-
-	ecs::AddComponent(pFont3, TextRenderer{ .font = &stencilFont, .text = playerNames[2], .offset = Vector3(1.0f, -1.0f, 0), .scale = Vector3(0.5f), .color = Vector3(0.5f, 0.8f, 0.2f) });
-	ecs::AddComponent(pFont3, Transform{ .position = Vector3(1434.0f,-1549.0f, 100.0f) });
-	ecs::AddComponent(laMuerte3, Transform{ .position = Vector3(1474.321533, -1495.868286, 100.000000), .rotation = Vector3(45.000000, 0.0000, 0.000000), .scale = Vector3(7) });
-	ecs::AddComponent(laMuerte3, Player{ .acerationSpeed = 300.0f, .minAceleration = 120.0f, .playerID = 2, .playerFont = pFont3,.playername = playerNames[2], .playerLap = lap });
-	ecs::AddComponent(laMuerte3, ModelRenderer{ .model = &model });
-	ecs::AddComponent(laMuerte3, Rigidbody{ .drag = 0.025f });
-	ecs::AddComponent(laMuerte3, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision , .visualise = false });
-	//engineSpeaker3.Play(engineSound);
-	//engineSpeaker3.SetLooping(1);
-
-
-	ecs::Entity laMuerte4 = ecs::NewEntity();
-
-	ecs::AddComponent(pFont4, TextRenderer{ .font = &stencilFont, .text = playerNames[3], .offset = Vector3(1.0f, -1.0f, 0), .scale = Vector3(0.5f), .color = Vector3(0.5f, 0.8f, 0.2f) });
-	ecs::AddComponent(pFont4, Transform{ .position = Vector3(1434.0f,-1549.0f, 100.0f) });
-	ecs::AddComponent(laMuerte4, Transform{ .position = Vector3(1474.321533, -1569.868286, 100.000000), .rotation = Vector3(45.000000, 0.0000, 0.000000), .scale = Vector3(7) });
-	ecs::AddComponent(laMuerte4, Player{ .acerationSpeed = 300.0f, .minAceleration = 120.0f, .playerID = 3, .playerFont = pFont4,.playername = playerNames[3], .playerLap = lap });
-	ecs::AddComponent(laMuerte4, ModelRenderer{ .model = &model });
-	ecs::AddComponent(laMuerte4, Rigidbody{ .drag = 0.025f });
-	ecs::AddComponent(laMuerte4, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision , .visualise = false });
-	//engineSpeaker4.Play(engineSound);
-	//engineSpeaker4.SetLooping(1);
-
-	/*ecs::Entity GUIBackround = ecs::NewEntity();
-	ecs::AddComponent(GUIBackround, SpriteRenderer{ .texture = &GUItexture, .uiElement = true });
-	ecs::AddComponent(GUIBackround, Transform{ .position = Vector3(0, -0.95, -0.9), .scale = Vector3(1, 0.2, 1) });*/
-
-	ecs::Entity torpIndicator1 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator1, TextRenderer{ .font = &stencilFont, .text = playerNames[0], .offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	ecs::AddComponent(torpIndicator1, SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(-0.75, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
-	ecs::Entity torpIndicator2 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator2, SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator2, Transform{ .position = Vector3(-0.65, -0.9, -0.55), .scale = Vector3(0.05, 0.085, 1) });
-
-	ecs::Entity torpIndicator3 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator3, TextRenderer{ .font = &stencilFont, .text = playerNames[1], .offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	ecs::AddComponent(torpIndicator3, SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator3, Transform{ .position = Vector3(-0.25, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
-	ecs::Entity torpIndicator4 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator4, SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator4, Transform{ .position = Vector3(-0.15, -0.9, -0.55), .scale = Vector3(0.05, 0.085, 1) });
-
-	ecs::Entity torpIndicator5 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator5, TextRenderer{ .font = &stencilFont, .text = playerNames[2],.offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	ecs::AddComponent(torpIndicator5, SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator5, Transform{ .position = Vector3(0.15, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
-	ecs::Entity torpIndicator6 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator6, SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator6, Transform{ .position = Vector3(0.25, -0.9, -0.55), .scale = Vector3(0.05, 0.085, 1) });
-
-	ecs::Entity torpIndicator7 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator7, TextRenderer{ .font = &stencilFont, .text = playerNames[3],.offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	ecs::AddComponent(torpIndicator7, SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator7, Transform{ .position = Vector3(0.65, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
-	ecs::Entity torpIndicator8 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator8, SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator8, Transform{ .position = Vector3(0.75, -0.9, -0.55), .scale = Vector3(0.05, 0.085, 1) });
+	CreatePlayers(1, Vector2(1434.0f, -1370.0f), &model);
 
 
 	// create explosion Animation PlayerController 
@@ -267,10 +173,13 @@ int main()
 		TextRenderer& p2Win = ecs::GetComponent<TextRenderer>(pSFont2);
 		TextRenderer& p3Win = ecs::GetComponent<TextRenderer>(pSFont3);
 		TextRenderer& p4Win = ecs::GetComponent<TextRenderer>(pSFont4);
+
+		/*
 		Player& player = ecs::GetComponent<Player>(laMuerte);
 		Player& player2 = ecs::GetComponent<Player>(laMuerte2);
 		Player& player3 = ecs::GetComponent<Player>(laMuerte3);
 		Player& player4 = ecs::GetComponent<Player>(laMuerte4);
+		*/
 
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
@@ -284,11 +193,12 @@ int main()
 		//winText.text = timerStr.c_str();
 		// UI System 				
 
+		/*
 		p1Win.text = to_string(player.lap) + "/1";
 		p2Win.text = to_string(player2.lap) + "/1";
 		p3Win.text = to_string(player3.lap) + "/1";
 		p4Win.text = to_string(player4.lap) + "/1";
-
+		*/
 		/*
 		//player 1
 		if (player.projectileTime1 > 0)
@@ -400,8 +310,7 @@ int main()
 		float normalizedVelocity4 = PlayerRigidbody4.velocity.Length() / 166.0f;
 		float accLevel4 = std::lerp(0.0f, 1.5f, normalizedVelocity4);
 		//engineSpeaker4.setPitch(0.5f + accLevel4);
-		*/
-
+		
 		//soundDevice->SetSourceLocation(cheerSpeaker, 1530, -1700, 1);
 
 		if (player.playExlposionSound)
@@ -432,7 +341,7 @@ int main()
 			//soundDevice->SetSourceLocation(explosionSpeaker, PlayerTransform4.position.x, PlayerTransform4.position.y, 0);
 			player4.playExlposionSound = false;
 		}
-
+		*/
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
