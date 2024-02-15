@@ -24,57 +24,30 @@ and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any
 source distribution.
 *********************************************************************/
+
 #pragma once
 
-#include <vector>
-#include <set>
-#include <map>
-#include <string>
-#include <engine/MapLayer.h>
-#include <engine/GL/Texture.h>
-#include <engine/GL/Shader.h>
-#include <engine/GL/Camera.h>
-#include <engine/Vector.h>
+#include <tmxlite/Map.hpp>
+#include <engine/TMVariables.h>
 
-///A class to load a tilemap using the tmxlite library
-class Tilemap final
+using namespace tmx;
+using namespace std;
+
+// OldTilemap still has Tilemap variable name and class
+// so for now TMap to not cause errors. Need to fix name's
+// later when new code is´finished and old code can be
+// removed.
+class TMap final
 {
 public:
-	///Constructor
-	Tilemap(engine::Camera* cam);
-	~Tilemap();
-	
-	///Load tilemap
-	void loadMap(const std::string ownMap);
-	///Draw tilemap
-	void draw(float layer);
 
-	///Get the position of a tile in world coordinates
-	engine::Vector2 GetTilePosition(unsigned int x, unsigned int y);
-	///Check larger area collisionbox
-	std::vector<engine::Vector2> CheckCollisionBox(engine::Vector2 topLeft, engine::Vector2 bottomRight);
-	///Check the smaller Collisions that are turned on upon the larger collision box colliding
-	unsigned int checkCollision(float x, float y);
-	///The size of a tile
-	tmx::Vector2u tileSize;
-	///The position of a tile
-	glm::vec3 position;
-	///The bounds of the map
-	tmx::FloatRect bounds;
+	// Constructor
+	TMap();
 
-	///How many layers are there in the map
-	std::set<float> zLayers;
+	// Destructor
+	~TMap(){}
 
-	///A 2D vector of tile IDs used for simple tile collision checking
-	std::vector<std::vector<unsigned int>> collisionLayer;
-private:
-	void initGLStuff(const tmx::Map&);
-	std::shared_ptr<engine::Texture> loadTexture(const std::string&);
-
-
-	std::map<float, std::vector<std::shared_ptr<MapLayer>>> mapLayers;
-	std::vector<std::shared_ptr<engine::Texture>> allTextures;
-	
-	engine::Shader* m_shader;
-	engine::Camera* camera;
+	// setup() -function to get properties and
+	// set them into correct struct properties
+	void setup();
 };

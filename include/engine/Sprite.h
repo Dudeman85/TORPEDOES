@@ -17,7 +17,7 @@
 #include <engine/GL/Shader.h>
 #include <engine/GL/Texture.h>
 #include <engine/GL/Camera.h>
-#include <engine/Tilemap.h>
+#include <engine/OldTilemap.h>
 
 
 namespace engine

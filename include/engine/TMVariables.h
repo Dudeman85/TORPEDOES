@@ -27,13 +27,28 @@ source distribution.
 
 #pragma once
 
-class MapLayer final
+#include <tmxlite/Map.hpp>
+#include <unordered_map>
+#include <variant>
+#include <string>
+
+
+class TMVariables
 {
-
 public:
-	//  Constructor
-	MapLayer();
 
-	// Destructor
-	~MapLayer();
+private:
+	// Tilemap unordered map variable
+	std::unordered_map<std::string*, std::variant<int*, float*, std::string*>> tilemap;
+	// Group layer unordered map variable
+	std::unordered_map<std::string*, std::variant<int*, float*, std::string*>> group;
+	// Object layer unordered map variable
+	std::unordered_map<std::string*, std::variant<int*, float*, std::string*>> object;
+	// Tile layer unordered map variable
+	std::unordered_map<std::string*, std::variant<int*, float*, std::string*>> layer;
+	// Tileset unordered map variable
+	std::unordered_map<std::string*, std::variant<int*, float*, std::string*>> tileset;
+	// Tile unordered map variable
+	std::unordered_map<std::string*, std::variant<int*, float*, std::string*>> tile;
 };
+

@@ -27,20 +27,44 @@ source distribution.
 
 #pragma once
 
+#include <vector>
+#include <memory>
+#include <engine/GL/Texture.h>
 #include <tmxlite/Map.hpp>
-#include <engine/Constants.h>
-#include <engine/Vector.h>
-#include <iostream>
 
-using namespace tmx;
-using namespace std;
-
-class Tilemap final
+///A class to create and store data for the tiled map
+class MapLayer final
 {
 public:
+	///Constructor
+	MapLayer(const tmx::Map&, std::size_t, const std::vector <std::shared_ptr<engine::Texture>>& textures);
+	~MapLayer();
+	
+	MapLayer(const MapLayer&) = delete;
+	MapLayer& operator = (const MapLayer&) = delete;
+	
+	///Draw the map with the given data
+	void draw(glm::mat4 model, unsigned int modelLoc, unsigned int, unsigned int);
 
-	// setup() -function to get properties
-	void setup(const string tilemap);
+	///How many layers are there in the map
+	float zLayer = 0;
+	///The size of the tiles
+	glm::vec2 tileSize;
+private:
+	std::vector < std::shared_ptr<engine::Texture> > m_allTextures;
 
+	unsigned int VAO;
+	//unsigned int tileSize;
 
+	struct Subset final
+	{
+		float sx;
+		float sy;
+		unsigned vbo = 0;
+		std::shared_ptr<engine::Texture> texture = 0;
+		std::shared_ptr<engine::Texture> lookup = 0;
+	};
+	std::vector<Subset> m_subsets;
+
+	void createSubsets(const tmx::Map&, std::size_t);
 };

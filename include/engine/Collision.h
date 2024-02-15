@@ -2,7 +2,7 @@
 #include <engine/Vector.h>
 #include <engine/ECS.h>
 #include <engine/Primitive.h>
-#include <engine/Tilemap.h>
+#include <engine/OldTilemap.h>
 #include <vector>
 #include <array>
 #include <functional>
