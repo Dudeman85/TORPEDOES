@@ -4,10 +4,6 @@
 //Sanity saver
 using namespace engine;
 
-//Add a deleteAllEntities function to ecs
-//Add an overridable exception to deleteAllEntities in the for of a "persistent" tag which prevents deletion
-//Game programmer defines functions with everything needed to load a level, which they can call after deleteAllEntities
-
 ecs::Entity entity;
 ecs::Entity entity2;
 

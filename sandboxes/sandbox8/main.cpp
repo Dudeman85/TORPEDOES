@@ -1,4 +1,4 @@
-//Author Leandro Lopez (Leo): Camera Fix.
+//Author Leandro Lopez (Leo): Camera Fix. Multi texture render 
 #define WIN32_LEAN_AND_MEAN
 #include <engine/Tilemap.h>
 #include "PlayerController.h"
@@ -252,7 +252,7 @@ int main()
 
 	// Loand Map . Tilemap file 
 	Tilemap map(&cam);
-	map.loadMap("level1.tmx");
+	map.loadMap("level2.tmx");
 	spriteRenderSystem->SetTilemap(&map);
 	collisionSystem->SetTilemap(&map);
 	PhysicsSystem::SetTileProperty(1, TileProperty{ true });
@@ -461,9 +461,9 @@ int main()
 		//Calculate the Bounding Box
 		std::array<float, 4> camBounds{
 			cam.position.y * 2 + cam.height / 2,  // yls pain 
-				cam.position.x * 2 + cam.width / 2,   // leveys 
-				cam.position.y * 2 - cam.height / 2,
-				cam.position.x * 2 - cam.width / 2 };
+			cam.position.x * 2 + cam.width / 2,   // leveys 
+			cam.position.y * 2 - cam.height / 2,
+			cam.position.x * 2 - cam.width / 2 };
 
 		float zoomOutThreshold = -camPadding * 2.5f;
 		float zoomInThreshold = camPadding * 2.0f;
@@ -482,8 +482,8 @@ int main()
 			playerController->playerBounds[3] < camBounds[3] - zoomOutThreshold)
 		{
 
-			float zoomOutFactor = 10.0f;
-			float zoomOutValue = zoomOutFactor - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10.0f;
+			float zoomOutFactor = 5.0f;
+			float zoomOutValue = zoomOutFactor - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 5.0f;
 			camScale = max(camScale + zoomOutValue, camScaleMin);
 			/*camScale += 10 - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10;*/
 		}
@@ -544,22 +544,3 @@ int main()
 }
 
 
-
-
-
-//Zoom in
-		//else if (topDiff - camPadding > camDeadzone && rightDiff - camPadding > camDeadzone && bottomDiff - camPadding > camDeadzone && leftDiff - camPadding > camDeadzone)
-		//	camScale -=  min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 100;
-
-
-// Zoom out 
-// (topDiff  <- camPadding < -camDeadzone || rightDiff - camPadding < -camDeadzone || bottomDiff - camPadding < -camDeadzone || leftDiff - camPadding < - camDeadzone) 
-
-
-
-// Zoom in
-// (topDiff > camPadding > camDeadzone && rightDiff - camPadding > camDeadzone && bottomDiff - camPadding > camDeadzone && leftDiff - camPadding > camDeadzone)
-
-//float aspectRation = cam.width / cam.height;
-//float desiredZoom = max(boundingBoxWidth / (cam.width * aspectRatio), boundingBoxHeight / cam.height);
-//camScale = max(desiredZoom, camScaleMin, camScaleMax);
