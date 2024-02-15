@@ -33,17 +33,24 @@ int main()
     input::DigitalInputEvent* shootEvent = new input::DigitalInputEvent("shootEvent");
     // TODO: Make an API for this, so no need to call "new"
 
+    input::DigitalInputEvent* Boost = new input::DigitalInputEvent("Boost");
+
     input::AnalogInputEvent* moveforward1 = new input::AnalogInputEvent("movePlayer1");
     input::AnalogInputEvent* moveforward2 = new input::AnalogInputEvent("movePlayer2");
+    input::AnalogInputEvent* moveforward3 = new input::AnalogInputEvent("movePlayer3");
+    input::AnalogInputEvent* moveforward4 = new input::AnalogInputEvent("movePlayer4");
     // TODO: Make an API for this, so no need to call "new"
 
     // TODO: Add GLFW_GAMEPAD axis to analog binding
-    input::bindAnalogInput(GLFW_JOYSTICK_1, {"movePlayer1"});
+    input::bindAnalogInput(GLFW_JOYSTICK_1, {"movePlayer1"}, { GLFW_GAMEPAD_AXIS_LEFT_X, GLFW_GAMEPAD_AXIS_LEFT_Y });
     input::bindAnalogInput(GLFW_JOYSTICK_2, {"movePlayer2"});
     input::bindAnalogInput(GLFW_JOYSTICK_3, {"movePlayer3"});
     input::bindAnalogInput(GLFW_JOYSTICK_4, {"movePlayer3"});
 
+    input::bindDigitalControllerInput(GLFW_JOYSTICK_1, GLFW_GAMEPAD_BUTTON_A, { "movePlayer3" });
+
     input::bindDigitalInput(GLFW_KEY_SPACE, {"shootEvent"});
+    input::bindDigitalInput(GLFW_GAMEPAD_BUTTON_A, {"shootEvent"});
 
     // Main loop
     while (!glfwWindowShouldClose(window)) 
@@ -52,25 +59,24 @@ int main()
         //glfwPollEvents();
         input::update();
 
-        // DONE: Add & test InputButtons
-        // DONE: Add InputEvents
-        // DONE: Test InputEvents
-        // DONE: Add analog axis
-        // DONE: Add & test InputCustom
-
         std::string message = "";
-        if (shootEvent->isNewPress())
+        if (Boost->isNewPress())
         {
-            message = " x pressed";
+            message = "Boost pressed";
         }
-        if (shootEvent->isNewRelease())
+        if (Boost->isNewRelease())
         {
-            std::cout << " x release";
+            std::cout << "Boost release";
         }
-        if(message.length() > 3)
-        std::cout << message << "\n";
+        if (message.length() > 3)
+        {
+            std::cout << message << "\n";
+        }
+
+        //std::cout << moveforward1->getValue(0) << " " << moveforward1->getValue(1) << "\n";
        
-        // TODO: Add & test InputAxisEvents
+        
+
         // TODO: Add & test API functions for easy creation, modification & access of all above
     }
 
