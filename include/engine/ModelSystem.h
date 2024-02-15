@@ -7,25 +7,23 @@ namespace engine
 {
 	///3D Model Renderer component
 	ECS_REGISTER_COMPONENT(ModelRenderer)
-	struct ModelRenderer
+		struct ModelRenderer
 	{
 		///Stores vertex data
 		Model* model;
 		///Stores shader data
 		Shader* shader;
 
-		std::vector<Texture*> textures; // save multiple textures
-		//Texture* defaultTexture;
-
+		///Alternate textures, will override default ones from model
+		std::vector<Texture*> textures;
 	};
-	
 
 	///3D Model Render System, requires Transform and ModelRenderer
 	ECS_REGISTER_SYSTEM(ModelRenderSystem, Transform, ModelRenderer)
-	class ModelRenderSystem : public ecs::System
+		class ModelRenderSystem : public ecs::System
 	{
 	public:
-		///Initialize the shaders
+		///Initialize the Model Render System
 		void Init()
 		{
 			//The default 3D model shader with bling-phong lighting
@@ -88,9 +86,8 @@ namespace engine
 				}
 				)", false);
 		}
-	
-		///Call this every frame
 
+		///Call this every frame
 		void Update(Camera* cam)
 		{
 			//For each entity
@@ -126,45 +123,47 @@ namespace engine
 				//Light Position
 				unsigned int lightPosLoc = glGetUniformLocation(shader->ID, "lightPos");
 				glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
-				// camara pposition
+				//Camera Position
 				unsigned int viewPosLoc = glGetUniformLocation(shader->ID, "viewPos");
 				glUniform3fv(viewPosLoc, 1, glm::value_ptr(cam->position));
 
-
 				unsigned int diffuseNr = 1;
 				unsigned int specularNr = 1;
-
 				//For each mesh in the model
 				for (unsigned int i = 0; i < modelRenderer.model->meshes.size(); i++)
 				{
 					Mesh mesh = modelRenderer.model->meshes[i];
 
-					////Activate proper texture unit before binding
-					glActiveTexture(GL_TEXTURE0);
+					//Use default texture if no specific texture is assigned
+					glActiveTexture(GL_TEXTURE0 + i);
 
-					// Check if we have a texture for this mesh
-					if (i < modelRenderer.textures.size() && modelRenderer.textures[i]) {
-						//Bind texture
+					//Retrieve texture number and type (the N in texture_{type}N)
+					std::string number;
+					std::string name;
+
+					//Check if we have an override texture for this mesh
+					if (i < modelRenderer.textures.size() && modelRenderer.textures[i])
+					{
+						name = modelRenderer.textures[i]->type;
+
+						//Bind override texture
 						glBindTexture(GL_TEXTURE_2D, modelRenderer.textures[i]->ID());
 					}
-					else {
-						// Use default texture if no specific texture is assigned
-						
-						glActiveTexture(GL_TEXTURE0 + i);
+					else
+					{
+						name = mesh.textures[i]->type;
 
-						//Retrieve texture number and type (the N in texture_{type}N)
-						std::string number;
-						std::string name = mesh.textures[i]->type;
-						if (name == "texture_diffuse")
-							number = std::to_string(diffuseNr++);
-						else if (name == "texture_specular")
-							number = std::to_string(specularNr++);
-
-						//Set the uniform for the material texture
-						glUniform1i(glGetUniformLocation(shader->ID, (name + number).c_str()), i);
-
+						//Bind default texture
 						glBindTexture(GL_TEXTURE_2D, mesh.textures[i]->ID());
 					}
+
+					if (name == "texture_diffuse")
+						number = std::to_string(diffuseNr++);
+					else if (name == "texture_specular")
+						number = std::to_string(specularNr++);
+
+					//Set the uniform for the material texture
+					glUniform1i(glGetUniformLocation(shader->ID, (name + number).c_str()), i);
 
 					//Draw mesh
 					glBindVertexArray(mesh.VAO);
