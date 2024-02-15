@@ -174,34 +174,34 @@ int main()
 	ecs::Entity torpIndicator1 = ecs::NewEntity();
 	ecs::AddComponent(torpIndicator1, TextRenderer{ .font = &stencilFont, .text = playerNames[0], .offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 	ecs::AddComponent(torpIndicator1, SpriteRenderer{ .texture = &torprdytexture});
-	ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(15, 15, 8) });
+	ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
 	ecs::Entity torpIndicator2 = ecs::NewEntity();
 	ecs::AddComponent(torpIndicator2, SpriteRenderer{ .texture = &torprdytexture});
-	ecs::AddComponent(torpIndicator2, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(15, 15, 8) });
+	ecs::AddComponent(torpIndicator2, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
 
 	ecs::Entity torpIndicator3 = ecs::NewEntity();
 	ecs::AddComponent(torpIndicator3, TextRenderer{ .font = &stencilFont, .text = playerNames[1], .offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 	ecs::AddComponent(torpIndicator3, SpriteRenderer{ .texture = &torprdytexture});
-	ecs::AddComponent(torpIndicator3, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(15, 15, 8) });
+	ecs::AddComponent(torpIndicator3, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
 	ecs::Entity torpIndicator4 = ecs::NewEntity();
 	ecs::AddComponent(torpIndicator4, SpriteRenderer{ .texture = &torprdytexture});
-	ecs::AddComponent(torpIndicator4, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(15, 15, 8) });
+	ecs::AddComponent(torpIndicator4, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
 
 	ecs::Entity torpIndicator5 = ecs::NewEntity();
 	ecs::AddComponent(torpIndicator5, TextRenderer{ .font = &stencilFont, .text = playerNames[2],.offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	ecs::AddComponent(torpIndicator5, SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator5, Transform{ .position = Vector3(0.25, -0.9, -0.55), .scale = Vector3(0.05, 0.085, 1) });
+	ecs::AddComponent(torpIndicator5, SpriteRenderer{ .texture = &torprdytexture});
+	ecs::AddComponent(torpIndicator5, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
 	ecs::Entity torpIndicator6 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator6, SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator6, Transform{ .position = Vector3(0.25, -0.9, -0.55), .scale = Vector3(0.05, 0.085, 1) });
+	ecs::AddComponent(torpIndicator6, SpriteRenderer{ .texture = &torprdytexture});
+	ecs::AddComponent(torpIndicator6, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
 
 	ecs::Entity torpIndicator7 = ecs::NewEntity();
 	ecs::AddComponent(torpIndicator7, TextRenderer{ .font = &stencilFont, .text = playerNames[3],.offset = Vector3(0.0f, 1.25f, 0.0f), .scale = Vector3(0.013f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	ecs::AddComponent(torpIndicator7, SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator7, Transform{ .position = Vector3(0.65, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
+	ecs::AddComponent(torpIndicator7, SpriteRenderer{ .texture = &torprdytexture});
+	ecs::AddComponent(torpIndicator7, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
 	ecs::Entity torpIndicator8 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator8, SpriteRenderer{ .texture = &torprdytexture, .uiElement = true });
-	ecs::AddComponent(torpIndicator8, Transform{ .position = Vector3(0.75, -0.9, -0.55), .scale = Vector3(0.05, 0.085, 1) });
+	ecs::AddComponent(torpIndicator8, SpriteRenderer{ .texture = &torprdytexture});
+	ecs::AddComponent(torpIndicator8, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
 
 
 	// create explosion Animation PlayerController 
@@ -294,9 +294,9 @@ int main()
 
 		Transform& p1Transform = ecs::GetComponent<Transform>(laMuerte);
 		Transform& torpIconLoc1 = ecs::GetComponent<Transform>(torpIndicator1);
-		torpIconLoc1.position = Vector3(p1Transform.position.x - 25, p1Transform.position.y - 18, 200);
+		torpIconLoc1.position = Vector3(p1Transform.position.x -3, p1Transform.position.y - 16, 200);
 		Transform& torpIconLoc2 = ecs::GetComponent<Transform>(torpIndicator2);
-		torpIconLoc2.position = Vector3(p1Transform.position.x + 5, p1Transform.position.y - 18, 201);
+		torpIconLoc2.position = Vector3(p1Transform.position.x -3, p1Transform.position.y - 23, 201);
 		SpriteRenderer& torpIcon1 = ecs::GetComponent<SpriteRenderer>(torpIndicator1);
 		SpriteRenderer& torpIcon2 = ecs::GetComponent<SpriteRenderer>(torpIndicator2);
 		//player 1
@@ -324,9 +324,9 @@ int main()
 		// Player 2
 		Transform& p2Transform = ecs::GetComponent<Transform>(laMuerte2);
 		Transform& torpIconLoc3 = ecs::GetComponent<Transform>(torpIndicator3);
-		torpIconLoc3.position = Vector3(p2Transform.position.x - 25, p2Transform.position.y - 18, 200);
+		torpIconLoc3.position = Vector3(p2Transform.position.x - 5, p2Transform.position.y - 16, 200);
 		Transform& torpIconLoc4 = ecs::GetComponent<Transform>(torpIndicator4);
-		torpIconLoc4.position = Vector3(p2Transform.position.x + 5, p2Transform.position.y - 18, 201);
+		torpIconLoc4.position = Vector3(p2Transform.position.x - 5, p2Transform.position.y - 24, 201);
 		SpriteRenderer& torpIcon3 = ecs::GetComponent<SpriteRenderer>(torpIndicator3);
 		SpriteRenderer& torpIcon4 = ecs::GetComponent<SpriteRenderer>(torpIndicator4);
 		
@@ -353,50 +353,70 @@ int main()
 
 		}
 
-		//// palyer 3
-		//if (player3.projectileTime1 > 0)
-		//{
-		//	torpicon5.texture = &torprldtexture;
-		//}
-		//else
-		//{
-		//	torpicon5.texture = &torprdytexture;
-		//	//torpSpeaker5.Play(torpedoSound);
-		//	//soundDevice->SetSourceLocation(torpSpeaker5, PlayerTransform3.position.x, PlayerTransform3.position.y, 0);
-		//}
-		//if (player3.projectileTime2 > 0)
-		//{
-		//	torpicon6.texture = &torprldtexture;
-		//}
-		//else
-		//{
-		//	torpicon6.texture = &torprdytexture;
-		//	//torpSpeaker6.Play(torpedoSound);
-		//	//soundDevice->SetSourceLocation(torpSpeaker6, PlayerTransform3.position.x, PlayerTransform3.position.y, 0);
-		//}
+		// Player 3
+		Transform& p3Transform = ecs::GetComponent<Transform>(laMuerte3);
+		Transform& torpIconLoc5 = ecs::GetComponent<Transform>(torpIndicator5);
+		torpIconLoc5.position = Vector3(p3Transform.position.x - 5, p3Transform.position.y - 16, 200);
+		Transform& torpIconLoc6 = ecs::GetComponent<Transform>(torpIndicator6);
+		torpIconLoc6.position = Vector3(p3Transform.position.x - 5, p3Transform.position.y - 24, 201);
+		SpriteRenderer& torpIcon5 = ecs::GetComponent<SpriteRenderer>(torpIndicator5);
+		SpriteRenderer& torpIcon6 = ecs::GetComponent<SpriteRenderer>(torpIndicator6);
 
-		//// palyer 4 
 
-		//if (player4.projectileTime1 > 0)
-		//{
-		//	torpicon7.texture = &torprldtexture;
-		//}
-		//else
-		//{
-		//	torpicon7.texture = &torprdytexture;
-		//	//torpSpeaker7.Play(torpedoSound);
-		//	//soundDevice->SetSourceLocation(torpSpeaker7, PlayerTransform4.position.x, PlayerTransform4.position.y, 0);
-		//}
-		//if (player4.projectileTime2 > 0)
-		//{
-		//	torpicon8.texture = &torprldtexture;
-		//}
-		//else
-		//{
-		//	torpicon8.texture = &torprdytexture;
-		//	//torpSpeaker8.Play(torpedoSound);
-		//	//soundDevice->SetSourceLocation(torpSpeaker8, PlayerTransform4.position.x, PlayerTransform4.position.y, 0);
-		//}
+		if (player3.projectileTime1 > 0)
+		{
+			torpIcon5.texture = &torprldtexture;
+		}
+		else
+		{
+			torpIcon5.texture = &torprdytexture;
+			//torpSpeaker3.Play(torpedoSound);
+			//soundDevice->SetSourceLocation(torpSpeaker3, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
+		}
+		if (player3.projectileTime2 > 0)
+		{
+			torpIcon6.texture = &torprldtexture;
+		}
+		else
+		{
+			torpIcon6.texture = &torprdytexture;
+			//torpSpeaker4.Play(torpedoSound);
+			//soundDevice->SetSourceLocation(torpSpeaker4, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
+
+		}
+
+		// Player 4
+		Transform& p4Transform = ecs::GetComponent<Transform>(laMuerte4);
+		Transform& torpIconLoc7 = ecs::GetComponent<Transform>(torpIndicator7);
+		torpIconLoc7.position = Vector3(p4Transform.position.x - 5, p4Transform.position.y - 16, 200);
+		Transform& torpIconLoc8 = ecs::GetComponent<Transform>(torpIndicator8);
+		torpIconLoc8.position = Vector3(p4Transform.position.x - 5, p4Transform.position.y - 24, 201);
+		SpriteRenderer& torpIcon7 = ecs::GetComponent<SpriteRenderer>(torpIndicator7);
+		SpriteRenderer& torpIcon8 = ecs::GetComponent<SpriteRenderer>(torpIndicator8);
+
+
+		if (player4.projectileTime1 > 0)
+		{
+			torpIcon7.texture = &torprldtexture;
+		}
+		else
+		{
+			torpIcon7.texture = &torprdytexture;
+			//torpSpeaker3.Play(torpedoSound);
+			//soundDevice->SetSourceLocation(torpSpeaker3, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
+		}
+		if (player4.projectileTime2 > 0)
+		{
+			torpIcon8.texture = &torprldtexture;
+		}
+		else
+		{
+			torpIcon8.texture = &torprdytexture;
+			//torpSpeaker4.Play(torpedoSound);
+			//soundDevice->SetSourceLocation(torpSpeaker4, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
+
+		}
+
 
 		//engine Sounds
 		//soundDevice->SetSourceLocation(engineSpeaker, PlayerTransform.position.x, PlayerTransform.position.y, 0);
