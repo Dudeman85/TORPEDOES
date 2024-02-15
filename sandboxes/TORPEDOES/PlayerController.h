@@ -165,6 +165,7 @@ public:
 			{   // Do animation where projectile impact 
 				CreateAnimation(projectransfor.position);
 				projectransfor.position.y += 10000000;
+
 			}
 		}
 	}
