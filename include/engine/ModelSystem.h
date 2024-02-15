@@ -127,43 +127,52 @@ namespace engine
 				unsigned int viewPosLoc = glGetUniformLocation(shader->ID, "viewPos");
 				glUniform3fv(viewPosLoc, 1, glm::value_ptr(cam->position));
 
-				unsigned int diffuseNr = 1;
-				unsigned int specularNr = 1;
 				//For each mesh in the model
 				for (unsigned int i = 0; i < modelRenderer.model->meshes.size(); i++)
 				{
+					unsigned int diffuseNr = 1;
+					unsigned int specularNr = 1;
+
 					Mesh mesh = modelRenderer.model->meshes[i];
 
-					//Use default texture if no specific texture is assigned
-					glActiveTexture(GL_TEXTURE0 + i);
-
-					//Retrieve texture number and type (the N in texture_{type}N)
-					std::string number;
-					std::string name;
-
-					//Check if we have an override texture for this mesh
-					if (i < modelRenderer.textures.size() && modelRenderer.textures[i])
+					//For each Texture in the mesh
+					for (unsigned int j = 0; j < mesh.textures.size(); j++)
 					{
-						name = modelRenderer.textures[i]->type;
+						//Use default texture if no specific texture is assigned
+						glActiveTexture(GL_TEXTURE0 + j);
 
-						//Bind override texture
-						glBindTexture(GL_TEXTURE_2D, modelRenderer.textures[i]->ID());
+						//Retrieve texture number and type (the N in texture_{type}N)
+						std::string number;
+						std::string name;
+
+						//Check if we have an override texture for this mesh
+						if (j < modelRenderer.textures.size() && modelRenderer.textures[j])
+						{
+							name = modelRenderer.textures[j]->type;
+
+							//Bind override texture
+							glBindTexture(GL_TEXTURE_2D, modelRenderer.textures[j]->ID());
+						}
+						//Use default texture
+						else
+						{
+							name = mesh.textures[j]->type;
+
+							//Bind default texture
+							glBindTexture(GL_TEXTURE_2D, mesh.textures[j]->ID());
+						}
+
+						if (name == "texture_diffuse")
+							number = std::to_string(diffuseNr++);
+						else if (name == "texture_specular")
+							number = std::to_string(specularNr++);
+
+						//Set the uniform for the material texture
+						glUniform1i(glGetUniformLocation(shader->ID, (name + number).c_str()), j);
 					}
-					else
-					{
-						name = mesh.textures[i]->type;
 
-						//Bind default texture
-						glBindTexture(GL_TEXTURE_2D, mesh.textures[i]->ID());
-					}
-
-					if (name == "texture_diffuse")
-						number = std::to_string(diffuseNr++);
-					else if (name == "texture_specular")
-						number = std::to_string(specularNr++);
-
-					//Set the uniform for the material texture
-					glUniform1i(glGetUniformLocation(shader->ID, (name + number).c_str()), i);
+					//Unbind texture
+					glActiveTexture(GL_TEXTURE0);
 
 					//Draw mesh
 					glBindVertexArray(mesh.VAO);
