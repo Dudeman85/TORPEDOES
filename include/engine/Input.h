@@ -272,7 +272,6 @@ namespace input
 		// Before handling new events, we should refresh the event's state
 		void refreshState()
 		{
-			InputState newState = InputState::None;
 			pressed = eventStates::Not;
 			released = eventStates::Not;
 
@@ -366,7 +365,7 @@ namespace input
 				}
 			}
 			else
-			{ 
+			{
 				// Set outputState to be InputState
 				buttonOutputState = buttonInputState;
 				// Reset inputState
@@ -650,6 +649,12 @@ namespace input
 	// Updates all inputs. Call BEFORE polling input events (such as before gameloop)
 	static void update()
 	{
+		// Update DigitalInputEvents
+		for (auto it = nameToDigitalInputEvent.begin(); it != nameToDigitalInputEvent.end(); ++it)
+		{
+			it->second->refreshState();
+		}
+
 		// Read all new events
 		glfwPollEvents();
 

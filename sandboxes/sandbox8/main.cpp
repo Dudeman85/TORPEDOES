@@ -60,6 +60,19 @@ int main()
 	Model model("LaMuerte.obj");
 	Model checkPointModel("Checkpoint.obj");
 	Model model2("Finish_line.obj");
+
+	// Texture list 
+	Texture *texturePtr = new Texture("text2.png");
+	std::vector<Texture*> textures;
+	textures.push_back(texturePtr);
+
+
+
+
+
+
+
+
 	//(Texture GUItexture = Texture("GUI_backround.png");
 	Texture torprldtexture = Texture("torpedoReloading.png");
 	Texture torprdytexture = Texture("torpedoReady.png");
@@ -168,7 +181,7 @@ int main()
 	ecs::AddComponent(pFont4, Transform{ .position = Vector3(1434.0f,-1549.0f, 100.0f) });
 	ecs::AddComponent(laMuerte4, Transform{ .position = Vector3(1474.321533, -1569.868286, 100.000000), .rotation = Vector3(45.000000, 0.0000, 0.000000), .scale = Vector3(7) });
 	ecs::AddComponent(laMuerte4, Player{ .acerationSpeed = 300.0f, .minAceleration = 120.0f, .playerID = 3, .playerFont = pFont4,.playername = playerNames[3], .playerLap = lap });
-	ecs::AddComponent(laMuerte4, ModelRenderer{ .model = &model });
+	ecs::AddComponent(laMuerte4, ModelRenderer{ .model = &model , .textures = textures });// new implement Texture list load multitexture (Leo-test)
 	ecs::AddComponent(laMuerte4, Rigidbody{ .drag = 0.025f });
 	ecs::AddComponent(laMuerte4, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision , .visualise = false });
 	//engineSpeaker4.Play(engineSound);
@@ -239,7 +252,7 @@ int main()
 
 	// Loand Map . Tilemap file 
 	Tilemap map(&cam);
-	map.loadMap("level1.tmx");
+	map.loadMap("level2.tmx");
 	spriteRenderSystem->SetTilemap(&map);
 	collisionSystem->SetTilemap(&map);
 	PhysicsSystem::SetTileProperty(1, TileProperty{ true });
@@ -448,9 +461,9 @@ int main()
 		//Calculate the Bounding Box
 		std::array<float, 4> camBounds{
 			cam.position.y * 2 + cam.height / 2,  // yls pain 
-				cam.position.x * 2 + cam.width / 2,   // leveys 
-				cam.position.y * 2 - cam.height / 2,
-				cam.position.x * 2 - cam.width / 2 };
+			cam.position.x * 2 + cam.width / 2,   // leveys 
+			cam.position.y * 2 - cam.height / 2,
+			cam.position.x * 2 - cam.width / 2 };
 
 		float zoomOutThreshold = -camPadding * 2.5f;
 		float zoomInThreshold = camPadding * 2.0f;
@@ -504,10 +517,10 @@ int main()
 		float desiredZoom = max(boundingBoxWidth / (cam.width * aspectRatio), boundingBoxHeight / cam.height);
 
 
-		// Ajustar el zoom de la cmara solo si el zoom deseado supera los lmites establecidos
-		if (desiredZoom > camScaleMin && desiredZoom < camScaleMax) {
-			camScale = desiredZoom;
-		}
+		//// Ajustar el zoom de la cmara solo si el zoom deseado supera los lmites establecidos
+		//if (desiredZoom > camScaleMin && desiredZoom < camScaleMax) {
+		//	camScale = desiredZoom;
+		//}
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
