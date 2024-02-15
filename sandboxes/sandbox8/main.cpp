@@ -252,7 +252,7 @@ int main()
 
 	// Loand Map . Tilemap file 
 	Tilemap map(&cam);
-	map.loadMap("level1.tmx");
+	map.loadMap("level2.tmx");
 	spriteRenderSystem->SetTilemap(&map);
 	collisionSystem->SetTilemap(&map);
 	PhysicsSystem::SetTileProperty(1, TileProperty{ true });
@@ -461,9 +461,9 @@ int main()
 		//Calculate the Bounding Box
 		std::array<float, 4> camBounds{
 			cam.position.y * 2 + cam.height / 2,  // yls pain 
-				cam.position.x * 2 + cam.width / 2,   // leveys 
-				cam.position.y * 2 - cam.height / 2,
-				cam.position.x * 2 - cam.width / 2 };
+			cam.position.x * 2 + cam.width / 2,   // leveys 
+			cam.position.y * 2 - cam.height / 2,
+			cam.position.x * 2 - cam.width / 2 };
 
 		float zoomOutThreshold = -camPadding * 2.5f;
 		float zoomInThreshold = camPadding * 2.0f;
@@ -517,10 +517,10 @@ int main()
 		float desiredZoom = max(boundingBoxWidth / (cam.width * aspectRatio), boundingBoxHeight / cam.height);
 
 
-		// Ajustar el zoom de la cmara solo si el zoom deseado supera los lmites establecidos
-		if (desiredZoom > camScaleMin && desiredZoom < camScaleMax) {
-			camScale = desiredZoom;
-		}
+		//// Ajustar el zoom de la cmara solo si el zoom deseado supera los lmites establecidos
+		//if (desiredZoom > camScaleMin && desiredZoom < camScaleMax) {
+		//	camScale = desiredZoom;
+		//}
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
