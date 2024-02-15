@@ -15,7 +15,7 @@ namespace engine
 		Shader* shader;
 
 		std::vector<Texture*> textures; // save multiple textures
-		Texture* defaultTexture;
+		//Texture* defaultTexture;
 
 	};
 	
@@ -131,20 +131,25 @@ namespace engine
 				glUniform3fv(viewPosLoc, 1, glm::value_ptr(cam->position));
 
 
+				unsigned int diffuseNr = 1;
+				unsigned int specularNr = 1;
+
 				//For each mesh in the model
 				for (unsigned int i = 0; i < modelRenderer.model->meshes.size(); i++)
 				{
 					Mesh mesh = modelRenderer.model->meshes[i];
 
-					//Texture uniforms are named: uniform sampler2D texture_diffuseN, or texture_specularN
-					//We can support up to 8 textures which have to be defined in the shader
-					unsigned int diffuseNr = 1;
-					unsigned int specularNr = 1;
+					////Activate proper texture unit before binding
+					glActiveTexture(GL_TEXTURE0);
 
-					//For each Texture in the mesh
-					for (unsigned int i = 0; i < mesh.textures.size(); i++)
-					{
-						//Activate proper texture unit before binding
+					// Check if we have a texture for this mesh
+					if (i < modelRenderer.textures.size() && modelRenderer.textures[i]) {
+						//Bind texture
+						glBindTexture(GL_TEXTURE_2D, modelRenderer.textures[i]->ID());
+					}
+					else {
+						// Use default texture if no specific texture is assigned
+						
 						glActiveTexture(GL_TEXTURE0 + i);
 
 						//Retrieve texture number and type (the N in texture_{type}N)
@@ -160,9 +165,6 @@ namespace engine
 
 						glBindTexture(GL_TEXTURE_2D, mesh.textures[i]->ID());
 					}
-
-					//Unbind texture
-					glActiveTexture(GL_TEXTURE0);
 
 					//Draw mesh
 					glBindVertexArray(mesh.VAO);
@@ -185,3 +187,4 @@ namespace engine
 		Shader* defaultShader;
 	};
 }
+
