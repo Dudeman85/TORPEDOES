@@ -75,7 +75,7 @@ int main()
 	ecs::AddComponent(pSFont4, Transform{ .position = Vector3(0.75, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
 
 
-	playerController->CreatePlayers(4, Vector2(1434.0f, -1370.0f));
+	playerController->CreatePlayers(6, Vector2(1434.0f, -1370.0f));
 
 
 	// create explosion Animation PlayerController 
@@ -101,8 +101,7 @@ int main()
 	ecs::AddComponent(crowd2, Animator{});
 	AnimationSystem::AddAnimation(crowd2, crowdAnims, "Cheer3");
 	AnimationSystem::PlayAnimation(crowd2, "Cheer3", true);
-	//cheerSpeaker.Play(cheerSound);
-	//cheerSpeaker.SetLooping(1);
+
 
 	Animation countdownAnim = AnimationsFromSpritesheet("/spritesheets/UI_Countdown_Ver2.png", 5, 1, vector<int>(5, 1000))[0];
 	ecs::Entity countdown = ecs::NewEntity();
@@ -135,19 +134,6 @@ int main()
 
 	while (!glfwWindowShouldClose(window))
 	{
-		TextRenderer& winText = ecs::GetComponent<TextRenderer>(playerWin);
-		TextRenderer& p1Win = ecs::GetComponent<TextRenderer>(pSFont1);
-		TextRenderer& p2Win = ecs::GetComponent<TextRenderer>(pSFont2);
-		TextRenderer& p3Win = ecs::GetComponent<TextRenderer>(pSFont3);
-		TextRenderer& p4Win = ecs::GetComponent<TextRenderer>(pSFont4);
-
-		/*
-		Player& player = ecs::GetComponent<Player>(laMuerte);
-		Player& player2 = ecs::GetComponent<Player>(laMuerte2);
-		Player& player3 = ecs::GetComponent<Player>(laMuerte3);
-		Player& player4 = ecs::GetComponent<Player>(laMuerte4);
-		*/
-
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
@@ -157,200 +143,11 @@ int main()
 		// star Timer 
 		float Timer = playerController->getTimer();
 		std::string timerStr = std::to_string((int)round(Timer)); // round pyörista float arvo lahipakokonais 
-		//winText.text = timerStr.c_str();
 		// UI System 				
-
-		/*
-		p1Win.text = to_string(player.lap) + "/1";
-		p2Win.text = to_string(player2.lap) + "/1";
-		p3Win.text = to_string(player3.lap) + "/1";
-		p4Win.text = to_string(player4.lap) + "/1";
-		*/
-		/*
-		//player 1
-		Transform& p1Transform = ecs::GetComponent<Transform>(laMuerte);
-		Transform& torpIconLoc1 = ecs::GetComponent<Transform>(torpIndicator1);
-		torpIconLoc1.position = Vector3(p1Transform.position.x - 3, p1Transform.position.y - 16, 200);
-		Transform& torpIconLoc2 = ecs::GetComponent<Transform>(torpIndicator2);
-		torpIconLoc2.position = Vector3(p1Transform.position.x - 3, p1Transform.position.y - 23, 201);
-		SpriteRenderer& torpIcon1 = ecs::GetComponent<SpriteRenderer>(torpIndicator1);
-		SpriteRenderer& torpIcon2 = ecs::GetComponent<SpriteRenderer>(torpIndicator2);
-
-		if (player.projectileTime1 > 0)
-		{
-			torpIcon1.texture = &torprldtexture;
-		}
-		else
-		{
-			torpIcon1.texture = &torprdytexture;
-			//torpSpeaker.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker, PlayerTransform.position.x, PlayerTransform.position.y, 0);
-		}
-		if (player.projectileTime2 > 0)
-		{
-			torpIcon2.texture = &torprldtexture;
-		}
-		else
-		{
-			torpIcon2.texture = &torprdytexture;
-			//torpSpeaker2.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker2, PlayerTransform.position.x, PlayerTransform.position.y, 0);
-		}
-
-		// Player 2
-		Transform& p2Transform = ecs::GetComponent<Transform>(laMuerte2);
-		Transform& torpIconLoc3 = ecs::GetComponent<Transform>(torpIndicator3);
-		torpIconLoc3.position = Vector3(p2Transform.position.x - 5, p2Transform.position.y - 16, 200);
-		Transform& torpIconLoc4 = ecs::GetComponent<Transform>(torpIndicator4);
-		torpIconLoc4.position = Vector3(p2Transform.position.x - 5, p2Transform.position.y - 24, 201);
-		SpriteRenderer& torpIcon3 = ecs::GetComponent<SpriteRenderer>(torpIndicator3);
-		SpriteRenderer& torpIcon4 = ecs::GetComponent<SpriteRenderer>(torpIndicator4);
-
-
-		if (player2.projectileTime1 > 0)
-		{
-			torpIcon3.texture = &torprldtexture;
-		}
-		else
-		{
-			torpIcon3.texture = &torprdytexture;
-			//torpSpeaker3.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker3, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
-		}
-		if (player2.projectileTime2 > 0)
-		{
-			torpIcon4.texture = &torprldtexture;
-		}
-		else
-		{
-			torpIcon4.texture = &torprdytexture;
-			//torpSpeaker4.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker4, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
-
-		}
-
-		// Player 3
-		Transform& p3Transform = ecs::GetComponent<Transform>(laMuerte3);
-		Transform& torpIconLoc5 = ecs::GetComponent<Transform>(torpIndicator5);
-		torpIconLoc5.position = Vector3(p3Transform.position.x - 5, p3Transform.position.y - 16, 200);
-		Transform& torpIconLoc6 = ecs::GetComponent<Transform>(torpIndicator6);
-		torpIconLoc6.position = Vector3(p3Transform.position.x - 5, p3Transform.position.y - 24, 201);
-		SpriteRenderer& torpIcon5 = ecs::GetComponent<SpriteRenderer>(torpIndicator5);
-		SpriteRenderer& torpIcon6 = ecs::GetComponent<SpriteRenderer>(torpIndicator6);
-
-
-		if (player3.projectileTime1 > 0)
-		{
-			torpIcon5.texture = &torprldtexture;
-		}
-		else
-		{
-			torpIcon5.texture = &torprdytexture;
-			//torpSpeaker3.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker3, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
-		}
-		if (player3.projectileTime2 > 0)
-		{
-			torpIcon6.texture = &torprldtexture;
-		}
-		else
-		{
-			torpIcon6.texture = &torprdytexture;
-			//torpSpeaker4.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker4, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
-
-		}
-
-		// Player 4
-		Transform& p4Transform = ecs::GetComponent<Transform>(laMuerte4);
-		Transform& torpIconLoc7 = ecs::GetComponent<Transform>(torpIndicator7);
-		torpIconLoc7.position = Vector3(p4Transform.position.x - 5, p4Transform.position.y - 16, 200);
-		Transform& torpIconLoc8 = ecs::GetComponent<Transform>(torpIndicator8);
-		torpIconLoc8.position = Vector3(p4Transform.position.x - 5, p4Transform.position.y - 24, 201);
-		SpriteRenderer& torpIcon7 = ecs::GetComponent<SpriteRenderer>(torpIndicator7);
-		SpriteRenderer& torpIcon8 = ecs::GetComponent<SpriteRenderer>(torpIndicator8);
-
-
-		if (player4.projectileTime1 > 0)
-		{
-			torpIcon7.texture = &torprldtexture;
-		}
-		else
-		{
-			torpIcon7.texture = &torprdytexture;
-			//torpSpeaker3.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker3, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
-		}
-		if (player4.projectileTime2 > 0)
-		{
-			torpIcon8.texture = &torprldtexture;
-		}
-		else
-		{
-			torpIcon8.texture = &torprdytexture;
-			//torpSpeaker4.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker4, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
-
-		}
-
-		//engine Sounds
-		//soundDevice->SetSourceLocation(engineSpeaker, PlayerTransform.position.x, PlayerTransform.position.y, 0);
-		//soundDevice->SetSourceLocation(engineSpeaker2, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
-		//soundDevice->SetSourceLocation(engineSpeaker3, PlayerTransform3.position.x, PlayerTransform3.position.y, 0);
-		//soundDevice->SetSourceLocation(engineSpeaker4, PlayerTransform4.position.x, PlayerTransform4.position.y, 0);
-		//adding pitch based on speed
-		/*
-		float normalizedVelocity = PlayerRigidbody.velocity.Length() / 166.0f;
-		float accLevel = std::lerp(0.0f, 1.5f, normalizedVelocity);
-		//engineSpeaker.setPitch(0.5f + accLevel);
-
-		float normalizedVelocity2 = PlayerRigidbody2.velocity.Length() / 166.0f;
-		float accLevel2 = std::lerp(0.0f, 1.5f, normalizedVelocity2);
-		//engineSpeaker2.setPitch(0.5f + accLevel2);
-
-		float normalizedVelocity3 = PlayerRigidbody3.velocity.Length() / 166.0f;
-		float accLevel3 = std::lerp(0.0f, 1.5f, normalizedVelocity3);
-		//engineSpeaker3.setPitch(0.5f + accLevel3);
-
-		float normalizedVelocity4 = PlayerRigidbody4.velocity.Length() / 166.0f;
-		float accLevel4 = std::lerp(0.0f, 1.5f, normalizedVelocity4);
-		//engineSpeaker4.setPitch(0.5f + accLevel4);
-
-		//soundDevice->SetSourceLocation(cheerSpeaker, 1530, -1700, 1);
-
-		if (player.playExlposionSound)
-		{
-
-			//explosionSpeaker.Play(explosionSound);
-			//soundDevice->SetSourceLocation(explosionSpeaker, PlayerTransform.position.x, PlayerTransform.position.y, 0);
-			player.playExlposionSound = false;
-		}
-		if (player2.playExlposionSound)
-		{
-
-			//explosionSpeaker.Play(explosionSound);
-			//soundDevice->SetSourceLocation(explosionSpeaker, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
-			player2.playExlposionSound = false;
-		}
-		if (player3.playExlposionSound)
-		{
-
-			//explosionSpeaker.Play(explosionSound);
-			//soundDevice->SetSourceLocation(explosionSpeaker, PlayerTransform3.position.x, PlayerTransform3.position.y, 0);
-			player3.playExlposionSound = false;
-		}
-		if (player4.playExlposionSound)
-		{
-
-			//explosionSpeaker.Play(explosionSound);
-			//soundDevice->SetSourceLocation(explosionSpeaker, PlayerTransform4.position.x, PlayerTransform4.position.y, 0);
-			player4.playExlposionSound = false;
-		}
-		*/
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			//Keep the camera in bounds of the tilemap and set it to the average position of the players
+		//Keep the camera in bounds of the tilemap and set it to the average position of the players
 		Vector3 avgPos = playerController->avgPosition / playerController->entities.size();
 
 		//// Center the camera on the average position of the players
@@ -424,15 +221,12 @@ int main()
 			camScale = desiredZoom;
 		}
 
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		//Reset the average player position data
 		playerController->avgPosition = Vector3();
 		playerController->playerBounds = { -INFINITY, -INFINITY, INFINITY, INFINITY };
 
-		//soundDevice->SetLocation(camPosX, camPosY, 1);
-		//soundDevice->SetOrientation(0.f, 0.f, -1.f, 0.f, 0.f, 1.f);
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 		engine::Update(&cam);
 
@@ -442,18 +236,7 @@ int main()
 		glfwPollEvents();
 	}
 
+	ecs::DestroyAllEntities(true);
 	glfwTerminate();
 	return 0;
 }
-//Zoom in
-		//else if (topDiff - camPadding > camDeadzone && rightDiff - camPadding > camDeadzone && bottomDiff - camPadding > camDeadzone && leftDiff - camPadding > camDeadzone)
-		//	camScale -=  min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 100;
-
-
-// Zoom out 
-// (topDiff  <- camPadding < -camDeadzone || rightDiff - camPadding < -camDeadzone || bottomDiff - camPadding < -camDeadzone || leftDiff - camPadding < - camDeadzone) 
-
-
-
-// Zoom in
-// (topDiff > camPadding > camDeadzone && rightDiff - camPadding > camDeadzone && bottomDiff - camPadding > camDeadzone && leftDiff - camPadding > camDeadzone)

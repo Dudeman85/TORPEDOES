@@ -74,7 +74,7 @@ class PlayerController : public ecs::System
 	{
 		ecs::Entity projecAnim = ecs::NewEntity();
 		animPosition.z += 100;
-		ecs::AddComponent(projecAnim, Transform{ .position = animPosition,  .scale = Vector3(20) });
+		ecs::AddComponent(projecAnim, Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20)});
 		ecs::AddComponent(projecAnim, SpriteRenderer{ });
 		ecs::AddComponent(projecAnim, Animator{ .onAnimationEnd = ecs::DestroyEntity });
 		AnimationSystem::AddAnimation(projecAnim, *ExplosionAnim, "explosion");
@@ -431,8 +431,8 @@ public:
 			ecs::AddComponent(player, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
 
 			//Create the player's name tag
-			ecs::AddComponent(playerNameText, TextRenderer{ .font = stencilFont, .text = "P", .color = Vector3(0.5, 0.8, 0.2) });
-			ecs::AddComponent(playerNameText, Transform{ .position = Vector3(0, 1, 1) , .scale = Vector3(10)});
+			ecs::AddComponent(playerNameText, TextRenderer{ .font = stencilFont, .text = "P" + to_string(i + 1), .color = Vector3(0.5, 0.8, 0.2)});
+			ecs::AddComponent(playerNameText, Transform{ .position = Vector3(-2, 2, 1) , .scale = Vector3(0.1)});
 			TransformSystem::AddParent(playerNameText, player);
 
 			//Create the player's rendered entity
@@ -442,10 +442,10 @@ public:
 
 			//Create the players's torpedo indicators
 			ecs::AddComponent(torpIndicator1, SpriteRenderer{ .texture = torpReadyTexture });
-			ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(-1, -1, 10), .scale = Vector3(4, 1, 1) });
+			ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(-2, -2, 10), .scale = Vector3(2, .5, 1) });
 			TransformSystem::AddParent(torpIndicator1, player);
 			ecs::AddComponent(torpIndicator2, SpriteRenderer{ .texture = torpReadyTexture });
-			ecs::AddComponent(torpIndicator2, Transform{ .position = Vector3(1, -1, 10), .scale = Vector3(4, 1, 1) });
+			ecs::AddComponent(torpIndicator2, Transform{ .position = Vector3(2, -2, 10), .scale = Vector3(2, .5, 1) });
 			TransformSystem::AddParent(torpIndicator2, player);
 		}
 	}
