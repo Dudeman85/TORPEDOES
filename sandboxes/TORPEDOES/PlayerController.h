@@ -74,7 +74,7 @@ class PlayerController : public ecs::System
 	{
 		ecs::Entity projecAnim = ecs::NewEntity();
 		animPosition.z += 100;
-		ecs::AddComponent(projecAnim, Transform{ .position = animPosition,  .scale = Vector3(20) });
+		ecs::AddComponent(projecAnim, Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20)});
 		ecs::AddComponent(projecAnim, SpriteRenderer{ });
 		ecs::AddComponent(projecAnim, Animator{ .onAnimationEnd = ecs::DestroyEntity });
 		AnimationSystem::AddAnimation(projecAnim, *ExplosionAnim, "explosion");
