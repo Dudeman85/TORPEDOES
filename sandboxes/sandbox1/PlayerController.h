@@ -92,7 +92,7 @@ public:
 	static Animation* ExplosionAnim;
 	void Init()
 	{
-		torpedomodel = new Model("torpedo.obj");
+		torpedomodel = new Model("/3dmodels/torpedo.obj");
 	}
 	~PlayerController()
 	{
@@ -154,7 +154,7 @@ public:
 			{
 				player.hitPlayer = true;
 				CreateAnimation(projectransfor.position + rigidbody.velocity / 15);
-				projectransfor.position.y += 10000000; // destroy Entity "almost"
+				ecs::DestroyEntity(collision.b);
 				player.playExlposionSound = true;
 			}
 		}
@@ -169,7 +169,7 @@ public:
 			if (collision.b != 1)
 			{   // Do animation where projectile impact 
 				CreateAnimation(projectransfor.position);
-				projectransfor.position.y += 10000000;
+				ecs::DestroyEntity(collision.a);
 			}
 		}
 	}

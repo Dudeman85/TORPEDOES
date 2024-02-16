@@ -30,24 +30,26 @@ int main()
     }
 
     input::initialize(window);
-    input::DigitalInputEvent* shootEvent = new input::DigitalInputEvent("shootEvent");
-    // TODO: Make an API for this, so no need to call "new"
 
-    input::DigitalInputEvent* Boost = new input::DigitalInputEvent("Boost");
+    for (size_t i = 0; i < 4; i++)
+    {
+        std::string eventName = "Boost" + to_string(i);
 
-    input::AnalogInputEvent* moveforward1 = new input::AnalogInputEvent("movePlayer1");
-    input::AnalogInputEvent* moveforward2 = new input::AnalogInputEvent("movePlayer2");
-    input::AnalogInputEvent* moveforward3 = new input::AnalogInputEvent("movePlayer3");
-    input::AnalogInputEvent* moveforward4 = new input::AnalogInputEvent("movePlayer4");
-    // TODO: Make an API for this, so no need to call "new"
+        input::ConstructDigitalEvent(eventName);
+        input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { eventName });
+    }
 
-    // TODO: Add GLFW_GAMEPAD axis to analog binding
-    input::bindAnalogInput(GLFW_JOYSTICK_1, {"movePlayer1"}, { GLFW_GAMEPAD_AXIS_LEFT_X, GLFW_GAMEPAD_AXIS_LEFT_Y });
-    input::bindAnalogInput(GLFW_JOYSTICK_2, {"movePlayer2"});
-    input::bindAnalogInput(GLFW_JOYSTICK_3, {"movePlayer3"});
-    input::bindAnalogInput(GLFW_JOYSTICK_4, {"movePlayer3"});
+    for (size_t i = 0; i < 4; i++)
+    {
+        std::string eventName = "Move" + to_string(i);
 
-    input::bindDigitalControllerInput(GLFW_JOYSTICK_1, GLFW_GAMEPAD_BUTTON_A, { "movePlayer3" });
+        input::ConstructAnalogEvent(eventName);
+        input::bindAnalogControllerInput(GLFW_JOYSTICK_4, { GLFW_GAMEPAD_AXIS_LEFT_X, GLFW_GAMEPAD_AXIS_LEFT_Y }, { eventName });
+
+        std::cout << eventName << "\n";
+    }
+    
+    input::ConstructDigitalEvent("shootEvent");
 
     input::bindDigitalInput(GLFW_KEY_SPACE, {"shootEvent"});
     input::bindDigitalInput(GLFW_GAMEPAD_BUTTON_A, {"shootEvent"});
@@ -60,13 +62,21 @@ int main()
         input::update();
 
         std::string message = "";
-        if (Boost->isNewPress())
+        if (input::GetNewPress("Boost0"))
         {
             message = "Boost pressed";
         }
-        if (Boost->isNewRelease())
+        if (input::GetNewRelease("Boost0"))
         {
             std::cout << "Boost release";
+        }
+        if (input::GetNewPress("Boost1"))
+        {
+            message = "Boost2 pressed";
+        }
+        if (input::GetNewRelease("Boost1"))
+        {
+            std::cout << "Boost2 release";
         }
         if (message.length() > 3)
         {
@@ -74,8 +84,6 @@ int main()
         }
 
         //std::cout << moveforward1->getValue(0) << " " << moveforward1->getValue(1) << "\n";
-       
-        
 
         // TODO: Add & test API functions for easy creation, modification & access of all above
     }

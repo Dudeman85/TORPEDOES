@@ -529,10 +529,14 @@ namespace engine::ecs
 		//Make a copy of the entities set to prevent iterator breaking
 		std::set<Entity> usedEntitiesCopy = usedEntities;
 
-		for (auto itr = usedEntitiesCopy.begin(); itr != usedEntitiesCopy.end(); ++itr)
+		for (auto itr = usedEntitiesCopy.begin(); itr != usedEntitiesCopy.end();)
 		{
 			//Get the entity and increment the iterator
-			ecs::Entity entity = *itr;
+			ecs::Entity entity = *itr++;
+
+			//Check validity of entity, it can get deleted by component destructors
+			if (!EntityExists(entity))
+				continue;
 
 			//Only delete "persistent" entities when forced
 			if (!HasTag(entity, "persistent") || ignorePersistent)

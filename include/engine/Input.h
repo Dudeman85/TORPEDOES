@@ -199,7 +199,6 @@ namespace input
 
 		}
 
-	protected:
 		std::string name;
 	};
 
@@ -459,48 +458,80 @@ namespace input
 
 		void test()
 		{
-			GLFWgamepadstate state;
-
-			if (glfwGetGamepadState(joystick, &state) != GLFW_TRUE)
+			if (!glfwJoystickPresent(joystick))
 			{
 				return;
 			}
 
-			if (state.buttons[button])
+			// Update joystick analog events
+			if (glfwJoystickIsGamepad(joystick))
 			{
-				pressState(GLFW_PRESS);
+				GLFWgamepadstate state;
+
+				// If joystick is not connected, return
+				if (glfwGetGamepadState(joystick, &state) != GLFW_TRUE)
+				{
+					return;
+				}
+
+				if (state.buttons[button])
+				{
+					pressState(GLFW_PRESS);
+				}
+				else
+				{
+					pressState(GLFW_RELEASE);
+				}
 			}
 			else
 			{
-				pressState(GLFW_RELEASE);
-			}
+				int count;
 
-			checkStateChange();
+				const unsigned char* buttonsStart = glfwGetJoystickButtons(joystick, &count);
+
+				// If button is not on the controller, return
+				if (count <= button)
+				{
+					std::cout << "WARNING: Controller" << joystick << "'s button " << button << " has been set to an invalid button. The maximum button for this controller is:" << (count - 1) << "\n";
+					return;
+				}
+
+				// If controller disconnected, return
+				if (!buttonsStart)
+				{
+					return;
+				}
+				// There is a cosmic chance that at point, the disconnect happens and game crashes. But oh well
+
+				// Set button state
+				bool a = !(*(buttonsStart + button) == GLFW_PRESS);
+
+				pressState(a);
+			}
 		}
 
 		void pressState(int pressed)
 		{
-		// REWRITE FOR CONTROLLERS, FUN!
-
 			switch (pressed)
 			{
 			case GLFW_PRESS:
 				// Button is currently being pressed, what about other inputs this update cycle?
 				switch (buttonInputState)
 				{
-				case input::InputState::None:		// No input before: ignore
-				case input::InputState::Released:	// Should not be possible: ignore
-				case input::InputState::Pressed:	// Should not be possible: ignore
-				case input::InputState::NewPress:	// Same input: ignore
+				case input::InputState::None:				// No input before
+				case input::InputState::Released:			// Not pressed last update cycle
+				case input::InputState::NewRelease:			// Not pressed last update cycle
+				case input::InputState::NewPressNewRelease:	// Not pressed last update cycle
 					// There were no conflicting inputs: Set as new press:
 					buttonInputState = InputState::NewPress;
 					break;
-				case input::InputState::NewRelease:
-				case input::InputState::NewReleaseNewPress:
-				case input::InputState::NewPressNewRelease:
-					// Both inputs: Set as new new release, then new press:
-					buttonInputState = InputState::NewReleaseNewPress;
+				case input::InputState::NewPress:			// Same input
+				case input::InputState::NewReleaseNewPress:	// Same input
+					// The input is same as last frame: Downgrade
+					buttonInputState = InputState::Pressed;
 					break;
+				case input::InputState::Pressed:			// Lesser input
+					// There were lesser inputs: Keep that input
 				default:
 					break;
 				}
@@ -509,19 +540,20 @@ namespace input
 				// Button is currently not being pressed, what about other inputs this update cycle?
 				switch (buttonInputState)
 				{
-				case input::InputState::None:		// No input before: ignore
-				case input::InputState::Released:	// Should not be possible: ignore
-				case input::InputState::Pressed:	// Should not be possible: ignore
-				case input::InputState::NewRelease:	// Same input: ignore
+				case input::InputState::None:				// No input before
+				case input::InputState::Pressed:			// Pressed last update cycle
+				case input::InputState::NewPress:			// Pressed last update cycle
+				case input::InputState::NewReleaseNewPress:	// Pressed last update cycle
 					// There were no conflicting inputs: Set as new release:
 					buttonInputState = InputState::NewRelease;
 					break;
-				case input::InputState::NewPress:
-				case input::InputState::NewReleaseNewPress:
-				case input::InputState::NewPressNewRelease:
-					// Both inputs: Set as new new press, then new release:
-					buttonInputState = InputState::NewPressNewRelease;
+				case input::InputState::NewRelease:			// Same input
+				case input::InputState::NewPressNewRelease:	// Same input
+					// The input is same as last frame: Downgrade
+					buttonInputState = InputState::Released;
 					break;
+				case input::InputState::Released:			// Lesser input
+					// There were lesser inputs: Keep that input
 				default:
 					break;
 				}
@@ -530,6 +562,10 @@ namespace input
 				// Do not handle GLFW_REPEAT
 				break;
 			}
+
+			// Set outputState to be InputState
+			buttonOutputState = buttonInputState;
+			// Do not reset inputState
 		}
 	};
 
@@ -637,10 +673,10 @@ namespace input
 		bindDigitalControllerInput(joystick, button, digitalInputEventsToBind);
 	}
 
-	class AnalogInput;
-	std::map<int, AnalogInput*> joystickToAnalogInput;	// All AnalogInputs
+	class AnalogControllerInput;
+	std::map<int, AnalogControllerInput*> joystickToAnalogInput;	// All AnalogInputs
 
-	class AnalogInput
+	class AnalogControllerInput
 	{
 	public:
 		// n-dimensional analog input
@@ -649,7 +685,7 @@ namespace input
 		float min = -1;
 		float max = 1;
 
-		AnalogInput(float joystick)
+		AnalogControllerInput(float joystick)
 		{
 			joystickToAnalogInput[joystick] = this;
 		}
@@ -680,7 +716,7 @@ namespace input
 		}
 	};
 
-	void bindAnalogInput(AnalogInput* inputButton, std::vector<AnalogInputEvent*> inputEvents, std::vector<int> axes = {0})
+	void bindAnalogControllerInput(AnalogControllerInput* inputButton, std::vector<int> axes, std::vector<AnalogInputEvent*> inputEvents)
 	{
 		// Bind all specified events to AnalogInput
 		for (auto inputEvent : inputEvents)
@@ -692,7 +728,7 @@ namespace input
 			}
 		}
 	}
-	static void bindAnalogInput(int joystick, std::vector<AnalogInputEvent*> inputEvents, std::vector<int> axes = { 0 })
+	static void bindAnalogControllerInput(int joystick, std::vector<int> axes, std::vector<AnalogInputEvent*> inputEvents)
 	{
 		// Find inputKey
 		auto it = joystickToAnalogInput.find(joystick);
@@ -700,15 +736,15 @@ namespace input
 		// Check if the key exists in the map
 		if (it != joystickToAnalogInput.end())
 		{
-			bindAnalogInput(it->second, inputEvents);
+			bindAnalogControllerInput(it->second, axes, inputEvents);
 		}
 		else
 		{
-			// Construct a new AnalogInput to bind
-			bindAnalogInput(new AnalogInput(joystick), inputEvents, axes);
+			// Construct a new AnalogControllerInput to bind
+			bindAnalogControllerInput(new AnalogControllerInput(joystick), axes, inputEvents);
 		}
 	}
-	static void bindAnalogInput(int joystick, std::vector<std::string> analogInputEventNames, std::vector<int> axes = { 0 })
+	static void bindAnalogControllerInput(int joystick, std::vector<int> axes, std::vector<std::string> analogInputEventNames)
 	{
 		std::vector<AnalogInputEvent*> digitalInputEventsToBind;
 
@@ -728,7 +764,7 @@ namespace input
 			}
 		}
 
-		bindAnalogInput(joystick, digitalInputEventsToBind, axes);
+		bindAnalogControllerInput(joystick, axes, digitalInputEventsToBind);
 	}
 
 	// Function prototype for the key callback
@@ -872,5 +908,99 @@ namespace input
 		{
 			delete it->second;
 		}
+	}
+
+	static void ConstructAnalogEvent(std::string name)
+	{
+		new input::AnalogInputEvent(name);	// memory is freed in uninitialize()
+	}
+	static void ConstructDigitalEvent(std::string name)
+	{
+		new input::DigitalInputEvent(name);	// memory is freed in uninitialize()
+	}
+
+	static void ConstructAnalogEvents(std::vector<std::string> Eventnames)
+	{
+		for (auto eventName : Eventnames)
+		{
+			ConstructAnalogEvent(eventName);
+		}
+	}
+	static void ConstructDigitalEvents(std::vector<std::string> Eventnames)
+	{
+		for (auto eventName : Eventnames)
+		{
+			ConstructDigitalEvent(eventName);
+		}
+	}
+
+	static bool GetNewPress(std::string eventName)
+	{
+		for (auto it : nameToDigitalInputEvent)
+		{
+			if (it.second->name == eventName)
+			{
+				return it.second->isNewPress();
+			}
+		}
+		std::cout << "WARNING: Attempting to test state of unknown event: " << eventName << "\n";
+
+		return false;
+	}
+	static bool GetPressed(std::string eventName)
+	{
+		for (auto it : nameToDigitalInputEvent)
+		{
+			if (it.second->name != eventName)
+			{
+				continue;
+			}
+			return it.second->isPressed();
+		}
+		std::cout << "WARNING: Attempting to test state of unknown event: " << eventName << "\n";
+
+		return false;
+	}
+	static bool GetReleased(std::string eventName)
+	{
+		for (auto it : nameToDigitalInputEvent)
+		{
+			if (it.second->name != eventName)
+			{
+				continue;
+			}
+			return it.second->isReleased();
+		}
+		std::cout << "WARNING: Attempting to test state of unknown event: " << eventName << "\n";
+
+		return false;
+	}
+	static bool GetNewRelease(std::string eventName)
+	{
+		for (auto it : nameToDigitalInputEvent)
+		{
+			if (it.second->name != eventName)
+			{
+				continue;
+			}
+			return it.second->isNewRelease();
+		}
+		std::cout << "WARNING: Attempting to test state of unknown event: " << eventName << "\n";
+
+		return false;
+	}
+	static bool GetChanged(std::string eventName)
+	{
+		for (auto it : nameToDigitalInputEvent)
+		{
+			if (it.second->name != eventName)
+			{
+				continue;
+			}
+			return it.second->isChanged();
+		}
+		std::cout << "WARNING: Attempting to test state of unknown event: " << eventName << "\n";
+
+		return false;
 	}
 }
