@@ -25,19 +25,32 @@ void CreatePlayers(int count, Vector2 startPos, Model* defaultModel)
 	Vector2 offset(0, 60);
 	for (int i = 0; i < count; i++)
 	{
-		//Create the player name text
+		//Create the player's name tag
 		ecs::Entity playerNameText = ecs::NewEntity();
 		ecs::AddComponent(playerNameText, TextRenderer{ .font = stencilFont, .text = "P" + to_string(i + 1), .offset = Vector3(1, -1, 0), .scale = Vector3(0.5), .color = Vector3(0.5, 0.8, 0.2) });
 		ecs::AddComponent(playerNameText, Transform{ });
 
-		//Create the player entity
+		//Create the player entity which contains everything but rendering
 		ecs::Entity player = ecs::NewEntity();
 		ecs::AddComponent(player, Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(45, 0, 0), .scale = Vector3(7) });
 		ecs::AddComponent(player, Player{ .acerationSpeed = 300, .minAceleration = 120, .playerID = i, .playerFont = playerNameText });
-		ecs::AddComponent(player, ModelRenderer{ .model = defaultModel });
 		ecs::AddComponent(player, Rigidbody{ .drag = 0.025 });
 		vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
 		ecs::AddComponent(player, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
+
+		//Create the player's rendered entity
+		ecs::Entity playerRender = ecs::NewEntity();
+		ecs::AddComponent(playerRender, Transform{ .rotation = Vector3(45, 0, 0) });
+		ecs::AddComponent(player, ModelRenderer{ .model = defaultModel });
+		/*
+		//TODO
+		ecs::Entity torpIndicator1 = ecs::NewEntity();
+		ecs::AddComponent(torpIndicator1, SpriteRenderer{ .texture = &torprdytexture });
+		ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
+		ecs::Entity torpIndicator2 = ecs::NewEntity();
+		ecs::AddComponent(torpIndicator2, SpriteRenderer{ .texture = &torprdytexture });
+		ecs::AddComponent(torpIndicator2, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
+		*/
 	}
 }
 
@@ -66,17 +79,17 @@ int main()
 	//engine.physicsSystem->gravity = Vector2(0, -981);
 	collisionSystem->cam = &cam;
 
-	Model model("LaMuerte.obj");
-	Model checkPointModel("Checkpoint.obj");
-	Model model2("Finish_line.obj");
-	Texture torprldtexture = Texture("UI_Red_Torpedo_Icon.png");
-	Texture torprdytexture = Texture("UI_Green_Torpedo_Icon.png");
+	Model model("/3dmodels/LaMuerte.obj");
+	Model checkPointModel("/3dmodels/Checkpoint.obj");
+	Model model2("/3dmodels/Finish_line.obj");
+	Texture torprldtexture = Texture("/GUI/UI_Red_Torpedo_Icon.png");
+	Texture torprdytexture = Texture("/GUI/UI_Green_Torpedo_Icon.png");
 	// Font http address:
 	// https://www.dafont.com/stencil-ww-ii.font
 	stencilFont = new Font("Stencil WW II.ttf", 0, 0, 48);
 
 
-	Texture* winSprite = new Texture("winner.png");
+	Texture* winSprite = new Texture("/GUI/winner.png");
 	ecs::Entity playerWin = ecs::NewEntity();
 	ecs::AddComponent(playerWin, TextRenderer{ .font = stencilFont, .text = "", .offset = Vector3(-1.0f, 1.1f, 1.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 	ecs::AddComponent(playerWin, SpriteRenderer{ .texture = winSprite, .enabled = false, .uiElement = true });
@@ -101,14 +114,14 @@ int main()
 	ecs::AddComponent(pSFont4, Transform{ .position = Vector3(0.75, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
 
 
-	CreatePlayers(1, Vector2(1434.0f, -1370.0f), &model);
+	CreatePlayers(4, Vector2(1434.0f, -1370.0f), &model);
 
 
 	// create explosion Animation PlayerController 
-	Animation explosionAnim = AnimationsFromSpritesheet("explosion.png", 6, 1, vector<int>(6, 150))[0];
+	Animation explosionAnim = AnimationsFromSpritesheet("/spritesheets/explosion.png", 6, 1, vector<int>(6, 150))[0];
 	playerController->ExplosionAnim = &explosionAnim;
 
-	Animation crowdAnims = AnimationsFromSpritesheet("CrowdCheer14.png", 3, 1, vector<int>(3, 150))[0];
+	Animation crowdAnims = AnimationsFromSpritesheet("/spritesheets/CrowdCheer14.png", 3, 1, vector<int>(3, 150))[0];
 	ecs::Entity crowd = ecs::NewEntity();
 	ecs::AddComponent(crowd, Transform{ .position = Vector3(1530, -1700, 10), .scale = Vector3(100, 30, 0) });
 	ecs::AddComponent(crowd, SpriteRenderer{});
@@ -130,7 +143,7 @@ int main()
 	//cheerSpeaker.Play(cheerSound);
 	//cheerSpeaker.SetLooping(1);
 
-	Animation countdownAnim = AnimationsFromSpritesheet("UI_Countdown_Ver2.png", 5, 1, vector<int>(5, 1000))[0];
+	Animation countdownAnim = AnimationsFromSpritesheet("/spritesheets/UI_Countdown_Ver2.png", 5, 1, vector<int>(5, 1000))[0];
 	ecs::Entity countdown = ecs::NewEntity();
 	ecs::AddComponent(countdown, Transform{ .position = Vector3(1475, -1270, 10), .scale = Vector3(60, 100, 0) });
 	ecs::AddComponent(countdown, SpriteRenderer{});
@@ -141,7 +154,7 @@ int main()
 
 	// Loand Map . Tilemap file 
 	Tilemap map(&cam);
-	map.loadMap("level1.tmx");
+	map.loadMap("/levels/level1.tmx");
 	spriteRenderSystem->SetTilemap(&map);
 	collisionSystem->SetTilemap(&map);
 	PhysicsSystem::SetTileProperty(1, TileProperty{ true });

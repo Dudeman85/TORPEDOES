@@ -12,7 +12,7 @@ namespace engine
 
 	///Rigidbody component
 	ECS_REGISTER_COMPONENT(Rigidbody)
-	struct Rigidbody
+		struct Rigidbody
 	{
 		///Velocity of the rigidbody
 		Vector3 velocity;
@@ -36,15 +36,17 @@ namespace engine
 
 	///Physics System, Requires Rigidbody and Transform components
 	ECS_REGISTER_SYSTEM(PhysicsSystem, Transform, Rigidbody)
-	class PhysicsSystem : public ecs::System
+		class PhysicsSystem : public ecs::System
 	{
 	public:
 		///Update the physics system, call this every frame
 		void Update(float deltaTime)
 		{
 			//For each entity
-			for (auto const& entity : entities)
+			for (auto itr = entities.begin(); itr != entities.end();)
 			{
+				ecs::Entity entity = *itr++;
+
 				//Get required components
 				Transform& transform = ecs::GetComponent<Transform>(entity);
 				Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(entity);
@@ -119,7 +121,7 @@ namespace engine
 				return 0;
 
 			ecs::Entity a = collisions.front().a;
-			Collision maxIntersect = Collision{.mtv = Vector2(0)};
+			Collision maxIntersect = Collision{ .mtv = Vector2(0) };
 
 			int i = 0;
 			do
@@ -182,14 +184,20 @@ namespace engine
 					CollisionSystem::UpdateAABB(entity);
 					//Check entity and tilemap collision
 					std::vector<Collision> collisions = ecs::GetSystem<CollisionSystem>()->CheckCollision(entity);
-					std::vector<Collision> tilemapCollisions = ecs::GetSystem<CollisionSystem>()->CheckTilemapCollision(entity);
+					std::vector<Collision> tilemapCollisions;
 
 					//Solve each entity collision
 					for (Collision& collision : collisions)
 					{
-						SimpleSolveCollision(collision);
+						if (collision.type == Collision::Type::collision || collision.type == Collision::Type::trigger)
+							//Solve entity collisions
+							SimpleSolveCollision(collision);
+						else
+							//Store all the tilemap collision for later
+							tilemapCollisions.push_back(collision);
 					}
 
+					//Solve tilemap collisions
 					SolveTilemapCollision(tilemapCollisions);
 				}
 			}

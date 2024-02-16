@@ -87,7 +87,7 @@ public:
 	static Animation* ExplosionAnim;
 	void Init()
 	{
-		torpedomodel = new Model("torpedo.obj");
+		torpedomodel = new Model("/3dmodels/torpedo.obj");
 	}
 	~PlayerController()
 	{
@@ -149,7 +149,7 @@ public:
 			{
 				player.hitPlayer = true;
 				CreateAnimation(projectransfor.position + rigidbody.velocity / 15);
-				projectransfor.position.y += 10000000; // destroy Entity "almost"
+				ecs::DestroyEntity(collision.b);
 				player.playExlposionSound = true;
 			}
 		}
@@ -164,12 +164,10 @@ public:
 			if (collision.b != 1)
 			{   // Do animation where projectile impact 
 				CreateAnimation(projectransfor.position);
-				projectransfor.position.y += 10000000;
-
+				ecs::DestroyEntity(collision.a);
 			}
 		}
 	}
-
 
 	/// PlayerControlle Update 
 	void Update(GLFWwindow* window, float dt)
@@ -358,7 +356,7 @@ public:
 				{
 					CreateProjectile(forwardDirection, player.projectileSpeed, transform.position, transform.rotation, player.playerID);
 					// Reset the projectile time to a cooldown 
-					player.projectileTime1 = 5.0f;
+					player.projectileTime1 = 0.0f;
 					// "Create a cooldown time between shots."
 					player.projectileTime3 = 0.2f;
 				}
@@ -366,7 +364,7 @@ public:
 				else if (player.projectileTime2 <= 0.0f)
 				{
 					CreateProjectile(forwardDirection, player.projectileSpeed, transform.position, transform.rotation, player.playerID);
-					player.projectileTime2 = 5.0f;
+					player.projectileTime2 = 0.0f;
 					player.projectileTime3 = 0.2f;
 				}
 
