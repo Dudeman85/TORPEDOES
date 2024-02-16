@@ -12,7 +12,8 @@
 
 namespace input
 { 
-	using inputKey = int;	// GLFW key
+	using inputKey = int;	// GLFW keyboard key
+	using inputButton = int;// GLFW gamepad button
 	using keyState = int;	// Whether key is pressed
 
 	enum class InputState
@@ -210,30 +211,37 @@ namespace input
 			nameToAnalogInputEvent[name] = this;
 		}
 
-		std::vector<float*> outputValues;
-		float totalValue = 0;
-		bool totalValueUpdated = false;
+		std::multimap<int, float*> AxesToOutputValues;
+		std::map<int, float> totalValues;
+		bool totalValuesUpdated = false;
 
 		void inputPollingFinished()
 		{
-			// We are not guaranteed to keep same totalValue, as we've finished input polling
-			totalValueUpdated = false;
+			// We are not guaranteed to keep the same totalValue, as we've finished input polling
+			totalValuesUpdated = false;
 		}
 
-		const float getValue()
+		const std::map<int, float> getValues()
 		{
-			if (!totalValueUpdated)
+			if (!totalValuesUpdated)
 			{
 				// Update total value
-				float output = 0;
-				for (auto outputValue : outputValues)
+				std::map<int, float> output;
+				
+				for (auto it = AxesToOutputValues.begin(); it != AxesToOutputValues.end(); ++it) 
 				{
-					output += *outputValue;
+					output[it->first] += *it->second;
 				}
-				totalValue = output;
-				totalValueUpdated = true;
+				totalValues = output;
+				totalValuesUpdated = true;
 			}
-			return totalValue;
+			return totalValues;
+		}
+
+		const float getValue(int axis)
+		{
+			auto temp = getValues();
+			return temp[axis];
 		}
 	};
 
@@ -330,6 +338,12 @@ namespace input
 	class DigitalInput
 	{
 	public:
+		// Don't call
+		DigitalInput()
+		{
+
+		}
+
 		DigitalInput(inputKey key)
 		{
 			//inputButtons.push_back(this);
@@ -427,6 +441,98 @@ namespace input
 		}
 	};
 
+	class DigitalControllerInput;
+	std::map<std::pair<int, int>, DigitalControllerInput*> inputButtonToDigitalControllerInput;	// All DigitalControllerInputs
+
+	class DigitalControllerInput : public DigitalInput
+	{
+	public:
+		int joystick;
+		inputButton button;
+
+		DigitalControllerInput(inputButton setButton, int setJoystick)
+		{
+			joystick = setJoystick;
+			button = setButton;
+			inputButtonToDigitalControllerInput[{joystick, setButton}] = this;
+		}
+
+		void test()
+		{
+			GLFWgamepadstate state;
+
+			if (glfwGetGamepadState(joystick, &state) != GLFW_TRUE)
+			{
+				return;
+			}
+
+			if (state.buttons[button])
+			{
+				pressState(GLFW_PRESS);
+			}
+			else
+			{
+				pressState(GLFW_RELEASE);
+			}
+
+			checkStateChange();
+		}
+
+		void pressState(int pressed)
+		{
+		// REWRITE FOR CONTROLLERS, FUN!
+
+			switch (pressed)
+			{
+			case GLFW_PRESS:
+				// Button is currently being pressed, what about other inputs this update cycle?
+				switch (buttonInputState)
+				{
+				case input::InputState::None:		// No input before: ignore
+				case input::InputState::Released:	// Should not be possible: ignore
+				case input::InputState::Pressed:	// Should not be possible: ignore
+				case input::InputState::NewPress:	// Same input: ignore
+					// There were no conflicting inputs: Set as new press:
+					buttonInputState = InputState::NewPress;
+					break;
+				case input::InputState::NewRelease:
+				case input::InputState::NewReleaseNewPress:
+				case input::InputState::NewPressNewRelease:
+					// Both inputs: Set as new new release, then new press:
+					buttonInputState = InputState::NewReleaseNewPress;
+					break;
+				default:
+					break;
+				}
+				break;
+			case GLFW_RELEASE:
+				// Button is currently not being pressed, what about other inputs this update cycle?
+				switch (buttonInputState)
+				{
+				case input::InputState::None:		// No input before: ignore
+				case input::InputState::Released:	// Should not be possible: ignore
+				case input::InputState::Pressed:	// Should not be possible: ignore
+				case input::InputState::NewRelease:	// Same input: ignore
+					// There were no conflicting inputs: Set as new release:
+					buttonInputState = InputState::NewRelease;
+					break;
+				case input::InputState::NewPress:
+				case input::InputState::NewReleaseNewPress:
+				case input::InputState::NewPressNewRelease:
+					// Both inputs: Set as new new press, then new release:
+					buttonInputState = InputState::NewPressNewRelease;
+					break;
+				default:
+					break;
+				}
+				break;
+			default:
+				// Do not handle GLFW_REPEAT
+				break;
+			}
+		}
+	};
+
 	static void unbindInput(DigitalInput* inputButton)
 	{
 		// TODO:
@@ -484,6 +590,53 @@ namespace input
 		bindDigitalInput(key, digitalInputEventsToBind);
 	}
 
+	static void bindDigitalControllerInput(int joystick, DigitalControllerInput* inputButton, std::vector<DigitalInputEvent*> inputEvents)
+	{
+		// Bind all specified events to DigitalInput
+		for (auto inputEvent : inputEvents)
+		{
+			inputEvent->outputStates.push_back(&inputButton->buttonOutputState);
+		}
+	}
+	static void bindDigitalControllerInput(int joystick, inputButton button, std::vector<DigitalInputEvent*> inputEvents)
+	{
+		// Find inputKey
+		auto it = inputButtonToDigitalControllerInput.find({joystick, button});
+
+		// Check if the key exists in the map
+		if (it != inputButtonToDigitalControllerInput.end())
+		{
+			bindDigitalControllerInput(joystick, it->second, inputEvents);
+		}
+		else
+		{
+			// Construct a new DigitalControllerInput to bind
+			bindDigitalControllerInput(joystick, new DigitalControllerInput(button, joystick), inputEvents);
+		}
+	}
+	static void bindDigitalControllerInput(int joystick, inputButton button, std::vector<std::string> digitalInputEventNames)
+	{
+		std::vector<DigitalInputEvent*> digitalInputEventsToBind;
+
+		// Find by DigitalInputEvent name
+		for (const auto& digitalInputEventName : digitalInputEventNames)
+		{
+			auto it = nameToDigitalInputEvent.find(digitalInputEventName);
+
+			// Check if the DigitalInputEvent's name exists in the map
+			if (it != nameToDigitalInputEvent.end())
+			{
+				digitalInputEventsToBind.push_back(it->second);
+			}
+			else
+			{
+				std::cout << "WARNING: No matching DigitalInputEvent found for " << digitalInputEventName << std::endl;
+			}
+		}
+
+		bindDigitalControllerInput(joystick, button, digitalInputEventsToBind);
+	}
+
 	class AnalogInput;
 	std::map<int, AnalogInput*> joystickToAnalogInput;	// All AnalogInputs
 
@@ -508,7 +661,7 @@ namespace input
 		void setAxis(std::vector<float> values)
 		{
 			int i = 0;
-			for (int value : values)
+			for (float value : values)
 			{
 				setAxis(i, value);
 				i++;
@@ -519,7 +672,6 @@ namespace input
 			for (size_t i = 0; i < 6; i++)
 			{
 				setAxis(i, values[i]);
-				i++;
 			}
 		}
 		const float getValue(int axis)
@@ -536,11 +688,11 @@ namespace input
 			// Bind all specified axes to event
 			for (int axis : axes)
 			{
-				inputEvent->outputValues.push_back(&inputButton->axisToValue[axis]);
+				inputEvent->AxesToOutputValues.insert({axis, &inputButton->axisToValue[axis]});
 			}
 		}
 	}
-	static void bindAnalogInput(int joystick, std::vector<AnalogInputEvent*> inputEvents)
+	static void bindAnalogInput(int joystick, std::vector<AnalogInputEvent*> inputEvents, std::vector<int> axes = { 0 })
 	{
 		// Find inputKey
 		auto it = joystickToAnalogInput.find(joystick);
@@ -553,10 +705,10 @@ namespace input
 		else
 		{
 			// Construct a new AnalogInput to bind
-			bindAnalogInput(new AnalogInput(joystick), inputEvents);
+			bindAnalogInput(new AnalogInput(joystick), inputEvents, axes);
 		}
 	}
-	static void bindAnalogInput(int joystick, std::vector<std::string> analogInputEventNames)
+	static void bindAnalogInput(int joystick, std::vector<std::string> analogInputEventNames, std::vector<int> axes = { 0 })
 	{
 		std::vector<AnalogInputEvent*> digitalInputEventsToBind;
 
@@ -576,7 +728,7 @@ namespace input
 			}
 		}
 
-		bindAnalogInput(joystick, digitalInputEventsToBind);
+		bindAnalogInput(joystick, digitalInputEventsToBind, axes);
 	}
 
 	// Function prototype for the key callback
@@ -675,6 +827,12 @@ namespace input
 			}
 		}
 
+		// Update binded DigitalControllerInput
+		for (auto it = inputButtonToDigitalControllerInput.begin(); it != inputButtonToDigitalControllerInput.end(); ++it)
+		{
+			it->second->test();
+		}
+
 		// Update binded DigitalInputs
 		for (auto it = inputKeytoDigitalInput.begin(); it != inputKeytoDigitalInput.end(); ++it)
 		{
@@ -695,6 +853,7 @@ namespace input
 			delete it->second;
 		}
 		nameToDigitalInputEvent.clear();
+
 		// Free AnalogInputEvents
 		for (auto it = nameToAnalogInputEvent.begin(); it != nameToAnalogInputEvent.end(); ++it)
 		{
@@ -707,6 +866,7 @@ namespace input
 		{
 			delete it->second;
 		}
+
 		// Free AnalogInputs
 		for (auto it = joystickToAnalogInput.begin(); it != joystickToAnalogInput.end(); ++it)
 		{

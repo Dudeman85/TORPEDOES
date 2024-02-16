@@ -190,12 +190,12 @@ int main()
 	ecs::AddComponent(torpIndicator4, SpriteRenderer{ .texture = &torprdytexture});
 	ecs::AddComponent(torpIndicator4, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
 
-	ecs::Entity torpIndicator5 = ecs::NewEntity();
-	ecs::AddComponent(torpIndicator5, SpriteRenderer{ .texture = &torprdytexture});
-	ecs::AddComponent(torpIndicator5, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
-	ecs::Entity torpIndicator6 = ecs::NewEntity();
+	ecs::Entity hedgehogIndicator = ecs::NewEntity();
+	ecs::AddComponent(hedgehogIndicator, SpriteRenderer{ .texture = &hedgehogrdytexture});
+	ecs::AddComponent(hedgehogIndicator, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 14, 8) });
+	/*ecs::Entity torpIndicator6 = ecs::NewEntity();
 	ecs::AddComponent(torpIndicator6, SpriteRenderer{ .texture = &torprdytexture});
-	ecs::AddComponent(torpIndicator6, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
+	ecs::AddComponent(torpIndicator6, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });*/
 
 	ecs::Entity torpIndicator7 = ecs::NewEntity();
 	ecs::AddComponent(torpIndicator7, SpriteRenderer{ .texture = &torprdytexture});
@@ -295,35 +295,54 @@ int main()
 
 
 		//player 1
+		//Transform& p1Transform = ecs::GetComponent<Transform>(laMuerte);
+		//Transform& torpIconLoc1 = ecs::GetComponent<Transform>(torpIndicator1);
+		//torpIconLoc1.position = Vector3(p1Transform.position.x -3, p1Transform.position.y - 16, 200);
+		//Transform& torpIconLoc2 = ecs::GetComponent<Transform>(torpIndicator2);
+		//torpIconLoc2.position = Vector3(p1Transform.position.x -3, p1Transform.position.y - 23, 201);
+		//SpriteRenderer& torpIcon1 = ecs::GetComponent<SpriteRenderer>(torpIndicator1);
+		//SpriteRenderer& torpIcon2 = ecs::GetComponent<SpriteRenderer>(torpIndicator2);
+		//
+		//if (player.projectileTime1 > 0)
+		//{
+		//	torpIcon1.texture = &torprldtexture;
+		//}
+		//else
+		//{
+		//	torpIcon1.texture = &torprdytexture;
+		//	//torpSpeaker.Play(torpedoSound);
+		//	//soundDevice->SetSourceLocation(torpSpeaker, PlayerTransform.position.x, PlayerTransform.position.y, 0);
+		//}
+		//if (player.projectileTime2 > 0)
+		//{
+		//	torpIcon2.texture = &torprldtexture;
+		//}
+		//else
+		//{
+		//	torpIcon2.texture = &torprdytexture;
+		//	//torpSpeaker2.Play(torpedoSound);
+		//	//soundDevice->SetSourceLocation(torpSpeaker2, PlayerTransform.position.x, PlayerTransform.position.y, 0);
+		//}
+		// Player 1
 		Transform& p1Transform = ecs::GetComponent<Transform>(laMuerte);
-		Transform& torpIconLoc1 = ecs::GetComponent<Transform>(torpIndicator1);
-		torpIconLoc1.position = Vector3(p1Transform.position.x -3, p1Transform.position.y - 16, 200);
-		Transform& torpIconLoc2 = ecs::GetComponent<Transform>(torpIndicator2);
-		torpIconLoc2.position = Vector3(p1Transform.position.x -3, p1Transform.position.y - 23, 201);
-		SpriteRenderer& torpIcon1 = ecs::GetComponent<SpriteRenderer>(torpIndicator1);
-		SpriteRenderer& torpIcon2 = ecs::GetComponent<SpriteRenderer>(torpIndicator2);
-		
+		Transform& HedgehogIconLoc = ecs::GetComponent<Transform>(hedgehogIndicator);
+		HedgehogIconLoc.position = Vector3(p1Transform.position.x - 5, p1Transform.position.y - 16, 200);
+		//Transform& torpIconLoc6 = ecs::GetComponent<Transform>(torpIndicator6);
+		//torpIconLoc6.position = Vector3(p3Transform.position.x - 5, p3Transform.position.y - 24, 201);
+		SpriteRenderer& hegdehogIcon = ecs::GetComponent<SpriteRenderer>(hedgehogIndicator);
+		//SpriteRenderer& torpIcon6 = ecs::GetComponent<SpriteRenderer>(torpIndicator6);
+
+
 		if (player.projectileTime1 > 0)
 		{
-			torpIcon1.texture = &torprldtexture;
+			hegdehogIcon.texture = &hedgehogrldtexture;
 		}
 		else
 		{
-			torpIcon1.texture = &torprdytexture;
-			//torpSpeaker.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker, PlayerTransform.position.x, PlayerTransform.position.y, 0);
+			hegdehogIcon.texture = &hedgehogrdytexture;
+			//torpSpeaker3.Play(torpedoSound);
+			//soundDevice->SetSourceLocation(torpSpeaker3, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
 		}
-		if (player.projectileTime2 > 0)
-		{
-			torpIcon2.texture = &torprldtexture;
-		}
-		else
-		{
-			torpIcon2.texture = &torprdytexture;
-			//torpSpeaker2.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker2, PlayerTransform.position.x, PlayerTransform.position.y, 0);
-		}
-
 		// Player 2
 		Transform& p2Transform = ecs::GetComponent<Transform>(laMuerte2);
 		Transform& torpIconLoc3 = ecs::GetComponent<Transform>(torpIndicator3);
@@ -356,37 +375,37 @@ int main()
 
 		}
 
-		// Player 3
-		Transform& p3Transform = ecs::GetComponent<Transform>(laMuerte3);
-		Transform& torpIconLoc5 = ecs::GetComponent<Transform>(torpIndicator5);
-		torpIconLoc5.position = Vector3(p3Transform.position.x - 5, p3Transform.position.y - 16, 200);
-		Transform& torpIconLoc6 = ecs::GetComponent<Transform>(torpIndicator6);
-		torpIconLoc6.position = Vector3(p3Transform.position.x - 5, p3Transform.position.y - 24, 201);
-		SpriteRenderer& torpIcon5 = ecs::GetComponent<SpriteRenderer>(torpIndicator5);
-		SpriteRenderer& torpIcon6 = ecs::GetComponent<SpriteRenderer>(torpIndicator6);
+		//// Player 3
+		//Transform& p3Transform = ecs::GetComponent<Transform>(laMuerte3);
+		//Transform& HedgehogIconLoc = ecs::GetComponent<Transform>(hedgehogIndicator);
+		//HedgehogIconLoc.position = Vector3(p3Transform.position.x - 5, p3Transform.position.y - 16, 200);
+		////Transform& torpIconLoc6 = ecs::GetComponent<Transform>(torpIndicator6);
+		////torpIconLoc6.position = Vector3(p3Transform.position.x - 5, p3Transform.position.y - 24, 201);
+		//SpriteRenderer& hegdehogIcon = ecs::GetComponent<SpriteRenderer>(hedgehogIndicator);
+		////SpriteRenderer& torpIcon6 = ecs::GetComponent<SpriteRenderer>(torpIndicator6);
 
 
-		if (player3.projectileTime1 > 0)
-		{
-			torpIcon5.texture = &torprldtexture;
-		}
-		else
-		{
-			torpIcon5.texture = &torprdytexture;
-			//torpSpeaker3.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker3, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
-		}
-		if (player3.projectileTime2 > 0)
-		{
-			torpIcon6.texture = &torprldtexture;
-		}
-		else
-		{
-			torpIcon6.texture = &torprdytexture;
-			//torpSpeaker4.Play(torpedoSound);
-			//soundDevice->SetSourceLocation(torpSpeaker4, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
+		//if (player3.projectileTime1 > 0)
+		//{
+		//	hegdehogIcon.texture = &hedgehogrldtexture;
+		//}
+		//else
+		//{
+		//	hegdehogIcon.texture = &hedgehogrdytexture;
+		//	//torpSpeaker3.Play(torpedoSound);
+		//	//soundDevice->SetSourceLocation(torpSpeaker3, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
+		//}
+		//if (player3.projectileTime2 > 0)
+		//{
+		//	torpIcon6.texture = &torprldtexture;
+		//}
+		//else
+		//{
+		//	torpIcon6.texture = &torprdytexture;
+		//	//torpSpeaker4.Play(torpedoSound);
+		//	//soundDevice->SetSourceLocation(torpSpeaker4, PlayerTransform2.position.x, PlayerTransform2.position.y, 0);
 
-		}
+		//}
 
 		// Player 4
 		Transform& p4Transform = ecs::GetComponent<Transform>(laMuerte4);

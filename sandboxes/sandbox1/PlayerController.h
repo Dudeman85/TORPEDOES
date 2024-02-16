@@ -308,7 +308,7 @@ public:
 				{
 					CreateProjectile(forwardDirection, player.projectileSpeed, transform.position, transform.rotation, player.playerID);
 					// Reset the projectile time to a cooldown 
-					player.projectileTime1 = 5.0f;
+					player.projectileTime1 = 0.2f;
 					// "Create a cooldown time between shots."
 					player.projectileTime3 = 0.2f;
 				}
@@ -316,7 +316,7 @@ public:
 				else if (player.projectileTime2 <= 0.0f)
 				{
 					CreateProjectile(forwardDirection, player.projectileSpeed, transform.position, transform.rotation, player.playerID);
-					player.projectileTime2 = 5.0f;
+					player.projectileTime2 = 0.2f;
 					player.projectileTime3 = 0.2f;
 				}
 

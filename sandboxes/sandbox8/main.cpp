@@ -1,4 +1,4 @@
-//Author Leandro Lopez (Leo): Camera Fix.
+//Author Leandro Lopez (Leo): Camera Fix. Multi texture render 
 #define WIN32_LEAN_AND_MEAN
 #include <engine/Tilemap.h>
 #include "PlayerController.h"
@@ -482,8 +482,8 @@ int main()
 			playerController->playerBounds[3] < camBounds[3] - zoomOutThreshold)
 		{
 
-			float zoomOutFactor = 10.0f;
-			float zoomOutValue = zoomOutFactor - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10.0f;
+			float zoomOutFactor = 5.0f;
+			float zoomOutValue = zoomOutFactor - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 5.0f;
 			camScale = max(camScale + zoomOutValue, camScaleMin);
 			/*camScale += 10 - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10;*/
 		}
@@ -517,10 +517,10 @@ int main()
 		float desiredZoom = max(boundingBoxWidth / (cam.width * aspectRatio), boundingBoxHeight / cam.height);
 
 
-		//// Ajustar el zoom de la cmara solo si el zoom deseado supera los lmites establecidos
-		//if (desiredZoom > camScaleMin && desiredZoom < camScaleMax) {
-		//	camScale = desiredZoom;
-		//}
+		// Ajustar el zoom de la cmara solo si el zoom deseado supera los lmites establecidos
+		if (desiredZoom > camScaleMin && desiredZoom < camScaleMax) {
+			camScale = desiredZoom;
+		}
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -544,22 +544,3 @@ int main()
 }
 
 
-
-
-
-//Zoom in
-		//else if (topDiff - camPadding > camDeadzone && rightDiff - camPadding > camDeadzone && bottomDiff - camPadding > camDeadzone && leftDiff - camPadding > camDeadzone)
-		//	camScale -=  min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 100;
-
-
-// Zoom out 
-// (topDiff  <- camPadding < -camDeadzone || rightDiff - camPadding < -camDeadzone || bottomDiff - camPadding < -camDeadzone || leftDiff - camPadding < - camDeadzone) 
-
-
-
-// Zoom in
-// (topDiff > camPadding > camDeadzone && rightDiff - camPadding > camDeadzone && bottomDiff - camPadding > camDeadzone && leftDiff - camPadding > camDeadzone)
-
-//float aspectRation = cam.width / cam.height;
-//float desiredZoom = max(boundingBoxWidth / (cam.width * aspectRatio), boundingBoxHeight / cam.height);
-//camScale = max(desiredZoom, camScaleMin, camScaleMax);
