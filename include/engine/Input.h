@@ -938,7 +938,7 @@ namespace input
 	{
 		for (auto it : nameToDigitalInputEvent)
 		{
-			if (it.second->name != eventName)
+			if (it.second->name == eventName)
 			{
 				return it.second->isNewPress();
 			}

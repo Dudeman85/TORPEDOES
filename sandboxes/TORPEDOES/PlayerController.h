@@ -5,8 +5,6 @@
 // Declaration of the entity component system (ECS) instance
 using namespace engine;
 
-extern Font* stencilFont;
-
 ECS_REGISTER_COMPONENT(Player)
 struct Player
 {
@@ -54,6 +52,7 @@ class PlayerController : public ecs::System
 	Model* defaultPlayerModel;
 	Texture* torpCooldownTexture;
 	Texture* torpReadyTexture;
+	Font* stencilFont;
 
 	float starTimer = 4; // start Time 
 	Model* torpedomodel;
@@ -100,6 +99,8 @@ public:
 		defaultPlayerModel = new Model("/3dmodels/LaMuerte.obj");
 		torpCooldownTexture = new Texture("/GUI/UI_Red_Torpedo_Icon.png");
 		torpReadyTexture = new Texture("/GUI/UI_Green_Torpedo_Icon.png");
+
+		stencilFont = new Font("Stencil WW II.ttf", 0, 0, 48);
 	}
 	~PlayerController()
 	{
@@ -430,9 +431,9 @@ public:
 			ecs::AddComponent(player, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
 
 			//Create the player's name tag
-			ecs::AddComponent(playerNameText, TextRenderer{ .font = stencilFont, .text = "P" + to_string(i + 1), .offset = Vector3(1, -1, 0), .scale = Vector3(0.5), .color = Vector3(0.5, 0.8, 0.2) });
-			ecs::AddComponent(playerNameText, Transform{ .position = Vector3(0, 1, 10)});
-			//TransformSystem::AddParent(torp);
+			ecs::AddComponent(playerNameText, TextRenderer{ .font = stencilFont, .text = "P", .color = Vector3(0.5, 0.8, 0.2) });
+			ecs::AddComponent(playerNameText, Transform{ .position = Vector3(0, 1, 1) , .scale = Vector3(10)});
+			TransformSystem::AddParent(playerNameText, player);
 
 			//Create the player's rendered entity
 			ecs::AddComponent(playerRender, Transform{ .rotation = Vector3(45, 0, 0) });
