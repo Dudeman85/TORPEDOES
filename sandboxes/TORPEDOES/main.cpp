@@ -2,7 +2,6 @@
 #include <engine/Tilemap.h>
 #include "PlayerController.h"
 
-
 int checkPointNumber = 0;
 Font* stencilFont = nullptr;
 
@@ -18,41 +17,6 @@ void createChepoint(Vector3 position, Vector3 rotation, Vector3 scale, Model& ch
 
 	checkPointNumber++;
 };
-
-//Spawn 1-4 players, all in a line from top to bottom
-void CreatePlayers(int count, Vector2 startPos, Model* defaultModel)
-{
-	Vector2 offset(0, 60);
-	for (int i = 0; i < count; i++)
-	{
-		//Create the player's name tag
-		ecs::Entity playerNameText = ecs::NewEntity();
-		ecs::AddComponent(playerNameText, TextRenderer{ .font = stencilFont, .text = "P" + to_string(i + 1), .offset = Vector3(1, -1, 0), .scale = Vector3(0.5), .color = Vector3(0.5, 0.8, 0.2) });
-		ecs::AddComponent(playerNameText, Transform{ });
-
-		//Create the player entity which contains everything but rendering
-		ecs::Entity player = ecs::NewEntity();
-		ecs::AddComponent(player, Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(45, 0, 0), .scale = Vector3(7) });
-		ecs::AddComponent(player, Player{ .acerationSpeed = 300, .minAceleration = 120, .playerID = i, .playerFont = playerNameText });
-		ecs::AddComponent(player, Rigidbody{ .drag = 0.025 });
-		vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
-		ecs::AddComponent(player, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
-
-		//Create the player's rendered entity
-		ecs::Entity playerRender = ecs::NewEntity();
-		ecs::AddComponent(playerRender, Transform{ .rotation = Vector3(45, 0, 0) });
-		ecs::AddComponent(player, ModelRenderer{ .model = defaultModel });
-		/*
-		//TODO
-		ecs::Entity torpIndicator1 = ecs::NewEntity();
-		ecs::AddComponent(torpIndicator1, SpriteRenderer{ .texture = &torprdytexture });
-		ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
-		ecs::Entity torpIndicator2 = ecs::NewEntity();
-		ecs::AddComponent(torpIndicator2, SpriteRenderer{ .texture = &torprdytexture });
-		ecs::AddComponent(torpIndicator2, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(14, 3.5, 8) });
-		*/
-	}
-}
 
 int main()
 {
@@ -79,11 +43,8 @@ int main()
 	//engine.physicsSystem->gravity = Vector2(0, -981);
 	collisionSystem->cam = &cam;
 
-	Model model("/3dmodels/LaMuerte.obj");
 	Model checkPointModel("/3dmodels/Checkpoint.obj");
 	Model model2("/3dmodels/Finish_line.obj");
-	Texture torprldtexture = Texture("/GUI/UI_Red_Torpedo_Icon.png");
-	Texture torprdytexture = Texture("/GUI/UI_Green_Torpedo_Icon.png");
 	// Font http address:
 	// https://www.dafont.com/stencil-ww-ii.font
 	stencilFont = new Font("Stencil WW II.ttf", 0, 0, 48);
@@ -114,7 +75,7 @@ int main()
 	ecs::AddComponent(pSFont4, Transform{ .position = Vector3(0.75, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
 
 
-	CreatePlayers(4, Vector2(1434.0f, -1370.0f), &model);
+	playerController->CreatePlayers(4, Vector2(1434.0f, -1370.0f));
 
 
 	// create explosion Animation PlayerController 
@@ -405,7 +366,7 @@ int main()
 				cam.position.y * 2 - cam.height / 2,
 				cam.position.x * 2 - cam.width / 2 };
 
-		float zoomOutThreshold = -camPadding * 2.5f;
+		float zoomOutThreshold = -camPadding * 2.5f ;
 		float zoomInThreshold = camPadding * 2.0f;
 
 		//Calculate the difference between the player and camera bounds
@@ -423,7 +384,7 @@ int main()
 		{
 
 			float zoomOutFactor = 10.0f;
-			float zoomOutValue = zoomOutFactor - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10.0f;
+			float zoomOutValue = zoomOutFactor - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10.0;
 			camScale = max(camScale + zoomOutValue, camScaleMin);
 			/*camScale += 10 - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10;*/
 		}
@@ -454,7 +415,7 @@ int main()
 
 		// Calculate the desired zoom level and adjust the camera zoom.
 		float aspectRatio = cam.width / cam.height;
-		float desiredZoom = max(boundingBoxWidth / (cam.width * aspectRatio), boundingBoxHeight / cam.height);
+		float desiredZoom = std::max(boundingBoxWidth / (cam.width * aspectRatio), boundingBoxHeight / cam.height);
 
 
 		// Ajustar el zoom de la cmara solo si el zoom deseado supera los lmites establecidos

@@ -2,9 +2,10 @@
 #include <engine/Application.h>
 #include <GL/gl.h>
 
-
 // Declaration of the entity component system (ECS) instance
 using namespace engine;
+
+extern Font* stencilFont;
 
 ECS_REGISTER_COMPONENT(Player)
 struct Player
@@ -27,6 +28,9 @@ struct Player
 	ecs::Entity playerFont;
 	string playername;
 	string playerLap;
+
+	//Child entities
+	ecs::Entity renderedEntity;
 };
 ECS_REGISTER_COMPONENT(CheckPoint)
 struct CheckPoint
@@ -42,10 +46,14 @@ struct Projectile
 
 bool HAS_WON = false;
 
-// Player controller System. Requires Player , Tranform , Rigidbody , PolygonCollider &  ModelRenderer
-ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonCollider, ModelRenderer)
+// Player controller System. Requires Player , Tranform , Rigidbody , PolygonCollider
+ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonCollider)
 class PlayerController : public ecs::System
 {
+	//Change this to a vector one for each player
+	Model* defaultPlayerModel;
+	Texture* torpCooldownTexture;
+	Texture* torpReadyTexture;
 
 	float starTimer = 4; // start Time 
 	Model* torpedomodel;
@@ -76,7 +84,8 @@ class PlayerController : public ecs::System
 	};
 
 public:
-	float getTimer() const {
+	float getTimer() const
+	{
 		return starTimer;
 	}
 
@@ -88,6 +97,9 @@ public:
 	void Init()
 	{
 		torpedomodel = new Model("/3dmodels/torpedo.obj");
+		defaultPlayerModel = new Model("/3dmodels/LaMuerte.obj");
+		torpCooldownTexture = new Texture("/GUI/UI_Red_Torpedo_Icon.png");
+		torpReadyTexture = new Texture("/GUI/UI_Green_Torpedo_Icon.png");
 	}
 	~PlayerController()
 	{
@@ -178,10 +190,11 @@ public:
 			//Get the entity and increment the iterator
 			ecs::Entity entity = *itr++;
 
-			
+
 			// Get player, transform, and rigidbody components
 			Player& player = ecs::GetComponent<Player>(entity);
 			Transform& transform = ecs::GetComponent<Transform>(entity);
+			Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(entity);
 			PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
 			//initialize input zero 
@@ -288,14 +301,14 @@ public:
 					}
 				}
 			}
-			if(player.playerID == 0)
+			if (player.playerID == 0)
 				starTimer -= dt;
 			//printf("starTimer: %i\n", int(starTimer));
 			// topedo hit logica 
 			if (player.hitPlayer == true)
 			{
 				// Hacer que el jugador gire 360 grados instantáneamente en el eje Y
-				TransformSystem::Rotate(entity, 0, 360.0f * dt, 0);
+				TransformSystem::Rotate(player.renderedEntity, 0, 360.0f * dt, 0);
 
 
 				// Restablecer hitPlayer después de un cierto tiempo (por ejemplo, 2 segundos)
@@ -323,7 +336,7 @@ public:
 
 			// CALCULATE POSITION AND ROTATE 
 			// Calculate the forward direction
-			Vector2 forwardDirection = Vector2(cos(glm::radians(transform.rotation.y)), sin(glm::radians(transform.rotation.y)));
+			Vector2 forwardDirection = Vector2(cos(glm::radians(modelTransform.rotation.y)), sin(glm::radians(modelTransform.rotation.y)));
 			forwardDirection.Normalize();
 
 			// Initialize the impulse as zero
@@ -331,7 +344,7 @@ public:
 			if (rotateInput != 0.0f)
 			{
 				// Apply forward impulse if rotating or receiving a rotation command
-				TransformSystem::Rotate(entity, 0, -rotateInput * player.rotationSpeed * dt, 0);
+				TransformSystem::Rotate(player.renderedEntity, 0, -rotateInput * player.rotationSpeed * dt, 0);
 				forwardImpulse = forwardDirection * player.minAceleration * dt;
 			}
 
@@ -354,7 +367,7 @@ public:
 				// "Create a projectile using the parameters of the player object."
 				if (player.projectileTime1 <= 0.0f)
 				{
-					CreateProjectile(forwardDirection, player.projectileSpeed, transform.position, transform.rotation, player.playerID);
+					CreateProjectile(forwardDirection, player.projectileSpeed, transform.position, modelTransform.rotation, player.playerID);
 					// Reset the projectile time to a cooldown 
 					player.projectileTime1 = 0.0f;
 					// "Create a cooldown time between shots."
@@ -363,7 +376,7 @@ public:
 
 				else if (player.projectileTime2 <= 0.0f)
 				{
-					CreateProjectile(forwardDirection, player.projectileSpeed, transform.position, transform.rotation, player.playerID);
+					CreateProjectile(forwardDirection, player.projectileSpeed, transform.position, modelTransform.rotation, player.playerID);
 					player.projectileTime2 = 0.0f;
 					player.projectileTime3 = 0.2f;
 				}
@@ -388,13 +401,53 @@ public:
 			player.projectileTime3 -= dt;
 
 
-			collider.rotationOverride = transform.rotation.y + 1080;
+			collider.rotationOverride = modelTransform.rotation.y + 1080;
 
 			// Apply the resulting impulse to the object
 			PhysicsSystem::Impulse(entity, forwardImpulse);
-			TransformSystem::SetPosition(player.playerFont, transform.position + Vector3(0, 20, 0));
 		}
-	};
+	}
+
+	//Spawn 1-4 players, all in a line from top to bottom
+	void CreatePlayers(int count, Vector2 startPos)
+	{
+		Vector2 offset(0, 60);
+		for (int i = 0; i < count; i++)
+		{
+			//Make all the necessary entities
+			ecs::Entity player = ecs::NewEntity();
+			ecs::Entity playerNameText = ecs::NewEntity();
+			ecs::Entity playerRender = ecs::NewEntity();
+			ecs::Entity torpIndicator1 = ecs::NewEntity();
+			ecs::Entity torpIndicator2 = ecs::NewEntity();
+
+
+			//Create the player entity which contains everything but rendering
+			ecs::AddComponent(player, Player{ .acerationSpeed = 300, .minAceleration = 120, .playerID = i, .playerFont = playerNameText, .renderedEntity = playerRender });
+			ecs::AddComponent(player, Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
+			ecs::AddComponent(player, Rigidbody{ .drag = 0.025 });
+			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
+			ecs::AddComponent(player, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
+
+			//Create the player's name tag
+			ecs::AddComponent(playerNameText, TextRenderer{ .font = stencilFont, .text = "P" + to_string(i + 1), .offset = Vector3(1, -1, 0), .scale = Vector3(0.5), .color = Vector3(0.5, 0.8, 0.2) });
+			ecs::AddComponent(playerNameText, Transform{ .position = Vector3(0, 1, 10)});
+			//TransformSystem::AddParent(torp);
+
+			//Create the player's rendered entity
+			ecs::AddComponent(playerRender, Transform{ .rotation = Vector3(45, 0, 0) });
+			ecs::AddComponent(playerRender, ModelRenderer{ .model = defaultPlayerModel });
+			TransformSystem::AddParent(playerRender, player);
+
+			//Create the players's torpedo indicators
+			ecs::AddComponent(torpIndicator1, SpriteRenderer{ .texture = torpReadyTexture });
+			ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(-1, -1, 10), .scale = Vector3(4, 1, 1) });
+			TransformSystem::AddParent(torpIndicator1, player);
+			ecs::AddComponent(torpIndicator2, SpriteRenderer{ .texture = torpReadyTexture });
+			ecs::AddComponent(torpIndicator2, Transform{ .position = Vector3(1, -1, 10), .scale = Vector3(4, 1, 1) });
+			TransformSystem::AddParent(torpIndicator2, player);
+		}
+	}
 
 	Vector3 avgPosition;
 	std::array<float, 4> playerBounds{ -INFINITY, -INFINITY, INFINITY, INFINITY };
