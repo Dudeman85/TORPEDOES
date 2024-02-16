@@ -32,7 +32,7 @@ namespace engine
 
 	///Polygon Collider component
 	ECS_REGISTER_COMPONENT(PolygonCollider)
-	struct PolygonCollider
+		struct PolygonCollider
 	{
 		///The vertices of the polygon making up the collider, going clockwise. The vertices must form a convex polygon
 		std::vector<Vector2> vertices;
@@ -50,7 +50,7 @@ namespace engine
 
 	///Collision System, Requires Transform and PolygonCollider
 	ECS_REGISTER_SYSTEM(CollisionSystem, Transform, PolygonCollider)
-	class CollisionSystem : public ecs::System
+		class CollisionSystem : public ecs::System
 	{
 	public:
 
@@ -61,7 +61,6 @@ namespace engine
 			for (auto itr = entities.begin(); itr != entities.end();)
 			{
 				ecs::Entity entity = *itr++;
-
 
 				PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
 				Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -93,17 +92,18 @@ namespace engine
 			}
 		}
 
-		///Checks collision between entity a and every other entity, Returns the collisions from the perspective of a
+		///Checks collision between entity a and every other entity, Returns the collisions from the perspective of a, and calls every applicable callback function
 		std::vector<Collision> CheckCollision(ecs::Entity a)
 		{
 			Transform& aTransform = ecs::GetComponent<Transform>(a);
 			PolygonCollider& aCollider = ecs::GetComponent<PolygonCollider>(a);
 
 			//Check tilemap collision
-			std::vector<Collision> collisions = CheckTilemapCollision(a);
+			std::vector<Collision> tilemapCollisions = CheckTilemapCollision(a);
+			std::vector<Collision> entityCollisions;
 
 			//For each entity
-			for (const ecs::Entity& b : entities)
+			for (ecs::Entity b : entities)
 			{
 				//Don't collide with self
 				if (a == b)
@@ -115,13 +115,55 @@ namespace engine
 
 				Collision collision = CheckEntityCollision(a, b);
 				if (collision.type != Collision::Type::miss)
-					collisions.push_back(collision);
+					entityCollisions.push_back(collision);
 			}
+
+			//For each collision call a and b callbacks
+			for (const Collision& entityCollision : entityCollisions)
+			{
+				PolygonCollider& bCollider = ecs::GetComponent<PolygonCollider>(entityCollision.b);
+
+				//Setup collision event from b's perspective
+				Collision bToA;
+				bToA.a = entityCollision.b;
+				bToA.b = a;
+				bToA.type = entityCollision.type;
+				bToA.normal = Vector2() - entityCollision.normal;
+				bToA.mtv = Vector2() - entityCollision.mtv;
+
+				if (ecs::EntityExists(entityCollision.b))
+				{
+					//Call b's callback
+					if (bCollider.callback)
+						bCollider.callback(bToA);
+				}
+				if (ecs::EntityExists(entityCollision.a))
+				{
+					//Call a's callback
+					if (aCollider.callback)
+						aCollider.callback(entityCollision);
+				}
+			}
+			//For each tilemap collision call a's destructor
+			for (const Collision& tilemapCollision : tilemapCollisions)
+			{
+				if (ecs::EntityExists(tilemapCollision.a))
+				{
+					//Call a's callback
+					if (aCollider.callback)
+						aCollider.callback(tilemapCollision);
+				}
+			}
+
+			//Combine the tilemap and entity collisions
+			std::vector<Collision> collisions = tilemapCollisions;
+			collisions.insert(collisions.end(), entityCollisions.begin(), entityCollisions.end());
+
 			return collisions;
 		}
 
-		///Checks for collision between a tilemap collision layer and an entity
-		std::vector<Collision> CheckTilemapCollision(ecs:: Entity entity)
+		///Checks for collision between a tilemap collision layer and an entity. Does not call callbacks
+		std::vector<Collision> CheckTilemapCollision(ecs::Entity entity)
 		{
 			//If no tilemap collision layer is set return no collisions
 			if (!tilemap)
@@ -143,9 +185,9 @@ namespace engine
 			//Vertices of a tile
 			std::vector<Vector2> tileVerts{
 				Vector2(-((float)tilemap->tileSize.x / 2), (float)tilemap->tileSize.y / 2), //Top-Left
-				Vector2((float)tilemap->tileSize.x / 2, (float)tilemap->tileSize.y / 2),  //Top-Right
-				Vector2((float)tilemap->tileSize.x / 2, -((float)tilemap->tileSize.y / 2)), //Bottom-Right
-				Vector2(-((float)tilemap->tileSize.x / 2), -((float)tilemap->tileSize.y / 2)) //Bottom-Left
+					Vector2((float)tilemap->tileSize.x / 2, (float)tilemap->tileSize.y / 2),  //Top-Right
+					Vector2((float)tilemap->tileSize.x / 2, -((float)tilemap->tileSize.y / 2)), //Bottom-Right
+					Vector2(-((float)tilemap->tileSize.x / 2), -((float)tilemap->tileSize.y / 2)) //Bottom-Left
 			};
 			//Visualise tile collider
 			Primitive tileCollider = Primitive::Polygon(tileVerts);
@@ -154,7 +196,7 @@ namespace engine
 			for (int i = 0; i < possibleCollisions.size(); i++)
 			{
 				//Move the tile verts to position
-				Vector2 tilePosition = tilemap->GetTilePosition(possibleCollisions[i].x, possibleCollisions[i].y); 
+				Vector2 tilePosition = tilemap->GetTilePosition(possibleCollisions[i].x, possibleCollisions[i].y);
 				std::vector<Vector2> transformedTileVerts = TransformSystem::ApplyTransforms2D(tileVerts, 0, 1, tilePosition);
 				//Check entity-tile collision
 				Collision collision = SATIntersect(entityVerts, transformedTileVerts);
@@ -176,10 +218,6 @@ namespace engine
 					collision.b = tilemap->collisionLayer[possibleCollisions[i].x][possibleCollisions[i].y];
 					collision.type = collider.trigger ? Collision::Type::tilemapTrigger : Collision::Type::tilemapCollision;
 
-					//Call the callback if applicable
-					if (collider.callback)
-						collider.callback(collision);
-
 					collisions.push_back(collision);
 				}
 				else
@@ -193,7 +231,7 @@ namespace engine
 			return collisions;
 		}
 
-		///Check Entity-Entity collision, this will also call any callbacks
+		///Check Entity-Entity collision. Does not call callbacks
 		static Collision CheckEntityCollision(ecs::Entity a, ecs::Entity b)
 		{
 			//Get relevant components from a and b
@@ -236,12 +274,6 @@ namespace engine
 				bToA.type = type;
 				bToA.normal = Vector2() - collision.normal;
 				bToA.mtv = Vector2() - collision.mtv;
-
-				//Call calback functions if applicable
-				if (aCollider.callback)
-					aCollider.callback(aToB);
-				if (bCollider.callback)
-					bCollider.callback(bToA);
 
 				return aToB;
 
