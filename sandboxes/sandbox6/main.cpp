@@ -39,21 +39,29 @@ int main()
 
 	EngineInit();
 
-	input::initialize(window);										
+	input::initialize(window);
 	ecs::GetSystem<PauseSystem>()->Init(window);
-	
+
 	auto& isGamePause = ecs::GetSystem<PauseSystem>()->isGamePause;
+	
+
+
 
 	//INPUTS  START	
-	input::DigitalInputEvent* moveUp =			new input::DigitalInputEvent("MoveUp");	 
-	input::DigitalInputEvent* moveDown =	    new input::DigitalInputEvent("MoveDown");
-	input::DigitalInputEvent* select =			new input::DigitalInputEvent("Select");	 
-	input::DigitalInputEvent* pause =			new input::DigitalInputEvent("Pause");	
-	input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp" });							 
-	input::bindDigitalInput(GLFW_KEY_DOWN, { "MoveDown" });						 
-	input::bindDigitalInput(GLFW_KEY_ENTER, { "Select" });						 
-	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });								 
-	
+	input::ConstructDigitalEvent("MoveUp");
+	input::ConstructDigitalEvent("MoveDown");
+	input::ConstructDigitalEvent("Select");
+	input::ConstructDigitalEvent("Pause");
+	input::ConstructDigitalEvent("MoveRight");
+	input::ConstructDigitalEvent("MoveLeft");
+
+	input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft" });
+	input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight" });
+	input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp" });
+	input::bindDigitalInput(GLFW_KEY_DOWN, { "MoveDown" });
+	input::bindDigitalInput(GLFW_KEY_ENTER, { "Select" });
+	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
+
 
 	engine::Camera cam = engine::Camera(1120, 630);
 	cam.SetPosition(Vector3(0, 0, 1500));
@@ -68,17 +76,17 @@ int main()
 	//engine.physicsSystem->gravity = Vector2(0, -981);
 	collisionSystem->cam = &cam;
 
-	Model model("LaMuerte.obj");
-	Model checkPointModel("Checkpoint.obj");
-	Model model2("Finish_line.obj");
-	Texture torprldtexture = Texture("torpedoReloading.png");
-	Texture torprdytexture = Texture("torpedoReady.png");
+	Model model("3dmodels/LaMuerte.obj");
+	Model checkPointModel("3dmodels/Checkpoint.obj");
+	Model model2("3dmodels/Finish_line.obj");
+	Texture torprldtexture = Texture("GUI/torpedoReloading.png");
+	Texture torprdytexture = Texture("GUI/torpedoReady.png");
 	// Font http address:
 	// https://www.dafont.com/stencil-ww-ii.font
 	Font stencilFont("Stencil WW II.ttf", 0, 0, 48);
 
-	
-	Texture* winSprite = new Texture("winner.png");
+
+	Texture* winSprite = new Texture("GUI/winner.png");
 	ecs::Entity playerWin = ecs::NewEntity();
 	ecs::AddComponent(playerWin, TextRenderer{ .font = &stencilFont, .text = "", .offset = Vector3(-1.0f, 1.1f, 1.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 	ecs::AddComponent(playerWin, SpriteRenderer{ .texture = winSprite, .enabled = false, .uiElement = true });
@@ -222,10 +230,10 @@ int main()
 
 
 	// create explosion Animation PlayerController 
-	Animation explosionAnim = AnimationsFromSpritesheet("explosion.png", 6, 1, vector<int>(6, 150))[0];
+	Animation explosionAnim = AnimationsFromSpritesheet("spritesheets/explosion.png", 6, 1, vector<int>(6, 150))[0];
 	playerController->ExplosionAnim = &explosionAnim;
 
-	Animation crowdAnims = AnimationsFromSpritesheet("CrowdCheer14.png", 3, 1, vector<int>(3, 150))[0];
+	Animation crowdAnims = AnimationsFromSpritesheet("spritesheets/CrowdCheer14.png", 3, 1, vector<int>(3, 150))[0];
 	ecs::Entity crowd = ecs::NewEntity();
 	ecs::AddComponent(crowd, Transform{ .position = Vector3(1530, -1700, 10), .scale = Vector3(100, 30, 0) });
 	ecs::AddComponent(crowd, SpriteRenderer{});
@@ -247,7 +255,7 @@ int main()
 	//cheerSpeaker.Play(cheerSound);
 	//cheerSpeaker.SetLooping(1);
 
-	Animation countdownAnim = AnimationsFromSpritesheet("UI_Countdown_Ver2.png", 5, 1, vector<int>(5, 1000))[0];
+	Animation countdownAnim = AnimationsFromSpritesheet("spritesheets/UI_Countdown_Ver2.png", 5, 1, vector<int>(5, 1000))[0];
 	ecs::Entity countdown = ecs::NewEntity();
 	ecs::AddComponent(countdown, Transform{ .position = Vector3(1475, -1200, 10), .scale = Vector3(60, 100, 0) });
 	ecs::AddComponent(countdown, SpriteRenderer{});
@@ -258,7 +266,7 @@ int main()
 
 	// Loand Map . Tilemap file 
 	Tilemap map(&cam);
-	map.loadMap("level1.tmx");
+	map.loadMap("levels/level1.tmx");
 	spriteRenderSystem->SetTilemap(&map);
 	collisionSystem->SetTilemap(&map);
 	PhysicsSystem::SetTileProperty(1, TileProperty{ true });
@@ -281,7 +289,7 @@ int main()
 	{
 		input::update();	 //added by: Sauli Hanell
 
-		printf(std::to_string(cam.position.x).c_str(), std::to_string(cam.position.y).c_str());
+		//printf(std::to_string(cam.position.x).c_str(), std::to_string(cam.position.y).c_str());
 		TextRenderer& winText = ecs::GetComponent<TextRenderer>(playerWin);
 		TextRenderer& p1Win = ecs::GetComponent<TextRenderer>(pSFont1);
 		TextRenderer& p2Win = ecs::GetComponent<TextRenderer>(pSFont2);
@@ -530,25 +538,55 @@ int main()
 		}
 
 		/////////////////////////////////////--   PAUSE INPUT STARTS   --//////////////////////////////////////////////
-		if (pause->isNewPress())
+		if (input::GetNewPress("Pause"))
 		{
 			printf("Pause\n");
-			isGamePause =! isGamePause;		
+			isGamePause = !isGamePause;
 			ecs::GetSystem<PauseSystem>()->ToggleShowUIMenu();
 		}
+		if (isGamePause) 
+		{
+			if (input::GetNewPress("MoveUp"))
+			{
+				ecs::GetSystem<PauseSystem>()->MoveUpper();
+			}
+			if (input::GetNewPress("MoveDown"))
+			{
+				ecs::GetSystem<PauseSystem>()->MoveLower();
+			}
+
+			if (ecs::GetSystem<PauseSystem>()->IsCurrentPauseComponentSlider())
+			{
+				 	
+				/*this dosent works*/ PauseComponent& selectedPauseComponent = ecs::GetSystem<PauseSystem>()->GetCurrentSelectedPauseComponent();
+
+				if (input::GetNewPress("MoveRight"))
+				{
+					
+					//selectedPauseComponent.sliderValue += 0.01;
+					/*this dosent works*///ecs::GetSystem<PauseSystem>()->UpdateSlider();
+					ecs::GetSystem<PauseSystem>()->MoveSliderRight();
+					std::cout << "MoveRight value:" << selectedPauseComponent.sliderValue <<"\n";
+
+				}
+				if (input::GetNewPress("MoveLeft"))
+				{
+				
+					//selectedPauseComponent.sliderValue += -0.01;
+					/*this dosent works*///ecs::GetSystem<PauseSystem>()->UpdateSlider();
+					ecs::GetSystem<PauseSystem>()->MoveSliderLeft();
+					std::cout << "MoveLeft value:" << selectedPauseComponent.sliderValue << "\n";
+					
+				}
+			
+			}
+			if ( input::GetNewPress("Select"))
+			{
+				ecs::GetSystem<PauseSystem>()->Selected();
+			}
+
+		}
 		
-		if (isGamePause && moveUp->isNewPress())
-		{	
-			ecs::GetSystem<PauseSystem>()->MoveUpper();
-		}
-		if (isGamePause && moveDown->isNewPress())
-		{
-			ecs::GetSystem<PauseSystem>()->MoveLower();
-		}
-		if (isGamePause && select->isNewRelease())
-		{
-			ecs::GetSystem<PauseSystem>()->Selected();
-		}
 		/////////////////////////////////////--   PAUSE INPUT ENDS   --////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -562,9 +600,9 @@ int main()
 		engine::Update(&cam);
 
 		// playerControl Update for frame 
-		if (!isGamePause) 
+		if (!isGamePause)
 		{
-		playerController->Update(window, deltaTime);
+			playerController->Update(window, deltaTime);
 
 		}
 		glfwSwapBuffers(window);
