@@ -31,24 +31,50 @@ source distribution.
 #include <unordered_map>
 #include <variant>
 #include <string>
+#include <vector>
+#include <memory>
+
+struct TMap
+{
+	// Tilemap unordered map variable
+	std::unordered_map<std::string, std::variant<int, float, tmx::Vector2u, std::string>> tilemap;
+};
+
+struct TGroup
+{
+	// Group layer unordered map variable
+	std::unordered_map<std::string, std::variant<int, float, tmx::Vector2u, std::string>> group;
+};
+
+struct TObject
+{
+	// Object layer unordered map variable
+	std::unordered_map<std::unique_ptr<std::string>, std::unique_ptr<std::variant<int, float, tmx::Vector2u, std::string>>> object;
+};
+
+struct TLayer
+{
+	// Tile layer unordered map variable
+	std::unordered_map<std::unique_ptr<std::string>, std::unique_ptr<std::variant<int, float, tmx::Vector2u, std::string>>> layer;
+};
+
+struct TSet
+{
+	// Tileset unordered map variable
+	std::unordered_map<std::unique_ptr<std::string>, std::unique_ptr<std::variant<int, float, tmx::Vector2u, std::string>>> tileset;
+};
+
+struct TTile
+{
+	// Tile unordered map variable
+	std::unordered_map<std::unique_ptr<std::string>, std::unique_ptr<std::variant<int, float, tmx::Vector2u, std::string>>> tile;
+};
 
 
 class TMVariables
 {
 public:
 
-private:
-	// Tilemap unordered map variable
-	std::unordered_map<std::string*, std::variant<int*, float*, std::string*>> tilemap;
-	// Group layer unordered map variable
-	std::unordered_map<std::string*, std::variant<int*, float*, std::string*>> group;
-	// Object layer unordered map variable
-	std::unordered_map<std::string*, std::variant<int*, float*, std::string*>> object;
-	// Tile layer unordered map variable
-	std::unordered_map<std::string*, std::variant<int*, float*, std::string*>> layer;
-	// Tileset unordered map variable
-	std::unordered_map<std::string*, std::variant<int*, float*, std::string*>> tileset;
-	// Tile unordered map variable
-	std::unordered_map<std::string*, std::variant<int*, float*, std::string*>> tile;
+private:	
 };
 
