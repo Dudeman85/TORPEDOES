@@ -242,6 +242,7 @@ int main()
 		glfwPollEvents();
 	}
 
+	ecs::DestroyAllEntities(true);
 	glfwTerminate();
 	return 0;
 }
