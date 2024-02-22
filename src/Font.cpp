@@ -1,4 +1,5 @@
 #include <engine/Font.h>
+#include <engine/Constants.h>
 
 Font::Font(std::string filepathname, FT_Long face_index, FT_UInt pixel_width, FT_UInt pixel_height)
 {

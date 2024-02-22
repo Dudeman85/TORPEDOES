@@ -129,7 +129,7 @@ namespace engine
 			if (!skip)
 			{
 				//Load the texture from location relative to model
-				Texture* texture = new Texture(textureLoc.C_Str(), GL_LINEAR, false);
+				Texture* texture = new Texture((directory + "/" + textureLoc.C_Str()).c_str(), GL_LINEAR, false, false);
 				texture->type = typeName;
 				texture->path = textureLoc.C_Str();
 				textures.push_back(texture);

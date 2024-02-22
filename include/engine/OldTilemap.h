@@ -36,27 +36,36 @@ source distribution.
 #include <engine/GL/Camera.h>
 #include <engine/Vector.h>
 
+///A class to load a tilemap using the tmxlite library
 class Tilemap final
 {
 public:
+	///Constructor
 	Tilemap(engine::Camera* cam);
 	~Tilemap();
 	
+	///Load tilemap
 	void loadMap(const std::string ownMap);
+	///Draw tilemap
 	void draw(float layer);
 
-	//Get the position of a tile in world coordinates
+	///Get the position of a tile in world coordinates
 	engine::Vector2 GetTilePosition(unsigned int x, unsigned int y);
+	///Check larger area collisionbox
 	std::vector<engine::Vector2> CheckCollisionBox(engine::Vector2 topLeft, engine::Vector2 bottomRight);
+	///Check the smaller Collisions that are turned on upon the larger collision box colliding
 	unsigned int checkCollision(float x, float y);
-
+	///The size of a tile
 	tmx::Vector2u tileSize;
+	///The position of a tile
 	glm::vec3 position;
+	///The bounds of the map
 	tmx::FloatRect bounds;
 
+	///How many layers are there in the map
 	std::set<float> zLayers;
 
-	//A 2D vector of tile IDs used for simple tile collision checking
+	///A 2D vector of tile IDs used for simple tile collision checking
 	std::vector<std::vector<unsigned int>> collisionLayer;
 private:
 	void initGLStuff(const tmx::Map&);

@@ -8,11 +8,11 @@
 
 namespace engine
 {
-	//Abstraction class for OpenGL shaders
+	///Abstraction class for OpenGL shaders
 	class Shader
 	{
 	public:
-		//Give the vertex and fragment shader sources directly or if fromFile = true load them from given directories. 
+		///Give the vertex and fragment shader sources directly or if fromFile = true load them from given directories. 
 		Shader(std::string vertexShaderPath, std::string fragmentShaderPath, bool fromFile = true)
 		{
 			//Load Vertex shader
@@ -107,12 +107,12 @@ namespace engine
 			glDeleteShader(fragmentShader);
 		}
 
-		//Use this shader program
+		///Use this shader program
 		void use()
 		{
 			glUseProgram(ID);
 		}
-
+		///the id num of the shaders
 		unsigned int ID;
 	};
 }

@@ -10,39 +10,43 @@ namespace engine
 {
 	enum Direction { up = 0, right = 1, down = 2, left = 3 };
 
-	//Rigidbody component
+	///Rigidbody component
 	ECS_REGISTER_COMPONENT(Rigidbody)
-	struct Rigidbody : ecs::Component
+		struct Rigidbody
 	{
+		///Velocity of the rigidbody
 		Vector3 velocity;
+		///Mass of the rigidbody in Danny's
 		float mass = 1;
+		///How much gravity affects the rigidbody
 		float gravityScale = 1;
-		//How much linear drag should be applied between 0-1 
+		///How much linear drag should be applied between 0-1 
 		float drag = 0;
-		//Aka bounciness how much velocity will be preserved after a collision between 0-1
+		///Aka bounciness how much velocity will be preserved after a collision between 0-1
 		float restitution = 1;
-		//If true, this will not be effected by outside forces calculations
+		///If true, this will not be effected by outside forces calculations
 		bool kinematic = false;
 	};
 
-	//Tilemap tile properties, not a component
+	///Tilemap tile properties, not a component
 	struct TileProperty
 	{
 		bool trigger;
 	};
 
-	//Physics System
-	//Requires Rigidbody and Transform components
+	///Physics System, Requires Rigidbody and Transform components
 	ECS_REGISTER_SYSTEM(PhysicsSystem, Transform, Rigidbody)
-	class PhysicsSystem : public ecs::System
+		class PhysicsSystem : public ecs::System
 	{
 	public:
-		//Update the physics system, call this every frame
+		///Update the physics system, call this every frame
 		void Update(float deltaTime)
 		{
 			//For each entity
-			for (auto const& entity : entities)
+			for (auto itr = entities.begin(); itr != entities.end();)
 			{
+				ecs::Entity entity = *itr++;
+
 				//Get required components
 				Transform& transform = ecs::GetComponent<Transform>(entity);
 				Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(entity);
@@ -68,8 +72,7 @@ namespace engine
 
 		//COLLISION RESOLUTION:
 
-		//Temporary function to solve a collision does affect rotation rotation
-		//Returns 0 on success, >0 on trigger, and <0 on failure 
+		///Temporary function to solve a collision does affect rotation rotation, Returns 0 on success, >0 on trigger, and <0 on failure 
 		static int SimpleSolveCollision(Collision collision)
 		{
 			//One of the entities does not have a rigidbody. Return <0 on failure;
@@ -103,8 +106,7 @@ namespace engine
 			return -1;
 		}
 
-		//Solve a collision between two colliders
-		//Returns 0 on success, >0 on trigger, and <0 on failure 
+		///Solve a collision between two colliders, Returns 0 on success, >0 on trigger, and <0 on failure
 		static int SolveTilemapCollision(std::vector<Collision> collisions)
 		{
 			//No collision, nothing needs to be done
@@ -119,7 +121,7 @@ namespace engine
 				return 0;
 
 			ecs::Entity a = collisions.front().a;
-			Collision maxIntersect = Collision{.mtv = Vector2(0)};
+			Collision maxIntersect = Collision{ .mtv = Vector2(0) };
 
 			int i = 0;
 			do
@@ -165,7 +167,7 @@ namespace engine
 		//UTILITY:
 
 		//TODO return collisions
-		//Move an entity while checking for collision, assuming entity has collider
+		///Move an entity while checking for collision, assuming entity has collider
 		static void Move(ecs::Entity entity, Vector3 amount, int steps = 1)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -182,34 +184,41 @@ namespace engine
 					CollisionSystem::UpdateAABB(entity);
 					//Check entity and tilemap collision
 					std::vector<Collision> collisions = ecs::GetSystem<CollisionSystem>()->CheckCollision(entity);
-					std::vector<Collision> tilemapCollisions = ecs::GetSystem<CollisionSystem>()->CheckTilemapCollision(entity);
+					std::vector<Collision> tilemapCollisions;
 
 					//Solve each entity collision
 					for (Collision& collision : collisions)
 					{
-						SimpleSolveCollision(collision);
+						if (collision.type == Collision::Type::collision || collision.type == Collision::Type::trigger)
+							//Solve entity collisions
+							SimpleSolveCollision(collision);
+						else
+							//Store all the tilemap collision for later
+							tilemapCollisions.push_back(collision);
 					}
 
+					//Solve tilemap collisions
 					SolveTilemapCollision(tilemapCollisions);
 				}
 			}
 		}
 
-		//Add velocity to entity, does not include deltaTime
+		///Add velocity to entity, does not include deltaTime
 		static void Impulse(ecs::Entity entity, Vector3 velocity)
 		{
 			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(entity);
 			rigidbody.velocity += velocity * rigidbody.mass;
 		}
 
-		//Sets the rigidbody properties of a tile type
+		///Sets the rigidbody properties of a tile type
 		static void SetTileProperty(unsigned int tileID, TileProperty properties)
 		{
 			tileProperties.insert({ tileID, properties });
 		}
 
-		//How many steps should be used for movements, bigger is more accurate but slower
+		///How many steps should be used for movements, bigger is more accurate but slower
 		int step = 1;
+		///gravity yay
 		Vector3 gravity;
 		static const int tilemapIterationLimit = 10;
 	private:

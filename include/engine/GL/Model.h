@@ -17,10 +17,11 @@
 
 namespace engine
 {
-	//A class to store 3D model vertex and texture data, as well as handle model loading
+	///A class to store 3D model vertex and texture data, as well as handle model loading
 	class Model
 	{
 	public:
+		///Load the models from the asset path
 		Model(std::string path)
 		{
 			LoadModel(assetPath + path);
@@ -33,7 +34,7 @@ namespace engine
 			}
 		}
 
-		//Model data
+		///Model data
 		std::vector<Mesh> meshes;
 
 	private:

@@ -10,63 +10,57 @@
 
 namespace engine
 {
-	//Collision Event struct, not a component
+	///Collision Event struct, not a component
 	struct Collision
 	{
 		enum class Type { miss, collision, trigger, tilemapCollision, tilemapTrigger };
 
 		Type type;
 
-		//The entity which instigated the collision
+		///The entity which instigated the collision
 		ecs::Entity a;
-		//The entity which was subject to the collision
-		//In a tilemap collision this will be the tile ID
+		///The entity which was subject to the collision, In a tilemap collision this will be the tile ID
 		ecs::Entity b;
 
-		//The point of collision, will always be a vertice of one collider
+		///The point of collision, will always be a vertice of one collider
 		Vector3 point;
-		//The normal of the collision surface, will always be the normal of a side of the other collider than point
+		///The normal of the collision surface, will always be the normal of a side of the other collider than point
 		Vector3 normal;
-		//Minimum Translation Vector is the smallest translation needed to end overlap
+		///Minimum Translation Vector is the smallest translation needed to end overlap
 		Vector3 mtv;
 	};
 
-	//Polygon Collider component
+	///Polygon Collider component
 	ECS_REGISTER_COMPONENT(PolygonCollider)
-	struct PolygonCollider : ecs::Component
+		struct PolygonCollider
 	{
-		//The vertices of the polygon making up the collider, going clockwise
-		//The vertices must form a convex polygon
+		///The vertices of the polygon making up the collider, going clockwise. The vertices must form a convex polygon
 		std::vector<Vector2> vertices;
-		//Callback function on collision
+		///Callback function on collision
 		std::function<void(Collision)> callback;
-		//Should the collider only act as a trigger
+		///Should the collider only act as a trigger
 		bool trigger = false;
-		//Draw this collider
+		///Draw this collider
 		bool visualise = false;
-		//Override the rotation of the collider, (0-360)degrees
-		//This is useful if attaching a 2D collider to a 3D model
+		///Override the rotation of the collider, (0-360)degrees. This is useful if attaching a 2D collider to a 3D model
 		float rotationOverride = -1;
-		//The axis-aligned bounding box of the collider
-		//This is updated automatically and is set in world coordinates
+		//The axis-aligned bounding box of the collider. This is updated automatically and is set in world coordinates
 		std::array<float, 4> bounds;
 	};
 
-	//Collision System
-	//Requires Transform and PolygonCollider
+	///Collision System, Requires Transform and PolygonCollider
 	ECS_REGISTER_SYSTEM(CollisionSystem, Transform, PolygonCollider)
-	class CollisionSystem : public ecs::System
+		class CollisionSystem : public ecs::System
 	{
 	public:
 
-		//Called every frame
+		///Called every frame
 		void Update()
 		{
 			//For each entity
 			for (auto itr = entities.begin(); itr != entities.end();)
 			{
 				ecs::Entity entity = *itr++;
-
 
 				PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
 				Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -98,18 +92,18 @@ namespace engine
 			}
 		}
 
-		//Checks collision between entity a and every other entity
-		//Returns the collisions from the perspective of a
+		///Checks collision between entity a and every other entity, Returns the collisions from the perspective of a, and calls every applicable callback function
 		std::vector<Collision> CheckCollision(ecs::Entity a)
 		{
 			Transform& aTransform = ecs::GetComponent<Transform>(a);
 			PolygonCollider& aCollider = ecs::GetComponent<PolygonCollider>(a);
 
 			//Check tilemap collision
-			std::vector<Collision> collisions = CheckTilemapCollision(a);
+			std::vector<Collision> tilemapCollisions = CheckTilemapCollision(a);
+			std::vector<Collision> entityCollisions;
 
 			//For each entity
-			for (const ecs::Entity& b : entities)
+			for (ecs::Entity b : entities)
 			{
 				//Don't collide with self
 				if (a == b)
@@ -121,13 +115,55 @@ namespace engine
 
 				Collision collision = CheckEntityCollision(a, b);
 				if (collision.type != Collision::Type::miss)
-					collisions.push_back(collision);
+					entityCollisions.push_back(collision);
 			}
+
+			//For each collision call a and b callbacks
+			for (const Collision& entityCollision : entityCollisions)
+			{
+				PolygonCollider& bCollider = ecs::GetComponent<PolygonCollider>(entityCollision.b);
+
+				//Setup collision event from b's perspective
+				Collision bToA;
+				bToA.a = entityCollision.b;
+				bToA.b = a;
+				bToA.type = entityCollision.type;
+				bToA.normal = Vector2() - entityCollision.normal;
+				bToA.mtv = Vector2() - entityCollision.mtv;
+
+				if (ecs::EntityExists(entityCollision.b))
+				{
+					//Call b's callback
+					if (bCollider.callback)
+						bCollider.callback(bToA);
+				}
+				if (ecs::EntityExists(entityCollision.a))
+				{
+					//Call a's callback
+					if (aCollider.callback)
+						aCollider.callback(entityCollision);
+				}
+			}
+			//For each tilemap collision call a's destructor
+			for (const Collision& tilemapCollision : tilemapCollisions)
+			{
+				if (ecs::EntityExists(tilemapCollision.a))
+				{
+					//Call a's callback
+					if (aCollider.callback)
+						aCollider.callback(tilemapCollision);
+				}
+			}
+
+			//Combine the tilemap and entity collisions
+			std::vector<Collision> collisions = tilemapCollisions;
+			collisions.insert(collisions.end(), entityCollisions.begin(), entityCollisions.end());
+
 			return collisions;
 		}
 
-		//Checks for collision between a tilemap collision layer and an entity
-		std::vector<Collision> CheckTilemapCollision(ecs:: Entity entity)
+		///Checks for collision between a tilemap collision layer and an entity. Does not call callbacks
+		std::vector<Collision> CheckTilemapCollision(ecs::Entity entity)
 		{
 			//If no tilemap collision layer is set return no collisions
 			if (!tilemap)
@@ -149,9 +185,9 @@ namespace engine
 			//Vertices of a tile
 			std::vector<Vector2> tileVerts{
 				Vector2(-((float)tilemap->tileSize.x / 2), (float)tilemap->tileSize.y / 2), //Top-Left
-				Vector2((float)tilemap->tileSize.x / 2, (float)tilemap->tileSize.y / 2),  //Top-Right
-				Vector2((float)tilemap->tileSize.x / 2, -((float)tilemap->tileSize.y / 2)), //Bottom-Right
-				Vector2(-((float)tilemap->tileSize.x / 2), -((float)tilemap->tileSize.y / 2)) //Bottom-Left
+					Vector2((float)tilemap->tileSize.x / 2, (float)tilemap->tileSize.y / 2),  //Top-Right
+					Vector2((float)tilemap->tileSize.x / 2, -((float)tilemap->tileSize.y / 2)), //Bottom-Right
+					Vector2(-((float)tilemap->tileSize.x / 2), -((float)tilemap->tileSize.y / 2)) //Bottom-Left
 			};
 			//Visualise tile collider
 			Primitive tileCollider = Primitive::Polygon(tileVerts);
@@ -160,7 +196,7 @@ namespace engine
 			for (int i = 0; i < possibleCollisions.size(); i++)
 			{
 				//Move the tile verts to position
-				Vector2 tilePosition = tilemap->GetTilePosition(possibleCollisions[i].x, possibleCollisions[i].y); 
+				Vector2 tilePosition = tilemap->GetTilePosition(possibleCollisions[i].x, possibleCollisions[i].y);
 				std::vector<Vector2> transformedTileVerts = TransformSystem::ApplyTransforms2D(tileVerts, 0, 1, tilePosition);
 				//Check entity-tile collision
 				Collision collision = SATIntersect(entityVerts, transformedTileVerts);
@@ -182,10 +218,6 @@ namespace engine
 					collision.b = tilemap->collisionLayer[possibleCollisions[i].x][possibleCollisions[i].y];
 					collision.type = collider.trigger ? Collision::Type::tilemapTrigger : Collision::Type::tilemapCollision;
 
-					//Call the callback if applicable
-					if (collider.callback)
-						collider.callback(collision);
-
 					collisions.push_back(collision);
 				}
 				else
@@ -199,7 +231,7 @@ namespace engine
 			return collisions;
 		}
 
-		//Check Entity-Entity collision, this will also call any callbacks
+		///Check Entity-Entity collision. Does not call callbacks
 		static Collision CheckEntityCollision(ecs::Entity a, ecs::Entity b)
 		{
 			//Get relevant components from a and b
@@ -243,20 +275,13 @@ namespace engine
 				bToA.normal = Vector2() - collision.normal;
 				bToA.mtv = Vector2() - collision.mtv;
 
-				//Call calback functions if applicable
-				if (aCollider.callback)
-					aCollider.callback(aToB);
-				if (bCollider.callback)
-					bCollider.callback(bToA);
-
 				return aToB;
 
 			}
 			return Collision{ .type = Collision::Type::miss };
 		}
 
-		//Check SAT intersection between two convex polygons
-		//Expects Vertices to have Transforms applied
+		///Check SAT intersection between two convex polygons, Expects Vertices to have Transforms applied
 		static Collision SATIntersect(std::vector<Vector2> aVerts, std::vector<Vector2> bVerts)
 		{
 			//Calculate all axes to check
@@ -389,7 +414,7 @@ namespace engine
 			return collision;
 		}
 
-		//Checks if a and b bounds are intersecting
+		///Checks if a and b bounds are intersecting
 		static bool AABBIntersect(ecs::Entity a, ecs::Entity b)
 		{
 			//Get the bounds
@@ -400,7 +425,7 @@ namespace engine
 			return (aBounds[3] < bBounds[1] && aBounds[1] > bBounds[3] && aBounds[2] < bBounds[0] && aBounds[0] > bBounds[2]);
 		}
 
-		//Update the AABB of the polygon collider
+		///Update the AABB of the polygon collider
 		static void UpdateAABB(ecs::Entity entity)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -434,7 +459,7 @@ namespace engine
 			collider.bounds = bounds;
 		}
 
-		//Set the tilemap collision layer
+		///Set the tilemap collision layer
 		void SetTilemap(Tilemap* collisionTilemap)
 		{
 			if (collisionTilemap->collisionLayer.empty())
@@ -447,7 +472,13 @@ namespace engine
 			}
 		}
 
-		//Camera is needed for visualisation
+		///Removes the tilemap from collision
+		void RemoveTilemap()
+		{
+			tilemap = nullptr;
+		}
+
+		///Camera is needed for visualisation
 		Camera* cam = nullptr;
 
 	private:

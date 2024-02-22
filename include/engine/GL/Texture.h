@@ -12,7 +12,7 @@ namespace engine
 	//Forward declare Image class for second constructor
 	class Image;
 
-	//Abstraction class for OpenGL textures
+	///Abstraction class for OpenGL textures
 	class Texture
 	{
 	private:
@@ -20,6 +20,7 @@ namespace engine
 		Texture();
 
 	public:
+		///Constructor
 		Texture(int sx, int sy, const std::vector<std::uint16_t>& data)
 		{
 			//Generate and bind texture
@@ -34,14 +35,16 @@ namespace engine
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		}
 
-		//Load a texture from path
-		Texture(std::string path, unsigned int filteringType = GL_NEAREST, bool flip = true)
+		///Load a texture from path
+		Texture(std::string path, unsigned int filteringType = GL_NEAREST, bool flip = true, bool relativePath = true)
 		{
 			//Flip the image when loading into an OpenGL texture
 			stbi_set_flip_vertically_on_load(flip);
 			//Load image
+			if (relativePath)
+				path = assetPath + path;
 			int width, height, nrChannels;
-			unsigned char* imageData = stbi_load((assetPath + path).c_str(), &width, &height, &nrChannels, 0);
+			unsigned char* imageData = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
 
 			if (imageData)
 			{
@@ -82,10 +85,10 @@ namespace engine
 			}
 			else
 			{
-				std::cout << "Error loading texture from " << assetPath + path << std::endl;
+				std::cout << "Error loading texture from " << path << std::endl;
 			}
 		}
-		//Declare the constuctor through image. It is defined in Image.h
+		///Declare the constuctor through image. It is defined in Image.h
 		inline Texture(Image image, unsigned int filteringType = GL_NEAREST);
 
 		~Texture()
@@ -93,7 +96,7 @@ namespace engine
 			glDeleteTextures(1, &id);
 		}
 
-		//Sets the OpenGL sampling type when up and downscaling the texture. Ex. GL_NEAREST, GL_LINEAR, etc.
+		///Sets the OpenGL sampling type when up and downscaling the texture. Ex. GL_NEAREST, GL_LINEAR, etc.
 		void SetScalingFilter(unsigned int type)
 		{
 			glBindTexture(GL_TEXTURE_2D, id);
@@ -106,13 +109,13 @@ namespace engine
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
-		//Get this textures OpenGL ID
+		///Get this textures OpenGL ID
 		unsigned int ID()
 		{
 			return id;
 		}
 
-		//Use this texture to draw the next sprite
+		///Use this texture to draw the next sprite
 		void Use()
 		{
 			glBindTexture(GL_TEXTURE_2D, id);

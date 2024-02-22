@@ -4,25 +4,32 @@
 
 namespace engine
 {
-	// TextRenderer component
+	/// TextRenderer component
 	ECS_REGISTER_COMPONENT(TextRenderer)
-	struct TextRenderer : ecs::Component
+	struct TextRenderer
 	{
+		///The font of the text
 		Font* font;
+		///The text that is printed
 		std::string text = "";
+		///Location of the text on the screen
 		Vector3 offset;
+		///Rotation of the text
 		Vector3 rotation;
+		///Size of the text
 		Vector3 scale = Vector3(1);
+		///Color of the text
 		Vector3 color;
+		///Bool to turn on the ui elements
 		bool uiElement = false;
 	};
 
-	// TextRenderSystem requires components TextRenderer component and transform component
+	/// TextRenderSystem requires components TextRenderer component and transform component
 	ECS_REGISTER_SYSTEM(TextRenderSystem, Transform, TextRenderer)
 	class TextRenderSystem : public ecs::System
 	{
 	public:
-		// Constructor
+		///Initialize the shaders
 		void Init()
 		{
 			m_shader = new Shader(
@@ -53,7 +60,7 @@ namespace engine
 					})",
 				false);
 		}
-
+		///Call this every frame
 		void Update(Camera* cam)
 		{
 			for (auto const& entity : entities)
@@ -67,16 +74,8 @@ namespace engine
 				}
 				m_shader->use();
 
-				//Create the model matrix
-				glm::mat4 model = glm::mat4(1.0f);
-				//Position
-				model = glm::translate(model, transform.position.ToGlm());
-				//X, Y, Z euler rotations
-				model = glm::rotate(model, glm::radians(transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-				model = glm::rotate(model, glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-				model = glm::rotate(model, glm::radians(transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-				//Scale
-				model = glm::scale(model, transform.scale.ToGlm());
+				//Create the model matrix, this is the same for each mesh so it only needs to be done once
+				glm::mat4 model = TransformSystem::GetGlobalTransformMatrix(entity);
 
 				//Give the shader the model matrix
 				unsigned int modelLoc = glGetUniformLocation(m_shader->ID, "model");

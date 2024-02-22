@@ -1,4 +1,5 @@
 #pragma once
+#define WIN32_LEAN_AND_MEAN
 #include <chrono>
 
 //ECS modules
@@ -18,10 +19,18 @@
 
 namespace engine
 {
-
+	// TODO: replace with double
 	float deltaTime = 0;
+	// TODO: replace with double
 	float programTime = 0;
 	chrono::time_point<chrono::high_resolution_clock> _lastFrame;
+
+	//If true updates physics and collision systems
+	bool enablePhysics = true;
+	//If true updates animation system
+	bool enableAnimation = true;
+	//If true enables sprite, model, text, and primitive rendering systems
+	bool enableRendering = true;
 
 	//Engine system pointers (for peak performance)
 	shared_ptr<CollisionSystem> collisionSystem;
@@ -54,6 +63,7 @@ namespace engine
 		primitiveRenderSystem = ecs::GetSystem<PrimitiveRenderSystem>();
 		primitiveRenderSystem->Init();
 		transformSystem = ecs::GetSystem<TransformSystem>();
+		ecs::SetComponentDestructor<Transform>(TransformSystem::OnTransformRemoved);
 	}
 
 	//Updates all default engine systems, calculates and returns delta time
@@ -67,15 +77,22 @@ namespace engine
 
 		//Update engine systems
 		//Physics must be before collision
-		physicsSystem->Update(deltaTime);
+		if (enablePhysics)
+			physicsSystem->Update(deltaTime);
 		//Animation must be before sprite rendering
-		modelRenderSystem->Update(cam);
-		animationSystem->Update(deltaTime);
-		spriteRenderSystem->Update(cam);
-		textRenderSystem->Update(cam);
-		primitiveRenderSystem->Update(cam);
-		//Collision system should be after rendering 
-		collisionSystem->Update();
+		if (enableAnimation)
+			animationSystem->Update(deltaTime);
+		if (enableRendering)
+		{
+			//ModelRenderer must be before SpriteRenderer
+			modelRenderSystem->Update(cam);
+			spriteRenderSystem->Update(cam);
+			textRenderSystem->Update(cam);
+			primitiveRenderSystem->Update(cam);
+		}
+		//Collision system should be after rendering
+		if (enablePhysics)
+			collisionSystem->Update();
 		//Transform must be after physics and rendering
 		transformSystem->Update();
 

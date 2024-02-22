@@ -20,7 +20,7 @@
 
 namespace engine
 {
-	//A class to create and store a primitive shape
+	///A class to create and store a primitive shape
 	class Primitive
 	{
 	private:
@@ -62,7 +62,7 @@ namespace engine
 			glDeleteBuffers(1, &EBO);
 		}
 
-		//A primitive can be drawn without being an entity
+		///A primitive can be drawn without being an entity
 		void Draw(Camera* cam, Vector3 color = Vector3(100.0f), Transform transform = Transform())
 		{
 			defaultShader->use();
@@ -103,14 +103,14 @@ namespace engine
 			glBindVertexArray(0);
 		}
 
-		//Create a line starting at p1 and ending at p2
+		///Create a line starting at p1 and ending at p2
 		static Primitive Line(Vector3 p1 = Vector3(-1, 0, 0), Vector3 p2 = Vector3(1, 0, 0))
 		{
 			//Rectangle vertices start at top left and go clockwise to bottom left
 			std::vector<float> vertices
 			{
 				//Positions		
-				p1.x, p1.y, p1.x,
+				p1.x, p1.y, p1.z,
 				p2.x, p2.y, p2.z,
 			};
 			//Indices to draw a line
@@ -123,8 +123,7 @@ namespace engine
 			return Primitive(vertices, indices);
 		}
 
-		//Create a triangle from three vertices
-		//Defaults to equilateral triangle
+		///Create a triangle from three vertices, Defaults to equilateral triangle
 		static Primitive Triangle(Vector3 v1 = Vector3(-1, -1, 0), Vector3 v2 = Vector3(1, -1, 0), Vector3 v3 = Vector3(0, 1, 0))
 		{
 			//Rectangle vertices start at bottom left and go clockwise to bottom right
@@ -145,8 +144,7 @@ namespace engine
 			return Primitive(vertices, indices);
 		}
 
-		//Create a rectangle from four vertices going clockwise
-		//Defaults to square
+		///Create a rectangle from four vertices going clockwise, Defaults to square
 		static Primitive Rectangle(Vector3 v1 = Vector3(-1, -1, 0), Vector3 v2 = Vector3(-1, 1, 0), Vector3 v3 = Vector3(1, 1, 0), Vector3 v4 = Vector3(1, -1, 0))
 		{
 			//Rectangle vertices start at bottom left and go clockwise to bottom right
@@ -169,7 +167,7 @@ namespace engine
 			return Primitive(vertices, indices);
 		}
 
-		//Create a polygon from provided 3D vertices, going clockwise
+		///Create a polygon from provided 3D vertices, going clockwise
 		static Primitive Polygon(std::vector<Vector3> verts)
 		{
 			//Move all Vector3 vertices to a simple float vector
@@ -187,7 +185,7 @@ namespace engine
 			//Create the primitive object from vertice data
 			return Primitive(vertices, indices);
 		}
-		//Create a polygon from provided 2D vertices, going clockwise
+		///Create a polygon from provided 2D vertices, going clockwise
 		static Primitive Polygon(std::vector<Vector2> verts)
 		{
 			//Move all Vector2 vertices to a simple float vector
@@ -205,7 +203,7 @@ namespace engine
 			//Create the primitive object from vertice data
 			return Primitive(vertices, indices);
 		}
-
+		///Number of vertices
 		unsigned int numVertices = 0;
 		unsigned int VAO, VBO, EBO;
 		static Shader* defaultShader;
@@ -213,25 +211,32 @@ namespace engine
 
 	Shader* Primitive::defaultShader = nullptr;
 
-	//Primitive Renderer Component
-	//They consist of only a primitive shape and a color, no texture
+	
 	ECS_REGISTER_COMPONENT(PrimitiveRenderer)
-	struct PrimitiveRenderer : ecs::Component
+	///Primitive Renderer Component, They consist of only a primitive shape and a color, no texture
+	struct PrimitiveRenderer
 	{
+		///Pointer
 		Primitive* primitive = nullptr;
+		///Color of the shapes
 		Vector3 color;
+		///Draw wireframes on objects
 		bool wireframe = false;
+		///Lock the X and Y of the shapes
 		bool lockXYRotation = false;
+		///Bool to turn primitive render on and off
 		bool enabled = true;
+		///Bool to turn ui elements on and off
 		bool uiElement = false;
 	};
 
-	//Primitive Render system
-	//Requires PrimitiveRenderer and Transform
+
 	ECS_REGISTER_SYSTEM(PrimitiveRenderSystem, Transform, PrimitiveRenderer)
+	///Primitive Render system, Requires PrimitiveRenderer and Transform
 	class PrimitiveRenderSystem : public ecs::System
 	{
 	public:
+		///Initialize the shaders
 		void Init()
 		{
 			//The default 3D model shader
@@ -267,7 +272,7 @@ namespace engine
 
 			Primitive::defaultShader = defaultShader;
 		}
-
+		///Call this every frame
 		void Update(Camera* cam)
 		{
 			//For each entity
@@ -344,7 +349,7 @@ namespace engine
 			//Unbind vertex array
 			glBindVertexArray(0);
 		}
-
+		///Pointer to store the shader
 		Shader* defaultShader;
 	};
 }

@@ -3,7 +3,7 @@ set(PROJECT_SRC
   ${PROJECT_DIR}/FreeFuncs.cpp
   ${PROJECT_DIR}/ImageLayer.cpp
   ${PROJECT_DIR}/Map.cpp
-  ${PROJECT_DIR}/miniz.c
+  #${PROJECT_DIR}/miniz.c
   ${PROJECT_DIR}/Object.cpp
   ${PROJECT_DIR}/ObjectGroup.cpp
   ${PROJECT_DIR}/Property.cpp

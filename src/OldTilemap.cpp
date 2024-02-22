@@ -308,7 +308,7 @@ void Tilemap::initGLStuff(const tmx::Map& map)
 	for (const auto& ts : tilesets)
 	{
 		std::string imagePath = ts.getImagePath();
-		imagePath.erase(imagePath.begin(), imagePath.begin() + 7);
+		//imagePath.erase(imagePath.begin(), imagePath.begin() + 7);
 		auto texture = loadTexture(imagePath);
 		allTextures.push_back(texture);
 	}
@@ -320,5 +320,5 @@ void Tilemap::initGLStuff(const tmx::Map& map)
 
 std::shared_ptr<engine::Texture> Tilemap::loadTexture(const std::string& path)
 {
-	return std::make_shared<engine::Texture>(path.c_str(), GL_NEAREST, false);
+	return std::make_shared<engine::Texture>(path.c_str(), GL_NEAREST, false, false);
 }
