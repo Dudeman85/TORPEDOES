@@ -27,4 +27,10 @@ source distribution.
 
 #include <engine/Tilemap.h>
 
+void TMap::setup(const string tilemap)
+{
+	Map map;
+	map.load(assetPath + tilemap);
+}
+
 

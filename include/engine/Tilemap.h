@@ -29,6 +29,7 @@ source distribution.
 
 #include <tmxlite/Map.hpp>
 #include <engine/TMVariables.h>
+#include <engine/Constants.h>
 
 using namespace tmx;
 using namespace std;
@@ -49,5 +50,5 @@ public:
 
 	// setup() -function to get properties and
 	// set them into correct struct properties
-	void setup();
+	void setup(const string tilemap);
 };
