@@ -256,19 +256,21 @@ int main()
 
 		engine::Update(&cam);
 
+		// playerControl Update for frame if not paused
 		if (!isGamePause)
 		{
 
 			playerController->Update(window, deltaTime);
 
 		}
+		// if paused  or Pause pressed update PauseSystem
 		if (isGamePause || input::GetNewPress("Pause"))
 		{
 			printf(" P  pauseSystem");
 			pauseSystem->Update();
 		}
-		// playerControl Update for frame 
-		playerController->Update(window, deltaTime);
+		
+		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
