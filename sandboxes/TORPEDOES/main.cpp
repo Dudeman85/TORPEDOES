@@ -1,6 +1,8 @@
 #define WIN32_LEAN_AND_MEAN
 #include <engine/Tilemap.h>
 #include "PlayerController.h"
+#include "engine/Input.h"  
+#include "MenuSystem.h"	
 
 int checkPointNumber = 0;
 Font* stencilFont = nullptr;
@@ -40,6 +42,31 @@ int main()
 
 	EngineInit();
 
+	input::initialize(window);
+	ecs::GetSystem<PauseSystem>()->Init(window);
+
+	auto& isGamePause = ecs::GetSystem<PauseSystem>()->isGamePause;
+
+
+
+
+	////////////////////////////     INPUTS  STARTS		/////////////////	 INPUTS  STARTS		//////////	
+	input::ConstructDigitalEvent("MoveUp");
+	input::ConstructDigitalEvent("MoveDown");
+	input::ConstructDigitalEvent("Select");
+	input::ConstructDigitalEvent("Pause");
+	input::ConstructDigitalEvent("MoveRight");
+	input::ConstructDigitalEvent("MoveLeft");
+
+	//TODO: add controller input
+	input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft" });
+	input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight" });
+	input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp" });
+	input::bindDigitalInput(GLFW_KEY_DOWN, { "MoveDown" });
+	input::bindDigitalInput(GLFW_KEY_ENTER, { "Select" });
+	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
+	////////////////////////////     INPUTS  Ends    //////////////////     INPUTS  Ends      //////////
+		
 	engine::Camera cam = engine::Camera(1120, 630);
 	cam.SetPosition(Vector3(0, 0, 1500));
 	//cam.perspective = true;
@@ -67,6 +94,7 @@ int main()
 	ecs::AddComponent(playerWin, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(0.5f) });
 	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
 	playerController->Init();
+	std::shared_ptr<PauseSystem> pauseSystem = ecs::GetSystem<PauseSystem>();
 
 	PlayerController::playerWin = playerWin;
 
@@ -129,6 +157,9 @@ int main()
 
 	while (!glfwWindowShouldClose(window))
 	{
+		
+		printf("deltatime: %f \n", deltaTime);
+		input::update();
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
@@ -225,12 +256,23 @@ int main()
 
 		engine::Update(&cam);
 
+		if (!isGamePause)
+		{
+
+			playerController->Update(window, deltaTime);
+
+		}
+		if (isGamePause || input::GetNewPress("Pause"))
+		{
+			printf(" P  pauseSystem");
+			pauseSystem->Update();
+		}
 		// playerControl Update for frame 
 		playerController->Update(window, deltaTime);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-
+	input::uninitialize();
 	ecs::DestroyAllEntities(true);
 	glfwTerminate();
 	return 0;
