@@ -16,15 +16,10 @@
 #include <engine/GL/Window.h>
 #include <engine/Image.h>
 #include <engine/AudioEngine.h>
+#include <engine/Timing.h>
 
 namespace engine
 {
-	// TODO: replace with double
-	float deltaTime = 0;
-	// TODO: replace with double
-	float programTime = 0;
-	chrono::time_point<chrono::high_resolution_clock> _lastFrame;
-
 	//If true updates physics and collision systems
 	bool enablePhysics = true;
 	//If true updates animation system
@@ -96,12 +91,9 @@ namespace engine
 		//Transform must be after physics and rendering
 		transformSystem->Update();
 
-		//Calculate Delta Time
-		chrono::time_point thisFrame = chrono::high_resolution_clock::now();
-		chrono::duration<double> duration = thisFrame - _lastFrame;
-		deltaTime = duration.count();
-		_lastFrame = thisFrame;
-		programTime += deltaTime;
+		//Timer Stuff
+		CalculateDeltaTime();
+		frameCount++;
 
 		return deltaTime;
 	}

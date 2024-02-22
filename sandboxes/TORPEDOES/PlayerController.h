@@ -166,7 +166,6 @@ public:
 				player.playExlposionSound = true;
 			}
 		}
-
 	}
 	// check if projectil collision tilemap Trigger
 	static void OnprojectilCollision(Collision collision)
@@ -190,7 +189,6 @@ public:
 		{
 			//Get the entity and increment the iterator
 			ecs::Entity entity = *itr++;
-
 
 			// Get player, transform, and rigidbody components
 			Player& player = ecs::GetComponent<Player>(entity);
@@ -400,7 +398,6 @@ public:
 			player.projectileTime1 -= dt;
 			player.projectileTime2 -= dt;
 			player.projectileTime3 -= dt;
-
 
 			collider.rotationOverride = modelTransform.rotation.y + 1080;
 

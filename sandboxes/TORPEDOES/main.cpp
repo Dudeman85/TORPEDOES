@@ -18,6 +18,16 @@ void createChepoint(Vector3 position, Vector3 rotation, Vector3 scale, Model& ch
 	checkPointNumber++;
 };
 
+void CreateCrowd(Vector3 pos, Animation& anim)
+{
+	ecs::Entity crowd = ecs::NewEntity();
+	ecs::AddComponent(crowd, Transform{ .position = pos, .scale = Vector3(100, 30, 0) });
+	ecs::AddComponent(crowd, SpriteRenderer{});
+	ecs::AddComponent(crowd, Animator{});
+	AnimationSystem::AddAnimation(crowd, anim, "CrowdCheer");
+	AnimationSystem::PlayAnimation(crowd, "CrowdCheer", true);
+}
+
 int main()
 {
 	string username = "";
@@ -75,7 +85,7 @@ int main()
 	ecs::AddComponent(pSFont4, Transform{ .position = Vector3(0.75, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
 
 
-	playerController->CreatePlayers(6, Vector2(1434.0f, -1370.0f));
+	playerController->CreatePlayers(4, Vector2(1434.0f, -1370.0f));
 
 
 	// create explosion Animation PlayerController 
@@ -83,24 +93,9 @@ int main()
 	playerController->ExplosionAnim = &explosionAnim;
 
 	Animation crowdAnims = AnimationsFromSpritesheet("/spritesheets/CrowdCheer14.png", 3, 1, vector<int>(3, 150))[0];
-	ecs::Entity crowd = ecs::NewEntity();
-	ecs::AddComponent(crowd, Transform{ .position = Vector3(1530, -1700, 10), .scale = Vector3(100, 30, 0) });
-	ecs::AddComponent(crowd, SpriteRenderer{});
-	ecs::AddComponent(crowd, Animator{});
-	AnimationSystem::AddAnimation(crowd, crowdAnims, "CrowdCheer");
-	AnimationSystem::PlayAnimation(crowd, "CrowdCheer", true);
-	ecs::Entity crowd1 = ecs::NewEntity();
-	ecs::AddComponent(crowd1, Transform{ .position = Vector3(1545, -1715, 11), .scale = Vector3(100, 30, 0) });
-	ecs::AddComponent(crowd1, SpriteRenderer{});
-	ecs::AddComponent(crowd1, Animator{});
-	AnimationSystem::AddAnimation(crowd1, crowdAnims, "Cheer2");
-	AnimationSystem::PlayAnimation(crowd1, "Cheer2", true);
-	ecs::Entity crowd2 = ecs::NewEntity();
-	ecs::AddComponent(crowd2, Transform{ .position = Vector3(1520, -1730, 12), .scale = Vector3(100, 30, 0) });
-	ecs::AddComponent(crowd2, SpriteRenderer{});
-	ecs::AddComponent(crowd2, Animator{});
-	AnimationSystem::AddAnimation(crowd2, crowdAnims, "Cheer3");
-	AnimationSystem::PlayAnimation(crowd2, "Cheer3", true);
+	CreateCrowd({ 1530, -1700, 10 }, crowdAnims);
+	CreateCrowd({ 1545, -1715, 11 }, crowdAnims);
+	CreateCrowd({ 1520, -1730, 12 }, crowdAnims);
 
 
 	Animation countdownAnim = AnimationsFromSpritesheet("/spritesheets/UI_Countdown_Ver2.png", 5, 1, vector<int>(5, 1000))[0];
