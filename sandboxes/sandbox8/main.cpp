@@ -62,17 +62,16 @@ int main()
 	Model model2("/3dmodels/Finish_line.obj");
 
 	// Texture list 
-	Texture *texturePtr = new Texture("/3dmodels/text2.png");
-	Texture* texturePtr1 = new Texture("/3dmodels/text3.png");
 	std::vector<Texture*> textures;
-	textures.push_back(texturePtr);
-	textures.push_back(texturePtr1);
+	textures.push_back(new Texture("/3dmodels/text2.png"));
+	textures.push_back(new Texture("/3dmodels/text3.png"));
 
+	// Index texture
+	int currentTextureIndex = 0;
 
-
-
-
-
+	// Texture time "Synchonization clicle frame whit texture"
+	float timeWhay = 0.5f;
+	bool canChangeTexture = true;
 
 
 	//(Texture GUItexture = Texture("GUI_backround.png");
@@ -183,7 +182,7 @@ int main()
 	ecs::AddComponent(pFont4, Transform{ .position = Vector3(1434.0f,-1549.0f, 100.0f) });
 	ecs::AddComponent(laMuerte4, Transform{ .position = Vector3(1474.321533, -1569.868286, 100.000000), .rotation = Vector3(45.000000, 0.0000, 0.000000), .scale = Vector3(7) });
 	ecs::AddComponent(laMuerte4, Player{ .acerationSpeed = 300.0f, .minAceleration = 120.0f, .playerID = 3, .playerFont = pFont4,.playername = playerNames[3], .playerLap = lap });
-	ecs::AddComponent(laMuerte4, ModelRenderer{ .model = &model , /*.textures = textures*/ });// new implement Texture list load multitexture (Leo-test)
+	ecs::AddComponent(laMuerte4, ModelRenderer{ .model = &model , });
 	ecs::AddComponent(laMuerte4, Rigidbody{ .drag = 0.025f });
 	ecs::AddComponent(laMuerte4, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision , .visualise = false });
 	//engineSpeaker4.Play(engineSound);
@@ -283,31 +282,41 @@ int main()
 		Player& player2 = ecs::GetComponent<Player>(laMuerte2);
 		Player& player3 = ecs::GetComponent<Player>(laMuerte3);
 		Player& player4 = ecs::GetComponent<Player>(laMuerte4);
-
+		float dt = deltaTime;
 
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
-		/// Leo Basic code to change the texture within the game when you press the R key.
-		if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
-		{
-			ModelRenderer& modelRenderer = ecs::GetComponent<ModelRenderer>(laMuerte4);
-			Texture* newTexture = new Texture("/3dmodels/text2.png");
 
-			modelRenderer.textures.push_back(newTexture);
-			modelRenderer.textures.clear();
-			ModelRenderer& modelRenderer1 = ecs::GetComponent<ModelRenderer>(laMuerte4);
-			Texture* newTexture1 = new Texture("/3dmodels/text3.png");
-			modelRenderer.textures.clear();
-			modelRenderer.textures.push_back(newTexture1);
 		
+		
+		/// Leo Basic code to change the texture within the game when you press the R key.
+		if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS && canChangeTexture)
+		{
+			//ModelRenderer modelRenderer;
+			ModelRenderer& modelRenderer = ecs::GetComponent<ModelRenderer>(laMuerte);
+			modelRenderer.textures.clear();
+		    modelRenderer.textures.push_back(textures[currentTextureIndex]);
+
+			currentTextureIndex++;
+			if (currentTextureIndex >= textures.size()) {
+				currentTextureIndex = 0;
+				
+			}
+			timeWhay = 0.5f;
+			canChangeTexture = false;
 		}
+		if(timeWhay <= 0.0f)
+		{
+			canChangeTexture = true;
+		}
+
 		if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) 
 		{
-			ModelRenderer& modelRenderer = ecs::GetComponent<ModelRenderer>(laMuerte4);
+			ModelRenderer& modelRenderer = ecs::GetComponent<ModelRenderer>(laMuerte);
 			modelRenderer.textures.clear();
 		}
-
+		timeWhay -= dt;
 
 		// SetLitght position to Camara position & LitghtColor  
 		modelRenderSystem->SetLight(Vector3(cam.position.x, cam.position.y, 1500), Vector3(255));
