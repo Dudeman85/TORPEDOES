@@ -39,6 +39,7 @@ void CreateLevel1(Camera* cam)
 	ecs::AddComponent(entity2, Transform{ .position = Vector3(0, 0, -10), .rotation = Vector3(90, 0, 0), .scale = Vector3(0.5) });
 	ecs::AddComponent(entity2, SpriteRenderer{ .texture = strawberry });
 	ecs::AddComponent(entity2, ModelRenderer{ .model = ship });
+	ecs::AddComponent(entity2, Timer{ .duration = 5, .callback = ecs::DestroyEntity, .running = true });
 
 	TransformSystem::AddParent(entity2, entity);
 }
@@ -66,7 +67,7 @@ void CreateLevel2(Camera* cam)
 	ecs::AddComponent(entity, Transform{ .position = Vector3(1, 0, 0), .rotation = Vector3(0, 0, 0), .scale = Vector3(30) });
 	ecs::AddComponent(entity, SpriteRenderer{ .texture = strawberry });
 	ecs::AddComponent(entity, Rigidbody{});
-	
+
 	//Create a new persistent entity
 	entity2 = ecs::NewEntity();
 	//Add the transform and SpriteRenderer components required for rendering a sprite
@@ -78,9 +79,9 @@ void CreateLevel2(Camera* cam)
 void LoadModels()
 {
 	//Load some sprites
-	strawberry = new Texture("sandbox4/strawberry.png");
+	strawberry = new Texture("testAssets/strawberry.png");
 	//Load some models
-	ship = new Model("sandbox4/Achelous.obj");
+	ship = new Model("testAssets/Achelous.obj");
 }
 
 int main()
@@ -105,6 +106,8 @@ int main()
 	LoadModels();
 
 	CreateLevel1(&cam);
+
+	TimerSystem::ScheduleFunction([]() { std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; }, 1, false, ScheduledFunction::Type::seconds);
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))

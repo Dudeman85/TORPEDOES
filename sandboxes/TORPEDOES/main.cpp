@@ -1,6 +1,8 @@
 #define WIN32_LEAN_AND_MEAN
 #include <engine/Tilemap.h>
 #include "PlayerController.h"
+#include "engine/Input.h"  
+#include "MenuSystem.h"	
 
 int checkPointNumber = 0;
 Font* stencilFont = nullptr;
@@ -18,6 +20,16 @@ void createChepoint(Vector3 position, Vector3 rotation, Vector3 scale, Model& ch
 	checkPointNumber++;
 };
 
+void CreateCrowd(Vector3 pos, Animation& anim)
+{
+	ecs::Entity crowd = ecs::NewEntity();
+	ecs::AddComponent(crowd, Transform{ .position = pos, .scale = Vector3(100, 30, 0) });
+	ecs::AddComponent(crowd, SpriteRenderer{});
+	ecs::AddComponent(crowd, Animator{});
+	AnimationSystem::AddAnimation(crowd, anim, "CrowdCheer");
+	AnimationSystem::PlayAnimation(crowd, "CrowdCheer", true);
+}
+
 int main()
 {
 	string username = "";
@@ -30,6 +42,31 @@ int main()
 
 	EngineInit();
 
+	input::initialize(window);
+	ecs::GetSystem<PauseSystem>()->Init(window);
+
+	auto& isGamePause = ecs::GetSystem<PauseSystem>()->isGamePause;
+
+
+
+
+	////////////////////////////     INPUTS  STARTS		/////////////////	 INPUTS  STARTS		//////////	
+	input::ConstructDigitalEvent("MoveUp");
+	input::ConstructDigitalEvent("MoveDown");
+	input::ConstructDigitalEvent("Select");
+	input::ConstructDigitalEvent("Pause");
+	input::ConstructDigitalEvent("MoveRight");
+	input::ConstructDigitalEvent("MoveLeft");
+
+	//TODO: add controller input
+	input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft" });
+	input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight" });
+	input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp" });
+	input::bindDigitalInput(GLFW_KEY_DOWN, { "MoveDown" });
+	input::bindDigitalInput(GLFW_KEY_ENTER, { "Select" });
+	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
+	////////////////////////////     INPUTS  Ends    //////////////////     INPUTS  Ends      //////////
+		
 	engine::Camera cam = engine::Camera(1120, 630);
 	cam.SetPosition(Vector3(0, 0, 1500));
 	//cam.perspective = true;
@@ -57,6 +94,7 @@ int main()
 	ecs::AddComponent(playerWin, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(0.5f) });
 	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
 	playerController->Init();
+	std::shared_ptr<PauseSystem> pauseSystem = ecs::GetSystem<PauseSystem>();
 
 	PlayerController::playerWin = playerWin;
 
@@ -75,7 +113,7 @@ int main()
 	ecs::AddComponent(pSFont4, Transform{ .position = Vector3(0.75, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
 
 
-	playerController->CreatePlayers(6, Vector2(1434.0f, -1370.0f));
+	playerController->CreatePlayers(4, Vector2(1434.0f, -1370.0f));
 
 
 	// create explosion Animation PlayerController 
@@ -83,24 +121,9 @@ int main()
 	playerController->ExplosionAnim = &explosionAnim;
 
 	Animation crowdAnims = AnimationsFromSpritesheet("/spritesheets/CrowdCheer14.png", 3, 1, vector<int>(3, 150))[0];
-	ecs::Entity crowd = ecs::NewEntity();
-	ecs::AddComponent(crowd, Transform{ .position = Vector3(1530, -1700, 10), .scale = Vector3(100, 30, 0) });
-	ecs::AddComponent(crowd, SpriteRenderer{});
-	ecs::AddComponent(crowd, Animator{});
-	AnimationSystem::AddAnimation(crowd, crowdAnims, "CrowdCheer");
-	AnimationSystem::PlayAnimation(crowd, "CrowdCheer", true);
-	ecs::Entity crowd1 = ecs::NewEntity();
-	ecs::AddComponent(crowd1, Transform{ .position = Vector3(1545, -1715, 11), .scale = Vector3(100, 30, 0) });
-	ecs::AddComponent(crowd1, SpriteRenderer{});
-	ecs::AddComponent(crowd1, Animator{});
-	AnimationSystem::AddAnimation(crowd1, crowdAnims, "Cheer2");
-	AnimationSystem::PlayAnimation(crowd1, "Cheer2", true);
-	ecs::Entity crowd2 = ecs::NewEntity();
-	ecs::AddComponent(crowd2, Transform{ .position = Vector3(1520, -1730, 12), .scale = Vector3(100, 30, 0) });
-	ecs::AddComponent(crowd2, SpriteRenderer{});
-	ecs::AddComponent(crowd2, Animator{});
-	AnimationSystem::AddAnimation(crowd2, crowdAnims, "Cheer3");
-	AnimationSystem::PlayAnimation(crowd2, "Cheer3", true);
+	CreateCrowd({ 1530, -1700, 10 }, crowdAnims);
+	CreateCrowd({ 1545, -1715, 11 }, crowdAnims);
+	CreateCrowd({ 1520, -1730, 12 }, crowdAnims);
 
 
 	Animation countdownAnim = AnimationsFromSpritesheet("/spritesheets/UI_Countdown_Ver2.png", 5, 1, vector<int>(5, 1000))[0];
@@ -134,6 +157,9 @@ int main()
 
 	while (!glfwWindowShouldClose(window))
 	{
+		
+		printf("deltatime: %f \n", deltaTime);
+		input::update();
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
@@ -227,15 +253,27 @@ int main()
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 		engine::Update(&cam);
 
-		// playerControl Update for frame 
-		playerController->Update(window, deltaTime);
+		// playerControl Update for frame if not paused
+		if (!isGamePause)
+		{
+
+			playerController->Update(window, deltaTime);
+
+		}
+		// if paused  or Pause pressed update PauseSystem
+		if (isGamePause || input::GetNewPress("Pause"))
+		{
+			printf(" P  pauseSystem");
+			pauseSystem->Update();
+		}
+		
+		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-
+	input::uninitialize();
 	ecs::DestroyAllEntities(true);
 	glfwTerminate();
 	return 0;
