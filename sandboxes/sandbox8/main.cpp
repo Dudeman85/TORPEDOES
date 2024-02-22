@@ -57,14 +57,16 @@ int main()
 
 
 
-	Model model("LaMuerte.obj");
-	Model checkPointModel("Checkpoint.obj");
-	Model model2("Finish_line.obj");
+	Model model("/3dmodels/LaMuerte.obj");
+	Model checkPointModel("/3dmodels/Checkpoint.obj");
+	Model model2("/3dmodels/Finish_line.obj");
 
 	// Texture list 
-	Texture *texturePtr = new Texture("text2.png");
+	Texture *texturePtr = new Texture("/3dmodels/text2.png");
+	Texture* texturePtr1 = new Texture("/3dmodels/text3.png");
 	std::vector<Texture*> textures;
 	textures.push_back(texturePtr);
+	textures.push_back(texturePtr1);
 
 
 
@@ -74,14 +76,14 @@ int main()
 
 
 	//(Texture GUItexture = Texture("GUI_backround.png");
-	Texture torprldtexture = Texture("torpedoReloading.png");
-	Texture torprdytexture = Texture("torpedoReady.png");
+	Texture torprldtexture = Texture("/GUI/UI_Red_Torpedo_Icon.png");
+	Texture torprdytexture = Texture("/GUI/UI_Green_Torpedo_Icon.png");
 	// Font http address:
 	// https://www.dafont.com/stencil-ww-ii.font
 	Font stencilFont("Stencil WW II.ttf", 0, 0, 48);
 
 
-	Texture* winSprite = new Texture("winner.png");
+	Texture* winSprite = new Texture("/GUI/winner.png");
 	ecs::Entity playerWin = ecs::NewEntity();
 	ecs::AddComponent(playerWin, TextRenderer{ .font = &stencilFont, .text = "", .offset = Vector3(-1.0f, 1.1f, 1.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 	ecs::AddComponent(playerWin, SpriteRenderer{ .texture = winSprite, .enabled = false, .uiElement = true });
@@ -181,7 +183,7 @@ int main()
 	ecs::AddComponent(pFont4, Transform{ .position = Vector3(1434.0f,-1549.0f, 100.0f) });
 	ecs::AddComponent(laMuerte4, Transform{ .position = Vector3(1474.321533, -1569.868286, 100.000000), .rotation = Vector3(45.000000, 0.0000, 0.000000), .scale = Vector3(7) });
 	ecs::AddComponent(laMuerte4, Player{ .acerationSpeed = 300.0f, .minAceleration = 120.0f, .playerID = 3, .playerFont = pFont4,.playername = playerNames[3], .playerLap = lap });
-	ecs::AddComponent(laMuerte4, ModelRenderer{ .model = &model , .textures = textures });// new implement Texture list load multitexture (Leo-test)
+	ecs::AddComponent(laMuerte4, ModelRenderer{ .model = &model , /*.textures = textures*/ });// new implement Texture list load multitexture (Leo-test)
 	ecs::AddComponent(laMuerte4, Rigidbody{ .drag = 0.025f });
 	ecs::AddComponent(laMuerte4, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision , .visualise = false });
 	//engineSpeaker4.Play(engineSound);
@@ -225,10 +227,10 @@ int main()
 
 
 	// create explosion Animation PlayerController 
-	Animation explosionAnim = AnimationsFromSpritesheet("explosion.png", 6, 1, vector<int>(6, 150))[0];
+	Animation explosionAnim = AnimationsFromSpritesheet("/spritesheets/explosion.png", 6, 1, vector<int>(6, 150))[0];
 	playerController->ExplosionAnim = &explosionAnim;
 
-	Animation crowdAnims = AnimationsFromSpritesheet("CrowdCheer14.png", 3, 1, vector<int>(3, 150))[0];
+	Animation crowdAnims = AnimationsFromSpritesheet("/spritesheets/CrowdCheer14.png", 3, 1, vector<int>(3, 150))[0];
 	ecs::Entity crowd = ecs::NewEntity();
 	ecs::AddComponent(crowd, Transform{ .position = Vector3(1530, -1700, 10), .scale = Vector3(100, 30, 0) });
 	ecs::AddComponent(crowd, SpriteRenderer{});
@@ -252,7 +254,7 @@ int main()
 
 	// Loand Map . Tilemap file 
 	Tilemap map(&cam);
-	map.loadMap("level2.tmx");
+	map.loadMap("/levels/level2.tmx");
 	spriteRenderSystem->SetTilemap(&map);
 	collisionSystem->SetTilemap(&map);
 	PhysicsSystem::SetTileProperty(1, TileProperty{ true });
@@ -285,6 +287,27 @@ int main()
 
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
+
+		/// Leo Basic code to change the texture within the game when you press the R key.
+		if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+		{
+			ModelRenderer& modelRenderer = ecs::GetComponent<ModelRenderer>(laMuerte4);
+			Texture* newTexture = new Texture("/3dmodels/text2.png");
+
+			modelRenderer.textures.push_back(newTexture);
+			modelRenderer.textures.clear();
+			ModelRenderer& modelRenderer1 = ecs::GetComponent<ModelRenderer>(laMuerte4);
+			Texture* newTexture1 = new Texture("/3dmodels/text3.png");
+			modelRenderer.textures.clear();
+			modelRenderer.textures.push_back(newTexture1);
+		
+		}
+		if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) 
+		{
+			ModelRenderer& modelRenderer = ecs::GetComponent<ModelRenderer>(laMuerte4);
+			modelRenderer.textures.clear();
+		}
+
 
 		// SetLitght position to Camara position & LitghtColor  
 		modelRenderSystem->SetLight(Vector3(cam.position.x, cam.position.y, 1500), Vector3(255));
@@ -482,8 +505,9 @@ int main()
 			playerController->playerBounds[3] < camBounds[3] - zoomOutThreshold)
 		{
 
-			float zoomOutFactor = 5.0f;
-			float zoomOutValue = zoomOutFactor - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 5.0f;
+			float zoomOutFactor = 7.0f;
+			//(zoomOutValue) = Zoom value and if it's + by a number, it also causes the Zoom to be applied beforehand
+			float zoomOutValue = zoomOutFactor - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 7.0f + 10.0; 
 			camScale = max(camScale + zoomOutValue, camScaleMin);
 			/*camScale += 10 - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10;*/
 		}

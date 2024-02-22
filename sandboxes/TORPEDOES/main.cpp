@@ -134,12 +134,6 @@ int main()
 
 	while (!glfwWindowShouldClose(window))
 	{
-		TextRenderer& winText = ecs::GetComponent<TextRenderer>(playerWin);
-		TextRenderer& p1Win = ecs::GetComponent<TextRenderer>(pSFont1);
-		TextRenderer& p2Win = ecs::GetComponent<TextRenderer>(pSFont2);
-		TextRenderer& p3Win = ecs::GetComponent<TextRenderer>(pSFont3);
-		TextRenderer& p4Win = ecs::GetComponent<TextRenderer>(pSFont4);
-
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 

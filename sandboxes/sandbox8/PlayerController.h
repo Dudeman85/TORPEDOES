@@ -88,7 +88,7 @@ public:
 	static Animation* ExplosionAnim;
 	void Init()
 	{
-		torpedomodel = new Model("torpedo.obj");
+		torpedomodel = new Model("/3dmodels/torpedo.obj");
 	}
 	~PlayerController()
 	{
@@ -150,7 +150,8 @@ public:
 			{
 				player.hitPlayer = true;
 				CreateAnimation(projectransfor.position + rigidbody.velocity / 15);
-				projectransfor.position.y += 10000000; // destroy Entity "almost"
+				ecs::DestroyEntity(collision.b);
+				//projectransfor.position.y += 10000000; // destroy Entity "almost"
 				player.playExlposionSound = true;
 			}
 		}
@@ -165,7 +166,8 @@ public:
 			if (collision.b != 1)
 			{   // Do animation where projectile impact 
 				CreateAnimation(projectransfor.position);
-				projectransfor.position.y += 10000000;
+				ecs::DestroyEntity(collision.a);
+				//projectransfor.position.y += 10000000;
 			}
 		}
 	}
@@ -191,12 +193,14 @@ public:
 			float accelerationInput = 0;
 			float rotateInput = 0;
 			bool ProjetileInput = 0;
+			bool TextureChangeImput = 0;
 			// Starte Time 
 			if (starTimer <= 0)
 			{
 				accelerationInput = 0;
 				rotateInput = 0;
 				ProjetileInput = 0;
+				TextureChangeImput = 0;
 				// Get keyboard input		 
 				if (player.playerID == 0)
 				{
@@ -204,6 +208,8 @@ public:
 					accelerationInput += +glfwGetKey(window, GLFW_KEY_A) - glfwGetKey(window, GLFW_KEY_Z);
 					rotateInput += -glfwGetKey(window, GLFW_KEY_COMMA) + glfwGetKey(window, GLFW_KEY_PERIOD);
 					ProjetileInput = glfwGetKey(window, GLFW_KEY_SPACE);
+					TextureChangeImput = glfwGetKey(window, GLFW_KEY_R);
+
 				}
 				else
 				{
@@ -305,7 +311,7 @@ public:
 				{
 					CreateProjectile(forwardDirection, player.projectileSpeed, transform.position, transform.rotation, player.playerID);
 					// Reset the projectile time to a cooldown 
-					player.projectileTime1 = 5.0f;
+					player.projectileTime1 = 0.0f;
 					// "Create a cooldown time between shots."
 					player.projectileTime3 = 0.2f;
 				}
@@ -313,7 +319,7 @@ public:
 				else if (player.projectileTime2 <= 0.0f)
 				{
 					CreateProjectile(forwardDirection, player.projectileSpeed, transform.position, transform.rotation, player.playerID);
-					player.projectileTime2 = 5.0f;
+					player.projectileTime2 = 0.0f;
 					player.projectileTime3 = 0.2f;
 				}
 
