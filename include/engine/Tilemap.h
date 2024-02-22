@@ -24,3 +24,30 @@ and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any
 source distribution.
 *********************************************************************/
+
+#pragma once
+
+#include <tmxlite/Map.hpp>
+#include <engine/TMVariables.h>
+
+using namespace tmx;
+using namespace std;
+
+// OldTilemap still has Tilemap variable name and class
+// so for now TMap to not cause errors. Need to fix name's
+// later when new code is´finished and old code can be
+// removed.
+class TMap final
+{
+public:
+
+	// Constructor
+	TMap();
+
+	// Destructor
+	~TMap(){}
+
+	// setup() -function to get properties and
+	// set them into correct struct properties
+	void setup();
+};

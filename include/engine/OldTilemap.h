@@ -30,7 +30,7 @@ source distribution.
 #include <set>
 #include <map>
 #include <string>
-#include <engine/MapLayer.h>
+#include <engine/OldMapLayer.h>
 #include <engine/GL/Texture.h>
 #include <engine/GL/Shader.h>
 #include <engine/GL/Camera.h>

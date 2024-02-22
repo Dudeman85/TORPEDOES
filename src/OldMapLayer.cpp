@@ -25,7 +25,7 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 #define _USE_MATH_DEFINES
-#include <engine/MapLayer.h>
+#include <engine/OldMapLayer.h>
 #include <tmxlite/Map.hpp>
 #include <tmxlite/TileLayer.hpp>
 #include <engine/GL/Texture.h>

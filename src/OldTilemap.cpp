@@ -25,13 +25,13 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 #define _USE_MATH_DEFINES
-#include <engine/Tilemap.h>
+#include <engine/OldTilemap.h>
 #include <engine/Constants.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <tmxlite/Map.hpp>
 #include <engine/GL/Shader.h>
 #include <engine/GL/Texture.h>
-#include <engine/MapLayer.h>
+#include <engine/OldMapLayer.h>
 #include <cassert>
 #include <array>
 #include <glm/gtc/type_ptr.hpp>
