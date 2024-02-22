@@ -16,6 +16,8 @@ namespace engine
 
 		///Alternate textures, will override default ones from model
 		std::vector<Texture*> textures;
+		
+
 	};
 
 	///3D Model Render System, requires Transform and ModelRenderer
