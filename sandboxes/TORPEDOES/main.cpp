@@ -37,7 +37,9 @@ void LoadLevel1(Camera* cam)
 	spriteRenderSystem->SetTilemap(resources::level1Map);
 	collisionSystem->SetTilemap(resources::level1Map);
 	PhysicsSystem::SetTileProperty(1, TileProperty{ true });
-	
+
+	ecs::GetSystem<PlayerController>()->CreatePlayers(4, Vector2(1434.0f, -1370.0f));
+
 	//Make all the checkpoints manually
 	createCheckpoint(Vector3(2100.226807, -963.837402, 100.000000), Vector3(30.000000, 159.245773, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 0
 	createCheckpoint(Vector3(2957.365723, -828.268005, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 1
@@ -50,6 +52,19 @@ void LoadLevel1(Camera* cam)
 	createCheckpoint(Vector3(943.931152, -293.566711, 100.000000), Vector3(45.000000, 107.476852, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 8
 	createCheckpoint(Vector3(586.608276, -1249.448486, 100.000000), Vector3(45.000000, 40.070156, 0.000000), Vector3(17), resources::checkPointModel, 90.0f); // 9
 	createCheckpoint(Vector3(1513.692383, -1462.996187, 50.000000), Vector3(90.000000, 90.901711, 0.000000), Vector3(14), resources::finishLineModel, -1, true); // 10
+
+	//Make the crowds manually
+	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims);
+	CreateCrowd({ 1545, -1715, 11 }, resources::crowdAnims);
+	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims);
+
+	//Play the countdown
+	ecs::Entity countdown = ecs::NewEntity();
+	ecs::AddComponent(countdown, Transform{ .position = Vector3(1475, -1270, 10), .scale = Vector3(60, 100, 0) });
+	ecs::AddComponent(countdown, SpriteRenderer{});
+	ecs::AddComponent(countdown, Animator{ .onAnimationEnd = ecs::DestroyEntity });
+	AnimationSystem::AddAnimation(countdown, resources::countdownAnim, "CountDown");
+	AnimationSystem::PlayAnimation(countdown, "CountDown", false);
 }
 
 int main()
@@ -73,9 +88,11 @@ int main()
 	resources::LoadResources(&cam);
 
 	input::initialize(window);
-	ecs::GetSystem<PauseSystem>()->Init(window);
 
-	auto& isGamePause = ecs::GetSystem<PauseSystem>()->isGamePause;
+	std::shared_ptr<PauseSystem> pauseSystem = ecs::GetSystem<PauseSystem>();
+	pauseSystem->Init(window);
+	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
+	playerController->Init();
 
 	////////////////////////////     INPUTS  STARTS		/////////////////	 INPUTS  STARTS		//////////	
 	input::ConstructDigitalEvent("MoveUp");
@@ -93,37 +110,8 @@ int main()
 	input::bindDigitalInput(GLFW_KEY_ENTER, { "Select" });
 	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
 	////////////////////////////     INPUTS  Ends    //////////////////     INPUTS  Ends      //////////
-		
-	
-	ecs::Entity playerWin = ecs::NewEntity();
-	ecs::AddComponent(playerWin, TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.0f, 1.1f, 1.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	ecs::AddComponent(playerWin, SpriteRenderer{ .texture = resources::winSprite, .enabled = false, .uiElement = true });
-	ecs::AddComponent(playerWin, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(0.5f) });
-	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
-	playerController->Init();
-	std::shared_ptr<PauseSystem> pauseSystem = ecs::GetSystem<PauseSystem>();
 
-	PlayerController::playerWin = playerWin;
-
-	playerController->CreatePlayers(4, Vector2(1434.0f, -1370.0f));
-
-
-	Animation crowdAnims = AnimationsFromSpritesheet("/spritesheets/CrowdCheer14.png", 3, 1, vector<int>(3, 150))[0];
-	CreateCrowd({ 1530, -1700, 10 }, crowdAnims);
-	CreateCrowd({ 1545, -1715, 11 }, crowdAnims);
-	CreateCrowd({ 1520, -1730, 12 }, crowdAnims);
-
-
-	Animation countdownAnim = AnimationsFromSpritesheet("/spritesheets/UI_Countdown_Ver2.png", 5, 1, vector<int>(5, 1000))[0];
-	ecs::Entity countdown = ecs::NewEntity();
-	ecs::AddComponent(countdown, Transform{ .position = Vector3(1475, -1270, 10), .scale = Vector3(60, 100, 0) });
-	ecs::AddComponent(countdown, SpriteRenderer{});
-	ecs::AddComponent(countdown, Animator{ .onAnimationEnd = ecs::DestroyEntity });
-	AnimationSystem::AddAnimation(countdown, countdownAnim, "CountDown");
-	AnimationSystem::PlayAnimation(countdown, "CountDown", false);
-
-	//call the function. createChepoint
-
+	//Load the first level
 	LoadLevel1(&cam);
 
 	while (!glfwWindowShouldClose(window))
@@ -225,14 +213,14 @@ int main()
 		engine::Update(&cam);
 
 		// playerControl Update for frame if not paused
-		if (!isGamePause)
+		if (!pauseSystem->isGamePause)
 		{
 
 			playerController->Update(window, deltaTime);
 
 		}
 		// if paused  or Pause pressed update PauseSystem
-		if (isGamePause || input::GetNewPress("Pause"))
+		if (pauseSystem->isGamePause || input::GetNewPress("Pause"))
 		{
 			printf(" P  pauseSystem");
 			pauseSystem->Update();
