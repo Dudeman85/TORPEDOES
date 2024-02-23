@@ -1,7 +1,7 @@
 #pragma once 
 #include <engine/Application.h>
 #include <GL/gl.h>
-
+#include "ShipType.h"
 // Declaration of the entity component system (ECS) instance
 using namespace engine;
 
@@ -48,6 +48,9 @@ bool HAS_WON = false;
 ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonCollider)
 class PlayerController : public ecs::System
 {
+	unordered_map<int, shipTypes> playersShipTypes;
+
+	unordered_map<shipTypes,Model > shipModels;
 	//Change this to a vector one for each player
 	Model* defaultPlayerModel;
 	Texture* torpCooldownTexture;
@@ -418,6 +421,7 @@ public:
 			ecs::Entity playerRender = ecs::NewEntity();
 			ecs::Entity torpIndicator1 = ecs::NewEntity();
 			ecs::Entity torpIndicator2 = ecs::NewEntity();
+
 
 
 			//Create the player entity which contains everything but rendering

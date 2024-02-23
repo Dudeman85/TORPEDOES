@@ -57,8 +57,17 @@ int main()
 	input::ConstructDigitalEvent("Pause");
 	input::ConstructDigitalEvent("MoveRight");
 	input::ConstructDigitalEvent("MoveLeft");
-
+	input::ConstructDigitalEvent("Shoot0");
+	input::ConstructDigitalEvent("Shoot1");
+	input::ConstructDigitalEvent("Shoot2");
+	input::ConstructDigitalEvent("Shoot3");
 	//TODO: add controller input
+
+	input::bindDigitalInput(GLFW_KEY_SPACE, { "Shoot0" });
+	input::bindDigitalInput(GLFW_KEY_1, { "Shoot1" });
+	input::bindDigitalInput(GLFW_KEY_2, { "Shoot2" });
+	input::bindDigitalInput(GLFW_KEY_3, { "Shoot3" });
+
 	input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft" });
 	input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight" });
 	input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp" });
@@ -95,6 +104,11 @@ int main()
 	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
 	playerController->Init();
 	std::shared_ptr<PauseSystem> pauseSystem = ecs::GetSystem<PauseSystem>();
+
+	//ShipSystems
+	std::shared_ptr<U_99System> u_99System = ecs::GetSystem<U_99System>();
+	std::shared_ptr<Pt_10System> pt_10System = ecs::GetSystem<Pt_10System>();
+	std::shared_ptr<LaMuerteSystem> laMuerte = ecs::GetSystem<LaMuerteSystem>();
 
 	PlayerController::playerWin = playerWin;
 
@@ -261,6 +275,9 @@ int main()
 
 			playerController->Update(window, deltaTime);
 
+			u_99System ->Update();
+			pt_10System->Update();
+			laMuerte-> Update();
 		}
 		// if paused  or Pause pressed update PauseSystem
 		if (isGamePause || input::GetNewPress("Pause"))

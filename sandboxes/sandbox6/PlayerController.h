@@ -1,7 +1,6 @@
 #pragma once 
 #include <engine/Application.h>
-#include <GL/gl.h>
-
+#include  "ShipType.h"
 
 // Declaration of the entity component system (ECS) instance
 using namespace engine;
@@ -46,6 +45,8 @@ bool HAS_WON = false;
 ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonCollider, ModelRenderer)
 class PlayerController : public ecs::System
 {
+	unordered_map<int, shipTypes> playersShipTypes;
+	
 
 	float starTimer = 19.0; // start Time 
 	Model* torpedomodel;
