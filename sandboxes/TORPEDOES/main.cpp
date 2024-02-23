@@ -77,7 +77,6 @@ int main()
 
 	auto& isGamePause = ecs::GetSystem<PauseSystem>()->isGamePause;
 
-
 	////////////////////////////     INPUTS  STARTS		/////////////////	 INPUTS  STARTS		//////////	
 	input::ConstructDigitalEvent("MoveUp");
 	input::ConstructDigitalEvent("MoveDown");
