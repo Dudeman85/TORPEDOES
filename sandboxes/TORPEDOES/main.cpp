@@ -5,14 +5,13 @@
 #include "MenuSystem.h"	
 
 int checkPointNumber = 0;
-Font* stencilFont = nullptr;
 
-void createChepoint(Vector3 position, Vector3 rotation, Vector3 scale, Model& checkPointModel, float hitboxrotation, bool finish_line = false)
+void createCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, Model* checkPointModel, float hitboxrotation, bool finish_line = false)
 {
 	ecs::Entity checkpoint = ecs::NewEntity();
 
 	ecs::AddComponent(checkpoint, Transform{ .position = position , .rotation = rotation , .scale = scale });
-	ecs::AddComponent(checkpoint, ModelRenderer{ .model = &checkPointModel });
+	ecs::AddComponent(checkpoint, ModelRenderer{ .model = checkPointModel });
 	ecs::AddComponent(checkpoint, CheckPoint{ .checkPointID = checkPointNumber , .Finish_line = finish_line });
 	std::vector<Vector2> CheckpointcolliderVerts{ Vector2(4, 8), Vector2(4, -8), Vector2(-4, -8), Vector2(-4, 8) };
 	ecs::AddComponent(checkpoint, PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = false, .rotationOverride = hitboxrotation }));
@@ -30,24 +29,53 @@ void CreateCrowd(Vector3 pos, Animation& anim)
 	AnimationSystem::PlayAnimation(crowd, "CrowdCheer", true);
 }
 
+void LoadLevel1(Camera* cam)
+{
+	collisionSystem->cam = cam;
+
+	//Set this level's tilemap
+	spriteRenderSystem->SetTilemap(resources::level1Map);
+	collisionSystem->SetTilemap(resources::level1Map);
+	PhysicsSystem::SetTileProperty(1, TileProperty{ true });
+	
+	//Make all the checkpoints manually
+	createCheckpoint(Vector3(2100.226807, -963.837402, 100.000000), Vector3(30.000000, 159.245773, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 0
+	createCheckpoint(Vector3(2957.365723, -828.268005, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 1
+	createCheckpoint(Vector3(3387.268555, -355.873444, 100.000000), Vector3(45.000000, 99.936874, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 2
+	createCheckpoint(Vector3(3655.793701, -1339.042236, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 3
+	createCheckpoint(Vector3(2795.650391, -1489.039795, 100.000000), Vector3(45.000000, -368.616577, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 4
+	createCheckpoint(Vector3(2597.463135, -684.973389, 100.000000), Vector3(45.000000, 180.022018, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 5
+	createCheckpoint(Vector3(1668.260010, -990.794373, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 6 
+	createCheckpoint(Vector3(1043.635132, -875.206543, 100.000000), Vector3(45.000000, 179.241272, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 7
+	createCheckpoint(Vector3(943.931152, -293.566711, 100.000000), Vector3(45.000000, 107.476852, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 8
+	createCheckpoint(Vector3(586.608276, -1249.448486, 100.000000), Vector3(45.000000, 40.070156, 0.000000), Vector3(17), resources::checkPointModel, 90.0f); // 9
+	createCheckpoint(Vector3(1513.692383, -1462.996187, 50.000000), Vector3(90.000000, 90.901711, 0.000000), Vector3(14), resources::finishLineModel, -1, true); // 10
+}
+
 int main()
 {
-	string username = "";
-	string lap = "1";
-	vector<string> playerNames(4);
-	vector<int> playerCheckpoints(4);
-
 	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window");
 
-
 	EngineInit();
+
+	engine::Camera cam = engine::Camera(1120, 630);
+	cam.SetPosition(Vector3(0, 0, 1500));
+	//cam.perspective = true;
+	cam.SetRotation(Vector3(0, 0, 0));
+	float camScale = 1.0;
+	float camScaleMin = 600.0f;
+	float camScaleMax = 1650.0f;
+	float aspectRatio = 16.f / 9.f;
+	float camPadding = 100;
+	float camDeadzone = 10;
+
+	//Loads all globally used resources
+	resources::LoadResources(&cam);
 
 	input::initialize(window);
 	ecs::GetSystem<PauseSystem>()->Init(window);
 
 	auto& isGamePause = ecs::GetSystem<PauseSystem>()->isGamePause;
-
-
 
 
 	////////////////////////////     INPUTS  STARTS		/////////////////	 INPUTS  STARTS		//////////	
@@ -67,30 +95,10 @@ int main()
 	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
 	////////////////////////////     INPUTS  Ends    //////////////////     INPUTS  Ends      //////////
 		
-	engine::Camera cam = engine::Camera(1120, 630);
-	cam.SetPosition(Vector3(0, 0, 1500));
-	//cam.perspective = true;
-	cam.SetRotation(Vector3(0, 0, 0));
-	float camScale = 1.0;
-	float camScaleMin = 600.0f;
-	float camScaleMax = 1650.0f;
-	float aspectRatio = 16.f / 9.f;
-	float camPadding = 100;
-	float camDeadzone = 10;
-	//engine.physicsSystem->gravity = Vector2(0, -981);
-	collisionSystem->cam = &cam;
-
-	Model checkPointModel("/3dmodels/Checkpoint.obj");
-	Model model2("/3dmodels/Finish_line.obj");
-	// Font http address:
-	// https://www.dafont.com/stencil-ww-ii.font
-	stencilFont = new Font("Stencil WW II.ttf", 0, 0, 48);
-
-
-	Texture* winSprite = new Texture("/GUI/winner.png");
+	
 	ecs::Entity playerWin = ecs::NewEntity();
-	ecs::AddComponent(playerWin, TextRenderer{ .font = stencilFont, .text = "", .offset = Vector3(-1.0f, 1.1f, 1.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	ecs::AddComponent(playerWin, SpriteRenderer{ .texture = winSprite, .enabled = false, .uiElement = true });
+	ecs::AddComponent(playerWin, TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.0f, 1.1f, 1.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
+	ecs::AddComponent(playerWin, SpriteRenderer{ .texture = resources::winSprite, .enabled = false, .uiElement = true });
 	ecs::AddComponent(playerWin, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(0.5f) });
 	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
 	playerController->Init();
@@ -98,27 +106,8 @@ int main()
 
 	PlayerController::playerWin = playerWin;
 
-	ecs::Entity pSFont1 = ecs::NewEntity();
-	ecs::Entity pSFont2 = ecs::NewEntity();
-	ecs::Entity pSFont3 = ecs::NewEntity();
-	ecs::Entity pSFont4 = ecs::NewEntity();
-
-	ecs::AddComponent(pSFont1, TextRenderer{ .font = stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	ecs::AddComponent(pSFont1, Transform{ .position = Vector3(-0.65, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
-	ecs::AddComponent(pSFont2, TextRenderer{ .font = stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	ecs::AddComponent(pSFont2, Transform{ .position = Vector3(-0.15, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
-	ecs::AddComponent(pSFont3, TextRenderer{ .font = stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	ecs::AddComponent(pSFont3, Transform{ .position = Vector3(0.25, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
-	ecs::AddComponent(pSFont4, TextRenderer{ .font = stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	ecs::AddComponent(pSFont4, Transform{ .position = Vector3(0.75, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
-
-
 	playerController->CreatePlayers(4, Vector2(1434.0f, -1370.0f));
 
-
-	// create explosion Animation PlayerController 
-	Animation explosionAnim = AnimationsFromSpritesheet("/spritesheets/explosion.png", 6, 1, vector<int>(6, 150))[0];
-	playerController->ExplosionAnim = &explosionAnim;
 
 	Animation crowdAnims = AnimationsFromSpritesheet("/spritesheets/CrowdCheer14.png", 3, 1, vector<int>(3, 150))[0];
 	CreateCrowd({ 1530, -1700, 10 }, crowdAnims);
@@ -134,31 +123,12 @@ int main()
 	AnimationSystem::AddAnimation(countdown, countdownAnim, "CountDown");
 	AnimationSystem::PlayAnimation(countdown, "CountDown", false);
 
-
-	// Loand Map . Tilemap file 
-	Tilemap map(&cam);
-	map.loadMap("/levels/level1.tmx");
-	spriteRenderSystem->SetTilemap(&map);
-	collisionSystem->SetTilemap(&map);
-	PhysicsSystem::SetTileProperty(1, TileProperty{ true });
 	//call the function. createChepoint
 
-	createChepoint(Vector3(2100.226807, -963.837402, 100.000000), Vector3(30.000000, 159.245773, 0.000000), Vector3(17), checkPointModel, 45.0f); // 0
-	createChepoint(Vector3(2957.365723, -828.268005, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), checkPointModel, 45.0f); // 1
-	createChepoint(Vector3(3387.268555, -355.873444, 100.000000), Vector3(45.000000, 99.936874, 0.000000), Vector3(17), checkPointModel, 45.0f); // 2
-	createChepoint(Vector3(3655.793701, -1339.042236, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), checkPointModel, 45.0f); // 3
-	createChepoint(Vector3(2795.650391, -1489.039795, 100.000000), Vector3(45.000000, -368.616577, 0.000000), Vector3(17), checkPointModel, 45.0f); // 4
-	createChepoint(Vector3(2597.463135, -684.973389, 100.000000), Vector3(45.000000, 180.022018, 0.000000), Vector3(17), checkPointModel, 45.0f); // 5
-	createChepoint(Vector3(1668.260010, -990.794373, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), checkPointModel, 45.0f); // 6 
-	createChepoint(Vector3(1043.635132, -875.206543, 100.000000), Vector3(45.000000, 179.241272, 0.000000), Vector3(17), checkPointModel, 45.0f); // 7
-	createChepoint(Vector3(943.931152, -293.566711, 100.000000), Vector3(45.000000, 107.476852, 0.000000), Vector3(17), checkPointModel, 45.0f); // 8
-	createChepoint(Vector3(586.608276, -1249.448486, 100.000000), Vector3(45.000000, 40.070156, 0.000000), Vector3(17), checkPointModel, 90.0f); // 9
-	createChepoint(Vector3(1513.692383, -1462.996187, 50.000000), Vector3(90.000000, 90.901711, 0.000000), Vector3(14), model2, -1, true); // 10
+	LoadLevel1(&cam);
 
 	while (!glfwWindowShouldClose(window))
 	{
-		
-		printf("deltatime: %f \n", deltaTime);
 		input::update();
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
@@ -177,8 +147,8 @@ int main()
 		Vector3 avgPos = playerController->avgPosition / playerController->entities.size();
 
 		//// Center the camera on the average position of the players
-		float camPosX = clamp(avgPos.x, map.position.x + cam.width / 2, map.position.x + map.bounds.width - cam.width / 2);
-		float camPosY = clamp(avgPos.y, map.position.y - map.bounds.height + cam.height / 2, map.position.y - cam.height / 2);
+		float camPosX = clamp(avgPos.x, resources::level1Map->position.x + cam.width / 2, resources::level1Map->position.x + resources::level1Map->bounds.width - cam.width / 2);
+		float camPosY = clamp(avgPos.y, resources::level1Map->position.y - resources::level1Map->bounds.height + cam.height / 2, resources::level1Map->position.y - cam.height / 2);
 		cam.SetPosition(Vector3(camPosX, camPosY, 1500));
 
 
@@ -232,8 +202,8 @@ int main()
 		Vector2 boundingBoxCenter = Vector2(playerController->playerBounds[3] + boundingBoxWidth * 0.5f, playerController->playerBounds[2] + boundingBoxHeight * 0.5f);
 
 		//Ajustar la posicin de la cmara segn el centro de la bounding box
-		camPosX = clamp(boundingBoxCenter.x, map.position.x + cam.width / 2, map.position.x + map.bounds.width - cam.width / 2);
-		camPosY = clamp(boundingBoxCenter.y, map.position.y - map.bounds.height + cam.height / 2, map.position.y - cam.height / 2);
+		camPosX = clamp(boundingBoxCenter.x, resources::level1Map->position.x + cam.width / 2, resources::level1Map->position.x + resources::level1Map->bounds.width - cam.width / 2);
+		camPosY = clamp(boundingBoxCenter.y, resources::level1Map->position.y - resources::level1Map->bounds.height + cam.height / 2, resources::level1Map->position.y - cam.height / 2);
 		cam.SetPosition(Vector3(camPosX, camPosY, 1500));
 
 		// Calculate the desired zoom level and adjust the camera zoom.

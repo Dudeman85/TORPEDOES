@@ -1,4 +1,5 @@
 #pragma once 
+#include "Resources.h"
 #include <engine/Application.h>
 #include <GL/gl.h>
 
@@ -52,7 +53,6 @@ class PlayerController : public ecs::System
 	Model* defaultPlayerModel;
 	Texture* torpCooldownTexture;
 	Texture* torpReadyTexture;
-	Font* stencilFont;
 
 	float starTimer = 4; // start Time 
 	Model* torpedomodel;
@@ -66,9 +66,6 @@ class PlayerController : public ecs::System
 		std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
 		ecs::AddComponent(projectile, PolygonCollider{ .vertices = Torpedoverts, .callback = PlayerController::OnprojectilCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
 		ecs::AddComponent(projectile, Projectile{ .ownerID = owerID });
-
-
-
 	}
 	static void CreateAnimation(Vector3 animPosition)
 	{
@@ -77,7 +74,7 @@ class PlayerController : public ecs::System
 		ecs::AddComponent(projecAnim, Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20)});
 		ecs::AddComponent(projecAnim, SpriteRenderer{ });
 		ecs::AddComponent(projecAnim, Animator{ .onAnimationEnd = ecs::DestroyEntity });
-		AnimationSystem::AddAnimation(projecAnim, *ExplosionAnim, "explosion");
+		AnimationSystem::AddAnimation(projecAnim, resources::explosionAnimation, "explosion");
 		AnimationSystem::PlayAnimation(projecAnim, "explosion", false);
 
 	};
@@ -88,19 +85,14 @@ public:
 		return starTimer;
 	}
 
-
 	static ecs::Entity playerWin;
 
-
-	static Animation* ExplosionAnim;
 	void Init()
 	{
 		torpedomodel = new Model("/3dmodels/torpedo.obj");
 		defaultPlayerModel = new Model("/3dmodels/LaMuerte.obj");
 		torpCooldownTexture = new Texture("/GUI/UI_Red_Torpedo_Icon.png");
 		torpReadyTexture = new Texture("/GUI/UI_Green_Torpedo_Icon.png");
-
-		stencilFont = new Font("Stencil WW II.ttf", 0, 0, 48);
 	}
 	~PlayerController()
 	{
@@ -428,7 +420,7 @@ public:
 			ecs::AddComponent(player, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
 
 			//Create the player's name tag
-			ecs::AddComponent(playerNameText, TextRenderer{ .font = stencilFont, .text = "P" + to_string(i + 1), .color = Vector3(0.5, 0.8, 0.2)});
+			ecs::AddComponent(playerNameText, TextRenderer{ .font = resources::niagaraFont, .text = "P" + to_string(i + 1), .color = Vector3(0.5, 0.8, 0.2)});
 			ecs::AddComponent(playerNameText, Transform{ .position = Vector3(-2, 2, 1) , .scale = Vector3(0.1)});
 			TransformSystem::AddParent(playerNameText, player);
 
@@ -451,5 +443,4 @@ public:
 	std::array<float, 4> playerBounds{ -INFINITY, -INFINITY, INFINITY, INFINITY };
 };
 
-Animation* PlayerController::ExplosionAnim = ExplosionAnim;
 ecs::Entity PlayerController::playerWin = playerWin;
