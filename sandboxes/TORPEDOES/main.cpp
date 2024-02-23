@@ -82,6 +82,19 @@ int main()
 
 	Model checkPointModel("/3dmodels/Checkpoint.obj");
 	Model model2("/3dmodels/Finish_line.obj");
+
+	// Texture list
+	std::vector<Texture*> textures;
+	textures.push_back(new Texture("/3dmodels/text2.png"));
+	textures.push_back(new Texture("/3dmodels/text3.png"));
+	textures.push_back(new Texture("/3dmodels/text4.png"));
+	textures.push_back(new Texture("/3dmodels/text5.png"));
+	textures.push_back(new Texture("/3dmodels/text6.png"));
+	textures.push_back(new Texture("/3dmodels/text7.png"));
+
+	// Index texture
+	int currentTextureIndex = 0;
+
 	// Font http address:
 	// https://www.dafont.com/stencil-ww-ii.font
 	stencilFont = new Font("Stencil WW II.ttf", 0, 0, 48);
@@ -165,7 +178,8 @@ int main()
 
 		// SetLitght position to Camara position & LitghtColor  
 		modelRenderSystem->SetLight(Vector3(cam.position.x, cam.position.y, 1500), Vector3(255));
-
+	
+		
 		// star Timer 
 		float Timer = playerController->getTimer();
 		std::string timerStr = std::to_string((int)round(Timer)); // round pyörista float arvo lahipakokonais 
@@ -238,7 +252,7 @@ int main()
 
 		// Calculate the desired zoom level and adjust the camera zoom.
 		float aspectRatio = cam.width / cam.height;
-		float desiredZoom = std::max(boundingBoxWidth / (cam.width * aspectRatio), boundingBoxHeight / cam.height);
+		float desiredZoom = max(boundingBoxWidth / (cam.width * aspectRatio), boundingBoxHeight / cam.height);
 
 
 		// Ajustar el zoom de la cmara solo si el zoom deseado supera los lmites establecidos
