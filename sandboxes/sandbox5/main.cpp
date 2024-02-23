@@ -1,8 +1,13 @@
-//Author Mika Koivuranta: Input system test 06.02.2024 
-#include <engine/Application.h>
-#include <functional>
-
+//Author Mika Koivuranta: preload textures test 23/02/24
+#include "engine/Application.h"
 #include "engine/Input.h"
+#include "engine/Constants.h"
+
+#include <functional>
+#include <filesystem>
+
+std::map<std::string, engine::Texture*> Textures;
+std::map<std::string, engine::Model*> Models;
 
 // Function to set up GLFW and create a window with a key callback
 GLFWwindow* initializeGLFW(int width, int height, const char* title) 
@@ -14,6 +19,126 @@ GLFWwindow* initializeGLFW(int width, int height, const char* title)
     return window;
 }
 
+void processDirectory(const std::string& path, void (*processingFunction)(const std::string&, const std::string&, const std::string&, unsigned int, bool),
+unsigned int filteringType, bool flip)
+{
+    using namespace std::filesystem;
+
+    for (const auto& directoryEntry : directory_iterator(path)) 
+    {
+        std::string PathName = directoryEntry.path().string();
+
+        if (is_directory(directoryEntry.path()))
+        {
+            // If a directory, call the function recursively
+            processDirectory(PathName, processingFunction, filteringType, flip);
+            return;
+        }
+        
+        // Name creation
+        std::string Name = PathName;
+        size_t position = path.find(path);
+        if (position != std::string::npos)
+        {
+            // Erase the original path from name
+            Name.erase(position, path.length());
+        }
+
+        if (!Name.empty()) 
+        {
+            // Erase the first character, which is "/"
+            Name = Name.substr(1);
+        }
+
+        std::string extension = "";
+        position = Name.find_last_of('.');
+        if (position != std::string::npos)
+        {
+            extension = Name.substr(position + 1); // Save the extension
+            Name = Name.substr(0, position); // Remove extension
+        }
+
+        // Process file
+        processingFunction(PathName, Name, extension, filteringType, flip);
+    }
+}
+
+static void addTexture(const std::string& path, const std::string& name, const std::string& extension, unsigned int filteringType, bool flip)
+{
+    if (extension != "png")
+    {
+        return; // Wrong file format
+    }
+
+    engine::Texture* NewTexture = new engine::Texture(path, filteringType, flip, false);
+    
+    if (!NewTexture)
+    {
+        printf("Failed to load a texture %s from %s \n", name.c_str(), path.c_str());
+        return;
+    }
+
+    // Place to texture list
+    Textures.emplace(name, NewTexture);
+
+    // Log
+    printf("Loaded a texture %s from %s \n", name.c_str(), path.c_str());
+}
+
+static void addModel(const std::string& path, const std::string& name, const std::string& extension, unsigned int filteringType, bool flip)
+{
+    if (extension != "obj")
+    {
+        return; // Wrong file format
+    }
+
+    // This is stupid: Why does model constructor add asset path?
+    engine::Model* newModel = new engine::Model(path, true);
+
+    if (!newModel)
+    {
+        printf("Failed to load a model %s from %s \n", name.c_str(), path.c_str());
+        return;
+    }
+
+    // Place to texture list
+    Models.emplace(name, newModel);
+
+    // Log
+    printf("Loaded a model %s from %s \n", name.c_str(), path.c_str());
+}
+
+void preloadTextures(const std::string& path, unsigned int filteringType, bool flip)
+{
+    processDirectory(assetPath + path, addTexture, filteringType, flip);
+}
+
+void preloadModels(const std::string& path)
+{
+    processDirectory(assetPath + path, addModel, 0, false);
+}
+
+engine::Texture* findTexture(const std::string& textureName)
+{
+    auto it = Textures.find(textureName);
+    if (it != Textures.end())
+    {
+        return (*it).second;
+    }
+
+    return nullptr;
+}
+
+engine::Model* findModel(const std::string& modelName)
+{
+    auto it = Models.find(modelName);
+    if (it != Models.end())
+    {
+        return (*it).second;
+    }
+
+    return nullptr;
+}
 
 int main()
 {
@@ -28,6 +153,9 @@ int main()
     {
         return -1;
     }
+
+    preloadTextures("menuUI", GL_NEAREST, false);
+    preloadModels("3dmodels");
 
     input::initialize(window);
 
