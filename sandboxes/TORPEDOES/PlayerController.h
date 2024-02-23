@@ -79,13 +79,13 @@ class PlayerController : public ecs::System
 
 	};
 
+	static ecs::Entity playerWin;
+
 public:
 	float getTimer() const
 	{
 		return starTimer;
 	}
-
-	static ecs::Entity playerWin;
 
 	void Init()
 	{
@@ -93,6 +93,11 @@ public:
 		defaultPlayerModel = new Model("/3dmodels/LaMuerte.obj");
 		torpCooldownTexture = new Texture("/GUI/UI_Red_Torpedo_Icon.png");
 		torpReadyTexture = new Texture("/GUI/UI_Green_Torpedo_Icon.png");
+
+		ecs::Entity playerWin = ecs::NewEntity();
+		ecs::AddComponent(playerWin, TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.0f, 1.1f, 1.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
+		ecs::AddComponent(playerWin, SpriteRenderer{ .texture = resources::winSprite, .enabled = false, .uiElement = true });
+		ecs::AddComponent(playerWin, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(0.5f) });
 	}
 	~PlayerController()
 	{
