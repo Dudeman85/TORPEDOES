@@ -7,7 +7,7 @@ namespace engine
 {
 	///3D Model Renderer component
 	ECS_REGISTER_COMPONENT(ModelRenderer)
-		struct ModelRenderer
+	struct ModelRenderer
 	{
 		///Stores vertex data
 		Model* model;
@@ -16,13 +16,11 @@ namespace engine
 
 		///Alternate textures, will override default ones from model
 		std::vector<Texture*> textures;
-		
-
 	};
 
 	///3D Model Render System, requires Transform and ModelRenderer
 	ECS_REGISTER_SYSTEM(ModelRenderSystem, Transform, ModelRenderer)
-		class ModelRenderSystem : public ecs::System
+	class ModelRenderSystem : public ecs::System
 	{
 	public:
 		///Initialize the Model Render System

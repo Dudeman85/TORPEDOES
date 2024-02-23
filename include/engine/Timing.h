@@ -5,7 +5,7 @@
 
 namespace engine
 {
-	//Global timers
+	//Global timers, these are updated in TimerSystem::Update()
 	//How many seconds the last frame took
 	double deltaTime = 0;
 	//How many seconds the program has been running
@@ -22,7 +22,6 @@ namespace engine
 		std::chrono::duration<double> duration = thisFrame - _lastFrame;
 		deltaTime = duration.count();
 		_lastFrame = thisFrame;
-		programTime += deltaTime;
 		return deltaTime;
 	}
 
@@ -30,7 +29,9 @@ namespace engine
 	struct ScheduledFunction
 	{
 		enum class Type { frames, seconds };
+		//Should the duration be treated as frames or seconds
 		Type type;
+		//How long the delay before calling is
 		double duration;
 		bool repeat = false;
 		std::function<void()> function;
@@ -39,7 +40,7 @@ namespace engine
 
 	//Timer Component
 	ECS_REGISTER_COMPONENT(Timer)
-		struct Timer
+	struct Timer
 	{
 		//Duration of the timer in seconds
 		double duration = 0;
@@ -55,7 +56,7 @@ namespace engine
 
 	//Timer System, Requires Timer
 	ECS_REGISTER_SYSTEM(TimerSystem, Timer)
-		class TimerSystem : public ecs::System
+	class TimerSystem : public ecs::System
 	{
 	private:
 		static std::vector<ScheduledFunction> schedule;
@@ -91,12 +92,14 @@ namespace engine
 
 					future.function();
 
-					//Stop timer if not repeating
+					//Delete the event if not repeating
 					if (!future.repeat)
 					{
-						schedule.erase(itr);
+						itr = schedule.erase(itr);
 					}
 				}
+
+				//itr can get a new value so make sure it is not end
 				if (itr != schedule.end())
 					itr++;
 			}
@@ -127,6 +130,11 @@ namespace engine
 						timer.running = false;
 				}
 			}
+
+			//Update all the time stuff
+			CalculateDeltaTime();
+			frameCount++;
+			programTime += deltaTime;
 		}
 
 		//Shorthand for starting an entity's timer

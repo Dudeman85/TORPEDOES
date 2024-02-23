@@ -107,7 +107,8 @@ int main()
 
 	CreateLevel1(&cam);
 
-	TimerSystem::ScheduleFunction([]() { std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; }, 1, false, ScheduledFunction::Type::seconds);
+	TimerSystem::ScheduleFunction([]() { std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n"; }, 1, false, ScheduledFunction::Type::seconds);
+	TimerSystem::ScheduleFunction([]() { std::cout << "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\n"; }, 2, true, ScheduledFunction::Type::seconds);
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))

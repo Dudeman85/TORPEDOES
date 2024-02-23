@@ -88,14 +88,10 @@ namespace engine
 		//Collision system should be after rendering
 		if (enablePhysics)
 			collisionSystem->Update();
-		//Transform must be after physics and rendering
+		//Transform must be after physics, collision and rendering
 		transformSystem->Update();
 		//Timer must be last
 		timerSystem->Update();
-
-		//Timer Stuff
-		CalculateDeltaTime();
-		frameCount++;
 
 		return deltaTime;
 	}
