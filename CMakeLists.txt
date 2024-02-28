@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(GameEngine)
 option(ENGINE_BUILD_SANDBOXES "Build developer sandboxes" ON )
+option(ENGINE_USE_VULKAN "Build for Vulkan instead of OpenGL" OFF )
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -30,6 +31,11 @@ option(ASSIMP_BUILD_TESTS OFF)
 option(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
 add_subdirectory("ext/assimp-5.0.1")
 
+# Vulkan
+IF(ENGINE_USE_VULKAN)
+	find_package(Vulkan REQUIRED)
+ENDIF()
+
 # OpenGL
 add_subdirectory("ext/glfw-3.3.2")
 add_subdirectory("ext/glm-0.9.9.7")
@@ -42,12 +48,13 @@ file(GLOB_RECURSE ENGINE_HEADER_FILES "./include/engine/*.h" "./include/engine/G
 # engine -library
 add_library(engine ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES} ${GLAD_GL} ${STB})
 
-IF (WIN32)
-	target_link_libraries(engine glfw tmxlite glm sndfile freetype assimp enet winmm ws2_32)
+IF(ENGINE_USE_VULKAN)
+	target_compile_definitions(engine PUBLIC GLFW_INCLUDE_VULKAN)
+	target_compile_definitions(engine PUBLIC ENGINE_USE_VULKAN)
+	target_link_libraries(engine Vulkan::Vulkan glfw tmxlite glm sndfile freetype assimp enet winmm ws2_32)
 ELSE()
-	target_link_libraries(engine glfw tmxlite glm sndfile freetype assimp enet)
+	target_link_libraries(engine glfw tmxlite glm sndfile freetype assimp enet winmm ws2_32)
 ENDIF()
-
 
 target_include_directories(engine PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
