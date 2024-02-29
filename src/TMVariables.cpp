@@ -24,3 +24,13 @@ and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any
 source distribution.
 *********************************************************************/
+
+#include <engine/TMVariables.h>
+
+void TMVariables::fetchData(const std::string tilemapPath)
+{
+	tmx::Map map;
+	map.load(tilemapPath);
+
+
+}
