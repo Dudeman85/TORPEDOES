@@ -123,10 +123,6 @@ int main()
 		// SetLitght position to Camara position & LitghtColor  
 		modelRenderSystem->SetLight(Vector3(cam.position.x, cam.position.y, 1500), Vector3(255));
 
-		// star Timer 
-		float Timer = playerController->getTimer();
-		std::string timerStr = std::to_string((int)round(Timer)); // round pyörista float arvo lahipakokonais 
-		// UI System 				
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

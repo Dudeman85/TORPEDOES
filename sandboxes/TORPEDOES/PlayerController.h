@@ -50,19 +50,15 @@ ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonColli
 class PlayerController : public ecs::System
 {
 	//Change this to a vector one for each player
-	Model* defaultPlayerModel;
-	Texture* torpCooldownTexture;
-	Texture* torpReadyTexture;
 
 	float starTimer = 4; // start Time 
-	Model* torpedomodel;
 	void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 sapawnRotation, int owerID)
 	{
 
 		ecs::Entity projectile = ecs::NewEntity();
 		ecs::AddComponent(projectile, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
 		ecs::AddComponent(projectile, Rigidbody{ .velocity = direction * projectileSpeed });
-		ecs::AddComponent(projectile, ModelRenderer{ .model = torpedomodel });
+		ecs::AddComponent(projectile, ModelRenderer{ .model = resources::torpedoModel });
 		std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
 		ecs::AddComponent(projectile, PolygonCollider{ .vertices = Torpedoverts, .callback = PlayerController::OnprojectilCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
 		ecs::AddComponent(projectile, Projectile{ .ownerID = owerID });
@@ -82,28 +78,13 @@ class PlayerController : public ecs::System
 	static ecs::Entity playerWin;
 
 public:
-	float getTimer() const
-	{
-		return starTimer;
-	}
-
 	void Init()
 	{
-		torpedomodel = new Model("/3dmodels/torpedo.obj");
-		defaultPlayerModel = new Model("/3dmodels/LaMuerte.obj");
-		torpCooldownTexture = new Texture("/GUI/UI_Red_Torpedo_Icon.png");
-		torpReadyTexture = new Texture("/GUI/UI_Green_Torpedo_Icon.png");
-
 		ecs::Entity playerWin = ecs::NewEntity();
 		ecs::AddComponent(playerWin, TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.0f, 1.1f, 1.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 		ecs::AddComponent(playerWin, SpriteRenderer{ .texture = resources::winSprite, .enabled = false, .uiElement = true });
 		ecs::AddComponent(playerWin, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(0.5f) });
 	}
-	~PlayerController()
-	{
-		delete torpedomodel;
-	}
-	// OnCollision 
 
 	static void OnCollision(Collision collision)
 	{
@@ -193,6 +174,7 @@ public:
 			Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(entity);
 			PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
+
 			//initialize input zero 
 			float accelerationInput = 0;
 			float rotateInput = 0;
@@ -325,8 +307,6 @@ public:
 			}
 
 
-
-
 			accelerationInput = std::clamp(accelerationInput, -1.0f, 1.0f);
 			rotateInput = std::clamp(rotateInput, -1.0f, 1.0f);
 
@@ -404,7 +384,7 @@ public:
 	}
 
 	//Spawn 1-4 players, all in a line from top to bottom
-	void CreatePlayers(int count, Vector2 startPos)
+	static void CreatePlayers(int count, Vector2 startPos)
 	{
 		Vector2 offset(0, 60);
 		for (int i = 0; i < count; i++)
@@ -432,14 +412,14 @@ public:
 
 			//Create the player's rendered entity
 			ecs::AddComponent(playerRender, Transform{ .rotation = Vector3(45, 0, 0) });
-			ecs::AddComponent(playerRender, ModelRenderer{ .model = defaultPlayerModel });
+			ecs::AddComponent(playerRender, ModelRenderer{ .model = resources::laMuerteModel});
 			TransformSystem::AddParent(playerRender, player);
 
 			//Create the players's torpedo indicators
-			ecs::AddComponent(torpIndicator1, SpriteRenderer{ .texture = torpReadyTexture });
+			ecs::AddComponent(torpIndicator1, SpriteRenderer{ .texture = resources::torpReadyTexture });
 			ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(-2, -2, 10), .scale = Vector3(2, .5, 1) });
 			TransformSystem::AddParent(torpIndicator1, player);
-			ecs::AddComponent(torpIndicator2, SpriteRenderer{ .texture = torpReadyTexture });
+			ecs::AddComponent(torpIndicator2, SpriteRenderer{ .texture = resources::torpReadyTexture });
 			ecs::AddComponent(torpIndicator2, Transform{ .position = Vector3(2, -2, 10), .scale = Vector3(2, .5, 1) });
 			TransformSystem::AddParent(torpIndicator2, player);
 		}
