@@ -58,7 +58,7 @@ namespace engine
 
         return textures;
     }
-
+    
     //Recursively loads all models
     std::unordered_map<std::string, Model*> ProcessDirectoryModels(const std::string& path, bool includeSubdirectories = true, unsigned int filteringType = GL_LINEAR)
     {
