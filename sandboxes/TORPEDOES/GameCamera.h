@@ -8,6 +8,7 @@
 	const float aspectRatio = 16.f / 9.f;
 	float camPadding = 100;
 	float camDeadzone = 10;
+	const float zoomThreshold = 5.0f;
 
 static void UpdateCam(GLFWwindow* window, Camera& cam, Tilemap *map) {
 	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
@@ -40,11 +41,11 @@ static void UpdateCam(GLFWwindow* window, Camera& cam, Tilemap *map) {
 	{
 
 		float zoomOutFactor = 10.0f;
-		float zoomOutValue = zoomOutFactor - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10.0;
+		float zoomOutValue = zoomOutFactor - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10.0 + zoomThreshold; 
 		camScale = max(camScale + zoomOutValue, camScaleMin);
 	}
 	// Zoom in
-	else if (topDiff > zoomInThreshold && rightDiff > zoomInThreshold && bottomDiff > zoomInThreshold && leftDiff > zoomInThreshold)
+	else if (topDiff > zoomInThreshold && rightDiff > zoomInThreshold && bottomDiff > zoomInThreshold && leftDiff > zoomInThreshold) 
 	{
 
 		float zoomInValue = min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 100.0f;
