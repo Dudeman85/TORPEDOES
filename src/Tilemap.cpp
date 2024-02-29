@@ -29,8 +29,8 @@ source distribution.
 
 void TMap::setup(const string tilemap)
 {
-	Map map;
-	map.load(assetPath + tilemap);
+	TMVariables mapVAr;
+	mapVAr.fetchData(assetPath + tilemap);
 }
 
 

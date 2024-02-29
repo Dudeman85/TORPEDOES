@@ -92,7 +92,7 @@ public:
 
 	// fetchData() function to get data from
 	// tmx and tsx files
-	void fetchData();
+	void fetchData(const std::string tilemap);
 
 	// Tilemap Get() and Set() functions
 	void tilemapGet()
