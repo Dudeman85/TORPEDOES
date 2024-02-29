@@ -55,8 +55,11 @@ namespace engine
 	public:
 
 		///Called every frame
-		void Update()
+		void Update(Camera* camera)
 		{
+			//This needs to be a member for tilemap rendering convenience
+			cam = camera;
+
 			//For each entity
 			for (auto itr = entities.begin(); itr != entities.end();)
 			{

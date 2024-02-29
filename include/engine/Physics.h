@@ -12,7 +12,7 @@ namespace engine
 
 	///Rigidbody component
 	ECS_REGISTER_COMPONENT(Rigidbody)
-		struct Rigidbody
+	struct Rigidbody
 	{
 		///Velocity of the rigidbody
 		Vector3 velocity;
@@ -36,7 +36,7 @@ namespace engine
 
 	///Physics System, Requires Rigidbody and Transform components
 	ECS_REGISTER_SYSTEM(PhysicsSystem, Transform, Rigidbody)
-		class PhysicsSystem : public ecs::System
+	class PhysicsSystem : public ecs::System
 	{
 	public:
 		///Update the physics system, call this every frame
@@ -166,7 +166,6 @@ namespace engine
 
 		//UTILITY:
 
-		//TODO return collisions
 		///Move an entity while checking for collision, assuming entity has collider
 		static void Move(ecs::Entity entity, Vector3 amount, int steps = 1)
 		{
@@ -222,6 +221,8 @@ namespace engine
 		Vector3 gravity;
 		static const int tilemapIterationLimit = 10;
 	private:
+		//Currently a bad system to assign different physics properties to tile IDs
+		//TODO: Probably move this to tilemap or make better in some other way
 		static std::map<unsigned int, TileProperty> tileProperties;
 	};
 
