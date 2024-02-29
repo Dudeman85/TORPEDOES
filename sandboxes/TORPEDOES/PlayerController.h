@@ -2,6 +2,7 @@
 #include "Resources.h"
 #include <engine/Application.h>
 #include <GL/gl.h>
+#include "Projectiles.h"
 
 // Declaration of the entity component system (ECS) instance
 using namespace engine;
@@ -37,11 +38,7 @@ struct CheckPoint
 	int checkPointID = 0;
 	bool Finish_line = false;
 };
-ECS_REGISTER_COMPONENT(Projectile)
-struct Projectile
-{
-	int ownerID = 0;
-};
+
 
 bool HAS_WON = false;
 
@@ -49,41 +46,47 @@ bool HAS_WON = false;
 ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonCollider)
 class PlayerController : public ecs::System
 {
-	//Change this to a vector one for each player
-
 	float starTimer = 4; // start Time 
-	void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 sapawnRotation, int owerID)
-	{
-
-		ecs::Entity projectile = ecs::NewEntity();
-		ecs::AddComponent(projectile, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
-		ecs::AddComponent(projectile, Rigidbody{ .velocity = direction * projectileSpeed });
-		ecs::AddComponent(projectile, ModelRenderer{ .model = resources::torpedoModel });
-		std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-		ecs::AddComponent(projectile, PolygonCollider{ .vertices = Torpedoverts, .callback = PlayerController::OnprojectilCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
-		ecs::AddComponent(projectile, Projectile{ .ownerID = owerID });
-	}
-	static void CreateAnimation(Vector3 animPosition)
-	{
-		ecs::Entity projecAnim = ecs::NewEntity();
-		animPosition.z += 100;
-		ecs::AddComponent(projecAnim, Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20)});
-		ecs::AddComponent(projecAnim, SpriteRenderer{ });
-		ecs::AddComponent(projecAnim, Animator{ .onAnimationEnd = ecs::DestroyEntity });
-		AnimationSystem::AddAnimation(projecAnim, resources::explosionAnimation, "explosion");
-		AnimationSystem::PlayAnimation(projecAnim, "explosion", false);
-
-	};
-
-	static ecs::Entity playerWin;
 
 public:
+	float getTimer() const
+	{
+		return starTimer;
+	}
+    static ecs::Entity playerWin;
+	
 	void Init()
 	{
 		ecs::Entity playerWin = ecs::NewEntity();
 		ecs::AddComponent(playerWin, TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.0f, 1.1f, 1.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 		ecs::AddComponent(playerWin, SpriteRenderer{ .texture = resources::winSprite, .enabled = false, .uiElement = true });
 		ecs::AddComponent(playerWin, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(0.5f) });
+	}
+
+	std::array<float, 4> GetPlayerBounds()
+	{
+		std::array<float, 4> playerBounds{ -INFINITY, -INFINITY, INFINITY, INFINITY };
+
+		//Get the min and max bounds of each player together
+
+		for (auto itr = entities.begin(); itr != entities.end();)
+		{
+			//Get the entity and increment the iterator
+			ecs::Entity entity = *itr++;
+			Transform& transform = ecs::GetComponent<Transform>(entity);
+
+			if (playerBounds[0] < transform.position.y)
+				playerBounds[0] = transform.position.y;
+			if (playerBounds[1] < transform.position.x)
+				playerBounds[1] = transform.position.x;
+			if (playerBounds[2] > transform.position.y)
+				playerBounds[2] = transform.position.y;
+			if (playerBounds[3] > transform.position.x)
+				playerBounds[3] = transform.position.x;
+
+		}
+		return playerBounds;
+
 	}
 
 	static void OnCollision(Collision collision)
@@ -96,7 +99,7 @@ public:
 
 		if (collision.type == Collision::Type::tilemapCollision)
 		{
-			ecs::GetComponent<Rigidbody>(collision.a).velocity *= 0.9995f;
+			ecs::GetComponent<Rigidbody>(collision.a).velocity *= 0.99f;
 
 		}
 		// Check if the collision involves a checkpoint
@@ -130,13 +133,13 @@ public:
 			}
 		}
 		// Check if the collision involves a projectile
-		else if (ecs::HasComponent<Projectile>(collision.b))
+		else if (ecs::HasComponent<Torpedo>(collision.b))
 		{
 			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(collision.b);
 			Transform& projectransfor = ecs::GetComponent<Transform>(collision.b);
-			Projectile& projectile = ecs::GetComponent<Projectile>(collision.b); // tällä on Entity on collision.b 
+			Torpedo& torpedo = ecs::GetComponent<Torpedo>(collision.b); // tällä on Entity on collision.b 
 			//Projectile& projectile = ecs::GetComponent<Projectile>(collision.a);
-			if (player.playerID != projectile.ownerID)
+			if (player.playerID != torpedo.ownerID)
 			{
 				player.hitPlayer = true;
 				CreateAnimation(projectransfor.position + rigidbody.velocity / 15);
@@ -358,18 +361,6 @@ public:
 				}
 
 			}
-
-			//Add up all the player positions
-			avgPosition += transform.position;
-			//Get the min and max bounds of each player together
-			if (playerBounds[0] < transform.position.y)
-				playerBounds[0] = transform.position.y;
-			if (playerBounds[1] < transform.position.x)
-				playerBounds[1] = transform.position.x;
-			if (playerBounds[2] > transform.position.y)
-				playerBounds[2] = transform.position.y;
-			if (playerBounds[3] > transform.position.x)
-				playerBounds[3] = transform.position.x;
 
 			// Decrease the projectile time by the elapsed time (dt)
 			player.projectileTime1 -= dt;

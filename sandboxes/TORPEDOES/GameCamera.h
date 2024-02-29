@@ -8,8 +8,9 @@
 	const float aspectRatio = 16.f / 9.f;
 	float camPadding = 100;
 	float camDeadzone = 10;
+	const float zoomThreshold = 5.0f;
 
-void UpdateCam(GLFWwindow* window, Camera& cam, Tilemap& map) {
+static void UpdateCam(GLFWwindow* window, Camera& cam, Tilemap *map) {
 	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
 	
 
@@ -40,11 +41,11 @@ void UpdateCam(GLFWwindow* window, Camera& cam, Tilemap& map) {
 	{
 
 		float zoomOutFactor = 10.0f;
-		float zoomOutValue = zoomOutFactor - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10.0;
+		float zoomOutValue = zoomOutFactor - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10.0 + zoomThreshold; 
 		camScale = max(camScale + zoomOutValue, camScaleMin);
 	}
 	// Zoom in
-	else if (topDiff > zoomInThreshold && rightDiff > zoomInThreshold && bottomDiff > zoomInThreshold && leftDiff > zoomInThreshold)
+	else if (topDiff > zoomInThreshold && rightDiff > zoomInThreshold && bottomDiff > zoomInThreshold && leftDiff > zoomInThreshold) 
 	{
 
 		float zoomInValue = min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 100.0f;
@@ -64,8 +65,8 @@ void UpdateCam(GLFWwindow* window, Camera& cam, Tilemap& map) {
 
 	// Adjust the camera position based on the center of the bounding box
 	Vector3 camPos;
-	camPos.x = clamp(boundingBoxCenter.x, map.position.x + cam.width / 2, map.position.x + map.bounds.width - cam.width / 2);
-	camPos.y = clamp(boundingBoxCenter.y, map.position.y - map.bounds.height + cam.height / 2, map.position.y - cam.height / 2);
+	camPos.x = clamp(boundingBoxCenter.x, map->position.x + cam.width / 2, map->position.x + map->bounds.width - cam.width / 2);
+	camPos.y = clamp(boundingBoxCenter.y, map->position.y - map->bounds.height + cam.height / 2, map->position.y - cam.height / 2);
 	camPos.z = 1500;
 	cam.SetPosition(camPos);
 
