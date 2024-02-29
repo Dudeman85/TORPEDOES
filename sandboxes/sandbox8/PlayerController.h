@@ -58,11 +58,9 @@ public:
 		return starTimer;
 	}
 
+    static ecs::Entity playerWin;
+    static Animation* ExplosionAnim;
 
-	static ecs::Entity playerWin;
-
-
-	static Animation* ExplosionAnim;
 	void Init()
 	{
 		torpedomodel = new Model("/3dmodels/torpedo.obj");
@@ -88,7 +86,7 @@ public:
 
 		if (collision.type == Collision::Type::tilemapCollision)
 		{
-			ecs::GetComponent<Rigidbody>(collision.a).velocity *= 0.9995f;
+			ecs::GetComponent<Rigidbody>(collision.a).velocity *= 0.99f;
 
 		}
 		// Check if the collision involves a checkpoint
@@ -330,7 +328,7 @@ public:
 					// "Create a cooldown time between shots."
 					player.projectileTime3 = 0.2f;
 				}
-
+				
 				else if (player.projectileTime2 <= 0.0f)
 				{
 					CreateProjectile(forwardDirection, player.projectileSpeed, transform.position, modelTransform.rotation, player.playerID);
