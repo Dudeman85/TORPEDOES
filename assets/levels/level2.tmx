@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="92" height="56" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="1">
  <tileset firstgid="1" source="TORPEDOES_Tileset.tsx"/>
+ <tileset firstgid="55" source="TORPEDOES_Tileset_ForTesting.tsx"/>
  <layer id="1" name="Tile Layer 1" width="92" height="56">
   <properties>
    <property name="Z" type="float" value="0"/>
@@ -27,7 +28,7 @@
  </layer>
  <layer id="3" name="collider" width="92" height="56">
   <data encoding="base64" compression="zlib">
-   eJzt2TEOgzAQAEHewv8fmT6VQ5yNDmalqxEjAbY5j+M4TTpq4t3Gu413G+823m28257o/c/18LfXm7iG593Gu+1T7533OM1qR7zbeLdNfn9PbIr3Xc5yeT8n3m3M2ni38W7j3ca7jXcb7zbebTu87X3W493Gu43Tev43dO0y4r2W/2l7Wjlb3unDu/3e8+ZdxruNdxvvtjt5T9jn8267k/eEeN873te6+kzwvhbvNt4z4t3Gu413G+823m2823i3vZ/XmN/PCw66OrU=
+   eJzt2UsKwzAMAFHfqrn/yUp3JQTaJPIosmZA6+JHmo+9jTE2Bx1j0ptNbza92fRm05tNb7aO3pnvw3d/r+I7vN5serOd9Y5cYzWriPRm05ut8v27YlW8V9nL1btPerNpxqY3m95serPpzaY3m95sK3m/Jk1kEd5nvn1mmcyeqPTW+4kTFX3/zna7413xvCHb7epEGXX3/req52nZvkfX7a/nT6SP3uxevt566x1Ttm0n72zXTt7Zpl28v9eR7bq6934t2a6re3/KtuzmfVS2737oss93qnpf/U9ke1dNbza9a6Q3m95serPpzaY3m95serPt92uc+fMGKCP99Q==
   </data>
  </layer>
 </map>

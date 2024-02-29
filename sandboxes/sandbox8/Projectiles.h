@@ -1,17 +1,13 @@
 #pragma once 
 #include <engine/Application.h>
 #include "PlayerController.h"
+#include "Resources.h"
 
 using namespace engine;
+using namespace resources;
+
 
 Model* torpedomodel;
-Animation explosionAnim ;
-
-
-void LoadAnim() {
-	explosionAnim = AnimationsFromSpritesheet("/spritesheets/explosion.png", 6, 1, vector<int>(6, 150))[0];
-
-}
 
 ECS_REGISTER_COMPONENT(Torpedo)
 struct Torpedo
@@ -27,7 +23,7 @@ static void CreateAnimation(Vector3 animPosition)
 	ecs::AddComponent(torpedoAnim, Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20) });
 	ecs::AddComponent(torpedoAnim, SpriteRenderer{ });
 	ecs::AddComponent(torpedoAnim, Animator{ .onAnimationEnd = ecs::DestroyEntity });
-	AnimationSystem::AddAnimation(torpedoAnim, explosionAnim, "explosion");
+	AnimationSystem::AddAnimation(torpedoAnim, explosionAnimation, "explosion");
 	AnimationSystem::PlayAnimation(torpedoAnim, "explosion", false);
 
 };
