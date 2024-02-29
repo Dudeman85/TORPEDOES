@@ -4,13 +4,21 @@
 namespace resources
 {
 	Font* niagaraFont;
+
+	Texture* winSprite;
+	Texture* torpCooldownTexture;
+	Texture* torpReadyTexture;
+
+	Model* torpedoModel;
+	Model* laMuerteModel;
 	Model* checkPointModel;
 	Model* finishLineModel;
-	Texture* winSprite;
-	Tilemap* level1Map;
+
 	Animation explosionAnimation;
 	Animation crowdAnims;
-	Animation countdownAnim;
+	Animation countdownAnim;	
+
+	Tilemap* level1Map;
 
 	void LoadResources(Camera* cam)
 	{
@@ -18,7 +26,11 @@ namespace resources
 
 		checkPointModel = new Model("/3dmodels/Checkpoint.obj");
 		finishLineModel = new Model("/3dmodels/Finish_line.obj");
+		torpedoModel = new Model("/3dmodels/torpedo.obj");
+		laMuerteModel = new Model("/3dmodels/LaMuerte.obj");
 
+		torpCooldownTexture = new Texture("/GUI/UI_Red_Torpedo_Icon.png");
+		torpReadyTexture = new Texture("/GUI/UI_Green_Torpedo_Icon.png");
 		winSprite = new Texture("/GUI/winner.png");
 
 		level1Map = new Tilemap(cam);
@@ -31,6 +43,10 @@ namespace resources
 
 	void UnloadResources()
 	{
-
+		delete niagaraFont;
+		delete checkPointModel;
+		delete finishLineModel;
+		delete winSprite;
+		delete level1Map;
 	}
 }
