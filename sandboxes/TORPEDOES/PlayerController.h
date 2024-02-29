@@ -86,6 +86,32 @@ public:
 		ecs::AddComponent(playerWin, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(0.5f) });
 	}
 
+	std::array<float, 4> GetPlayerBounds()
+	{
+		std::array<float, 4> playerBounds{ -INFINITY, -INFINITY, INFINITY, INFINITY };
+
+		//Get the min and max bounds of each player together
+
+		for (auto itr = entities.begin(); itr != entities.end();)
+		{
+			//Get the entity and increment the iterator
+			ecs::Entity entity = *itr++;
+			Transform& transform = ecs::GetComponent<Transform>(entity);
+
+			if (playerBounds[0] < transform.position.y)
+				playerBounds[0] = transform.position.y;
+			if (playerBounds[1] < transform.position.x)
+				playerBounds[1] = transform.position.x;
+			if (playerBounds[2] > transform.position.y)
+				playerBounds[2] = transform.position.y;
+			if (playerBounds[3] > transform.position.x)
+				playerBounds[3] = transform.position.x;
+
+		}
+		return playerBounds;
+
+	}
+
 	static void OnCollision(Collision collision)
 	{
 		// Get references to the involved components
@@ -358,18 +384,6 @@ public:
 				}
 
 			}
-
-			//Add up all the player positions
-			avgPosition += transform.position;
-			//Get the min and max bounds of each player together
-			if (playerBounds[0] < transform.position.y)
-				playerBounds[0] = transform.position.y;
-			if (playerBounds[1] < transform.position.x)
-				playerBounds[1] = transform.position.x;
-			if (playerBounds[2] > transform.position.y)
-				playerBounds[2] = transform.position.y;
-			if (playerBounds[3] > transform.position.x)
-				playerBounds[3] = transform.position.x;
 
 			// Decrease the projectile time by the elapsed time (dt)
 			player.projectileTime1 -= dt;
