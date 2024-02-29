@@ -16,7 +16,7 @@ namespace resources
 
 	Animation explosionAnimation;
 	Animation crowdAnims;
-	Animation countdownAnim;
+	Animation countdownAnim;	
 
 	Tilemap* level1Map;
 
@@ -26,16 +26,15 @@ namespace resources
 
 		checkPointModel = new Model("/3dmodels/Checkpoint.obj");
 		finishLineModel = new Model("/3dmodels/Finish_line.obj");
-		torpedoModel = new Model("/3dmodels/hedgehog.obj");
+		torpedoModel = new Model("/3dmodels/Prop_Ship_U_99.obj");
 		laMuerteModel = new Model("/3dmodels/LaMuerte.obj");
-		//hedgehogModel = new Model("/3dmodels/")
 
 		torpCooldownTexture = new Texture("/GUI/UI_Red_Torpedo_Icon.png");
 		torpReadyTexture = new Texture("/GUI/UI_Green_Torpedo_Icon.png");
 		winSprite = new Texture("/GUI/winner.png");
 
 		level1Map = new Tilemap(cam);
-		level1Map->loadMap("/levels/level1.tmx");
+		level1Map->loadMap("/levels/newsetTest.tmx");
 
 		explosionAnimation = AnimationsFromSpritesheet("/spritesheets/explosion.png", 6, 1, vector<int>(6, 150))[0];
 		crowdAnims = AnimationsFromSpritesheet("/spritesheets/CrowdCheer14.png", 3, 1, vector<int>(3, 150))[0];

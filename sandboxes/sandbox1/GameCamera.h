@@ -9,7 +9,7 @@
 	float camPadding = 100;
 	float camDeadzone = 10;
 
-void UpdateCam(GLFWwindow* window, Camera& cam, Tilemap& map) {
+static void UpdateCam(GLFWwindow* window, Camera& cam, Tilemap *map) {
 	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
 	
 
@@ -64,8 +64,8 @@ void UpdateCam(GLFWwindow* window, Camera& cam, Tilemap& map) {
 
 	// Adjust the camera position based on the center of the bounding box
 	Vector3 camPos;
-	camPos.x = clamp(boundingBoxCenter.x, map.position.x + cam.width / 2, map.position.x + map.bounds.width - cam.width / 2);
-	camPos.y = clamp(boundingBoxCenter.y, map.position.y - map.bounds.height + cam.height / 2, map.position.y - cam.height / 2);
+	camPos.x = clamp(boundingBoxCenter.x, map->position.x + cam.width / 2, map->position.x + map->bounds.width - cam.width / 2);
+	camPos.y = clamp(boundingBoxCenter.y, map->position.y - map->bounds.height + cam.height / 2, map->position.y - cam.height / 2);
 	camPos.z = 1500;
 	cam.SetPosition(camPos);
 
