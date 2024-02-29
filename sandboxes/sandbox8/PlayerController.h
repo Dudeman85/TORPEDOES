@@ -10,7 +10,7 @@ using namespace engine;
 ECS_REGISTER_COMPONENT(Player)
 struct Player
 {
-	float projectileSpeed = 500;  // Attack state
+	float projectileSpeed = 500.0f;// Attack state
 	bool attackHeld = false;     // Indicates if the attack button is held
 	float acerationSpeed = 1;    // Acceleration speed
 	float minAceleration = 1;    // Minimum acceleration while rotating
@@ -25,6 +25,9 @@ struct Player
 	float hitPlayerTime = 0;
 	bool playExlposionSound = false;
 	int playerID = 0;
+	// new Projectil 
+	float hedgehogSpeed = 200.0f;
+
 	ecs::Entity playerFont;
 	string playername;
 	string playerLap;
