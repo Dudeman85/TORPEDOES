@@ -3,9 +3,10 @@
 
 #include <engine/Application.h>
 #include <functional>
+#include "engine/Input.h"  
 
 //Pause Component
-ECS_REGISTER_COMPONENT(PauseComponent, Texture)
+ECS_REGISTER_COMPONENT(PauseComponent)
 struct PauseComponent
 {
 	ecs::Entity upper, lower;
@@ -45,6 +46,9 @@ class PauseSystem : public ecs::System
 	vector<Texture*> allTextures;
 	static GLFWwindow* window;
 
+
+
+
 public:
 	ecs::Entity currentSelection;
 	bool isGamePause;
@@ -59,12 +63,75 @@ public:
 	}
 	void Update()
 	{
-		
+		printf("IN MENU SYSTEM UPDATE()\n");
+		if (input::GetNewPress("Pause"))
+		{
+			printf("Pause\n");
+			isGamePause = !isGamePause;
+			ToggleShowUIMenu();
+		}
+		if (ecs::GetSystem<PauseSystem>()->isGamePause)
+		{
+			if (input::GetNewPress("MoveUp"))
+			{
+				MoveUpper();
+			}
+			if (input::GetNewPress("MoveDown"))
+			{
+				MoveLower();
+			}
+
+			if (IsCurrentPauseComponentSlider())
+			{								
+
+				if (input::GetNewPress("MoveRight"))
+				{										
+					/*this dosent works*///UpdateSlider();
+					MoveSliderRight();
+					
+				}
+				if (input::GetNewPress("MoveLeft"))
+				{
+
+					//selectedPauseComponent.sliderValue += -0.01;
+					/*this dosent works*///UpdateSlider();
+					MoveSliderLeft();
+					
+
+				}
+
+			}
+			if (input::GetNewPress("Select"))
+			{
+				Selected();
+			}
+
+		}
 
 	}
 	void Init(GLFWwindow* mainWindow)
 	{
+		printf("IN side MENU SYSTEM INIT\n");
 		PauseSystem::window = mainWindow;
+		input::initialize(window);
+
+		//INPUTS  START	
+		input::ConstructDigitalEvent("MoveUp");
+		input::ConstructDigitalEvent("MoveDown");
+		input::ConstructDigitalEvent("Select");
+		input::ConstructDigitalEvent("Pause");
+		input::ConstructDigitalEvent("MoveRight");
+		input::ConstructDigitalEvent("MoveLeft");
+
+		//TODO: add controller input
+		input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft" });
+		input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight" });
+		input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp" });
+		input::bindDigitalInput(GLFW_KEY_DOWN, { "MoveDown" });
+		input::bindDigitalInput(GLFW_KEY_ENTER, { "Select" });
+		input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
+
+
 		resumeButton = ecs::NewEntity();
 		optionsButton = ecs::NewEntity();
 		mainMenuButton = ecs::NewEntity();
@@ -310,12 +377,11 @@ public:
 	}
 
 	void MoveSliderRight()
-	{
-		PauseComponent& pauseComponent = ecs::GetComponent<PauseComponent>(currentSelection);
-		Transform& selectedSliderTransform = ecs::GetComponent<Transform>(currentSelection);
+	{		
 		PauseComponent& pauseComponentNub = ecs::GetComponent<PauseComponent>(musicSliderNub);
 		Transform& nubTransform = ecs::GetComponent<Transform>(musicSliderNub);
-		nubTransform.position += Vector3(0.01f, 0, 0);
+		nubTransform.position += Vector3(0.01f, 0, 0);	
+		nubTransform.position.x  = clamp(nubTransform.position.x, -0.17f, 0.17f);
 		printf("pauseComponentNub.sliderValue ");
 		std::cout << pauseComponentNub.sliderValue;
 		printf("\n");
@@ -323,13 +389,10 @@ public:
 	}
 	void MoveSliderLeft()
 	{
-
-
-		PauseComponent& pauseComponent = ecs::GetComponent<PauseComponent>(currentSelection);
-		Transform& selectedSliderTransform = ecs::GetComponent<Transform>(currentSelection);
 		PauseComponent& pauseComponentNub = ecs::GetComponent<PauseComponent>(musicSliderNub);
 		Transform& nubTransform = ecs::GetComponent<Transform>(musicSliderNub);
 		nubTransform.position -=  Vector3(0.01f, 0, 0);
+		nubTransform.position.x = clamp(nubTransform.position.x, -0.17f, 0.17f);
 		printf("pauseComponentNub.sliderValue ");
 		std::cout << pauseComponentNub.sliderValue;
 		printf("\n");

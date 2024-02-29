@@ -1,8 +1,8 @@
 #define WIN32_LEAN_AND_MEAN
 #include <engine/Tilemap.h>
 #include "PlayerController.h"
-#include "engine/Input.h"  //Added by Sauli Hanell
-#include "MenuSystem.h"	   //Added by Sauli Hanell
+#include "engine/Input.h"  
+#include "MenuSystem.h"	   
 int checkPointNumber = 0;
 
 void createChepoint(Vector3 position, Vector3 rotation, Vector3 scale, Model& checkPointModel, float hitboxrotation, bool finish_line = false)
@@ -45,7 +45,7 @@ int main()
 	auto& isGamePause = ecs::GetSystem<PauseSystem>()->isGamePause;
 	
 
-
+	
 
 	//INPUTS  START	
 	input::ConstructDigitalEvent("MoveUp");
@@ -55,6 +55,7 @@ int main()
 	input::ConstructDigitalEvent("MoveRight");
 	input::ConstructDigitalEvent("MoveLeft");
 
+	//TODO: add controller input
 	input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft" });
 	input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight" });
 	input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp" });
@@ -93,6 +94,7 @@ int main()
 	ecs::AddComponent(playerWin, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(0.5f) });
 	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
 	playerController->Init();
+	std::shared_ptr<PauseSystem> pauseSystem = ecs::GetSystem<PauseSystem>();
 
 	PlayerController::playerWin = playerWin;
 
@@ -537,58 +539,7 @@ int main()
 			camScale = desiredZoom;
 		}
 
-		/////////////////////////////////////--   PAUSE INPUT STARTS   --//////////////////////////////////////////////
-		if (input::GetNewPress("Pause"))
-		{
-			printf("Pause\n");
-			isGamePause = !isGamePause;
-			ecs::GetSystem<PauseSystem>()->ToggleShowUIMenu();
-		}
-		if (isGamePause) 
-		{
-			if (input::GetNewPress("MoveUp"))
-			{
-				ecs::GetSystem<PauseSystem>()->MoveUpper();
-			}
-			if (input::GetNewPress("MoveDown"))
-			{
-				ecs::GetSystem<PauseSystem>()->MoveLower();
-			}
-
-			if (ecs::GetSystem<PauseSystem>()->IsCurrentPauseComponentSlider())
-			{
-				 	
-				/*this dosent works*/ PauseComponent& selectedPauseComponent = ecs::GetSystem<PauseSystem>()->GetCurrentSelectedPauseComponent();
-
-				if (input::GetNewPress("MoveRight"))
-				{
-					
-					//selectedPauseComponent.sliderValue += 0.01;
-					/*this dosent works*///ecs::GetSystem<PauseSystem>()->UpdateSlider();
-					ecs::GetSystem<PauseSystem>()->MoveSliderRight();
-					std::cout << "MoveRight value:" << selectedPauseComponent.sliderValue <<"\n";
-
-				}
-				if (input::GetNewPress("MoveLeft"))
-				{
-				
-					//selectedPauseComponent.sliderValue += -0.01;
-					/*this dosent works*///ecs::GetSystem<PauseSystem>()->UpdateSlider();
-					ecs::GetSystem<PauseSystem>()->MoveSliderLeft();
-					std::cout << "MoveLeft value:" << selectedPauseComponent.sliderValue << "\n";
-					
-				}
-			
-			}
-			if ( input::GetNewPress("Select"))
-			{
-				ecs::GetSystem<PauseSystem>()->Selected();
-			}
-
-		}
-		
-		/////////////////////////////////////--   PAUSE INPUT ENDS   --////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 
 		//Reset the average player position data
 		playerController->avgPosition = Vector3();
@@ -600,10 +551,15 @@ int main()
 		engine::Update(&cam);
 
 		// playerControl Update for frame 
-		if (!isGamePause)
+		if (!isGamePause )
 		{
-			playerController->Update(window, deltaTime);
 
+			playerController->Update(window, deltaTime);
+			
+		}
+		if (isGamePause || input::GetNewPress("Pause"))
+		{	
+			pauseSystem->Update();
 		}
 		glfwSwapBuffers(window);
 		glfwPollEvents();

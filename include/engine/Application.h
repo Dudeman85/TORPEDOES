@@ -16,15 +16,10 @@
 #include <engine/GL/Window.h>
 #include <engine/Image.h>
 #include <engine/AudioEngine.h>
+#include <engine/Timing.h>
 
 namespace engine
 {
-	// TODO: replace with double
-	float deltaTime = 0;
-	// TODO: replace with double
-	float programTime = 0;
-	chrono::time_point<chrono::high_resolution_clock> _lastFrame;
-
 	//If true updates physics and collision systems
 	bool enablePhysics = true;
 	//If true updates animation system
@@ -33,6 +28,7 @@ namespace engine
 	bool enableRendering = true;
 
 	//Engine system pointers (for peak performance)
+	shared_ptr<TimerSystem> timerSystem;
 	shared_ptr<CollisionSystem> collisionSystem;
 	shared_ptr<PhysicsSystem> physicsSystem;
 	shared_ptr<ModelRenderSystem> modelRenderSystem;
@@ -44,13 +40,12 @@ namespace engine
 
 	void EngineInit()
 	{
-		//Init time
-		_lastFrame = chrono::high_resolution_clock::now();
-
 		//Make sure OpenGL context has been created
 		assert(OPENGL_INITIALIZED && "OpenGL has not been initialized! Create a window, or manually create the OpenGL context before calling EngineInit!");
 
 		//Get the engine systems
+		timerSystem = ecs::GetSystem<TimerSystem>();
+		timerSystem->Init();
 		collisionSystem = ecs::GetSystem<CollisionSystem>();
 		physicsSystem = ecs::GetSystem<PhysicsSystem>();
 		modelRenderSystem = ecs::GetSystem<ModelRenderSystem>();
@@ -66,7 +61,7 @@ namespace engine
 		ecs::SetComponentDestructor<Transform>(TransformSystem::OnTransformRemoved);
 	}
 
-	//Updates all default engine systems, calculates and returns delta time
+	//Updates all default engine systems, returns delta time
 	double Update(Camera* cam)
 	{
 		//TODO: Make better
@@ -93,15 +88,10 @@ namespace engine
 		//Collision system should be after rendering
 		if (enablePhysics)
 			collisionSystem->Update();
-		//Transform must be after physics and rendering
+		//Transform must be after physics, collision and rendering
 		transformSystem->Update();
-
-		//Calculate Delta Time
-		chrono::time_point thisFrame = chrono::high_resolution_clock::now();
-		chrono::duration<double> duration = thisFrame - _lastFrame;
-		deltaTime = duration.count();
-		_lastFrame = thisFrame;
-		programTime += deltaTime;
+		//Timer must be last
+		timerSystem->Update();
 
 		return deltaTime;
 	}
