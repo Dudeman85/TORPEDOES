@@ -28,46 +28,61 @@ source distribution.
 #pragma once
 
 #include <tmxlite/Map.hpp>
-#include <unordered_map>
-#include <variant>
+#include <map>
 #include <string>
 #include <vector>
 #include <memory>
 
+// Tiled Tilemap struct
 struct TMap
 {
-	// Tilemap unordered map variable
-	std::unordered_map<std::string, std::variant<int, float, tmx::Vector2u, std::string>> tilemap;
+	// Tilemap's properties map list
+	std::map<std::string, std::string> tilemap;
+	// Tilemap's all Group layers vector
+	std::vector<TGroup> groups;
+	// Tilemap's all Object layers vector
+	std::vector<TObject> objects;
+	// Tilemap's all Tile layers vector
+	std::vector<TLayer> layers;
+	// Tilemap's all tilesets vector
+	std::vector<TSet> tilesets;
 };
 
+// Tiled Group layer struct
 struct TGroup
 {
-	// Group layer unordered map variable
-	std::unordered_map<std::string, std::variant<int, float, tmx::Vector2u, std::string>> group;
+	// Group layers properties map list
+	std::map<std::string, std::string> group;
 };
 
+// Tiled Object layer struct
 struct TObject
 {
-	// Object layer unordered map variable
-	std::unordered_map<std::unique_ptr<std::string>, std::unique_ptr<std::variant<int, float, tmx::Vector2u, std::string>>> object;
+	// Object layers properties map list
+	std::map<std::string, std::string> object;
 };
 
+// Tiled Tile layer struct
 struct TLayer
 {
-	// Tile layer unordered map variable
-	std::unordered_map<std::unique_ptr<std::string>, std::unique_ptr<std::variant<int, float, tmx::Vector2u, std::string>>> layer;
+	// Tile layers properties map list
+	std::map<std::string, std::string> layer;
 };
 
+// Tiled Tileset struct
 struct TSet
 {
-	// Tileset unordered map variable
-	std::unordered_map<std::unique_ptr<std::string>, std::unique_ptr<std::variant<int, float, tmx::Vector2u, std::string>>> tileset;
+	// Tileset's properties map list
+	std::map<std::string, std::string> tileset;
+	// Tileset's all tiles vector
+	std::vector<TTile> tiles;
 };
 
+// Tiled Tile struct
 struct TTile
 {
-	// Tile unordered map variable
-	std::unordered_map<std::unique_ptr<std::string>, std::unique_ptr<std::variant<int, float, tmx::Vector2u, std::string>>> tile;
+	// Tile's properties map list
+	std::map<std::string, std::string> tile;
 };
 
 
@@ -75,6 +90,59 @@ class TMVariables
 {
 public:
 
-private:	
+	// fetchData() function to get data from
+	// tmx and tsx files
+	void fetchData();
+
+	// Tilemap Get() and Set() functions
+	void tilemapGet()
+	{
+
+	}
+	void tilemapSet()
+	{
+
+	}
+
+	// Group layer Get() and Set() functions
+	void groupGet()
+	{
+
+	}
+
+	void groupSet()
+	{
+
+	}
+
+	// Object layer Get() and Set() functions
+	void objectGet()
+	{
+
+	}
+
+	void objectSet()
+	{
+
+	}
+
+	// Tile layer Get() and Set() functions
+	void layerGet()
+	{
+
+	}
+
+	void layerSet()
+	{
+
+	}
+
+
+
+private:
+	// Tiled Tilemaps in vector. From here we
+	// get the properties and set new properties
+	// if needed.
+	std::unique_ptr<std::vector<TMap>> maps;
 };
 
