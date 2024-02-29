@@ -417,7 +417,7 @@ public:
 				}
 
 			}
-			PlayerBounds(transform);
+			
 			
 			// Decrease the projectile time by the elapsed time (dt)
 			player.projectileTime1 -= dt;
