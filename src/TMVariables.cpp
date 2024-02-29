@@ -29,8 +29,30 @@ source distribution.
 
 void TMVariables::fetchData(const std::string tilemapPath)
 {
+	// map class for tmx::Map functions
 	tmx::Map map;
+	// Loading tilemap from filepath.
 	map.load(tilemapPath);
+	// Temp list of tilesets
+	const auto& tilesets = map.getTilesets();
+	// Iterate through tilesets
+	for (const auto& tileset : tilesets)
+	{
+		// Get the list of tiles in this tileset
+		const auto& tiles = tileset.getTiles();
+		// Iterate through the tiles
+		for (const auto& tile : tiles)
+		{
+			TTile Tile;
+			const auto& properties = tile.properties;
+
+			for (const auto& prop : properties)
+			{
+
+			}
+		}
+	}
+
 
 
 }

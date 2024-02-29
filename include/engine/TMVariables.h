@@ -94,55 +94,12 @@ public:
 	// tmx and tsx files
 	void fetchData(const std::string tilemap);
 
-	// Tilemap Get() and Set() functions
-	void tilemapGet()
-	{
-
-	}
-	void tilemapSet()
-	{
-
-	}
-
-	// Group layer Get() and Set() functions
-	void groupGet()
-	{
-
-	}
-
-	void groupSet()
-	{
-
-	}
-
-	// Object layer Get() and Set() functions
-	void objectGet()
-	{
-
-	}
-
-	void objectSet()
-	{
-
-	}
-
-	// Tile layer Get() and Set() functions
-	void layerGet()
-	{
-
-	}
-
-	void layerSet()
-	{
-
-	}
-
-
+	// 
 
 private:
 	// Tiled Tilemaps in vector. From here we
 	// get the properties and set new properties
 	// if needed.
-	std::unique_ptr<std::vector<TMap>> maps;
+	std::unique_ptr<TMap> map;
 };
 
