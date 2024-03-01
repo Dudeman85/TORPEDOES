@@ -1,7 +1,6 @@
 #pragma once 
 #include "Resources.h"
 #include <engine/Application.h>
-#include <GL/gl.h>
 #include "Projectiles.h"
 
 // Declaration of the entity component system (ECS) instance
@@ -25,7 +24,7 @@ struct Player
 	float hitPlayerTime = 0;
 	bool playExlposionSound = false;
 	int playerID = 0;
-	ecs::Entity playerFont;
+	ecs::Entity nameText;
 	string playername;
 	string playerLap;
 
@@ -39,40 +38,33 @@ struct CheckPoint
 	bool Finish_line = false;
 };
 
-
-bool HAS_WON = false;
-
 // Player controller System. Requires Player , Tranform , Rigidbody , PolygonCollider
 ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonCollider)
 class PlayerController : public ecs::System
 {
-	float starTimer = 4; // start Time 
+	float starTimer = 4;
+    static ecs::Entity winScreen;
+	static bool hasWon;
 
 public:
-	float getTimer() const
-	{
-		return starTimer;
-	}
-    static ecs::Entity playerWin;
-	
 	void Init()
 	{
-		ecs::Entity playerWin = ecs::NewEntity();
-		ecs::AddComponent(playerWin, TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.0f, 1.1f, 1.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-		ecs::AddComponent(playerWin, SpriteRenderer{ .texture = resources::winSprite, .enabled = false, .uiElement = true });
-		ecs::AddComponent(playerWin, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(0.5f) });
+		winScreen = ecs::NewEntity();
+		ecs::AddComponent(winScreen, TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.5, 2, 1), .scale = Vector3(0.03f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
+		ecs::AddComponent(winScreen, SpriteRenderer{ .texture = resources::winSprite, .enabled = false, .uiElement = true });
+		ecs::AddComponent(winScreen, Transform{ .position = Vector3(0, 0, 0.5f), .scale = Vector3(0.3f) });
 	}
 
+	//Get the min and max bounds every player
 	std::array<float, 4> GetPlayerBounds()
 	{
 		std::array<float, 4> playerBounds{ -INFINITY, -INFINITY, INFINITY, INFINITY };
-
-		//Get the min and max bounds of each player together
 
 		for (auto itr = entities.begin(); itr != entities.end();)
 		{
 			//Get the entity and increment the iterator
 			ecs::Entity entity = *itr++;
+
 			Transform& transform = ecs::GetComponent<Transform>(entity);
 
 			if (playerBounds[0] < transform.position.y)
@@ -83,10 +75,8 @@ public:
 				playerBounds[2] = transform.position.y;
 			if (playerBounds[3] > transform.position.x)
 				playerBounds[3] = transform.position.x;
-
 		}
 		return playerBounds;
-
 	}
 
 	static void OnCollision(Collision collision)
@@ -97,15 +87,15 @@ public:
 
 		PolygonCollider& playerCollider = ecs::GetComponent<PolygonCollider>(collision.a);
 
+		//Slow player down when off track
 		if (collision.type == Collision::Type::tilemapCollision)
 		{
 			ecs::GetComponent<Rigidbody>(collision.a).velocity *= 0.99f;
 
 		}
-		// Check if the collision involves a checkpoint
 
-		// true tai false 
-		if (ecs::HasComponent<CheckPoint>(collision.b)) // varmista onko osuu checkpoint
+		// Check if the collision involves a checkpoint
+		if (ecs::HasComponent<CheckPoint>(collision.b))
 		{
 			CheckPoint& checkpoint = ecs::GetComponent<CheckPoint>(collision.b);  // hae checkpoint componenti
 			if (player.previousCheckpoint + 1 == checkpoint.checkPointID)        // tarkista onko pelaja osu oiken checkpoit
@@ -115,13 +105,13 @@ public:
 				{
 					if (player.lap == 1)
 					{
-						if (!HAS_WON)
+						if (!hasWon)
 						{
-							HAS_WON = true;
-							TextRenderer& winText = ecs::GetComponent<TextRenderer>(playerWin);
-							SpriteRenderer& winSprite = ecs::GetComponent<SpriteRenderer>(playerWin);
-							winSprite.enabled = true;
-							winText.text = player.playername;
+							std::cout << "AAAAAAAAAAAAAA";
+							//Display the win screen
+							hasWon = true;
+							ecs::GetComponent<TextRenderer>(winScreen).text = "Player " + std::to_string(player.playerID + 1);
+							ecs::GetComponent<SpriteRenderer>(winScreen).enabled = true;
 						}
 					}
 					else
@@ -145,19 +135,6 @@ public:
 				CreateAnimation(projectransfor.position + rigidbody.velocity / 15);
 				ecs::DestroyEntity(collision.b);
 				player.playExlposionSound = true;
-			}
-		}
-	}
-	// check if projectil collision tilemap Trigger
-	static void OnprojectilCollision(Collision collision)
-	{
-		Transform& projectransfor = ecs::GetComponent<Transform>(collision.a);
-		if (collision.type == Collision::Type::tilemapTrigger)
-		{
-			if (collision.b != 1)
-			{   // Do animation where projectile impact 
-				CreateAnimation(projectransfor.position);
-				ecs::DestroyEntity(collision.a);
 			}
 		}
 	}
@@ -389,11 +366,11 @@ public:
 
 
 			//Create the player entity which contains everything but rendering
-			ecs::AddComponent(player, Player{ .acerationSpeed = 300, .minAceleration = 120, .playerID = i, .playerFont = playerNameText, .renderedEntity = playerRender });
+			ecs::AddComponent(player, Player{ .acerationSpeed = 300, .minAceleration = 120, .playerID = i, .nameText = playerNameText, .renderedEntity = playerRender });
 			ecs::AddComponent(player, Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			ecs::AddComponent(player, Rigidbody{ .drag = 0.025 });
 			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
-			ecs::AddComponent(player, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
+			ecs::AddComponent(player, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = true });
 			
 
 			//Create the player's name tag
@@ -415,9 +392,8 @@ public:
 			TransformSystem::AddParent(torpIndicator2, player);
 		}
 	}
-
-	Vector3 avgPosition;
-	std::array<float, 4> playerBounds{ -INFINITY, -INFINITY, INFINITY, INFINITY };
 };
 
-ecs::Entity PlayerController::playerWin = playerWin;
+//Static member definitions
+ecs::Entity PlayerController::winScreen = winScreen;
+bool PlayerController::hasWon = false;
