@@ -64,9 +64,6 @@ namespace engine
 	//Updates all default engine systems, returns delta time
 	double Update(Camera* cam)
 	{
-		//TODO: Make better
-		collisionSystem->cam = cam;
-
 		//Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -87,15 +84,11 @@ namespace engine
 		}
 		//Collision system should be after rendering
 		if (enablePhysics)
-			collisionSystem->Update();
-		//Transform must be after physics and rendering
+			collisionSystem->Update(cam);
+		//Transform must be after physics, collision and rendering
 		transformSystem->Update();
 		//Timer must be last
 		timerSystem->Update();
-
-		//Timer Stuff
-		CalculateDeltaTime();
-		frameCount++;
 
 		return deltaTime;
 	}
