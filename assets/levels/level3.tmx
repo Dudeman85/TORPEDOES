@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="92" height="56" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="1">
+ <tileset firstgid="1" source="TORPEDOES_Tileset.tsx"/>
+ <layer id="1" name="Tile Layer 1" width="92" height="56">
+  <data encoding="base64" compression="zlib">
+   eJzt1suxwjAMheFkQTv0QUFAMWGAYpgBusLrbLBl+ejhs/hXd0DSdzMZtnVZNsYYA3SqzHrPDNVaRzevve/mYIfI5p5ulO4Sxdzbfd72yX5f7Rx607vH2+o+b97azxq922165tFbZi2dSW+5Nb3x3q1z6V3vMas32tqLt9Y7zbt3qxXau8fAyrvmjlm8rYvirbmPtTW9sdYa3lKjGbx7nk1t71ajaO/x3nfBqM9nNB/lhbaRfGfLLM3v1/a2eBYze0veQfTuv1HSi94w75G70Jveluaj98jirWGO2CGTt9QcOT+bd4u5xeyM3pbRm96Zoze9M0dvP9b0xlqjfutbW6AsvXhHMte0tfRm9I5sTW+cM93trGc1R7nOYm5tyRhj/zosDNkxUOfyfFxK13XO+eju5c5H6Wl0735+VP/avd/l75/S1+i+/XzJ//8HWMuZ5A==
+  </data>
+ </layer>
+</map>

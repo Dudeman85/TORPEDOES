@@ -1,25 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="92" height="56" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="1">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="92" height="56" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="1">
  <tileset firstgid="1" source="TORPEDOES_Tileset_ForTesting.tsx"/>
  <layer id="1" name="Tile Layer 1" width="92" height="56">
   <properties>
    <property name="Z" type="float" value="0"/>
   </properties>
   <data encoding="base64" compression="zlib">
-   eJztmEEOgyAURL1mXdd1u24v41E8WmkaEvMTpBhk4M8syFND/MK8qPCYpukZ2kNswldob7EZ0XmzEZ03G9F5sxGdNxvRebMRnTcb0XmzEZ03G9F5sxGdNxvRebMRnTcb0XmzEZ03G9F5sxGd9wi8hTYfUH7X5T205YDyW36PTPktvz1Tfstvz5Tf8tsz5bf89kz5Lb89U37Lb8+U3/79TtWaC/MdkQi/U7WWwnxHpPyW3z14KL99UH7z+h3Zg4cMfkf24KF3v+01tIe1GcfVi9/22pm8e6YdV+v9E+u0rfvv85Uw3HMNXHP9Qt0t9N32jMf2PMfUuFrvn1inU37nnq+Q37lec/3m3zxte8Zje55jalyo/cFUXfld12/7XpPfbfe/Wfw+Yum8XfH99ub3EUvnreb6q6bX8vv8e310v2v+11+5Lhvd7yvWrTX9FjF+i/K7F34A1sJ0PA==
+   eJztmEFOwzAQRXPNZt0IuioCViDoVXKUHI1BkaVq1MTYOP4ez1+MXhNFtT3/Ka19HYbhRepKVuGH1CdZjei8vRGdtzei8/ZGdN7eiM7bG9F5eyM6b29E5+2N6Ly9EZ23N6Lz9kZ03t6Iztsb0Xl7Izpvb0TnbYEnqXGH9Lssz1LTDuk3/bZM+k2/eyb9pt+5fJJ6zqxLpXn25Per1FtmvVeaZ09+/7ff9Jt+02/6Tb8x/JL6zqxbpXn25LcF9uS3BdLv/v0+rVkueqwxMV+LRPh9Xnu76LGmxHwtEuX3o7Ho93F+PxqLftNv+m2bLfkd2IKHHvwObMHD3v3W99AelmZYVyt+63s5ebdMva7a5yfaaT3uX+eXQvnOWTjHnpvWvdhyz/BZX8e4ta7a5yfa6S2/Y/NL5G+v59hz49qn5Z7hs76OcWtdqPPBrXHpd1m/9XuNftc9//bi9x5T+3bE73dvfu8xtW8l918lvabf+e91636X/F9/5L7Mut9H7FtL+k1i/Cbpdyv8ATxrdTQ=
   </data>
  </layer>
  <layer id="3" name="collider" width="92" height="56">
   <data encoding="base64" compression="zlib">
-   eJzt27ENgDAQBEFD/0XTAAHBe2WhWekamOAd+V5r3ZZOTbzbeLfxbuPdxruNdxvvNt5tvNt4t/Fu493Gu413G+823m2823i38W7j3ca7jXcb7zbebbzbeLfxbuPdxruNdxvvNt5tvNt4t/Fu493Gu4132y7v6yebjjfvkzYd7xnvr3+2vZcz8W7j3ca7jXcb7zbebbzbeJ8Z7zbebW93x/buAf/JA2s=
-  </data>
- </layer>
- <layer id="2" name="Tile Layer 2" width="92" height="56">
-  <properties>
-   <property name="Z" type="float" value="1"/>
-  </properties>
-  <data encoding="base64" compression="zlib">
-   eJzt1k0KglAAhVFX1Lxx9DPLalrtfxk9IcFBlkHeLM+BOxLx8enAqgIAAAAAAGBsqyfX1rFTzIfeWXpn6Z2ld5beWXpn6Z2ld5beWXpn6Z2ld5beWXpn6Z01pd5zeL96Z+mdpXeW3ll6Z02p97eemaR31tR6z5neWU3vTdm2s134DMs/2RBN70PZsbPTwHt5n95ZeucsyupK75T230TvDL3Hse9Zfb+u92e0XV85l106u455qAf6vodfG8CU3QBwOD2U
+   eJzt26ENADEMBEEr/RedBh48SFYBM9I1sMDMa2aWpaOhd0vvlt4tvVt6t/Ru6d3Su6V3S++W3i29W3q39G7p3dK7pXdL75beLb1berf0bund0ruld0vvlt4tvVt6t/Ru6d3Su6V3S++W3i29W3q39G7p3dK7pXdL7zP+/mzrfYbeLb1berf0bund0ruld0vvN+nd0rv1dXfs7jZEWAKj
   </data>
  </layer>
  <layer id="4" name="Tile Layer 3" width="92" height="56">
@@ -28,6 +20,22 @@
   </properties>
   <data encoding="base64" compression="zlib">
    eJzt1LENgDAMAMGsQ0MNNQtQ0cKojEYaBiASOMJ3krsUL8tKKQAAAAAAAAAAAAAAAAAAAEx15jpjKWdwSgpLdEAyLXe9vdABPRiiAxI5ogOS8W9/b48O+IHx4Xt33ube8xpakYc9A727ALakBXc=
+  </data>
+ </layer>
+ <layer id="5" name="Tile Layer 5" width="92" height="56">
+  <properties>
+   <property name="Z" type="float" value="-0.5"/>
+  </properties>
+  <data encoding="base64" compression="zlib">
+   eJzt0iESwkAQRcG9JuigQcPlcjRShYuKShd5K6baz/uvMcZzu9f0FD/bvaenqXvX1L1r6t41de+aundN3bum7l1T966pe9fUvWvq3jV175q6d03du6buXVP3rql719S9a+reNXXvmrp3Td27pu5dU/euqXvX1L1r6t41de+aundN3bum7l1T9655tMtjjHXZbu/tpF1cxaNd7r/frnsXvJd/c+577vvKzn3PfV9Z3bum7l1T966pe9fUvWvq3jV175q6d03du6buXVP3rql719S9a+reNXXvmrp3zS/+F0qG
+  </data>
+ </layer>
+ <layer id="2" name="Tile Layer 2" width="92" height="56">
+  <properties>
+   <property name="Z" type="float" value="1"/>
+  </properties>
+  <data encoding="base64" compression="zlib">
+   eJzt1ssKglAARdH7Rc0bR4+ZVtPqW/u0FBIcZA/Ik+FacEaCXrYOLAUAAAAAAICxrZ5cW8dOMR96Z+mdpXeW3ll6Z+mdpXeW3ll6Z+mdpXeW3ll6Z+mdpXfWlHrP4f3qnaV3lt5ZemfpnTWl3r96ZpLeWVPrPWd6Z7W9N822ve3CZ1iGV5VyHeO+72h775sdeju+G4qP6Z2ld86iWV30Tun+TfTO0Hsc1cDq+3W9v6Pr+sqp2bm3y5iHemDoe/i3AUzZDTZyPmo=
   </data>
  </layer>
 </map>
