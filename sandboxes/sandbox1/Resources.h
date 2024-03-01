@@ -26,7 +26,7 @@ namespace resources
 
 		checkPointModel = new Model("/3dmodels/Checkpoint.obj");
 		finishLineModel = new Model("/3dmodels/Finish_line.obj");
-		torpedoModel = new Model("/3dmodels/Prop_Ship_U_99.obj");
+		torpedoModel = new Model("/3dmodels/torpedo.obj");
 		laMuerteModel = new Model("/3dmodels/LaMuerte.obj");
 
 		torpCooldownTexture = new Texture("/GUI/UI_Red_Torpedo_Icon.png");
@@ -34,7 +34,7 @@ namespace resources
 		winSprite = new Texture("/GUI/winner.png");
 
 		level1Map = new Tilemap(cam);
-		level1Map->loadMap("/levels/newsetTest.tmx");
+		level1Map->loadMap("/levels/level3.tmx");
 
 		explosionAnimation = AnimationsFromSpritesheet("/spritesheets/explosion.png", 6, 1, vector<int>(6, 150))[0];
 		crowdAnims = AnimationsFromSpritesheet("/spritesheets/CrowdCheer14.png", 3, 1, vector<int>(3, 150))[0];
