@@ -143,6 +143,9 @@ void Tilemap::draw(float layer)
 	if (mapLayers.count(layer) == 0)
 		return;
 
+	if (!enabledLayers[layer])
+		return;
+
 	m_shader->use();
 
 	glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
@@ -224,6 +227,7 @@ void Tilemap::loadMap(const std::string ownMap)
 				}
 
 				mapLayers[layer->zLayer].push_back(layer);
+				enabledLayers[layer->zLayer] = true;
 			}
 		}
 	}

@@ -49,12 +49,12 @@ bool HAS_WON = false;
 ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonCollider)
 class PlayerController : public ecs::System
 {
-	float starTimer = 4; // start Time 
+	float countdownTimer = 4; // start Time 
 
 public:
 	float getTimer() const
 	{
-		return starTimer;
+		return countdownTimer;
 	}
 	static ecs::Entity playerWin;
 
@@ -186,7 +186,7 @@ public:
 			float rotateInput = 0;
 			bool ProjetileInput = 0;
 			// Starte Time 
-			if (starTimer <= 0)
+			if (countdownTimer <= 0)
 			{
 				accelerationInput = 0;
 				rotateInput = 0;
@@ -286,7 +286,7 @@ public:
 				}
 			}
 			if (player.playerID == 0)
-				starTimer -= dt;
+				countdownTimer -= dt;
 			//printf("starTimer: %i\n", int(starTimer));
 			// topedo hit logica 
 			if (player.hitPlayer == true)
