@@ -24,7 +24,7 @@ struct Player
 	float hitPlayerTime = 0;
 	bool playExlposionSound = false;
 	int playerID = 0;
-	ecs::Entity playerFont;
+	ecs::Entity nameText;
 	string playername;
 	string playerLap;
 };
@@ -393,7 +393,7 @@ public:
 
 			// Apply the resulting impulse to the object
 			PhysicsSystem::Impulse(entity, forwardImpulse);
-			TransformSystem::SetPosition(player.playerFont, transform.position + Vector3(0, 20, 0));
+			TransformSystem::SetPosition(player.nameText, transform.position + Vector3(0, 20, 0));
 		}
 	};
 

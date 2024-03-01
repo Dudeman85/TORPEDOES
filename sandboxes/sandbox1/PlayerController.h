@@ -24,7 +24,7 @@ struct Player
 	float hitPlayerTime = 0;
 	bool playExlposionSound = false;
 	int playerID = 0;
-	ecs::Entity playerFont;
+	ecs::Entity nameText;
 	string playername;
 	string playerLap;
 
@@ -412,7 +412,7 @@ public:
 
 
 			//Create the player entity which contains everything but rendering
-			ecs::AddComponent(player, Player{ .acerationSpeed = 300, .minAceleration = 120, .playerID = i, .playerFont = playerNameText, .renderedEntity = playerRender });
+			ecs::AddComponent(player, Player{ .acerationSpeed = 300, .minAceleration = 120, .playerID = i, .nameText = playerNameText, .renderedEntity = playerRender });
 			ecs::AddComponent(player, Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			ecs::AddComponent(player, Rigidbody{ .drag = 0.025 });
 			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
