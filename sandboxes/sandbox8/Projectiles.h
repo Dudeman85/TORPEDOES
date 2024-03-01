@@ -59,11 +59,11 @@ void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPos
 void CreateHedgehog(Vector2 direction , float hedgehogSpeed , Vector3 spanwPposition , Vector3 sapawnRotation , int owerID)
 {
 	ecs::Entity hedgehog = ecs::NewEntity();
-	ecs::AddComponent(hedgehog, Transform{ .position = spanwPposition, .rotation = sapawnRotation, .scale = Vector3(10) });
+	ecs::AddComponent(hedgehog, Transform{ .position = spanwPposition, .rotation = sapawnRotation, .scale = Vector3(100) });
 	ecs::AddComponent(hedgehog, Rigidbody{ .velocity = direction * hedgehogSpeed });
-	ecs::AddComponent(hedgehog, ModelRenderer{ .model = resources::torpedoModel });
+	ecs::AddComponent(hedgehog, ModelRenderer{ .model = resources::hedgehogModel });
 	std::vector<Vector2> Hedgehogverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-	ecs::AddComponent(hedgehog, PolygonCollider{ .vertices = Hedgehogverts, .callback = OnTopedoCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
+	ecs::AddComponent(hedgehog, PolygonCollider{ .vertices = Hedgehogverts, .callback = OnTopedoCollision, .trigger = true, .visualise = true,  .rotationOverride = sapawnRotation.y });
 	ecs::AddComponent(hedgehog, Torpedo{ .ownerID = owerID });
 }
 
