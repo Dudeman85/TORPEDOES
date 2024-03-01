@@ -1,7 +1,6 @@
 // Author: Viksteri Käppi. UI, sprite and animation testing
 #define WIN32_LEAN_AND_MEAN
-//#include <engine/Tilemap.h>
-//#include "PlayerController.h"
+
 #include "engine/Input.h"  
 #include "MenuSystem.h"	
 #include "GameCamera.h"
