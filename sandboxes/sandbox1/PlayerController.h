@@ -11,7 +11,7 @@ struct Player
 {
 	float projectileSpeed = 500;  // Attack state
 	bool attackHeld = false;     // Indicates if the attack button is held
-	float acerationSpeed = 1;    // Acceleration speed
+	float accelerationSpeed = 1;    // Acceleration speed
 	float minAceleration = 1;    // Minimum acceleration while rotating
 	float rotationSpeed = 75;    // Rotation speed
 	float projectileTime = 0;    // projectile Time 
@@ -23,8 +23,8 @@ struct Player
 	bool hitPlayer = false;
 	float hitPlayerTime = 0;
 	bool playExlposionSound = false;
-	int playerID = 0;
-	ecs::Entity playerFont;
+	int id = 0;
+	ecs::Entity nameText;
 	string playername;
 	string playerLap;
 
@@ -51,7 +51,7 @@ class PlayerController : public ecs::System
 {
 	//Change this to a vector one for each player
 
-	float starTimer = 4; // start Time 
+	float countdownTimer = 4; // start Time 
 	void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 sapawnRotation, int owerID)
 	{
 
@@ -162,7 +162,7 @@ public:
 			Transform& projectransfor = ecs::GetComponent<Transform>(collision.b);
 			Projectile& projectile = ecs::GetComponent<Projectile>(collision.b); // tällä on Entity on collision.b 
 			//Projectile& projectile = ecs::GetComponent<Projectile>(collision.a);
-			if (player.playerID != projectile.ownerID)
+			if (player.id != projectile.ownerID)
 			{
 				player.hitPlayer = true;
 				CreateAnimation(projectransfor.position + rigidbody.velocity / 15);
@@ -206,13 +206,13 @@ public:
 			float rotateInput = 0;
 			bool ProjetileInput = 0;
 			// Starte Time 
-			if (starTimer <= 0)
+			if (countdownTimer <= 0)
 			{
 				accelerationInput = 0;
 				rotateInput = 0;
 				ProjetileInput = 0;
 				// Get keyboard input		 
-				if (player.playerID == 0)
+				if (player.id == 0)
 				{
 					//Player 0 only gets keyboard input
 					accelerationInput += +glfwGetKey(window, GLFW_KEY_A) - glfwGetKey(window, GLFW_KEY_Z);
@@ -222,12 +222,12 @@ public:
 				else
 				{
 					// Check joystick input
-					int present = glfwJoystickPresent(player.playerID - 1);
+					int present = glfwJoystickPresent(player.id - 1);
 					// If the joystick is present, check its state
 					if (present == GLFW_TRUE)
 					{
 						GLFWgamepadstate state;
-						glfwGetGamepadState(player.playerID - 1, &state);
+						glfwGetGamepadState(player.id - 1, &state);
 						// Get joystick input, such as rotation and acceleration
 					   // Also check if the left and right buttons are pressed
 						//float rightStickX = state.axes[0];
@@ -279,13 +279,13 @@ public:
 						//const float ltValue = state.axes[4]; // Left trigger
 						//const float rtValue = state.axes[5]; // Right trigger
 						//accelerationInput += +rtValue - ltValue;
-						if (player.playerID == 1)
+						if (player.id == 1)
 						{
 							accelerationInput += rightStickY;
 							rotateInput += rightStickX;
 							ProjetileInput = static_cast<float>(*buttonpointer);
 						}
-						else if (player.playerID == 2)
+						else if (player.id == 2)
 						{
 							accelerationInput += rightStickY1;
 							rotateInput += rightStickX1;
@@ -305,8 +305,8 @@ public:
 					}
 				}
 			}
-			if (player.playerID == 0)
-				starTimer -= dt;
+			if (player.id == 0)
+				countdownTimer -= dt;
 			//printf("starTimer: %i\n", int(starTimer));
 			// topedo hit logica 
 			if (player.hitPlayer == true)
@@ -354,13 +354,13 @@ public:
 			if (accelerationInput > 0.0f)
 			{
 
-				forwardImpulse = forwardDirection * accelerationInput * dt * player.acerationSpeed;
+				forwardImpulse = forwardDirection * accelerationInput * dt * player.accelerationSpeed;
 			}
 			// Apply deceleration impulse if negative input is received
 			if (accelerationInput < 0.0f)
 			{
 
-				forwardImpulse = forwardDirection * accelerationInput * dt * player.acerationSpeed * 0.3;
+				forwardImpulse = forwardDirection * accelerationInput * dt * player.accelerationSpeed * 0.3;
 			}
 
 			// "Check if the variable 'ProjectileInput' is true and if the projectile time is equal to or less than zero."
@@ -369,7 +369,7 @@ public:
 				// "Create a projectile using the parameters of the player object."
 				if (player.projectileTime1 <= 0.0f)
 				{
-					CreateProjectile(forwardDirection, player.projectileSpeed, transform.position, modelTransform.rotation, player.playerID);
+					CreateProjectile(forwardDirection, player.projectileSpeed, transform.position, modelTransform.rotation, player.id);
 					// Reset the projectile time to a cooldown 
 					player.projectileTime1 = 0.0f;
 					// "Create a cooldown time between shots."
@@ -378,7 +378,7 @@ public:
 
 				else if (player.projectileTime2 <= 0.0f)
 				{
-					CreateProjectile(forwardDirection, player.projectileSpeed, transform.position, modelTransform.rotation, player.playerID);
+					CreateProjectile(forwardDirection, player.projectileSpeed, transform.position, modelTransform.rotation, player.id);
 					player.projectileTime2 = 0.0f;
 					player.projectileTime3 = 0.2f;
 				}
@@ -412,7 +412,7 @@ public:
 
 
 			//Create the player entity which contains everything but rendering
-			ecs::AddComponent(player, Player{ .acerationSpeed = 300, .minAceleration = 120, .playerID = i, .playerFont = playerNameText, .renderedEntity = playerRender });
+			ecs::AddComponent(player, Player{ .accelerationSpeed = 300, .minAceleration = 120, .id = i, .nameText = playerNameText, .renderedEntity = playerRender });
 			ecs::AddComponent(player, Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			ecs::AddComponent(player, Rigidbody{ .drag = 0.025 });
 			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };

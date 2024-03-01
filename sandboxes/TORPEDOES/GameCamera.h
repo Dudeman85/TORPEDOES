@@ -80,4 +80,5 @@ static void UpdateCam(GLFWwindow* window, Camera& cam, Tilemap *map) {
 		camScale = desiredZoom;
 	}
 
+	modelRenderSystem->SetLight(Vector3(cam.position.x, cam.position.y, 1500), Vector3(255));
 }
