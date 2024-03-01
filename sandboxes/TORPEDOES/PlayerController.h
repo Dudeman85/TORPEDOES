@@ -24,7 +24,7 @@ struct Player
 
 	//Checkpoint stuff
 	int previousCheckpoint = -1;
-	int lap = 0;
+	int lap = 1;
 
 	//Hit by weapon stuff
 	bool isHit = false;
@@ -61,7 +61,7 @@ public:
 		ecs::AddComponent(winScreen, Transform{ .position = Vector3(0, 0, 0.5f), .scale = Vector3(0.3f) });
 	}
 
-	//Get the min and max bounds every player
+	//Get the min and max bounds of every player
 	std::array<float, 4> GetPlayerBounds()
 	{
 		std::array<float, 4> playerBounds{ -INFINITY, -INFINITY, INFINITY, INFINITY };
@@ -87,10 +87,10 @@ public:
 
 	static void OnCollision(Collision collision)
 	{
-		// Get references to the involved components
-		Player& player = ecs::GetComponent<Player>(collision.a);  // collision.a on sama kun player entitety eli on sama kuin ( laMuerte) 
+		//collision.a is always a player
+		//Get references to the involved components
+		Player& player = ecs::GetComponent<Player>(collision.a);
 		Transform& playertranform = ecs::GetComponent<Transform>(collision.a);
-
 		PolygonCollider& playerCollider = ecs::GetComponent<PolygonCollider>(collision.a);
 
 		//Slow player down when off track

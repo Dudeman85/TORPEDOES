@@ -1,6 +1,4 @@
-#define WIN32_LEAN_AND_MEAN
-//#include <engine/Tilemap.h>
-//#include "PlayerController.h"
+#include "PlayerController.h"
 #include "engine/Input.h"  
 #include "MenuSystem.h"	
 #include "GameCamera.h"
@@ -140,10 +138,9 @@ int main()
 		{
 			playerController->Update(window, deltaTime);
 		}
-		// if paused  or Pause pressed update PauseSystem
+		// if paused or Pause pressed update PauseSystem
 		if (pauseSystem->isGamePause || input::GetNewPress("Pause"))
 		{
-			printf(" P  pauseSystem");
 			pauseSystem->Update();
 		}
 				

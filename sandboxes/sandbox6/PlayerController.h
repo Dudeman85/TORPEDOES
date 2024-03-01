@@ -20,8 +20,8 @@ struct Player
 	float projectileTime2 = 0.0f;  // time 2  projectile
 	float projectileTime3 = 0.0f;  // time 3  peojectile
 	int previousCheckpoint = -1;
-	bool hitPlayer = false;
-	float hitPlayerTime = 0;
+	bool isHit = false;
+	float hitTime = 0;
 	bool playExlposionSound = false;
 	int id = 0;
 	ecs::Entity nameText;
@@ -147,7 +147,7 @@ public:
 			//Projectile& projectile = ecs::GetComponent<Projectile>(collision.a);
 			if (player.id != projectile.ownerID)
 			{
-				player.hitPlayer = true;
+				player.isHit = true;
 				CreateAnimation(projectransfor.position + rigidbody.velocity / 15);
 				projectransfor.position.y += 10000000; // destroy Entity "almost"
 				player.playExlposionSound = true;
@@ -293,17 +293,17 @@ public:
 			countdownTimer -= dt;
 			//printf("starTimer: %i\n", int(starTimer));
 			// topedo hit logica 
-			if (player.hitPlayer == true)
+			if (player.isHit == true)
 			{
 				// Hacer que el jugador gire 360 grados instantáneamente en el eje Y
 				TransformSystem::Rotate(entity, 0, 360.0f * dt, 0);
 
 
 				// Restablecer hitPlayer después de un cierto tiempo (por ejemplo, 2 segundos)
-				if (player.hitPlayerTime >= 2)
+				if (player.hitTime >= 2)
 				{
-					player.hitPlayer = false;
-					player.hitPlayerTime = 0.0f; // Restablecer el tiempo de duración de hitPlayer
+					player.isHit = false;
+					player.hitTime = 0.0f; // Restablecer el tiempo de duración de hitPlayer
 
 				}
 				else
@@ -312,7 +312,7 @@ public:
 					rotateInput = 0;
 					ProjetileInput = false;
 
-					player.hitPlayerTime += dt; // Incrementar el tiempo de duración de hitPlayer
+					player.hitTime += dt; // Incrementar el tiempo de duración de hitPlayer
 				}
 			}
 
