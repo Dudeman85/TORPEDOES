@@ -65,6 +65,8 @@ public:
 	///How many layers are there in the map
 	std::set<float> zLayers;
 
+	std::unordered_map<float, bool> enabledLayers;
+
 	///A 2D vector of tile IDs used for simple tile collision checking
 	std::vector<std::vector<unsigned int>> collisionLayer;
 private:
