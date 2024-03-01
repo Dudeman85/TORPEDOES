@@ -7,7 +7,7 @@
 
 int checkPointNumber = 0;
 
-void createCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, Model* checkPointModel, float hitboxrotation, bool finish_line = false)
+void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, Model* checkPointModel, float hitboxrotation, bool finish_line = false)
 {
 	ecs::Entity checkpoint = ecs::NewEntity();
 
@@ -30,9 +30,25 @@ void CreateCrowd(Vector3 pos, Animation& anim)
 	AnimationSystem::PlayAnimation(crowd, "CrowdCheer", true);
 }
 
+//Play the countdown timer and freeze players untill it is done
+void PlayCountdown()
+{
+	ecs::Entity countdown = ecs::NewEntity();
+	ecs::AddComponent(countdown, Transform{ .position = Vector3(1475, -1270, 10), .scale = Vector3(60, 100, 0) });
+	ecs::AddComponent(countdown, SpriteRenderer{});
+	ecs::AddComponent(countdown, Animator{ .onAnimationEnd = ecs::DestroyEntity });
+	AnimationSystem::AddAnimation(countdown, resources::countdownAnim, "CountDown");
+	AnimationSystem::PlayAnimation(countdown, "CountDown", false);
+	ecs::GetSystem<PlayerController>()->countdownTimer = 5;
+}
+
+//Create everything for level 1
 void LoadLevel1(Camera* cam)
 {
 	collisionSystem->cam = cam;
+
+	//TEST
+	//resources::level1Map->enabledLayers[1] = false;
 
 	//Set this level's tilemap
 	spriteRenderSystem->SetTilemap(resources::level1Map);
@@ -42,30 +58,23 @@ void LoadLevel1(Camera* cam)
 	ecs::GetSystem<PlayerController>()->CreatePlayers(4, Vector2(1434.0f, -1370.0f));
 
 	//Make all the checkpoints manually
-	createCheckpoint(Vector3(2100.226807, -963.837402, 100.000000), Vector3(30.000000, 159.245773, 0.000000), Vector3(17), resources::checkPointModel, 45.0f);
-	/*
-	createCheckpoint(Vector3(2597.463135, -684.973389, 100.000000), Vector3(45.000000, 180.022018, 0.000000), Vector3(17), resources::checkPointModel, 45.0f);
-	createCheckpoint(Vector3(1668.260010, -990.794373, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), resources::checkPointModel, 45.0f);
-	createCheckpoint(Vector3(1043.635132, -875.206543, 100.000000), Vector3(45.000000, 179.241272, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); 
-	createCheckpoint(Vector3(943.931152, -293.566711, 100.000000), Vector3(45.000000, 107.476852, 0.000000), Vector3(17), resources::checkPointModel, 45.0f);
-	createCheckpoint(Vector3(586.608276, -1249.448486, 100.000000), Vector3(45.000000, 40.070156, 0.000000), Vector3(17), resources::checkPointModel, 90.0f);
-	*/
-	createCheckpoint(Vector3(1513.692383, -1462.996187, 50.000000), Vector3(90.000000, 90.901711, 0.000000), Vector3(14), resources::finishLineModel, -1, true); // 10
+	CreateCheckpoint(Vector3(2100.226807, -963.837402, 100.000000), Vector3(30.000000, 159.245773, 0.000000), Vector3(17), resources::checkPointModel, 45.0f);
+	CreateCheckpoint(Vector3(2597.463135, -684.973389, 100.000000), Vector3(45.000000, 180.022018, 0.000000), Vector3(17), resources::checkPointModel, 45.0f);
+	CreateCheckpoint(Vector3(1668.260010, -990.794373, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), resources::checkPointModel, 45.0f);
+	CreateCheckpoint(Vector3(1043.635132, -875.206543, 100.000000), Vector3(45.000000, 179.241272, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); 
+	CreateCheckpoint(Vector3(943.931152, -293.566711, 100.000000), Vector3(45.000000, 107.476852, 0.000000), Vector3(17), resources::checkPointModel, 45.0f);
+	CreateCheckpoint(Vector3(586.608276, -1249.448486, 100.000000), Vector3(45.000000, 40.070156, 0.000000), Vector3(17), resources::checkPointModel, 90.0f);
+	CreateCheckpoint(Vector3(1513.692383, -1462.996187, 50.000000), Vector3(90.000000, 90.901711, 0.000000), Vector3(14), resources::finishLineModel, -1, true); // 10
 
 	//Make the crowds manually
 	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims);
 	CreateCrowd({ 1545, -1715, 11 }, resources::crowdAnims);
 	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims);
 
-	//Play the countdown
-	ecs::Entity countdown = ecs::NewEntity();
-	ecs::AddComponent(countdown, Transform{ .position = Vector3(1475, -1270, 10), .scale = Vector3(60, 100, 0) });
-	ecs::AddComponent(countdown, SpriteRenderer{});
-	ecs::AddComponent(countdown, Animator{ .onAnimationEnd = ecs::DestroyEntity });
-	AnimationSystem::AddAnimation(countdown, resources::countdownAnim, "CountDown");
-	AnimationSystem::PlayAnimation(countdown, "CountDown", false);
+	PlayCountdown();
 }
 
+//Bind all input events here
 void SetupInput()
 {
 	input::ConstructDigitalEvent("MoveUp");
@@ -115,6 +124,8 @@ int main()
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
+		glfwPollEvents();
+
 		//Close window when Esc is pressed
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
@@ -127,9 +138,7 @@ int main()
 		// playerControl Update for frame if not paused
 		if (!pauseSystem->isGamePause)
 		{
-
 			playerController->Update(window, deltaTime);
-
 		}
 		// if paused  or Pause pressed update PauseSystem
 		if (pauseSystem->isGamePause || input::GetNewPress("Pause"))
@@ -139,7 +148,6 @@ int main()
 		}
 				
 		glfwSwapBuffers(window);
-		glfwPollEvents();
 	}
 
 	input::uninitialize();
