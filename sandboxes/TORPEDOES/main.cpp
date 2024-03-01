@@ -47,6 +47,9 @@ void LoadLevel1(Camera* cam)
 {
 	collisionSystem->cam = cam;
 
+	//TEST
+	//resources::level1Map->enabledLayers[1] = false;
+
 	//Set this level's tilemap
 	spriteRenderSystem->SetTilemap(resources::level1Map);
 	collisionSystem->SetTilemap(resources::level1Map);
