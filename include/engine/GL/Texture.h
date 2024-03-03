@@ -43,6 +43,7 @@ namespace engine
 			//Load image
 			if (relativePath)
 				path = assetPath + path;
+
 			int width, height, nrChannels;
 			unsigned char* imageData = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
 

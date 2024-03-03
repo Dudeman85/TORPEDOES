@@ -32,5 +32,3 @@ void TMap::setup(const string tilemap)
 	TMVariables mapVAr;
 	mapVAr.fetchData(assetPath + tilemap);
 }
-
-

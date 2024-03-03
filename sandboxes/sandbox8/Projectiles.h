@@ -12,6 +12,12 @@ struct Torpedo
 };
 
 
+ECS_REGISTER_COMPONENT(Hedgehog)
+struct Hedgehog
+{
+	int ownerID = 0;
+};
+
 static void CreateAnimation(Vector3 animPosition)
 {
 	ecs::Entity torpedoAnim = ecs::NewEntity();
@@ -50,5 +56,15 @@ void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPos
 	ecs::AddComponent(torpedo, Torpedo{ .ownerID = owerID });
 }
 
+void CreateHedgehog(Vector2 direction , float hedgehogSpeed , Vector3 spanwPposition , Vector3 sapawnRotation , int owerID)
+{
+	ecs::Entity hedgehog = ecs::NewEntity();
+	ecs::AddComponent(hedgehog, Transform{ .position = spanwPposition, .rotation = sapawnRotation, .scale = Vector3(100) });
+	ecs::AddComponent(hedgehog, Rigidbody{ .velocity = direction * hedgehogSpeed });
+	ecs::AddComponent(hedgehog, ModelRenderer{ .model = resources::hedgehogModel });
+	std::vector<Vector2> Hedgehogverts{ Vector2(0.2, 0.25), Vector2(0.2, -0.25), Vector2(-0.2, -0.25), Vector2(-0.2, 0.25) };
+	ecs::AddComponent(hedgehog, PolygonCollider{ .vertices = Hedgehogverts, .callback = OnTopedoCollision, .trigger = true, .visualise = true,  .rotationOverride = sapawnRotation.y });
+	ecs::AddComponent(hedgehog, Torpedo{ .ownerID = owerID });
+}
 
 

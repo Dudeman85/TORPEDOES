@@ -1,4 +1,5 @@
 #include <engine/Application.h>
+#include <engine/ResourceManagement.h>
 #include <thread>
 
 //Sanity saver
@@ -109,6 +110,9 @@ int main()
 
 	TimerSystem::ScheduleFunction([]() { std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n"; }, 1, false, ScheduledFunction::Type::seconds);
 	TimerSystem::ScheduleFunction([]() { std::cout << "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\n"; }, 2, true, ScheduledFunction::Type::seconds);
+
+
+	std::unordered_map<std::string, Texture*> textures = engine::PreloadTextures("testAssets");
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))

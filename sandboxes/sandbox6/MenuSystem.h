@@ -5,6 +5,16 @@
 #include <functional>
 #include "engine/Input.h"  
 
+struct ButtonData
+{
+	int  id;
+
+	std::string name;
+	Vector3 normalScale;
+	Vector3 SelectedScale;
+	Texture* selected, unselected;
+	std::function<void()>callback;
+};
 //Pause Component
 ECS_REGISTER_COMPONENT(PauseComponent)
 struct PauseComponent
@@ -13,7 +23,7 @@ struct PauseComponent
 	engine::Texture* selectedTexture;
 	engine::Texture* unselectedTexture;
 	std::function<void()> operation;
-	bool isOptionsMenu=false;
+	bool isOptionsMenu = false;
 	bool isSlider = false;
 	float sliderValue = 0;
 };
@@ -46,10 +56,11 @@ class PauseSystem : public ecs::System
 	vector<Texture*> allTextures;
 	static GLFWwindow* window;
 
-
+	map<string, Texture[] > allButtonTexturesOnAndOffSelected;
 
 
 public:
+
 	ecs::Entity currentSelection;
 	bool isGamePause;
 
@@ -82,13 +93,13 @@ public:
 			}
 
 			if (IsCurrentPauseComponentSlider())
-			{								
+			{
 
 				if (input::GetNewPress("MoveRight"))
-				{										
+				{
 					/*this dosent works*///UpdateSlider();
 					MoveSliderRight();
-					
+
 				}
 				if (input::GetNewPress("MoveLeft"))
 				{
@@ -96,7 +107,7 @@ public:
 					//selectedPauseComponent.sliderValue += -0.01;
 					/*this dosent works*///UpdateSlider();
 					MoveSliderLeft();
-					
+
 
 				}
 
@@ -111,6 +122,7 @@ public:
 	}
 	void Init(GLFWwindow* mainWindow)
 	{
+
 		printf("IN side MENU SYSTEM INIT\n");
 		PauseSystem::window = mainWindow;
 		input::initialize(window);
@@ -207,7 +219,7 @@ public:
 		//optionsResumeButton
 		ecs::AddComponent(optionsResumeButton, Transform{ .position = Vector3(0,.3f,-0.1f), .scale = Vector3(.25f) });
 		ecs::AddComponent(optionsResumeButton, SpriteRenderer{ .texture = allTextures[8],  .enabled = false, .uiElement = true });
-		ecs::AddComponent(optionsResumeButton, PauseComponent{ .upper = fullscreenEntity, .lower = musicSliderEntity, .selectedTexture = allTextures[8], .unselectedTexture = allTextures[9], .operation = BackToUIMenu, .isOptionsMenu = true});
+		ecs::AddComponent(optionsResumeButton, PauseComponent{ .upper = fullscreenEntity, .lower = musicSliderEntity, .selectedTexture = allTextures[8], .unselectedTexture = allTextures[9], .operation = BackToUIMenu, .isOptionsMenu = true });
 		//musicSliderEntity
 		ecs::AddComponent(musicSliderEntity, Transform{ .position = Vector3(0,.1f,-0.1f), .scale = Vector3(0.25f) });
 		ecs::AddComponent(musicSliderEntity, SpriteRenderer{ .texture = allTextures[10],  .enabled = false, .uiElement = true });
@@ -217,19 +229,62 @@ public:
 		ecs::AddComponent(fullscreenEntity, SpriteRenderer{ .texture = allTextures[12],  .enabled = false, .uiElement = true });
 		ecs::AddComponent(fullscreenEntity, PauseComponent{ .upper = musicSliderEntity, .lower = optionsResumeButton, .selectedTexture = allTextures[12], .unselectedTexture = allTextures[13], .operation = PauseSystem::OnQuitGamePressed, .isOptionsMenu = true });
 		//musicSliderNub
-		ecs::AddComponent(musicSliderNub, Transform{.position = ecs::GetComponent<Transform>(musicSliderEntity).position + Vector3(0,-0.2f,-0.1), .scale = Vector3(0.15f)});
+		ecs::AddComponent(musicSliderNub, Transform{ .position = ecs::GetComponent<Transform>(musicSliderEntity).position + Vector3(0,-0.2f,-0.1), .scale = Vector3(0.15f) });
 		ecs::AddComponent(musicSliderNub, SpriteRenderer{ .texture = allTextures[15],  .enabled = false, .uiElement = true });
 		ecs::AddComponent(musicSliderNub, PauseComponent{ .selectedTexture = allTextures[15], .unselectedTexture = allTextures[15], .isOptionsMenu = true,.isSlider = true });
 
+
 	}
 
-	void AddButton(ecs::Entity entity, Vector3 pos, Texture selectedTexture, Texture unselectedTexture, Vector3 scaleNormal, Vector3 scaleSelected)
+	void AddButton(ecs::Entity entity, Vector3 pos, Texture* selectedTexture, Texture* unselectedTexture, Vector3 scaleNormal, Vector3 scaleSelected)
 	{
-		ecs::AddComponent(fullscreenEntity, Transform{ .position = Vector3(0.7,-0.7f,-0.1f), .scale = Vector3(0.25f) });
-		ecs::AddComponent(fullscreenEntity, SpriteRenderer{ .texture = allTextures[12],  .enabled = false, .uiElement = true });
-		ecs::AddComponent(fullscreenEntity, PauseComponent{ .upper = mainMenuButton, .lower = resumeButton, .selectedTexture = allTextures[12], .unselectedTexture = allTextures[13], .operation = PauseSystem::OnQuitGamePressed });
+		ecs::AddComponent(entity, Transform{ .position = pos, .scale = scaleNormal });
+		ecs::AddComponent(entity, SpriteRenderer{ .texture = unselectedTexture,  .enabled = false, .uiElement = true });
+		ecs::AddComponent(entity, PauseComponent{ .upper = mainMenuButton, .lower = resumeButton, .selectedTexture = allTextures[12], .unselectedTexture = allTextures[13], .operation = PauseSystem::OnQuitGamePressed });
 
 	}
+
+
+	void CreateColumOfButtons(float verticalOffset, vector<ButtonData> buttonData)
+	{
+		int i = 0;
+
+		for (vector<ButtonData>::iterator buttonIterator = buttonData.begin(); buttonIterator < buttonData.end(); buttonIterator++)
+		{
+			auto& button = *buttonIterator;
+			auto upper = buttonIterator--;
+			auto lower = buttonIterator++;
+			auto& upperButton = upper ;
+			auto& lowerButton = lower ;
+			ecs::AddComponent(button.id, Transform{ .position = *new Vector3(0,.8f,-0.1f), .scale = button.normalScale });
+			ecs::AddComponent(button.id, SpriteRenderer{ .texture = &button.unselected,  .enabled = false, .uiElement = true });
+		//TODO	//ecs::AddComponent(button.id, PauseComponent{ .upper = upperButton.id, .lower = lowerButton, .selectedTexture = allTextures[12], .unselectedTexture = allTextures[13], .operation = PauseSystem::OnQuitGamePressed });
+
+			
+		}
+
+
+
+
+		//for (auto itr = buttonFuncAndTexture.begin(); itr != buttonFuncAndTexture.end(); itr++)
+		//{
+		//	// Access the first and second elements of the Texture array for the current key
+		//	Texture* texture0 = &itr->second[0]; // Texture[0]
+		//	Texture* texture1 = &itr->second[1]; // Texture[1]
+
+		//	// Create buttons using texture0 and texture1
+		//	AddButton(ecs::NewEntity(), Vector3(0, verticalOffset * i, -0.1f), texture0, texture1, scaleNormal, scaleSelected);
+
+		//	//AddButton
+		//	ecs::AddComponent(entity, Transform{ .position = pos, .scale = scaleNormal });
+		//	ecs::AddComponent(entity, SpriteRenderer{ .texture = unselectedTexture,  .enabled = false, .uiElement = true });
+		//	ecs::AddComponent(entity, PauseComponent{ .upper = mainMenuButton, .lower = resumeButton, .selectedTexture = allTextures[12], .unselectedTexture = allTextures[13], .operation = PauseSystem::OnQuitGamePressed });
+
+
+		//	i++;
+		//}
+	}
+
 	void MoveUpper()
 	{
 		printf("Move upper\n");
@@ -271,15 +326,15 @@ public:
 	{
 		return ecs::GetComponent<PauseComponent>(currentSelection).isSlider;
 	}
-    PauseComponent& GetCurrentSelectedPauseComponent()
+	PauseComponent& GetCurrentSelectedPauseComponent()
 	{
 		return ecs::GetComponent<PauseComponent>(currentSelection);
 	}
-	ecs::Entity GetCurrentSelection() 
+	ecs::Entity GetCurrentSelection()
 	{
-		 return currentSelection;
+		return currentSelection;
 	}
-	static void BackToUIMenu() 
+	static void BackToUIMenu()
 	{
 		ecs::GetSystem<PauseSystem>()->ToggleShowUIMenu();
 
@@ -350,7 +405,7 @@ public:
 		selectedSpriteRenderer.texture = pauseComponent.selectedTexture;
 
 	}
-	void SetCurrentSelection(ecs::Entity entity) 
+	void SetCurrentSelection(ecs::Entity entity)
 	{
 		PauseComponent& pauseComponent = ecs::GetComponent<PauseComponent>(entity);
 		SpriteRenderer& selectedSpriteRenderer = ecs::GetComponent<SpriteRenderer>(entity);
@@ -362,26 +417,26 @@ public:
 	void UpdateSlider()
 	{
 		// TODO: change 	sliderValue dosent update in main Fix need pointer or reference
-		
+
 
 		PauseComponent& pauseComponent = ecs::GetComponent<PauseComponent>(currentSelection);
 		Transform& selectedSliderTransform = ecs::GetComponent<Transform>(currentSelection);
 		PauseComponent& pauseComponentNub = ecs::GetComponent<PauseComponent>(musicSliderNub);
 		Transform& nubTransform = ecs::GetComponent<Transform>(musicSliderNub);
-		nubTransform.position =  Vector3(pauseComponentNub.sliderValue, 0, 0);
+		nubTransform.position = Vector3(pauseComponentNub.sliderValue, 0, 0);
 		printf("pauseComponentNub.sliderValue ");
-		std::cout << pauseComponentNub.sliderValue ;
+		std::cout << pauseComponentNub.sliderValue;
 		printf("\n");
-		std::cout << "Nub pos:" <<"x:"<<  nubTransform.position.x << " y:" << nubTransform.position.y << "\n";
+		std::cout << "Nub pos:" << "x:" << nubTransform.position.x << " y:" << nubTransform.position.y << "\n";
 
 	}
 
 	void MoveSliderRight()
-	{		
+	{
 		PauseComponent& pauseComponentNub = ecs::GetComponent<PauseComponent>(musicSliderNub);
 		Transform& nubTransform = ecs::GetComponent<Transform>(musicSliderNub);
-		nubTransform.position += Vector3(0.01f, 0, 0);	
-		nubTransform.position.x  = clamp(nubTransform.position.x, -0.17f, 0.17f);
+		nubTransform.position += Vector3(0.01f, 0, 0);
+		nubTransform.position.x = clamp(nubTransform.position.x, -0.17f, 0.17f);
 		printf("pauseComponentNub.sliderValue ");
 		std::cout << pauseComponentNub.sliderValue;
 		printf("\n");
@@ -391,7 +446,7 @@ public:
 	{
 		PauseComponent& pauseComponentNub = ecs::GetComponent<PauseComponent>(musicSliderNub);
 		Transform& nubTransform = ecs::GetComponent<Transform>(musicSliderNub);
-		nubTransform.position -=  Vector3(0.01f, 0, 0);
+		nubTransform.position -= Vector3(0.01f, 0, 0);
 		nubTransform.position.x = clamp(nubTransform.position.x, -0.17f, 0.17f);
 		printf("pauseComponentNub.sliderValue ");
 		std::cout << pauseComponentNub.sliderValue;
@@ -418,15 +473,15 @@ public:
 			//Get the entity and increment the iterator
 			ecs::Entity entity = *itr++;
 			bool& isOptionsMenu = ecs::GetComponent<PauseComponent>(entity).isOptionsMenu;
-			
+
 			bool& enabled = ecs::GetComponent<SpriteRenderer>(entity).enabled;
 			PauseComponent& pauseComponent = ecs::GetComponent<PauseComponent>(entity);
 			SpriteRenderer& spriteRenderer = ecs::GetComponent<SpriteRenderer>(entity);
 			spriteRenderer.texture = pauseComponent.unselectedTexture;
 
 			enabled = !enabled;
-			
-			
+
+
 
 		}
 
@@ -435,7 +490,7 @@ public:
 		Transform& selectedSpriteTransform = ecs::GetComponent<Transform>(currentSelection);
 		selectedSpriteTransform.scale = Vector3(0.32f);
 		selectedSpriteRenderer.texture = pauseComponent.selectedTexture;
-		
+
 	}
 
 };

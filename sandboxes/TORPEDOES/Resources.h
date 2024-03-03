@@ -20,6 +20,8 @@ namespace resources
 
 	Tilemap* level1Map;
 
+	//Load all the global resources here
+	//Stuff that is only used in one system can be loaded there 
 	void LoadResources(Camera* cam)
 	{
 		niagaraFont = new Font("Niagara Solid.ttf", 0, 0, 48);
