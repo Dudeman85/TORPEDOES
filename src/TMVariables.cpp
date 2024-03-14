@@ -29,30 +29,93 @@ source distribution.
 
 void TMVariables::fetchData(const std::string tilemapPath)
 {
+	// Temporal class for TMap
+	// used to store values to struct
+	TMap tmap;
+
+	// Temporal class for TGroup
+	// used to store values to struct
+	TGroup tgroup;
+
+	// Temporal class for TObject
+	// used to store values to struct
+	TObject tobject;
+
+	// Temporal class for TLayer
+	// used to store values to struct
+	TLayer tlayer;
+
+	// Temporal class for TSet
+	// used to store values to struct
+	TSet tset;
+
+	// Temporal class for TTile
+	// used to store values to struct
+	TTile ttile;
+
 	// map class for tmx::Map functions
 	tmx::Map map;
 	// Loading tilemap from filepath.
 	map.load(tilemapPath);
-	// Temp list of tilesets
+	// Get all the tilesets from
+	// tilemap
 	const auto& tilesets = map.getTilesets();
 	// Iterate through tilesets
 	for (const auto& tileset : tilesets)
 	{
-		// Get the list of tiles in this tileset
+		// Get the list of tiles
+		// in this tileset
 		const auto& tiles = tileset.getTiles();
 		// Iterate through the tiles
 		for (const auto& tile : tiles)
 		{
-			TTile Tile;
+			// Get the tile properties
 			const auto& properties = tile.properties;
-
-			for (const auto& prop : properties)
+			// Iterate through tile properties
+			for (const auto& property : properties)
 			{
-
+				// Insert the property values in to struct
+				ttile.tile.insert(property.getName(), property.getStringValue());
 			}
+			// Insert the tile into
+			// tileset struct
+			tset.tiles.push_back(ttile);
 		}
+		// Get the tileset properties
+		const auto& properties = tileset.getProperties();
+		// Iterate the property values in to struct
+		for (const auto& property : properties)
+		{
+			// Insert the property values in to struct
+			tset.tileset.insert(property.getName(), property.getStringValue());
+		}
+		// Insert the tileset
+		// in to tilemap struct
+		tmap.tilesets.push_back(tset);
 	}
 
+	// Get all the layers
+	// from tilemap
+	const auto& aLayers = map.getLayers();
+	// Iterate through all layers
+	for (const auto& layer : aLayers)
+	{
+		// get layer's type
+		const auto& layerType = layer->getType();
+
+		switch (layerType)
+		{
+		case tmx::Layer::Type::Group:
+
+			break;
+		case tmx::Layer::Type::Object:
+			break;
+		case tmx::Layer::Type::Tile:
+			break;
+		default:
+			break;
+		}
+	}
 
 
 }
