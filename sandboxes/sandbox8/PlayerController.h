@@ -1,5 +1,6 @@
 #pragma once 
 #include "Resources.h"
+#include <cmath>
 #include <engine/Application.h>
 #include "Projectiles.h"
 
@@ -308,6 +309,8 @@ public:
 				// Create a projectile using the parameters of the player object.
 				if (player.projectileTime1 <= 0.0f)
 				{
+				
+
 					CreateHedgehog(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
 					// Reset the projectile time to a cooldown 
 					player.projectileTime1 = 0.0f;
@@ -352,7 +355,7 @@ public:
 			//Create the player entity which contains everything but rendering
 			ecs::AddComponent(player, Player{ .id = i, .minAceleration = 120, .renderedEntity = playerRender, .nameText = playerNameText });
 			ecs::AddComponent(player, Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
-			ecs::AddComponent(player, Rigidbody{ .drag = 0.025 });
+			ecs::AddComponent(player, Rigidbody{ .gravityScale = 0, .drag = 0.025,  });
 			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
 			ecs::AddComponent(player, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
 
