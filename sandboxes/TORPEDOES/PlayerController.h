@@ -1,9 +1,8 @@
 #pragma once 
-#include "Resources.h"
 #include <engine/Application.h>
+#include "Resources.h"
 #include "Projectiles.h"
 
-// Declaration of the entity component system (ECS) instance
 using namespace engine;
 
 ECS_REGISTER_COMPONENT(Player)
@@ -347,6 +346,7 @@ public:
 			ecs::Entity playerRender = ecs::NewEntity();
 			ecs::Entity torpIndicator1 = ecs::NewEntity();
 			ecs::Entity torpIndicator2 = ecs::NewEntity();
+
 
 
 			//Create the player entity which contains everything but rendering
