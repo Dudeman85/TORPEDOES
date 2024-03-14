@@ -200,16 +200,16 @@ public:
 			PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
 
 			// Initialize inputs
-			float accelerationInput =	input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_Y);
-			float rotateInput =			input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_X);
-			bool ProjetileInput =		input::GetPressed("Shoot" + std::to_string(player.id));
+			float accelerationInput = input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_Y);
+			float rotateInput = input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_X);
+			bool ProjetileInput = input::GetPressed("Shoot" + std::to_string(player.id));
 
 			accelerationInput = std::clamp(accelerationInput, -1.0f, 1.0f);
 			rotateInput = std::clamp(rotateInput, -1.0f, 1.0f);
 
-		// Movement
+			// Movement
 
-			// Torpedo hit logic
+				// Torpedo hit logic
 			if (player.isHit == true)
 			{
 				// Rotate player 360 degrees
