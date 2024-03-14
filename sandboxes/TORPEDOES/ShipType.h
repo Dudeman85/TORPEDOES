@@ -54,16 +54,19 @@ public:
 };
 
 
+class MyClass : public ecs::System
+{
+};
+
 ECS_REGISTER_COMPONENT(Pt_10Component, Texture)
 struct Pt_10Component
 {
 	float projectileTimer;
 	float cooldown = 2;
-
 };
 
 ECS_REGISTER_SYSTEM(Pt_10System, Pt_10Component, Transform)
-class Pt_10System : public ecs::System
+class Pt_10System : public MyClass
 {
 public:
 	void Update()
