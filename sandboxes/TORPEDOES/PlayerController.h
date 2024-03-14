@@ -5,21 +5,33 @@
 
 using namespace engine;
 
+
+enum ShipType { torpedoBoat, submarine, cannonBoat, hedgehogBoat, pirateShip };
 ECS_REGISTER_COMPONENT(Player)
 struct Player
 {
+	ShipType shipType; //This might not be necessary
+
 	int id = 0;
 
-	//Movement params
-	float accelerationSpeed = 400;
-	float minAceleration = 1;    // Minimum acceleration while rotating
-	float rotationSpeed = 75;    // Rotation speed
+	//Movement stats
+	float accelerationSpeed;
+	float rotationSpeed;
+	//Minimum acceleration while rotating
+	float minAceleration = 100;
 
-	//Projectile timers
-	//TODO move to ship type logic
-	float projectileTime1 = 0.0f;  // time 1  projectile 
-	float projectileTime2 = 0.0f;  // time 2  projectile
-	float projectileTime3 = 0.0f;  // time 3  peojectile
+	//Action cooldowns
+	float mainCooldown;
+	float specialCooldown;
+
+	//Action timers
+	float actionTimer1 = 0.0f;
+	float projectileTime2 = 0.0f;
+	float projectileTime3 = 0.0f;
+
+	//Action functions
+	std::function<void(ecs::Entity, int)> mainAction;
+	std::function<void(ecs::Entity, int)> specialAction;
 
 	//Checkpoint stuff
 	int previousCheckpoint = -1;
@@ -49,15 +61,37 @@ class PlayerController : public ecs::System
 	static bool hasWon;
 	static int lapCount; // How many laps to race through
 
+	//A map from a ship type to a pre-initialized Player component with the proper stats
+	std::unordered_map<ShipType, Player> shipComponents;
+	//A map from a ship type to its 3D model
+	std::unordered_map<ShipType, Model*> shipModels;
+
 public:
 	float countdownTimer = 0;
 
 	void Init()
 	{
+		//Create the entity to be shown at a win
 		winScreen = ecs::NewEntity();
 		ecs::AddComponent(winScreen, TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.5, 2, 1), .scale = Vector3(0.03f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
 		ecs::AddComponent(winScreen, SpriteRenderer{ .texture = resources::winSprite, .enabled = false, .uiElement = true });
 		ecs::AddComponent(winScreen, Transform{ .position = Vector3(0, 0, 0.5f), .scale = Vector3(0.3f) });
+
+		//Initialize each ship type's stats
+		shipComponents.insert({ ShipType::torpedoBoat,
+			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+		shipComponents.insert({ ShipType::submarine,
+			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+		shipComponents.insert({ ShipType::cannonBoat,
+			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+		shipComponents.insert({ ShipType::hedgehogBoat,
+			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+
+		//Initialize ship type models
+		shipModels.insert({ ShipType::torpedoBoat, resources::laMuerteModel });
+		shipModels.insert({ ShipType::submarine, resources::laMuerteModel });
+		shipModels.insert({ ShipType::cannonBoat, resources::laMuerteModel });
+		shipModels.insert({ ShipType::hedgehogBoat, resources::laMuerteModel });
 	}
 
 	//Get the min and max bounds of every player
@@ -305,11 +339,11 @@ public:
 			if (ProjetileInput && player.projectileTime3 <= 0.0f)
 			{
 				// Create a projectile using the parameters of the player object.
-				if (player.projectileTime1 <= 0.0f)
+				if (player.actionTimer1 <= 0.0f)
 				{
 					CreateProjectile(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
 					// Reset the projectile time to a cooldown 
-					player.projectileTime1 = 0.0f;
+					player.actionTimer1 = 5.f;
 					// Create a cooldown time between shots.
 					player.projectileTime3 = 0.2f;
 				}
@@ -317,13 +351,13 @@ public:
 				else if (player.projectileTime2 <= 0.0f)
 				{
 					CreateProjectile(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
-					player.projectileTime2 = 0.0f;
+					player.projectileTime2 = 5.f;
 					player.projectileTime3 = 0.2f;
 				}
 			}
 
 			// Decrease the projectile time by the elapsed time (dt)
-			player.projectileTime1 -= dt;
+			player.actionTimer1 -= dt;
 			player.projectileTime2 -= dt;
 			player.projectileTime3 -= dt;
 
@@ -335,7 +369,7 @@ public:
 	}
 
 	//Spawn 1-4 players, all in a line from top to bottom
-	static void CreatePlayers(int count, Vector2 startPos)
+	void CreatePlayers(int count, Vector2 startPos, std::vector<ShipType> shipTypes)
 	{
 		Vector2 offset(0, 60);
 		for (int i = 0; i < count; i++)
@@ -349,7 +383,13 @@ public:
 
 
 			//Create the player entity which contains everything but rendering
-			ecs::AddComponent(player, Player{ .id = i, .minAceleration = 120, .renderedEntity = playerRender, .nameText = playerNameText });
+			//Player component is a bit special
+			ecs::AddComponent(player, shipComponents[shipTypes[i]]);
+			Player& playerComponent = ecs::GetComponent<Player>(player);
+			playerComponent.id = i;
+			playerComponent.renderedEntity = playerRender;
+			playerComponent.nameText = playerNameText;
+
 			ecs::AddComponent(player, Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			ecs::AddComponent(player, Rigidbody{ .drag = 0.025 });
 			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };

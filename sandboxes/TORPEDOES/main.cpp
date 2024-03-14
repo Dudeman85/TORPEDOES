@@ -53,7 +53,7 @@ void LoadLevel1(Camera* cam)
 	collisionSystem->SetTilemap(resources::level1Map);
 	PhysicsSystem::SetTileProperty(1, TileProperty{ true });
 
-	ecs::GetSystem<PlayerController>()->CreatePlayers(4, Vector2(1434.0f, -1370.0f));
+	ecs::GetSystem<PlayerController>()->CreatePlayers(4, Vector2(1434.0f, -1370.0f), std::vector<ShipType>{ShipType::torpedoBoat,ShipType::torpedoBoat, ShipType::torpedoBoat, ShipType::torpedoBoat});
 
 	//Make all the checkpoints manually
 	CreateCheckpoint(Vector3(2100.226807, -963.837402, 100.000000), Vector3(30.000000, 159.245773, 0.000000), Vector3(17), resources::checkPointModel, 45.0f);
@@ -146,10 +146,6 @@ int main()
 		if (!pauseSystem->isGamePause)
 		{
 			playerController->Update(window, deltaTime);
-
-			//u_99System ->Update();
-			//pt_10System->Update();
-			//laMuerte-> Update();
 		}
 		// if paused or Pause pressed update PauseSystem
 		if (pauseSystem->isGamePause || input::GetNewPress("Pause"))
