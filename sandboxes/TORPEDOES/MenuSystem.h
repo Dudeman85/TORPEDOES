@@ -5,6 +5,246 @@
 #include <functional>
 #include "engine/Input.h"  
 
+struct ButtonData
+{
+	int  id;
+
+	std::string name;
+	Vector3 normalScale;
+	Vector3 SelectedScale;
+	Texture* selected, unselected;
+	std::function<void()>callback;
+};
+//PlayerShipSelection
+ECS_REGISTER_COMPONENT(PlayerSelection)
+struct PlayerSelection
+{
+
+	int playerID;
+	int selection;
+	float cooldownToMoveSelection;
+	bool ready = false;
+	vector<ecs::Entity> visuals;
+
+};
+
+ECS_REGISTER_SYSTEM(PlayerSelectSystem, PlayerSelection, Transform)
+class PlayerSelectSystem : public ecs::System
+{
+	const float cooldownTime = 2;
+	//ecs::Entity playerSelection;
+
+	bool isPlayersReady = false;
+	vector<Texture*> textures;
+
+	ecs::Entity selectionWindow;
+
+	ecs::Entity arrowRight;
+	ecs::Entity arrowLeft;
+	ecs::Entity	shipModel;
+	ecs::Entity	readyText;
+
+public:
+	~PlayerSelectSystem()
+	{
+
+	}
+
+	bool isShipSelectionMenuOn = false;
+
+	vector< std::function<void()> >shipButtonFunctions
+	{
+		BackToUIMenu
+
+	};
+	void Init()
+	{
+		textures.push_back(new engine::Texture("GUI/UI_Green_Torpedo_Icon.png", GL_LINEAR_MIPMAP_NEAREST));
+		textures.push_back(new engine::Texture("GUI/UI_Checkmark.png", GL_LINEAR_MIPMAP_NEAREST));
+
+
+		input::ConstructDigitalEvent("MoveUp");
+		input::ConstructDigitalEvent("MoveDown");
+		input::ConstructDigitalEvent("Select");
+		input::ConstructDigitalEvent("Pause");
+		input::ConstructDigitalEvent("MoveRight");
+		input::ConstructDigitalEvent("MoveLeft");
+
+
+		input::ConstructDigitalEvent("Shoot0");
+		input::ConstructDigitalEvent("Shoot1");
+		input::ConstructDigitalEvent("Shoot2");
+		input::ConstructDigitalEvent("Shoot3");
+
+		input::ConstructDigitalEvent("MoveRight0");
+		input::ConstructDigitalEvent("MoveLeft0");
+		input::ConstructDigitalEvent("MoveRight1");
+		input::ConstructDigitalEvent("MoveLeft1");
+		input::ConstructDigitalEvent("MoveRight2");
+		input::ConstructDigitalEvent("MoveLeft2");
+		input::ConstructDigitalEvent("MoveRight3");
+		input::ConstructDigitalEvent("MoveLeft3");
+
+		input::ConstructDigitalEvent("MoveUp0");
+		input::ConstructDigitalEvent("MoveDown0");
+		input::ConstructDigitalEvent("MoveUp1");
+		input::ConstructDigitalEvent("MoveDown1");
+		input::ConstructDigitalEvent("MoveUp2");
+		input::ConstructDigitalEvent("MoveDown2");
+		input::ConstructDigitalEvent("MoveUp3");
+		input::ConstructDigitalEvent("MoveDown3");
+
+		input::ConstructDigitalEvent("SelectShip");
+		//TODO: add controller input
+		input::bindDigitalInput(GLFW_KEY_SPACE, { "Shoot0" });
+		input::bindDigitalInput(GLFW_KEY_1, { "Shoot1" });
+		input::bindDigitalInput(GLFW_KEY_2, { "Shoot2" });
+		input::bindDigitalInput(GLFW_KEY_3, { "Shoot3" });
+
+		input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft" });
+		input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight" });
+		input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp0" });
+		input::bindDigitalInput(GLFW_KEY_DOWN, { "MoveDown0" });
+		input::bindDigitalInput(GLFW_KEY_ENTER, { "Select" });
+		input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
+		input::bindDigitalInput(GLFW_KEY_U, { "SelectShip" });
+
+		for (int i = 0; i < 4; i++)
+		{
+
+			selectionWindow = ecs::NewEntity();
+			arrowRight = ecs::NewEntity();
+			arrowLeft = ecs::NewEntity();
+			shipModel = ecs::NewEntity();
+			readyText = ecs::NewEntity();
+
+			vector<ecs::Entity> visuals
+			{
+				arrowRight,
+				arrowLeft,
+				shipModel,
+				readyText
+			};
+
+			ecs::AddComponent(arrowRight, Transform{ .position = Vector3(0.5f,0,-0.1f), .rotation = 180, .scale = Vector3(0.2f) });
+			ecs::AddComponent(arrowRight, SpriteRenderer{ .texture = textures[0] , .enabled = false, .uiElement = true });
+			ecs::AddComponent(arrowLeft, Transform{ .position = Vector3(-0.5f,0,-0.1f), .rotation = 0 , .scale = Vector3(0.2f) });
+			ecs::AddComponent(arrowLeft, SpriteRenderer{ .texture = textures[0] , .enabled = false, .uiElement = true });
+
+			ecs::AddComponent(shipModel, Transform{ .position = Vector3(0,-0.2f,-0.1f) , .scale = 0 });
+			ecs::AddComponent(shipModel, ModelRenderer{ .model = resources::laMuerteModel });
+
+			ecs::AddComponent(readyText, Transform{ .position = Vector3(0,-0.2f,-0.1f) });
+			ecs::AddComponent(readyText, TextRenderer{ .font = resources::niagaraFont, .text = "unready" });
+
+
+			ecs::AddComponent(selectionWindow, Transform{ .position = Vector3(0,0,0), .scale = Vector3(1,1,-0.1f) });
+			ecs::AddComponent(selectionWindow, PlayerSelection{ .playerID = i , .visuals = visuals });
+
+
+			TransformSystem::AddParent(arrowRight, selectionWindow);
+			TransformSystem::AddParent(arrowLeft, selectionWindow);
+			TransformSystem::AddParent(shipModel, selectionWindow);
+			TransformSystem::AddParent(readyText, selectionWindow);
+
+
+
+		}
+
+
+	}
+	void Update()
+	{
+
+
+		for (auto itr = entities.begin(); itr != entities.end();)
+		{
+			ecs::Entity entity = *itr++;
+
+
+			//Player& player = ecs::GetComponent<Player>(entity);
+			PlayerSelection& playerSelection = ecs::GetComponent<PlayerSelection>(entity);
+			if (playerSelection.playerID)
+			{
+				std::cout << "\n\n\nplayerSelection.playerID" << playerSelection.playerID << "\n\n\n";
+
+				//Check players input	
+				// 
+				if (playerSelection.playerID == 0)
+				{
+
+
+					if (input::GetNewPress("MoveUp" + playerSelection.playerID))
+					{
+						printf("\n\n\nShip Selection moveUP\n\n\n");
+
+					}
+
+					if (input::GetNewPress("MoveDown" + playerSelection.playerID))
+					{
+						printf("\n\n\nShip Selection moveDown\n\n\n");
+					}
+				}
+				/*	if (input::GetNewPress("Shoot"+ id))
+					{
+						printf("Ship Selection Shoot\n");
+					}*/
+
+			}
+
+
+
+		}
+		if (isPlayersReady)
+		{	//start game	
+			printf("start game\n");
+		}
+
+
+	}
+	void ToggleMenuPlayerSelection()
+	{
+		printf("in MenuPlayerSelection\n");
+		//isShipSelectionMenuOn ? isShipSelectionMenuOn = false : true;
+		/*isShipSelectionMenuOn =  true;*/
+		for (auto itr = entities.begin(); itr != entities.end();)
+		{
+			//Get the entity and increment the iterator
+			ecs::Entity entity = *itr++;
+
+			if (isShipSelectionMenuOn)// Show every thing
+			{
+				ecs::GetComponent<SpriteRenderer>(arrowRight).enabled = true;
+				ecs::GetComponent<SpriteRenderer>(arrowLeft).enabled = true;
+				ecs::GetComponent<Transform>(shipModel).scale = Vector3(1, 1, -0.1f);
+
+				ecs::GetComponent<TextRenderer>(readyText).text = "UNready";
+
+			}
+
+			if (!isShipSelectionMenuOn)	//hide every thing
+			{
+
+				ecs::GetComponent<SpriteRenderer>(arrowRight).enabled = false;
+				ecs::GetComponent<SpriteRenderer>(arrowLeft).enabled = false;
+				ecs::GetComponent<Transform>(shipModel).scale = Vector3(0, 0, -0.1f);
+
+				ecs::GetComponent<TextRenderer>(readyText).text = "UNready";
+
+			}
+
+			printf("in MenuPlayerSelection for loop\n");
+		}
+		printf("Out MenuPlayerSelection\n\n\n");
+	};
+	static void BackToUIMenu()
+	{
+		ecs::GetSystem<PlayerSelectSystem>()->ToggleMenuPlayerSelection();
+
+	}
+
+};
+
 //Pause Component
 ECS_REGISTER_COMPONENT(PauseComponent)
 struct PauseComponent
@@ -230,6 +470,45 @@ public:
 		ecs::AddComponent(fullscreenEntity, PauseComponent{ .upper = mainMenuButton, .lower = resumeButton, .selectedTexture = allTextures[12], .unselectedTexture = allTextures[13], .operation = PauseSystem::OnQuitGamePressed });
 
 	}
+	void CreateColumOfButtons(float verticalOffset, vector<ButtonData> buttonData)
+	{
+		int i = 0;
+
+		for (vector<ButtonData>::iterator buttonIterator = buttonData.begin(); buttonIterator < buttonData.end(); buttonIterator++)
+		{
+			auto& button = *buttonIterator;
+			auto upper = buttonIterator--;
+			auto lower = buttonIterator++;
+			auto& upperButton = upper;
+			auto& lowerButton = lower;
+			ecs::AddComponent(button.id, Transform{ .position = *new Vector3(0,.8f,-0.1f), .scale = button.normalScale });
+			ecs::AddComponent(button.id, SpriteRenderer{ .texture = &button.unselected,  .enabled = false, .uiElement = true });
+			//TODO	//ecs::AddComponent(button.id, PauseComponent{ .upper = upperButton.id, .lower = lowerButton, .selectedTexture = allTextures[12], .unselectedTexture = allTextures[13], .operation = PauseSystem::OnQuitGamePressed });
+
+
+		}
+
+
+
+
+		//for (auto itr = buttonFuncAndTexture.begin(); itr != buttonFuncAndTexture.end(); itr++)
+		//{
+		//	// Access the first and second elements of the Texture array for the current key
+		//	Texture* texture0 = &itr->second[0]; // Texture[0]
+		//	Texture* texture1 = &itr->second[1]; // Texture[1]
+
+		//	// Create buttons using texture0 and texture1
+		//	AddButton(ecs::NewEntity(), Vector3(0, verticalOffset * i, -0.1f), texture0, texture1, scaleNormal, scaleSelected);
+
+		//	//AddButton
+		//	ecs::AddComponent(entity, Transform{ .position = pos, .scale = scaleNormal });
+		//	ecs::AddComponent(entity, SpriteRenderer{ .texture = unselectedTexture,  .enabled = false, .uiElement = true });
+		//	ecs::AddComponent(entity, PauseComponent{ .upper = mainMenuButton, .lower = resumeButton, .selectedTexture = allTextures[12], .unselectedTexture = allTextures[13], .operation = PauseSystem::OnQuitGamePressed });
+
+
+		//	i++;
+		//}
+	}
 	void MoveUpper()
 	{
 		printf("Move upper\n");
@@ -399,6 +678,10 @@ public:
 		std::cout << "Nub pos:" << "x:" << nubTransform.position.x << " y:" << nubTransform.position.y << "\n";
 
 	}
+	void ToggleShowUIShipSelection() 
+	{
+
+	}
 	void ToggleShowUIOptionsMenu()
 	{
 
@@ -442,138 +725,3 @@ public:
 GLFWwindow* PauseSystem::window = window;
 
 
-//enum class GameStates 
-//{
-//      GamePlay,MainMenu,Pause,Credits,Quit
-//};
-//enum class SelectionsInMenu {
-//    Start,
-//    Options,
-//    Exit
-//};
-//enum class SelectionsInQuit {
-//    Yes,
-//    No
-//};
-//enum class SelectionsInPause {
-//    Continue, MainMenu, Options
-//};
-//
-//class GameStateMachine {
-//public:
-//    // Constructor with initial state
-//    GameStateMachine() : currentGameState(GameStates::MainMenu) {}
-//
-//    // Method to transition to the next state
-//    void nextState() {
-//        switch (currentGameState) {
-//        case GameStates::MainMenu:
-//            std::cout << "Show main menu options\n";
-//             SelectionsInMenu::Start;
-//             SelectionsInMenu::Options;
-//             SelectionsInMenu::Exit;
-//            break;
-//
-//        case GameStates::GamePlay:
-//            std::cout << "Run game\n";           
-//            break;
-//
-//        case GameStates::Pause:
-//            std::cout << "Show pause menu\n";
-//
-//            currentGameState = SelectionsInPause::Start;
-//            break;
-//
-//        case GameStates::Credits:
-//            std::cout << "Transitioning from State2 to State3\n";
-//            currentGameState = SelectionsInMenu::Exit;
-//            break;
-//
-//        case GameStates::Quit:
-//            std::cout << "Transitioning from State2 to State3\n";
-//            currentGameState = SelectionsInMenu::Exit;
-//            break;
-//        }
-//    }
-//
-//    // Method to perform actions based on the current state
-//    void ActionAvailableInThisGameState() {
-//        switch (currentGameState) {
-//        case GameStates::MainMenu:
-//            std::cout << "Show main menu options\n";
-//            SelectionsInMenu::Start;
-//            SelectionsInMenu::Options;
-//            SelectionsInMenu::Exit;
-//            break;
-//        case SelectionsInMenu::Options:
-//            std::cout << "Performing action in State2\n";
-//            break;
-//        case SelectionsInMenu::Exit:
-//            std::cout << "Performing action in State3\n";
-//            break;
-//        }
-//    }
-//
-//private:
-//    GameStates currentGameState;
-//    SelectionsInPause SelectionsInPause
-//};
-//
-//int main() {
-//    GameStateMachine stateMachine;
-//
-//    for (int i = 0; i < 3; ++i) {
-//        stateMachine.performAction();
-//        stateMachine.nextState();
-//    }
-//
-//    return 0;
-//}
-
-////USER INTERFACE component
-//ECS_REGISTER_COMPONENT(UI, SpriteRenderer, Texture, Transform)
-//struct selection : ecs::Component
-//{
-//	Menu upper;
-//	Menu lower;
-//	std::function<void()>  callback;
-//};
-//
-//
-//
-//ECS_REGISTER_SYSTEM(Menu,Transform, SpriteRenderer, selection)
-//class Menu : public ecs::System 
-//{
-//	bool isMenuActive = true;
-//	selection oldSelection;
-//	selection currentSelection;
-//
-//public : 
-//	void Update() 
-//	{
-//		if (isMenuActive) 
-//		{
-//			
-//			if (OnUpArrowPressed()) 
-//			{
-//				currentSelection = currentSelection.upper;
-//			}
-//			if (OnDownArrowPressed())
-//			{
-//				currentSelection = currentSelection.lower;
-//			}
-//			if (OnEnterPressed() && NULL != currentSelection.callback())
-//			{
-//				currentSelection.callback();
-//			}
-//		}
-//
-//	}
-//
-//	//Draw selected button as selected and draw oldSelection as normal 
-//	RendererVisuals()
-//	{
-//
-//	}
-//
-//};

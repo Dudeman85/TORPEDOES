@@ -85,7 +85,11 @@ void SetupInput()
 	input::ConstructDigitalEvent("Shoot1");
 	input::ConstructDigitalEvent("Shoot2");
 	input::ConstructDigitalEvent("Shoot3");
-	//TODO: add controller input
+
+	input::ConstructDigitalEvent("SelectShip");
+	
+	
+	input::bindDigitalInput(GLFW_KEY_U, { "SelectShip" });
 
 	input::bindDigitalInput(GLFW_KEY_SPACE, { "Shoot0" });
 	input::bindDigitalInput(GLFW_KEY_1, { "Shoot1" });
@@ -121,6 +125,8 @@ int main()
 	pauseSystem->Init(window);
 	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
 	playerController->Init();
+	std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem = ecs::GetSystem<PlayerSelectSystem>();
+	ShipSelectionSystem->Init();
 
 	//Bind all input actions
 	SetupInput();
@@ -155,6 +161,10 @@ int main()
 		if (pauseSystem->isGamePause || input::GetNewPress("Pause"))
 		{
 			pauseSystem->Update();
+		}
+		if (input::GetNewPress("SelectShip"))
+		{
+			printf("Show ship selections");
 		}
 				
 		glfwSwapBuffers(window);
