@@ -1,7 +1,8 @@
 #pragma once
 #include <engine/Application.h>
 #include <functional>
-#include "engine/Input.h"  
+#include <engine/Input.h>  
+#include "PlayerController.h"
 //Author: Sauli Hanell month.day.year 2.22.2024
 
 enum  shipTypes { LaMuerte, pt_10, u_99, Hedgehog };
@@ -14,7 +15,7 @@ struct U_99Component
 	float cooldown = 2;
 };
 
-ECS_REGISTER_SYSTEM(U_99Component, Transform, Player)
+ECS_REGISTER_SYSTEM(U_99System, U_99Component, Transform)
 class U_99System : public ecs::System
 {
 
@@ -53,16 +54,19 @@ public:
 };
 
 
+class MyClass : public ecs::System
+{
+};
+
 ECS_REGISTER_COMPONENT(Pt_10Component, Texture)
 struct Pt_10Component
 {
 	float projectileTimer;
 	float cooldown = 2;
-
 };
 
-ECS_REGISTER_SYSTEM(Pt_10Component, Transform)
-class Pt_10System : public ecs::System
+ECS_REGISTER_SYSTEM(Pt_10System, Pt_10Component, Transform)
+class Pt_10System : public MyClass
 {
 public:
 	void Update()
@@ -75,7 +79,7 @@ public:
 			Pt_10Component& pt_10Component = ecs::GetComponent<Pt_10Component>(entity);
 			Player& player = ecs::GetComponent<Player>(entity);
 
-			if (pt_10Component.cooldown < pt_10Component.projectileTimer && input::GetNewPress("Shoot" + player.playerID))
+			if (pt_10Component.cooldown < pt_10Component.projectileTimer && input::GetNewPress("Shoot" + std::to_string(player.id)))
 			{
 				pt_10Component.projectileTimer = 0;
 				ShootProjectile();
@@ -102,7 +106,7 @@ struct LaMuerteComponent
 	float cooldown = 2;
 };
 
-ECS_REGISTER_SYSTEM(LaMuerteComponent, Transform)
+ECS_REGISTER_SYSTEM(LaMuerteSystem, LaMuerteComponent, Transform)
 class LaMuerteSystem : public ecs::System
 {
 public:
