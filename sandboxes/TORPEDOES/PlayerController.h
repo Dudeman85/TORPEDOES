@@ -81,7 +81,7 @@ public:
 		shipComponents.insert({ ShipType::torpedoBoat,
 			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 		shipComponents.insert({ ShipType::submarine,
-			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.accelerationSpeed = 800, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 		shipComponents.insert({ ShipType::cannonBoat,
 			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 		shipComponents.insert({ ShipType::hedgehogBoat,
@@ -89,7 +89,7 @@ public:
 
 		//Initialize ship type models
 		shipModels.insert({ ShipType::torpedoBoat, resources::laMuerteModel });
-		shipModels.insert({ ShipType::submarine, resources::laMuerteModel });
+		shipModels.insert({ ShipType::submarine, resources::checkPointModel });
 		shipModels.insert({ ShipType::cannonBoat, resources::laMuerteModel });
 		shipModels.insert({ ShipType::hedgehogBoat, resources::laMuerteModel });
 	}
@@ -317,8 +317,13 @@ public:
 			Vector2 forwardImpulse(0.0f, 0.0f);
 			if (rotateInput != 0.0f)
 			{
+				//Slow rotation based on throttle setting
+				//TODO: this function could be improved
+				float rotationScalar = 1 - log(2.0f * max(0.5f, accelerationInput));
+				std::cout << accelerationInput << std::endl;
+				std::cout << rotationScalar << std::endl;
 				// Apply forward impulse if rotating or receiving a rotation command
-				TransformSystem::Rotate(player.renderedEntity, 0, -rotateInput * player.rotationSpeed * dt, 0);
+				TransformSystem::Rotate(player.renderedEntity, 0, -rotateInput * player.rotationSpeed * rotationScalar * dt, 0);
 				forwardImpulse = forwardDirection * player.minAceleration * dt;
 			}
 
@@ -402,7 +407,7 @@ public:
 
 			//Create the player's rendered entity
 			ecs::AddComponent(playerRender, Transform{ .rotation = Vector3(45, 0, 0) });
-			ecs::AddComponent(playerRender, ModelRenderer{ .model = resources::laMuerteModel });
+			ecs::AddComponent(playerRender, ModelRenderer{ .model = shipModels[shipTypes[i]] });
 			TransformSystem::AddParent(playerRender, player);
 
 			//Create the players's torpedo indicators
