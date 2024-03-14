@@ -141,7 +141,7 @@ public:
 		}
 	}
 
-	/// PlayerControlle Update 
+	/// PlayerController Update 
 	void Update(GLFWwindow* window, float dt)
 	{
 		//Don't do anything untill countdown is done
@@ -151,20 +151,20 @@ public:
 			return;
 		}
 
-		//Iterate through entities in the system
+		// Iterate through entities in the system
 		for (auto itr = entities.begin(); itr != entities.end();)
 		{
-			//Get the entity and increment the iterator
+			// Get the entity and increment the iterator
 			ecs::Entity entity = *itr++;
 
-			//Get necessary components
+			// Get necessary components
 			Player& player = ecs::GetComponent<Player>(entity);
 			Transform& transform = ecs::GetComponent<Transform>(entity);
 			Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(entity);
 			PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
 
-			//initialize input zero 
+			// Initialize inputs as zero 
 			float accelerationInput = 0;
 			float rotateInput = 0;
 			bool ProjetileInput = 0;
@@ -179,6 +179,11 @@ public:
 				accelerationInput += +glfwGetKey(window, GLFW_KEY_A) - glfwGetKey(window, GLFW_KEY_Z);
 				rotateInput += -glfwGetKey(window, GLFW_KEY_COMMA) + glfwGetKey(window, GLFW_KEY_PERIOD);
 				ProjetileInput = glfwGetKey(window, GLFW_KEY_SPACE);
+
+				if(input::GetPressed("Shoot"))
+
+				accelerationInput += 
+
 			}
 			else
 			{
