@@ -11,6 +11,12 @@ struct Torpedo
 	int ownerID = 0;
 };
 
+//Temporary functin for testing
+void SpawnProjectile(ecs::Entity p, int playerID)
+{
+	std::cout << ecs::GetComponent<Transform>(p).position.ToString();
+}
+
 static void CreateAnimation(Vector3 animPosition)
 {
 	ecs::Entity torpedoAnim = ecs::NewEntity();
