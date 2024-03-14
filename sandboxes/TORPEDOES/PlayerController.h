@@ -200,16 +200,16 @@ public:
 			PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
 
 			// Initialize inputs
-			float accelerationInput =	input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_Y);
-			float rotateInput =			input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_X);
-			bool ProjetileInput =		input::GetPressed("Shoot" + std::to_string(player.id));
+			float accelerationInput = input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_Y);
+			float rotateInput = input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_X);
+			bool ProjetileInput = input::GetPressed("Shoot" + std::to_string(player.id));
 
 			accelerationInput = std::clamp(accelerationInput, -1.0f, 1.0f);
 			rotateInput = std::clamp(rotateInput, -1.0f, 1.0f);
 
-		// Movement
+			// Movement
 
-			// Torpedo hit logic
+				// Torpedo hit logic
 			if (player.isHit == true)
 			{
 				// Rotate player 360 degrees
@@ -241,9 +241,13 @@ public:
 			{
 				//Slow rotation based on throttle setting
 				//TODO: this function could be improved
-				float rotationScalar = 1 - log(2.0f * max(0.5f, accelerationInput));
-				std::cout << accelerationInput << std::endl;
-				std::cout << rotationScalar << std::endl;
+				float rotationScalar = 1 - log10(2.0f * std::max(0.5f, accelerationInput));
+				if (player.id == 0)
+				{
+					std::cout << accelerationInput << std::endl;
+					std::cout << rotationScalar << std::endl;
+
+				}
 				// Apply forward impulse if rotating or receiving a rotation command
 				TransformSystem::Rotate(player.renderedEntity, 0, -rotateInput * player.rotationSpeed * dt, 0);
 				forwardImpulse = forwardDirection * player.minAcceleration * dt;
