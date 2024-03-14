@@ -53,13 +53,14 @@ void LoadLevel1(Camera* cam)
 	collisionSystem->SetTilemap(resources::level1Map);
 	PhysicsSystem::SetTileProperty(1, TileProperty{ true });
 
-	ecs::GetSystem<PlayerController>()->CreatePlayers(4, Vector2(1434.0f, -1370.0f), std::vector<ShipType>{ShipType::torpedoBoat,ShipType::torpedoBoat, ShipType::torpedoBoat, ShipType::torpedoBoat});
+	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::torpedoBoat, ShipType::torpedoBoat, ShipType::torpedoBoat};
+	ecs::GetSystem<PlayerController>()->CreatePlayers(4, Vector2(1434.0f, -1370.0f), ships);
 
 	//Make all the checkpoints manually
 	CreateCheckpoint(Vector3(2100.226807, -963.837402, 100.000000), Vector3(30.000000, 159.245773, 0.000000), Vector3(17), resources::checkPointModel, 45.0f);
 	CreateCheckpoint(Vector3(2597.463135, -684.973389, 100.000000), Vector3(45.000000, 180.022018, 0.000000), Vector3(17), resources::checkPointModel, 45.0f);
 	CreateCheckpoint(Vector3(1668.260010, -990.794373, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), resources::checkPointModel, 45.0f);
-	CreateCheckpoint(Vector3(1043.635132, -875.206543, 100.000000), Vector3(45.000000, 179.241272, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); 
+	CreateCheckpoint(Vector3(1043.635132, -875.206543, 100.000000), Vector3(45.000000, 179.241272, 0.000000), Vector3(17), resources::checkPointModel, 45.0f);
 	CreateCheckpoint(Vector3(943.931152, -293.566711, 100.000000), Vector3(45.000000, 107.476852, 0.000000), Vector3(17), resources::checkPointModel, 45.0f);
 	CreateCheckpoint(Vector3(586.608276, -1249.448486, 100.000000), Vector3(45.000000, 40.070156, 0.000000), Vector3(17), resources::checkPointModel, 90.0f);
 	CreateCheckpoint(Vector3(1513.692383, -1462.996187, 50.000000), Vector3(90.000000, 90.901711, 0.000000), Vector3(14), resources::finishLineModel, -1, true); // 10
@@ -75,46 +76,39 @@ void LoadLevel1(Camera* cam)
 //Bind all input events here
 void SetupInput()
 {
-	input::ConstructDigitalEvent("Select");
 	input::ConstructDigitalEvent("Pause");
+	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
+	// TODO: add controller pause key
 
-	for (size_t i = 0; i < 2; i++)
+	for (size_t i = 0; i < 4; i++)
 	{
-		input::ConstructDigitalEvent("MoveUp" + std::to_string(i));
-		input::ConstructDigitalEvent("MoveDown" + std::to_string(i));
-		input::ConstructDigitalEvent("MoveRight" + std::to_string(i));
-		input::ConstructDigitalEvent("MoveLeft" + std::to_string(i));
+		input::ConstructAnalogEvent("Move" + std::to_string(i));
 
 		input::ConstructDigitalEvent("Shoot" + std::to_string(i));
-	}
-	for (size_t i = 2; i < 4; i++)
-	{
-		input::ConstructDigitalEvent("MoveUp" + std::to_string(i));
-		input::ConstructDigitalEvent("MoveDown" + std::to_string(i));
-		input::ConstructDigitalEvent("MoveRight" + std::to_string(i));
-		input::ConstructDigitalEvent("MoveLeft" + std::to_string(i));
+		input::ConstructDigitalEvent("Boost" + std::to_string(i));
 
-		input::ConstructDigitalEvent("Shoot" + std::to_string(i));
+		// Controller input
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
+		input::bindAnalogControllerInput(i, { GLFW_GAMEPAD_AXIS_LEFT_X, GLFW_GAMEPAD_AXIS_LEFT_Y }, { "Move" + std::to_string(i) });
 	}
 	
-	//TODO: add controller input
+	// Keyboard input for player 0
+	input::bindAnalogInput(GLFW_KEY_RIGHT, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_X);
+	input::bindAnalogInput(GLFW_KEY_LEFT, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_X, -1);
+	input::bindAnalogInput(GLFW_KEY_A, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y);
+	input::bindAnalogInput(GLFW_KEY_Z, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y, -1);
 
-	input::ConstructDigitalEvent("SelectShip");
-	
-	
-	input::bindDigitalInput(GLFW_KEY_U, { "SelectShip" });
+	input::bindDigitalInput(GLFW_KEY_N, { "Shoot0" });
+	input::bindDigitalInput(GLFW_KEY_M, { "Boost0" });
 
-	input::bindDigitalInput(GLFW_KEY_SPACE, { "Shoot0" });
-	input::bindDigitalInput(GLFW_KEY_1, { "Shoot1" });
-	input::bindDigitalInput(GLFW_KEY_2, { "Shoot2" });
-	input::bindDigitalInput(GLFW_KEY_3, { "Shoot3" });
-
+	/*
 	input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft0" });
 	input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight0" });
 	input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp0" });
 	input::bindDigitalInput(GLFW_KEY_DOWN, { "MoveDown0" });
 	input::bindDigitalInput(GLFW_KEY_ENTER, { "Select0" });
-	input::bindDigitalInput(GLFW_KEY_P, { "Pause0" });
+	*/
+	
 }
 
 int main()
@@ -157,10 +151,10 @@ int main()
 			glfwSetWindowShouldClose(window, true);
 
 		input::update();
-				
+
 		UpdateCam(window, cam, resources::level1Map);
 		engine::Update(&cam);
-		
+
 		// playerControl Update for frame if not paused
 		if (!pauseSystem->isGamePause)
 		{
@@ -171,11 +165,7 @@ int main()
 		{
 			pauseSystem->Update();
 		}
-		if (input::GetNewPress("SelectShip"))
-		{
-			printf("Show ship selections");
-		}
-				
+
 		glfwSwapBuffers(window);
 	}
 

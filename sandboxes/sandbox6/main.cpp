@@ -146,7 +146,7 @@ int main()
 	ecs::AddComponent(pFont1, TextRenderer{ .font = &stencilFont, .text = playerNames[0], .offset = Vector3(1.0f, -1.0f, 0), .scale = Vector3(0.5f), .color = Vector3(0.5f, 0.8f, 0.2f) });
 	ecs::AddComponent(pFont1, Transform{ .position = Vector3(1434.0f,-1449.0f, 100.0f) });
 	ecs::AddComponent(laMuerte, Transform{ .position = Vector3(1474.321533, -1435.868286, 100.000000), .rotation = Vector3(45.000000, 0.0000, 0.000000), .scale = Vector3(7) });
-	ecs::AddComponent(laMuerte, Player{ .accelerationSpeed = 300.0f, .minAceleration = 120.0f, .id = 0, .nameText = pFont1, .playername = playerNames[0], .playerLap = lap });
+	ecs::AddComponent(laMuerte, Player{ .accelerationSpeed = 300.0f, .minAcceleration = 120.0f, .id = 0, .nameText = pFont1, .playername = playerNames[0], .playerLap = lap });
 	ecs::AddComponent(laMuerte, ModelRenderer{ .model = &model });
 	ecs::AddComponent(laMuerte, Rigidbody{ .drag = 0.025f });
 	vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
@@ -161,7 +161,7 @@ int main()
 	ecs::AddComponent(pFont2, TextRenderer{ .font = &stencilFont, .text = playerNames[1], .offset = Vector3(1.0f, -1.0f, 0), .scale = Vector3(0.5f), .color = Vector3(0.5f, 0.8f, 0.2f) });
 	ecs::AddComponent(pFont2, Transform{ .position = Vector3(1434.0f,-1349.0f, 100.0f) });
 	ecs::AddComponent(laMuerte2, Transform{ .position = Vector3(1474.321533, -1369.868286, 100.000000), .rotation = Vector3(45.000000, 0.0000, 0.000000), .scale = Vector3(7) });
-	ecs::AddComponent(laMuerte2, Player{ .accelerationSpeed = 300.0f, .minAceleration = 120.0f, .id = 1, .nameText = pFont2,.playername = playerNames[1], .playerLap = lap });
+	ecs::AddComponent(laMuerte2, Player{ .accelerationSpeed = 300.0f, .minAcceleration = 120.0f, .id = 1, .nameText = pFont2,.playername = playerNames[1], .playerLap = lap });
 	ecs::AddComponent(laMuerte2, ModelRenderer{ .model = &model });
 	ecs::AddComponent(laMuerte2, Rigidbody{ .drag = 0.025f });
 	ecs::AddComponent(laMuerte2, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision , .visualise = false });
@@ -174,7 +174,7 @@ int main()
 	ecs::AddComponent(pFont3, TextRenderer{ .font = &stencilFont, .text = playerNames[2], .offset = Vector3(1.0f, -1.0f, 0), .scale = Vector3(0.5f), .color = Vector3(0.5f, 0.8f, 0.2f) });
 	ecs::AddComponent(pFont3, Transform{ .position = Vector3(1434.0f,-1549.0f, 100.0f) });
 	ecs::AddComponent(laMuerte3, Transform{ .position = Vector3(1474.321533, -1495.868286, 100.000000), .rotation = Vector3(45.000000, 0.0000, 0.000000), .scale = Vector3(7) });
-	ecs::AddComponent(laMuerte3, Player{ .accelerationSpeed = 300.0f, .minAceleration = 120.0f, .id = 2, .nameText = pFont3,.playername = playerNames[2], .playerLap = lap });
+	ecs::AddComponent(laMuerte3, Player{ .accelerationSpeed = 300.0f, .minAcceleration = 120.0f, .id = 2, .nameText = pFont3,.playername = playerNames[2], .playerLap = lap });
 	ecs::AddComponent(laMuerte3, ModelRenderer{ .model = &model });
 	ecs::AddComponent(laMuerte3, Rigidbody{ .drag = 0.025f });
 	ecs::AddComponent(laMuerte3, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision , .visualise = false });
@@ -187,7 +187,7 @@ int main()
 	ecs::AddComponent(pFont4, TextRenderer{ .font = &stencilFont, .text = playerNames[3], .offset = Vector3(1.0f, -1.0f, 0), .scale = Vector3(0.5f), .color = Vector3(0.5f, 0.8f, 0.2f) });
 	ecs::AddComponent(pFont4, Transform{ .position = Vector3(1434.0f,-1549.0f, 100.0f) });
 	ecs::AddComponent(laMuerte4, Transform{ .position = Vector3(1474.321533, -1569.868286, 100.000000), .rotation = Vector3(45.000000, 0.0000, 0.000000), .scale = Vector3(7) });
-	ecs::AddComponent(laMuerte4, Player{ .accelerationSpeed = 300.0f, .minAceleration = 120.0f, .id = 3, .nameText = pFont4,.playername = playerNames[3], .playerLap = lap });
+	ecs::AddComponent(laMuerte4, Player{ .accelerationSpeed = 300.0f, .minAcceleration = 120.0f, .id = 3, .nameText = pFont4,.playername = playerNames[3], .playerLap = lap });
 	ecs::AddComponent(laMuerte4, ModelRenderer{ .model = &model });
 	ecs::AddComponent(laMuerte4, Rigidbody{ .drag = 0.025f });
 	ecs::AddComponent(laMuerte4, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision , .visualise = false });

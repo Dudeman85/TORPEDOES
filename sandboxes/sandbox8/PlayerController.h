@@ -13,13 +13,13 @@ struct Player
 	float projectileSpeed = 500.0f;// Attack state
 	bool attackHeld = false;     // Indicates if the attack button is held
 	float accelerationSpeed = 1;    // Acceleration speed
-	float minAceleration = 1;    // Minimum acceleration while rotating
+	float minAcceleration = 1;    // Minimum acceleration while rotating
 	float rotationSpeed = 75;    // Rotation speed
 	float projectileTime = 0;    // projectile Time 
 	int lap = 1;
 	float actionTimer1 = 0.0f;  // time 1  projectile 
-	float projectileTime2 = 0.0f;  // time 2  projectile
-	float projectileTime3 = 0.0f;  // time 3  peojectile
+	float projectileRechargeTime = 0.0f;  // time 2  projectile
+	float projectileShootCooldown = 0.0f;  // time 3  peojectile
 	int previousCheckpoint = -1;
 	bool hitPlayer = false;
 	float hitPlayerTime = 0;
@@ -327,7 +327,7 @@ public:
 			{
 				// Apply forward impulse if rotating or receiving a rotation command
 				TransformSystem::Rotate(player.renderedEntity, 0, -rotateInput * player.rotationSpeed * dt, 0);
-				forwardImpulse = forwardDirection * player.minAceleration * dt;
+				forwardImpulse = forwardDirection * player.minAcceleration * dt;
 			}
 
 			// Apply acceleration impulse if positive input is received
@@ -344,7 +344,7 @@ public:
 			}
 
 			// "Check if the variable 'ProjectileInput' is true and if the projectile time is equal to or less than zero."
-			if (ProjetileInput && player.projectileTime3 <= 0.0f)
+			if (ProjetileInput && player.projectileShootCooldown <= 0.0f)
 			{
 				// "Create a projectile using the parameters of the player object."
 				if (player.actionTimer1 <= 0.0f)
@@ -353,22 +353,22 @@ public:
 					// Reset the projectile time to a cooldown 
 					player.actionTimer1 = 0.0f;
 					// "Create a cooldown time between shots."
-					player.projectileTime3 = 0.2f;
+					player.projectileShootCooldown = 0.2f;
 				}
 
-				else if (player.projectileTime2 <= 0.0f)
+				else if (player.projectileRechargeTime <= 0.0f)
 				{
 					CreateHedgehog(forwardDirection, player.projectileSpeed, transform.position, modelTransform.rotation, player.id);
-					player.projectileTime2 = 0.0f;
-					player.projectileTime3 = 0.2f;
+					player.projectileRechargeTime = 0.0f;
+					player.projectileShootCooldown = 0.2f;
 				}
 
 			}
 
 			// Decrease the projectile time by the elapsed time (dt)
 			player.actionTimer1 -= dt;
-			player.projectileTime2 -= dt;
-			player.projectileTime3 -= dt;
+			player.projectileRechargeTime -= dt;
+			player.projectileShootCooldown -= dt;
 
 			collider.rotationOverride = modelTransform.rotation.y + 1080;
 
@@ -392,7 +392,7 @@ public:
 
 
 			//Create the player entity which contains everything but rendering
-			ecs::AddComponent(player, Player{ .accelerationSpeed = 300, .minAceleration = 120, .id = i, .nameText = playerNameText, .renderedEntity = playerRender });
+			ecs::AddComponent(player, Player{ .accelerationSpeed = 300, .minAcceleration = 120, .id = i, .nameText = playerNameText, .renderedEntity = playerRender });
 			ecs::AddComponent(player, Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			ecs::AddComponent(player, Rigidbody{ .drag = 0.025 });
 			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
