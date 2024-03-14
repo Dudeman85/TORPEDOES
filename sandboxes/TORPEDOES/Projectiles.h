@@ -9,8 +9,7 @@ ECS_REGISTER_COMPONENT(Torpedo)
 struct Torpedo
 {
 	int ownerID = 0;
-};	
-
+};
 
 static void CreateAnimation(Vector3 animPosition)
 {
@@ -24,31 +23,26 @@ static void CreateAnimation(Vector3 animPosition)
 
 };
 
-
 // check if projectil collision tilemap Trigger
-	static void OnTopedoCollision(Collision collision)
-	{
-		Transform& torpedotransfor = ecs::GetComponent<Transform>(collision.a);
-		if (collision.type == Collision::Type::tilemapTrigger)
-		{
-			if (collision.b != 1)
-			{   // Do animation where projectile impact 
-				CreateAnimation(torpedotransfor.position);
-				ecs::DestroyEntity(collision.a);
+static void OnTopedoCollision(Collision collision)
+			{
+				Transform& torpedotransfor = ecs::GetComponent<Transform>(collision.a);
+				if (collision.type == Collision::Type::tilemapTrigger)
+				{
+					if (collision.b != 1)
+					{   // Do animation where projectile impact 
+						CreateAnimation(torpedotransfor.position);
+						ecs::DestroyEntity(collision.a);
+					}
+				}
 			}
-		}
-
-	}
-	void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 sapawnRotation, int owerID)
-    {
-		ecs::Entity torpedo = ecs::NewEntity();
-	    ecs::AddComponent(torpedo, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
-	   ecs::AddComponent(torpedo, Rigidbody{ .velocity = direction * projectileSpeed });
-	   ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::torpedoModel });
-	   std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-	   ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnTopedoCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
-	  ecs::AddComponent(torpedo, Torpedo{ .ownerID = owerID });
-    }
-
-
-	
+			void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 sapawnRotation, int owerID)
+			{
+				ecs::Entity torpedo = ecs::NewEntity();
+	ecs::AddComponent(torpedo, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
+	ecs::AddComponent(torpedo, Rigidbody{ .velocity = direction * projectileSpeed });
+	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::torpedoModel });
+	std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
+	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnTopedoCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
+	ecs::AddComponent(torpedo, Torpedo{ .ownerID = owerID });
+}

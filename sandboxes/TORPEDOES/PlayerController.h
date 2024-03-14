@@ -47,7 +47,7 @@ class PlayerController : public ecs::System
 {
 	static ecs::Entity winScreen;
 	static bool hasWon;
-	static int lapCount;
+	static int lapCount; // How many laps to race through
 
 public:
 	float countdownTimer = 0;
@@ -348,14 +348,13 @@ public:
 			ecs::Entity torpIndicator2 = ecs::NewEntity();
 
 
-
 			//Create the player entity which contains everything but rendering
 			ecs::AddComponent(player, Player{ .id = i, .minAceleration = 120, .renderedEntity = playerRender, .nameText = playerNameText });
 			ecs::AddComponent(player, Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			ecs::AddComponent(player, Rigidbody{ .drag = 0.025 });
 			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
 			ecs::AddComponent(player, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
-			
+
 			//Create the player's name tag
 			ecs::AddComponent(playerNameText, TextRenderer{ .font = resources::niagaraFont, .text = "P" + to_string(i + 1), .color = Vector3(0.5, 0.8, 0.2) });
 			ecs::AddComponent(playerNameText, Transform{ .position = Vector3(-2, 2, 1) , .scale = Vector3(0.1) });
