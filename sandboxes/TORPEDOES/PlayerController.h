@@ -1,9 +1,8 @@
 #pragma once 
-#include "Resources.h"
 #include <engine/Application.h>
+#include "Resources.h"
 #include "Projectiles.h"
-#include "ShipType.h"
-// Declaration of the entity component system (ECS) instance
+
 using namespace engine;
 
 ECS_REGISTER_COMPONENT(Player)

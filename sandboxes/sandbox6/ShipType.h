@@ -44,16 +44,7 @@ class u_99System : public ecs::System
 {
 	void Update() 
 	{
-
-		if () 
-		{
-
-		}
-		//call projectile from projectile.h
 	}
-
-
-
 };
 
 

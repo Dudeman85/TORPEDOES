@@ -147,9 +147,9 @@ int main()
 		{
 			playerController->Update(window, deltaTime);
 
-			u_99System ->Update();
-			pt_10System->Update();
-			laMuerte-> Update();
+			//u_99System ->Update();
+			//pt_10System->Update();
+			//laMuerte-> Update();
 		}
 		// if paused or Pause pressed update PauseSystem
 		if (pauseSystem->isGamePause || input::GetNewPress("Pause"))
