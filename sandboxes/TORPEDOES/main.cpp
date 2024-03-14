@@ -101,6 +101,8 @@ void SetupInput()
 	input::bindDigitalInput(GLFW_KEY_N, { "Shoot0" });
 	input::bindDigitalInput(GLFW_KEY_M, { "Boost0" });
 
+ 	input::bindAnalogInput(GLFW_KEY_UP, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y);
+	input::bindAnalogInput(GLFW_KEY_DOWN, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y, -1);
 	/*
 	input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft0" });
 	input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight0" });
@@ -160,11 +162,25 @@ int main()
 		{
 			playerController->Update(window, deltaTime);
 		}
+		
 		// if paused or Pause pressed update PauseSystem
 		if (pauseSystem->isGamePause || input::GetNewPress("Pause"))
 		{
+			pauseSystem->isGamePause = true;
 			pauseSystem->Update();
 		}
+		if (input::GetNewPress("SelectShip"))
+		{
+			ShipSelectionSystem->isShipSelectionMenuOn = true;
+		
+			ShipSelectionSystem->ToggleMenuPlayerSelection();
+			continue;
+		}
+		if (ShipSelectionSystem->isShipSelectionMenuOn)
+		{
+			ShipSelectionSystem->Update();
+		}
+
 
 		glfwSwapBuffers(window);
 	}

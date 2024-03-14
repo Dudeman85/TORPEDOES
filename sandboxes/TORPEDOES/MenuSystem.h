@@ -59,55 +59,12 @@ public:
 	};
 	void Init()
 	{
+
 		textures.push_back(new engine::Texture("GUI/UI_Green_Torpedo_Icon.png", GL_LINEAR_MIPMAP_NEAREST));
 		textures.push_back(new engine::Texture("GUI/UI_Checkmark.png", GL_LINEAR_MIPMAP_NEAREST));
 
 
-		input::ConstructDigitalEvent("MoveUp");
-		input::ConstructDigitalEvent("MoveDown");
-		input::ConstructDigitalEvent("Select");
-		input::ConstructDigitalEvent("Pause");
-		input::ConstructDigitalEvent("MoveRight");
-		input::ConstructDigitalEvent("MoveLeft");
 
-
-		input::ConstructDigitalEvent("Shoot0");
-		input::ConstructDigitalEvent("Shoot1");
-		input::ConstructDigitalEvent("Shoot2");
-		input::ConstructDigitalEvent("Shoot3");
-
-		input::ConstructDigitalEvent("MoveRight0");
-		input::ConstructDigitalEvent("MoveLeft0");
-		input::ConstructDigitalEvent("MoveRight1");
-		input::ConstructDigitalEvent("MoveLeft1");
-		input::ConstructDigitalEvent("MoveRight2");
-		input::ConstructDigitalEvent("MoveLeft2");
-		input::ConstructDigitalEvent("MoveRight3");
-		input::ConstructDigitalEvent("MoveLeft3");
-
-		input::ConstructDigitalEvent("MoveUp0");
-		input::ConstructDigitalEvent("MoveDown0");
-		input::ConstructDigitalEvent("MoveUp1");
-		input::ConstructDigitalEvent("MoveDown1");
-		input::ConstructDigitalEvent("MoveUp2");
-		input::ConstructDigitalEvent("MoveDown2");
-		input::ConstructDigitalEvent("MoveUp3");
-		input::ConstructDigitalEvent("MoveDown3");
-
-		input::ConstructDigitalEvent("SelectShip");
-		//TODO: add controller input
-		input::bindDigitalInput(GLFW_KEY_SPACE, { "Shoot0" });
-		input::bindDigitalInput(GLFW_KEY_1, { "Shoot1" });
-		input::bindDigitalInput(GLFW_KEY_2, { "Shoot2" });
-		input::bindDigitalInput(GLFW_KEY_3, { "Shoot3" });
-
-		input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft" });
-		input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight" });
-		input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp0" });
-		input::bindDigitalInput(GLFW_KEY_DOWN, { "MoveDown0" });
-		input::bindDigitalInput(GLFW_KEY_ENTER, { "Select" });
-		input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
-		input::bindDigitalInput(GLFW_KEY_U, { "SelectShip" });
 
 		for (int i = 0; i < 4; i++)
 		{
@@ -174,13 +131,13 @@ public:
 				{
 
 
-					if (input::GetNewPress("MoveUp" + playerSelection.playerID))
+					if (input::GetInputValue("Move" + std::to_string(playerSelection.playerID), GLFW_GAMEPAD_AXIS_LEFT_Y) >= 0.5f)
 					{
 						printf("\n\n\nShip Selection moveUP\n\n\n");
 
 					}
 
-					if (input::GetNewPress("MoveDown" + playerSelection.playerID))
+					if (input::GetInputValue("Move" + std::to_string(playerSelection.playerID), GLFW_GAMEPAD_AXIS_LEFT_Y) <= -0.5f)
 					{
 						printf("\n\n\nShip Selection moveDown\n\n\n");
 					}
@@ -253,7 +210,7 @@ struct PauseComponent
 	engine::Texture* selectedTexture;
 	engine::Texture* unselectedTexture;
 	std::function<void()> operation;
-	bool isOptionsMenu=false;
+	bool isOptionsMenu = false;
 	bool isSlider = false;
 	float sliderValue = 0;
 };
@@ -290,8 +247,11 @@ class PauseSystem : public ecs::System
 
 
 public:
+	float upTimer = 0;
+	float downTimer = 0;
+	const float delay = 0.2f;
 	ecs::Entity currentSelection;
-	bool isGamePause;
+	bool isGamePause = false;
 
 	~PauseSystem() {
 		delete currentSelected_Texture;
@@ -303,32 +263,59 @@ public:
 	}
 	void Update()
 	{
-		printf("IN MENU SYSTEM UPDATE()\n");
+		//printf("IN PauseSystem UPDATE()\n");
 		if (input::GetNewPress("Pause"))
 		{
 			printf("Pause\n");
-			isGamePause = !isGamePause;
+			//isGamePause = !isGamePause;
 			ToggleShowUIMenu();
 		}
-		if (ecs::GetSystem<PauseSystem>()->isGamePause)
+		if (isGamePause)
 		{
-			if (input::GetNewPress("MoveUp"))
+
+			printf("isGamePause is true\n");
+			if (input::GetInputValue("Move0", GLFW_GAMEPAD_AXIS_LEFT_Y) >= 0.5f)
 			{
-				MoveUpper();
+				upTimer += deltaTime;
+
+				if (upTimer >= delay)
+				{
+					printf("move up input\n");
+					MoveUpper();
+					upTimer = 0;
+				}
+
 			}
-			if (input::GetNewPress("MoveDown"))
+			else
 			{
-				MoveLower();
+				upTimer = 0;
 			}
+			if (input::GetInputValue("Move0", GLFW_GAMEPAD_AXIS_LEFT_Y) <= -0.5f)
+			{
+				downTimer += deltaTime;
+
+				if (downTimer >= delay)
+				{
+					printf("move down input\n");
+					MoveLower();
+					downTimer = 0;
+				}
+
+			}
+			else
+			{
+				downTimer = 0;
+			}
+
 
 			if (IsCurrentPauseComponentSlider())
-			{								
+			{
 
 				if (input::GetNewPress("MoveRight"))
-				{										
+				{
 					/*this dosent works*///UpdateSlider();
 					MoveSliderRight();
-					
+
 				}
 				if (input::GetNewPress("MoveLeft"))
 				{
@@ -336,7 +323,7 @@ public:
 					//selectedPauseComponent.sliderValue += -0.01;
 					/*this dosent works*///UpdateSlider();
 					MoveSliderLeft();
-					
+
 
 				}
 
@@ -351,25 +338,26 @@ public:
 	}
 	void Init(GLFWwindow* mainWindow)
 	{
+
 		printf("IN side MENU SYSTEM INIT\n");
 		PauseSystem::window = mainWindow;
 		input::initialize(window);
 
-		//INPUTS  START	
-		input::ConstructDigitalEvent("MoveUp");
-		input::ConstructDigitalEvent("MoveDown");
-		input::ConstructDigitalEvent("Select");
-		input::ConstructDigitalEvent("Pause");
-		input::ConstructDigitalEvent("MoveRight");
-		input::ConstructDigitalEvent("MoveLeft");
 
-		//TODO: add controller input
-		input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft" });
-		input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight" });
-		input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp" });
-		input::bindDigitalInput(GLFW_KEY_DOWN, { "MoveDown" });
-		input::bindDigitalInput(GLFW_KEY_ENTER, { "Select" });
-		input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
+
+
+
+
+
+
+
+
+
+
+
+
+
+		//input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
 
 
 		resumeButton = ecs::NewEntity();
@@ -447,7 +435,7 @@ public:
 		//optionsResumeButton
 		ecs::AddComponent(optionsResumeButton, Transform{ .position = Vector3(0,.3f,-0.1f), .scale = Vector3(.25f) });
 		ecs::AddComponent(optionsResumeButton, SpriteRenderer{ .texture = allTextures[8],  .enabled = false, .uiElement = true });
-		ecs::AddComponent(optionsResumeButton, PauseComponent{ .upper = fullscreenEntity, .lower = musicSliderEntity, .selectedTexture = allTextures[8], .unselectedTexture = allTextures[9], .operation = BackToUIMenu, .isOptionsMenu = true});
+		ecs::AddComponent(optionsResumeButton, PauseComponent{ .upper = fullscreenEntity, .lower = musicSliderEntity, .selectedTexture = allTextures[8], .unselectedTexture = allTextures[9], .operation = BackToUIMenu, .isOptionsMenu = true });
 		//musicSliderEntity
 		ecs::AddComponent(musicSliderEntity, Transform{ .position = Vector3(0,.1f,-0.1f), .scale = Vector3(0.25f) });
 		ecs::AddComponent(musicSliderEntity, SpriteRenderer{ .texture = allTextures[10],  .enabled = false, .uiElement = true });
@@ -457,7 +445,7 @@ public:
 		ecs::AddComponent(fullscreenEntity, SpriteRenderer{ .texture = allTextures[12],  .enabled = false, .uiElement = true });
 		ecs::AddComponent(fullscreenEntity, PauseComponent{ .upper = musicSliderEntity, .lower = optionsResumeButton, .selectedTexture = allTextures[12], .unselectedTexture = allTextures[13], .operation = PauseSystem::OnQuitGamePressed, .isOptionsMenu = true });
 		//musicSliderNub
-		ecs::AddComponent(musicSliderNub, Transform{.position = ecs::GetComponent<Transform>(musicSliderEntity).position + Vector3(0,-0.2f,-0.1), .scale = Vector3(0.15f)});
+		ecs::AddComponent(musicSliderNub, Transform{ .position = ecs::GetComponent<Transform>(musicSliderEntity).position + Vector3(0,-0.2f,-0.1), .scale = Vector3(0.15f) });
 		ecs::AddComponent(musicSliderNub, SpriteRenderer{ .texture = allTextures[15],  .enabled = false, .uiElement = true });
 		ecs::AddComponent(musicSliderNub, PauseComponent{ .selectedTexture = allTextures[15], .unselectedTexture = allTextures[15], .isOptionsMenu = true,.isSlider = true });
 
@@ -550,15 +538,15 @@ public:
 	{
 		return ecs::GetComponent<PauseComponent>(currentSelection).isSlider;
 	}
-    PauseComponent& GetCurrentSelectedPauseComponent()
+	PauseComponent& GetCurrentSelectedPauseComponent()
 	{
 		return ecs::GetComponent<PauseComponent>(currentSelection);
 	}
-	ecs::Entity GetCurrentSelection() 
+	ecs::Entity GetCurrentSelection()
 	{
-		 return currentSelection;
+		return currentSelection;
 	}
-	static void BackToUIMenu() 
+	static void BackToUIMenu()
 	{
 		ecs::GetSystem<PauseSystem>()->ToggleShowUIMenu();
 
@@ -629,7 +617,7 @@ public:
 		selectedSpriteRenderer.texture = pauseComponent.selectedTexture;
 
 	}
-	void SetCurrentSelection(ecs::Entity entity) 
+	void SetCurrentSelection(ecs::Entity entity)
 	{
 		PauseComponent& pauseComponent = ecs::GetComponent<PauseComponent>(entity);
 		SpriteRenderer& selectedSpriteRenderer = ecs::GetComponent<SpriteRenderer>(entity);
@@ -641,26 +629,26 @@ public:
 	void UpdateSlider()
 	{
 		// TODO: change 	sliderValue dosent update in main Fix need pointer or reference
-		
+
 
 		PauseComponent& pauseComponent = ecs::GetComponent<PauseComponent>(currentSelection);
 		Transform& selectedSliderTransform = ecs::GetComponent<Transform>(currentSelection);
 		PauseComponent& pauseComponentNub = ecs::GetComponent<PauseComponent>(musicSliderNub);
 		Transform& nubTransform = ecs::GetComponent<Transform>(musicSliderNub);
-		nubTransform.position =  Vector3(pauseComponentNub.sliderValue, 0, 0);
+		nubTransform.position = Vector3(pauseComponentNub.sliderValue, 0, 0);
 		printf("pauseComponentNub.sliderValue ");
-		std::cout << pauseComponentNub.sliderValue ;
+		std::cout << pauseComponentNub.sliderValue;
 		printf("\n");
-		std::cout << "Nub pos:" <<"x:"<<  nubTransform.position.x << " y:" << nubTransform.position.y << "\n";
+		std::cout << "Nub pos:" << "x:" << nubTransform.position.x << " y:" << nubTransform.position.y << "\n";
 
 	}
 
 	void MoveSliderRight()
-	{		
+	{
 		PauseComponent& pauseComponentNub = ecs::GetComponent<PauseComponent>(musicSliderNub);
 		Transform& nubTransform = ecs::GetComponent<Transform>(musicSliderNub);
-		nubTransform.position += Vector3(0.01f, 0, 0);	
-		nubTransform.position.x  = clamp(nubTransform.position.x, -0.17f, 0.17f);
+		nubTransform.position += Vector3(0.01f, 0, 0);
+		nubTransform.position.x = clamp(nubTransform.position.x, -0.17f, 0.17f);
 		printf("pauseComponentNub.sliderValue ");
 		std::cout << pauseComponentNub.sliderValue;
 		printf("\n");
@@ -670,7 +658,7 @@ public:
 	{
 		PauseComponent& pauseComponentNub = ecs::GetComponent<PauseComponent>(musicSliderNub);
 		Transform& nubTransform = ecs::GetComponent<Transform>(musicSliderNub);
-		nubTransform.position -=  Vector3(0.01f, 0, 0);
+		nubTransform.position -= Vector3(0.01f, 0, 0);
 		nubTransform.position.x = clamp(nubTransform.position.x, -0.17f, 0.17f);
 		printf("pauseComponentNub.sliderValue ");
 		std::cout << pauseComponentNub.sliderValue;
@@ -678,7 +666,7 @@ public:
 		std::cout << "Nub pos:" << "x:" << nubTransform.position.x << " y:" << nubTransform.position.y << "\n";
 
 	}
-	void ToggleShowUIShipSelection() 
+	void ToggleShowUIShipSelection()
 	{
 
 	}
@@ -701,15 +689,15 @@ public:
 			//Get the entity and increment the iterator
 			ecs::Entity entity = *itr++;
 			bool& isOptionsMenu = ecs::GetComponent<PauseComponent>(entity).isOptionsMenu;
-			
+
 			bool& enabled = ecs::GetComponent<SpriteRenderer>(entity).enabled;
 			PauseComponent& pauseComponent = ecs::GetComponent<PauseComponent>(entity);
 			SpriteRenderer& spriteRenderer = ecs::GetComponent<SpriteRenderer>(entity);
 			spriteRenderer.texture = pauseComponent.unselectedTexture;
 
 			enabled = !enabled;
-			
-			
+
+
 
 		}
 
@@ -718,7 +706,7 @@ public:
 		Transform& selectedSpriteTransform = ecs::GetComponent<Transform>(currentSelection);
 		selectedSpriteTransform.scale = Vector3(0.32f);
 		selectedSpriteRenderer.texture = pauseComponent.selectedTexture;
-		
+
 	}
 
 };
