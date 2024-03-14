@@ -76,16 +76,28 @@ void LoadLevel1(Camera* cam)
 //Bind all input events here
 void SetupInput()
 {
-	input::ConstructDigitalEvent("MoveUp");
-	input::ConstructDigitalEvent("MoveDown");
 	input::ConstructDigitalEvent("Select");
 	input::ConstructDigitalEvent("Pause");
-	input::ConstructDigitalEvent("MoveRight");
-	input::ConstructDigitalEvent("MoveLeft");
-	input::ConstructDigitalEvent("Shoot0");
-	input::ConstructDigitalEvent("Shoot1");
-	input::ConstructDigitalEvent("Shoot2");
-	input::ConstructDigitalEvent("Shoot3");
+
+	for (size_t i = 0; i < 2; i++)
+	{
+		input::ConstructDigitalEvent("MoveUp" + std::to_string(i));
+		input::ConstructDigitalEvent("MoveDown" + std::to_string(i));
+		input::ConstructDigitalEvent("MoveRight" + std::to_string(i));
+		input::ConstructDigitalEvent("MoveLeft" + std::to_string(i));
+
+		input::ConstructDigitalEvent("Shoot" + std::to_string(i));
+	}
+	for (size_t i = 2; i < 4; i++)
+	{
+		input::ConstructDigitalEvent("MoveUp" + std::to_string(i));
+		input::ConstructDigitalEvent("MoveDown" + std::to_string(i));
+		input::ConstructDigitalEvent("MoveRight" + std::to_string(i));
+		input::ConstructDigitalEvent("MoveLeft" + std::to_string(i));
+
+		input::ConstructDigitalEvent("Shoot" + std::to_string(i));
+	}
+	
 	//TODO: add controller input
 
 	input::bindDigitalInput(GLFW_KEY_SPACE, { "Shoot0" });
@@ -93,12 +105,12 @@ void SetupInput()
 	input::bindDigitalInput(GLFW_KEY_2, { "Shoot2" });
 	input::bindDigitalInput(GLFW_KEY_3, { "Shoot3" });
 
-	input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft" });
-	input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight" });
-	input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp" });
-	input::bindDigitalInput(GLFW_KEY_DOWN, { "MoveDown" });
-	input::bindDigitalInput(GLFW_KEY_ENTER, { "Select" });
-	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
+	input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft0" });
+	input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight0" });
+	input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp0" });
+	input::bindDigitalInput(GLFW_KEY_DOWN, { "MoveDown0" });
+	input::bindDigitalInput(GLFW_KEY_ENTER, { "Select0" });
+	input::bindDigitalInput(GLFW_KEY_P, { "Pause0" });
 }
 
 int main()
