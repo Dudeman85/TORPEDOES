@@ -102,20 +102,60 @@ void TMVariables::fetchData(const std::string tilemapPath)
 	{
 		// get layer's type
 		const auto& layerType = layer->getType();
-
+		// The different layertypes handling
+		// in switch function
 		switch (layerType)
 		{
+			// Group layer's handling
 		case tmx::Layer::Type::Group:
-
+			// Get this group layer's properties
+			const auto& properties = layer->getProperties();
+			// Iterate the property values in to struct
+			for (const auto& property : properties)
+			{
+				// Insert the property values in to struct
+				tgroup.group.insert(property.getName(), property.getStringValue());
+			}
+			// Insert the group layer
+			// in to tilemap struct
+			tmap.groups.push_back(tgroup);
 			break;
+			//  Object layer's handling
 		case tmx::Layer::Type::Object:
+			// Get this object layer's  properties
+			const auto& properties = layer->getProperties();
+			// Iterate the property values in to struct
+			for (const auto& property : properties)
+			{
+				// Insert the property values in to struct
+				tobject.object.insert(property.getName(), property.getStringValue());
+			}
+			// Insert the object layer
+			// in to tilemap struct
+			tmap.objects.push_back(tobject);
 			break;
+
+			// Tile layer's handling
 		case tmx::Layer::Type::Tile:
+			// Get this Tile layer's properties
+			const auto& properties = layer->getProperties();
+			// Iterate the property values in to struct
+			for (const auto& property : properties)
+			{
+				// Insert the propety values in to struct
+				tlayer.layer.emplace(property.getName(), property.getStringValue());
+			}
+			// Insert the tile layer
+			// in to tilemap struct
+			tmap.layers.push_back(tlayer);
 			break;
 		default:
 			break;
 		}
 	}
+
+	// 
+
 
 
 }
