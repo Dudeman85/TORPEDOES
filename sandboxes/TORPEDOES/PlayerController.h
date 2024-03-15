@@ -13,34 +13,36 @@ struct Player
 {
 	int id = 0;
 
-	//Movement stats
+	// Movement stats
 	float accelerationSpeed;
 	float rotationSpeed;
-	//Minimum acceleration while rotating
-	float minAcceleration = 100;
+	float minAcceleration = 100;	// Minimum acceleration while rotating
 
-	//Action cooldowns
-	float mainCooldown;
-	float specialCooldown;
+	// Action cooldowns
+	float shootCooldown = 0.2f;			// Time between shots
+	float specialCooldown = 0.2f;		// Time between special uses
+	float ammoRechargeCooldown = 0.5f;	// Time between gaining ammo
 
-	//Action timers
-	float actionTimer1 = 0.0f;
-	float projectileRechargeTime = 0.0f;
-	float projectileShootCooldown = 0.0f;
+	int ammo = 0;
+	int maxAmmo = 2;
 
-	//Action functions
+	// Action timers
+	float _ammoRechargeTimer = 0.0f;
+	float _shootTimer = 0.0f;
+
+	// Action functions
 	std::function<void(ecs::Entity, int)> mainAction;
 	std::function<void(ecs::Entity, int)> specialAction;
 
-	//Checkpoint stuff
+	// Checkpoint stuff
 	int previousCheckpoint = -1;
 	int lap = 1;
 
-	//Hit by weapon stuff
+	// Hit by weapon stuff
 	bool isHit = false;
 	float hitTime = 0;
 
-	//Rendered Child entities
+	// Rendered Child entities
 	ecs::Entity renderedEntity;
 	ecs::Entity nameText;
 };
@@ -78,13 +80,13 @@ public:
 
 		//Initialize each ship type's stats
 		shipComponents.insert({ ShipType::torpedoBoat,
-			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 		shipComponents.insert({ ShipType::submarine,
-			Player{.accelerationSpeed = 800, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.accelerationSpeed = 800, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 		shipComponents.insert({ ShipType::cannonBoat,
-			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 		shipComponents.insert({ ShipType::hedgehogBoat,
-			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 
 		//Initialize ship type models
 		shipModels.insert({ ShipType::torpedoBoat, resources::models["LaMuerte.obj"] });
@@ -209,9 +211,9 @@ public:
 			accelerationInput = std::clamp(accelerationInput, -1.0f, 1.0f);
 			rotateInput = std::clamp(rotateInput, -1.0f, 1.0f);
 
-			// Movement
+			/* Movement */
 
-				// Torpedo hit logic
+			// Torpedo hit logic
 			if (player.isHit == true)
 			{
 				// Rotate player 360 degrees
@@ -260,36 +262,47 @@ public:
 				forwardImpulse = forwardDirection * accelerationInput * dt * player.accelerationSpeed * 0.3;
 			}
 
-			// Check if the variable 'ProjectileInput' is true and if the projectile time is equal to or less than zero.
-			if (ProjetileInput && player.projectileShootCooldown <= 0.0f)
-			{
-				// Create a projectile using the parameters of the player object.
-				if (player.actionTimer1 <= 0.0f)
-				{
-					CreateProjectile(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
-					// Reset the projectile time to a cooldown 
-					player.actionTimer1 = 5.f;
-					// Create a cooldown time between shots.
-					player.projectileShootCooldown = 0.2f;
-				}
-
-				else if (player.projectileRechargeTime <= 0.0f)
-				{
-					CreateProjectile(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
-					player.projectileRechargeTime = 5.f;
-					player.projectileShootCooldown = 0.2f;
-				}
-			}
-
-			// Decrease the projectile time by the elapsed time (dt)
-			player.actionTimer1 -= dt;
-			player.projectileRechargeTime -= dt;
-			player.projectileShootCooldown -= dt;
-
 			collider.rotationOverride = modelTransform.rotation.y + 1080;
 
 			// Apply the resulting impulse to the object
 			PhysicsSystem::Impulse(entity, forwardImpulse);
+
+			/* Shooting */
+
+			// Increase the projectile timers by the elapsed time (dt)
+			player._shootTimer += dt;
+
+			// Check if the variable 'ProjectileInput' is true and if the projectile cooldown has passed.
+			if (player._shootTimer >= player.shootCooldown)
+			{
+				// If we pressed button and have ammo
+				if (ProjetileInput && (player.ammo > 0))
+				{
+					// Create a projectile using the parameters of the player object.
+					CreateProjectile(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
+
+					player.ammo--;
+
+					// Reset the projectile shoot time 
+					player._shootTimer = 0;
+
+					if(player.id == 0)
+					std::cout << "ammo: " << player.ammo << "\n";
+				}
+			}
+
+			// If not max ammo
+			if (player.ammo < player.maxAmmo)
+			{
+				player._ammoRechargeTimer += dt;
+
+				if (player._ammoRechargeTimer >= player.ammoRechargeCooldown)
+				{
+					// Add ammo
+					player.ammo++;
+					player._ammoRechargeTimer = 0;
+				}
+			}
 		}
 	}
 
