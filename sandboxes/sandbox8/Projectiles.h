@@ -58,9 +58,17 @@ void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPos
 
 void CreateHedgehog(Vector2 direction , float hedgehogSpeed , Vector3 spanwPposition , Vector3 sapawnRotation , int owerID)
 {
+	
+	 float angleShot = engine::Radians(45);
+
+	float vx = angleShot * direction.x * hedgehogSpeed ;
+	float vy = angleShot * direction.y * hedgehogSpeed  / 100.0f  ;
+
 	ecs::Entity hedgehog = ecs::NewEntity();
 	ecs::AddComponent(hedgehog, Transform{ .position = spanwPposition, .rotation = sapawnRotation, .scale = Vector3(100) });
-	ecs::AddComponent(hedgehog, Rigidbody{ .velocity = direction * hedgehogSpeed });
+
+	ecs::AddComponent(hedgehog, Rigidbody{ .velocity = Vector3(vx , vy, 0.0f)});
+
 	ecs::AddComponent(hedgehog, ModelRenderer{ .model = resources::hedgehogModel });
 	std::vector<Vector2> Hedgehogverts{ Vector2(0.2, 0.25), Vector2(0.2, -0.25), Vector2(-0.2, -0.25), Vector2(-0.2, 0.25) };
 	ecs::AddComponent(hedgehog, PolygonCollider{ .vertices = Hedgehogverts, .callback = OnTopedoCollision, .trigger = true, .visualise = true,  .rotationOverride = sapawnRotation.y });
