@@ -22,9 +22,9 @@ namespace engine
 	{
 	public:
 		///Load the models from the asset path
-		Model(const std::string& path, bool relativePath = false)
+		Model(const std::string& path)
 		{
-			LoadModel((!relativePath) ? assetPath + path : path);
+			LoadModel(path);
 		}
 		~Model()
 		{
