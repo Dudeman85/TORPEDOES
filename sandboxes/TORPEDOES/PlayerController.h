@@ -224,7 +224,6 @@ public:
 				else
 				{
 					// Ignore all input
-					return;
 
 					player.hitTime += dt; // Increment duration of hit time
 				}
@@ -240,16 +239,10 @@ public:
 			if (rotateInput != 0.0f)
 			{
 				//Slow rotation based on throttle setting
-				//TODO: this function could be improved
+				//TODO: this function could be improved by testing
 				float rotationScalar = 1 - log10(2.0f * std::max(0.5f, accelerationInput));
-				if (player.id == 0)
-				{
-					std::cout << accelerationInput << std::endl;
-					std::cout << rotationScalar << std::endl;
-
-				}
 				// Apply forward impulse if rotating or receiving a rotation command
-				TransformSystem::Rotate(player.renderedEntity, 0, -rotateInput * player.rotationSpeed * dt, 0);
+				TransformSystem::Rotate(player.renderedEntity, 0, -rotateInput * player.rotationSpeed * rotationScalar * dt, 0);
 				forwardImpulse = forwardDirection * player.minAcceleration * dt;
 			}
 
