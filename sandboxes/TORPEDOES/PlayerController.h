@@ -23,7 +23,7 @@ struct Player
 	// Action cooldowns
 	float shootCooldown = 0.2f;			// Time between shots
 	float specialCooldown = 0.2f;		// Time between special uses
-	float ammoRechargeCooldown = 5.f;	// Time between gaining ammo
+	float ammoRechargeCooldown = 0.5f;	// Time between gaining ammo
 
 	int ammo = 0;
 	int maxAmmo = 2;
@@ -82,13 +82,13 @@ public:
 
 		//Initialize each ship type's stats
 		shipComponents.insert({ ShipType::torpedoBoat,
-			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 		shipComponents.insert({ ShipType::submarine,
-			Player{.accelerationSpeed = 800, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.accelerationSpeed = 800, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 		shipComponents.insert({ ShipType::cannonBoat,
-			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 		shipComponents.insert({ ShipType::hedgehogBoat,
-			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 
 		//Initialize ship type models
 		shipModels.insert({ ShipType::torpedoBoat, resources::laMuerteModel });
@@ -209,7 +209,7 @@ public:
 			accelerationInput = std::clamp(accelerationInput, -1.0f, 1.0f);
 			rotateInput = std::clamp(rotateInput, -1.0f, 1.0f);
 
-			// Movement
+			/* Movement */
 
 			// Torpedo hit logic
 			if (player.isHit == true)
@@ -260,50 +260,47 @@ public:
 				forwardImpulse = forwardDirection * accelerationInput * dt * player.accelerationSpeed * 0.3;
 			}
 
-			// Shooting
-
-			// Increase the projectile timers by the elapsed time (dt)
-			player._ammoRechargeTimer += dt;
-			player._shootTimer += dt;
-
-			// Check if the variable 'ProjectileInput' is true and if the projectile cooldown has passed.
-			if (player._shootTimer <= player.shootCooldown)
-			{
-				// If we pressed button and have ammo
-				if (ProjetileInput && (player.ammo >= 0))
-				{
-					// Create a projectile using the parameters of the player object.
-					CreateProjectile(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
-
-					// Reset ammo recharge time... Why do we do this?
-					player._ammoRechargeTimer = 0;
-				}
-
-				// Reset the projectile time to a cooldown 
-				//player._ammo = 0;
-
-				/*
-				else if (player._projectileRechargeTime <= 0.2f)
-				{
-					CreateProjectile(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
-					player._projectileTimer = 5.f;
-					player._projectileTimer = 0.2f;
-				}*/
-			}
-
-			if (player._ammoRechargeTimer >= player.ammoRechargeCooldown)
-			{
-				if (player.ammo <= player.maxAmmo)
-				{
-					player.ammo++;
-					player._ammoRechargeTimer = 0;
-				}
-			}
-
 			collider.rotationOverride = modelTransform.rotation.y + 1080;
 
 			// Apply the resulting impulse to the object
 			PhysicsSystem::Impulse(entity, forwardImpulse);
+
+			/* Shooting */
+
+			// Increase the projectile timers by the elapsed time (dt)
+			player._shootTimer += dt;
+
+			// Check if the variable 'ProjectileInput' is true and if the projectile cooldown has passed.
+			if (player._shootTimer >= player.shootCooldown)
+			{
+				// If we pressed button and have ammo
+				if (ProjetileInput && (player.ammo > 0))
+				{
+					// Create a projectile using the parameters of the player object.
+					CreateProjectile(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
+
+					player.ammo--;
+
+					// Reset the projectile shoot time 
+					player._shootTimer = 0;
+
+					if(player.id == 0)
+					std::cout << "ammo: " << player.ammo << "\n";
+				}
+			}
+
+			// If not max ammo
+			if (player.ammo < player.maxAmmo)
+			{
+				player._ammoRechargeTimer += dt;
+
+				if (player._ammoRechargeTimer >= player.ammoRechargeCooldown)
+				{
+					// Add ammo
+					player.ammo++;
+					player._ammoRechargeTimer = 0;
+				}
+			}
 		}
 	}
 
