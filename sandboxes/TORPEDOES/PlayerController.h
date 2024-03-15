@@ -7,6 +7,7 @@
 using namespace engine;
 
 enum ShipType { torpedoBoat, submarine, cannonBoat, hedgehogBoat, pirateShip };
+enum HitState { noHit, torpedoHit, cannonHit, hedgehogHit };
 
 ECS_REGISTER_COMPONENT(Player)
 struct Player
@@ -39,7 +40,7 @@ struct Player
 	int lap = 1;
 
 	// Hit by weapon stuff
-	bool isHit = false;
+	HitState hitStatus = HitState::noHit;
 	float hitTime = 0;
 
 	// Rendered Child entities
@@ -169,7 +170,7 @@ public:
 
 			if (player.id != torpedo.ownerID)
 			{
-				player.isHit = true;
+				player.hitStatus = HitState::torpedoHit;
 				CreateAnimation(projectransfor.position + rigidbody.velocity / 15);
 
 				//Destroy torpedo at end of frame
@@ -214,15 +215,16 @@ public:
 			/* Movement */
 
 			// Torpedo hit logic
-			if (player.isHit == true)
+			switch (player.hitStatus)
 			{
+			case HitState::torpedoHit:
 				// Rotate player 360 degrees
 				TransformSystem::Rotate(player.renderedEntity, 0, 360.0f * dt, 0);
 
 				// Restabilize player when hit time has gone by
 				if (player.hitTime >= 2)
 				{
-					player.isHit = false;
+					player.hitStatus = HitState::noHit;
 					player.hitTime = 0.0f;
 				}
 				else
@@ -231,6 +233,12 @@ public:
 
 					player.hitTime += dt; // Increment duration of hit time
 				}
+				break;
+
+			case HitState::cannonHit:
+				break;
+			default:
+				break;
 			}
 
 			// CALCULATE POSITION AND ROTATE 
@@ -286,8 +294,8 @@ public:
 					// Reset the projectile shoot time 
 					player._shootTimer = 0;
 
-					if(player.id == 0)
-					std::cout << "ammo: " << player.ammo << "\n";
+					if (player.id == 0)
+						std::cout << "ammo: " << player.ammo << "\n";
 				}
 			}
 
