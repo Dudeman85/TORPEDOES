@@ -13,6 +13,7 @@ namespace resources
 	Model* laMuerteModel;
 	Model* checkPointModel;
 	Model* finishLineModel;
+	Model* shellModel;
 
 	Animation explosionAnimation;
 	Animation crowdAnims;
@@ -27,6 +28,7 @@ namespace resources
 		checkPointModel = new Model("/3dmodels/Checkpoint.obj");
 		finishLineModel = new Model("/3dmodels/Finish_line.obj");
 		torpedoModel = new Model("/3dmodels/torpedo.obj");
+		shellModel = new Model("/3dmodels/Weapon_HedgehogAmmo.obj");
 		laMuerteModel = new Model("/3dmodels/LaMuerte.obj");
 
 		torpCooldownTexture = new Texture("/GUI/UI_Red_Torpedo_Icon.png");

@@ -1,96 +1,103 @@
 #pragma once 
-#include "Resources.h"
 #include <engine/Application.h>
-#include <GL/gl.h>
+#include "Resources.h"
+#include "Projectiles.h"
+//#include "engine/Input.h"
 
 // Declaration of the entity component system (ECS) instance
 using namespace engine;
+enum ShipType { torpedoBoat, submarine, cannonBoat, hedgehogBoat, pirateShip };
 
 ECS_REGISTER_COMPONENT(Player)
 struct Player
 {
-	float projectileSpeed = 500;  // Attack state
-	bool attackHeld = false;     // Indicates if the attack button is held
-	float accelerationSpeed = 1;    // Acceleration speed
-	float minAcceleration = 1;    // Minimum acceleration while rotating
-	float rotationSpeed = 75;    // Rotation speed
-	float projectileTime = 0;    // projectile Time 
-	int lap = 1;
-	float actionTimer1 = 0.0f;  // time 1  projectile 
-	float projectileRechargeTime = 0.0f;  // time 2  projectile
-	float projectileShootCooldown = 0.0f;  // time 3  peojectile
+	ShipType shipType; //This might not be necessary
+
+	int id = 0;
+
+	//Movement stats
+	float accelerationSpeed;
+	float rotationSpeed;
+	//Minimum acceleration while rotating
+	float minAcceleration = 100;
+
+	//Action cooldowns
+	float mainCooldown;
+	float specialCooldown;
+
+	//Action timers
+	float actionTimer1 = 0.0f;
+	float projectileRechargeTime = 0.0f;
+	float projectileShootCooldown = 0.0f;
+
+	//Action functions
+	std::function<void(ecs::Entity, int)> mainAction;
+	std::function<void(ecs::Entity, int)> specialAction;
+
+	//Checkpoint stuff
 	int previousCheckpoint = -1;
+	int lap = 1;
+
+	//Hit by weapon stuff
 	bool isHit = false;
 	float hitTime = 0;
-	bool playExlposionSound = false;
-	int id = 0;
-	ecs::Entity nameText;
-	string playername;
-	string playerLap;
 
-	//Child entities
+	//Rendered Child entities
 	ecs::Entity renderedEntity;
+	ecs::Entity nameText;
 };
+
 ECS_REGISTER_COMPONENT(CheckPoint)
 struct CheckPoint
 {
 	int checkPointID = 0;
 	bool Finish_line = false;
 };
-ECS_REGISTER_COMPONENT(Projectile)
-struct Projectile
-{
-	int ownerID = 0;
-};
-
-bool HAS_WON = false;
 
 // Player controller System. Requires Player , Tranform , Rigidbody , PolygonCollider
 ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonCollider)
 class PlayerController : public ecs::System
 {
-	//Change this to a vector one for each player
+	static ecs::Entity winScreen;
+	static bool hasWon;
+	static int lapCount; // How many laps to race through
 
-	float countdownTimer = 4; // start Time 
-	void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 sapawnRotation, int owerID)
-	{
-
-		ecs::Entity projectile = ecs::NewEntity();
-		ecs::AddComponent(projectile, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
-		ecs::AddComponent(projectile, Rigidbody{ .velocity = direction * projectileSpeed });
-		ecs::AddComponent(projectile, ModelRenderer{ .model = resources::torpedoModel });
-		std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-		ecs::AddComponent(projectile, PolygonCollider{ .vertices = Torpedoverts, .callback = PlayerController::OnprojectilCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
-		ecs::AddComponent(projectile, Projectile{ .ownerID = owerID });
-	}
-	static void CreateAnimation(Vector3 animPosition)
-	{
-		ecs::Entity projecAnim = ecs::NewEntity();
-		animPosition.z += 100;
-		ecs::AddComponent(projecAnim, Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20)});
-		ecs::AddComponent(projecAnim, SpriteRenderer{ });
-		ecs::AddComponent(projecAnim, Animator{ .onAnimationEnd = ecs::DestroyEntity });
-		AnimationSystem::AddAnimation(projecAnim, resources::explosionAnimation, "explosion");
-		AnimationSystem::PlayAnimation(projecAnim, "explosion", false);
-
-	};
-
-	static ecs::Entity playerWin;
+	//A map from a ship type to a pre-initialized Player component with the proper stats
+	std::unordered_map<ShipType, Player> shipComponents;
+	//A map from a ship type to its 3D model
+	std::unordered_map<ShipType, Model*> shipModels;
 
 public:
+	float countdownTimer = 0;
+
 	void Init()
 	{
-		ecs::Entity playerWin = ecs::NewEntity();
-		ecs::AddComponent(playerWin, TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.0f, 1.1f, 1.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-		ecs::AddComponent(playerWin, SpriteRenderer{ .texture = resources::winSprite, .enabled = false, .uiElement = true });
-		ecs::AddComponent(playerWin, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(0.5f) });
+		//Create the entity to be shown at a win
+		winScreen = ecs::NewEntity();
+		ecs::AddComponent(winScreen, TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.5, 2, 1), .scale = Vector3(0.03f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
+		ecs::AddComponent(winScreen, SpriteRenderer{ .texture = resources::winSprite, .enabled = false, .uiElement = true });
+		ecs::AddComponent(winScreen, Transform{ .position = Vector3(0, 0, 0.5f), .scale = Vector3(0.3f) });
+
+		//Initialize each ship type's stats
+		shipComponents.insert({ ShipType::torpedoBoat,
+			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+		shipComponents.insert({ ShipType::submarine,
+			Player{.accelerationSpeed = 800, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+		shipComponents.insert({ ShipType::cannonBoat,
+			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+		shipComponents.insert({ ShipType::hedgehogBoat,
+			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+
+		//Initialize ship type models
+		shipModels.insert({ ShipType::torpedoBoat, resources::laMuerteModel });
+		shipModels.insert({ ShipType::submarine, resources::checkPointModel });
+		shipModels.insert({ ShipType::cannonBoat, resources::laMuerteModel });
+		shipModels.insert({ ShipType::hedgehogBoat, resources::laMuerteModel });
 	}
 
 	std::array<float, 4> GetPlayerBounds()
 	{
 		std::array<float, 4> playerBounds{ -INFINITY, -INFINITY, INFINITY, INFINITY };
-
-		//Get the min and max bounds of each player together
 
 		for (auto itr = entities.begin(); itr != entities.end();)
 		{
@@ -114,37 +121,35 @@ public:
 
 	static void OnCollision(Collision collision)
 	{
+		// collision.a is always a player
 		// Get references to the involved components
-		Player& player = ecs::GetComponent<Player>(collision.a);  // collision.a on sama kun player entitety eli on sama kuin ( laMuerte) 
+		Player& player = ecs::GetComponent<Player>(collision.a);
 		Transform& playertranform = ecs::GetComponent<Transform>(collision.a);
-
 		PolygonCollider& playerCollider = ecs::GetComponent<PolygonCollider>(collision.a);
 
+		// Slow player down when off track
 		if (collision.type == Collision::Type::tilemapCollision)
 		{
-			ecs::GetComponent<Rigidbody>(collision.a).velocity *= 0.99f;
-
+			ecs::GetComponent<Rigidbody>(collision.a).velocity *= 0.991f;
 		}
-		// Check if the collision involves a checkpoint
 
-		// true tai false 
-		if (ecs::HasComponent<CheckPoint>(collision.b)) // varmista onko osuu checkpoint
+		// Check if the collision involves a checkpoint
+		if (ecs::HasComponent<CheckPoint>(collision.b))
 		{
-			CheckPoint& checkpoint = ecs::GetComponent<CheckPoint>(collision.b);  // hae checkpoint componenti
-			if (player.previousCheckpoint + 1 == checkpoint.checkPointID)        // tarkista onko pelaja osu oiken checkpoit
+			CheckPoint& checkpoint = ecs::GetComponent<CheckPoint>(collision.b);	// Get checkpoint component
+			if (player.previousCheckpoint + 1 == checkpoint.checkPointID)			// Check whether player collided with next checkpoint
 			{
-				player.previousCheckpoint = checkpoint.checkPointID;              // asenta pelaja vimene checkpoin osunut 
+				player.previousCheckpoint = checkpoint.checkPointID;				// Set as previous checkpoint
 				if (checkpoint.Finish_line)
 				{
-					if (player.lap == 1)
+					if (player.lap == lapCount)
 					{
-						if (!HAS_WON)
+						if (!hasWon)
 						{
-							HAS_WON = true;
-							TextRenderer& winText = ecs::GetComponent<TextRenderer>(playerWin);
-							SpriteRenderer& winSprite = ecs::GetComponent<SpriteRenderer>(playerWin);
-							winSprite.enabled = true;
-							winText.text = player.playername;
+							//Display the win screen
+							hasWon = true;
+							ecs::GetComponent<TextRenderer>(winScreen).text = "Player " + std::to_string(player.id + 1);
+							ecs::GetComponent<SpriteRenderer>(winScreen).enabled = true;
 						}
 					}
 					else
@@ -156,38 +161,42 @@ public:
 			}
 		}
 		// Check if the collision involves a projectile
-		else if (ecs::HasComponent<Projectile>(collision.b))
+		else if (ecs::HasComponent<Torpedo>(collision.b))
 		{
 			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(collision.b);
 			Transform& projectransfor = ecs::GetComponent<Transform>(collision.b);
-			Projectile& projectile = ecs::GetComponent<Projectile>(collision.b); // tällä on Entity on collision.b 
-			//Projectile& projectile = ecs::GetComponent<Projectile>(collision.a);
-			if (player.id != projectile.ownerID)
+			Torpedo& torpedo = ecs::GetComponent<Torpedo>(collision.b); // Entity is collision.b 
+
+			if (player.id != torpedo.ownerID)
 			{
 				player.isHit = true;
 				CreateAnimation(projectransfor.position + rigidbody.velocity / 15);
 				ecs::DestroyEntity(collision.b);
-				player.playExlposionSound = true;
 			}
 		}
-	}
-	// check if projectil collision tilemap Trigger
-	static void OnprojectilCollision(Collision collision)
-	{
-		Transform& projectransfor = ecs::GetComponent<Transform>(collision.a);
-		if (collision.type == Collision::Type::tilemapTrigger)
+		else if (ecs::HasComponent<Cannon>(collision.b))
 		{
-			if (collision.b != 1)
-			{   // Do animation where projectile impact 
-				CreateAnimation(projectransfor.position);
-				ecs::DestroyEntity(collision.a);
+			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(collision.b);
+			Transform& projectransfor = ecs::GetComponent<Transform>(collision.b);
+			Cannon& shell = ecs::GetComponent<Cannon>(collision.b); // Entity is collision.b 
+
+			if (player.id != shell.ownerID)
+			{
+				player.isHit = true;
+				CreateAnimation(projectransfor.position + rigidbody.velocity / 15);
+				ecs::DestroyEntity(collision.b);
 			}
 		}
 	}
-
 	/// PlayerControlle Update 
 	void Update(GLFWwindow* window, float dt)
 	{
+		//Don't do anything until countdown is done
+		if (countdownTimer > 0)
+		{
+			countdownTimer -= dt;
+			return;
+		}
 		// Iterate through entities in the system
 		for (auto itr = entities.begin(); itr != entities.end();)
 		{
@@ -311,24 +320,20 @@ public:
 			// topedo hit logica 
 			if (player.isHit == true)
 			{
-				// Hacer que el jugador gire 360 grados instantáneamente en el eje Y
+				// Rotate player 360 degrees
 				TransformSystem::Rotate(player.renderedEntity, 0, 360.0f * dt, 0);
 
-
-				// Restablecer hitPlayer después de un cierto tiempo (por ejemplo, 2 segundos)
+				// Restabilize player when hit time has gone by
 				if (player.hitTime >= 2)
 				{
 					player.isHit = false;
-					player.hitTime = 0.0f; // Restablecer el tiempo de duración de hitPlayer
-
+					player.hitTime = 0.0f;
 				}
 				else
 				{
-					accelerationInput = 0;
-					rotateInput = 0;
-					ProjetileInput = false;
+					// Ignore all input
 
-					player.hitTime += dt; // Incrementar el tiempo de duración de hitPlayer
+					player.hitTime += dt; // Increment duration of hit time
 				}
 			}
 
@@ -345,45 +350,49 @@ public:
 			Vector2 forwardImpulse(0.0f, 0.0f);
 			if (rotateInput != 0.0f)
 			{
+				//Slow rotation based on throttle setting
+				//TODO: this function could be improved by testing
+				float rotationScalar = 1 - log10(2.0f * std::max(0.5f, accelerationInput));
 				// Apply forward impulse if rotating or receiving a rotation command
-				TransformSystem::Rotate(player.renderedEntity, 0, -rotateInput * player.rotationSpeed * dt, 0);
+				TransformSystem::Rotate(player.renderedEntity, 0, -rotateInput * player.rotationSpeed * rotationScalar * dt, 0);
 				forwardImpulse = forwardDirection * player.minAcceleration * dt;
 			}
+
 
 			// Apply acceleration impulse if positive input is received
 			if (accelerationInput > 0.0f)
 			{
-
 				forwardImpulse = forwardDirection * accelerationInput * dt * player.accelerationSpeed;
 			}
 			// Apply deceleration impulse if negative input is received
 			if (accelerationInput < 0.0f)
 			{
-
+				// TODO: Deacceleration rate
 				forwardImpulse = forwardDirection * accelerationInput * dt * player.accelerationSpeed * 0.3;
 			}
 
-			// "Check if the variable 'ProjectileInput' is true and if the projectile time is equal to or less than zero."
+			// Check if the variable 'ProjectileInput' is true and if the projectile time is equal to or less than zero.
 			if (ProjetileInput && player.projectileShootCooldown <= 0.0f)
 			{
-				// "Create a projectile using the parameters of the player object."
+				// Create a projectile using the parameters of the player object.
 				if (player.actionTimer1 <= 0.0f)
 				{
-					CreateProjectile(forwardDirection, player.projectileSpeed, transform.position, modelTransform.rotation, player.id);
+					CreateCannonProjectile(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
 					// Reset the projectile time to a cooldown 
-					player.actionTimer1 = 0.0f;
-					// "Create a cooldown time between shots."
+					player.actionTimer1 = 1.f;
+					// Create a cooldown time between shots.
 					player.projectileShootCooldown = 0.2f;
 				}
 
 				else if (player.projectileRechargeTime <= 0.0f)
 				{
-					CreateProjectile(forwardDirection, player.projectileSpeed, transform.position, modelTransform.rotation, player.id);
-					player.projectileRechargeTime = 0.0f;
+					CreateCannonProjectile(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
+					player.projectileRechargeTime = 1.f;
 					player.projectileShootCooldown = 0.2f;
 				}
-
 			}
+
+			
 
 			// Decrease the projectile time by the elapsed time (dt)
 			player.actionTimer1 -= dt;
@@ -397,8 +406,11 @@ public:
 		}
 	}
 
+	Vector3 avgPosition;
+	std::array<float, 4> playerBounds{ -INFINITY, -INFINITY, INFINITY, INFINITY };
+
 	//Spawn 1-4 players, all in a line from top to bottom
-	static void CreatePlayers(int count, Vector2 startPos)
+	void CreatePlayers(int count, Vector2 startPos, std::vector<ShipType> shipTypes)
 	{
 		Vector2 offset(0, 60);
 		for (int i = 0; i < count; i++)
@@ -412,21 +424,26 @@ public:
 
 
 			//Create the player entity which contains everything but rendering
-			ecs::AddComponent(player, Player{ .accelerationSpeed = 300, .minAcceleration = 120, .id = i, .nameText = playerNameText, .renderedEntity = playerRender });
+			//Player component is a bit special
+			ecs::AddComponent(player, shipComponents[shipTypes[i]]);
+			Player& playerComponent = ecs::GetComponent<Player>(player);
+			playerComponent.id = i;
+			playerComponent.renderedEntity = playerRender;
+			playerComponent.nameText = playerNameText;
+
 			ecs::AddComponent(player, Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			ecs::AddComponent(player, Rigidbody{ .drag = 0.025 });
 			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
 			ecs::AddComponent(player, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
-			
 
 			//Create the player's name tag
-			ecs::AddComponent(playerNameText, TextRenderer{ .font = resources::niagaraFont, .text = "P" + to_string(i + 1), .color = Vector3(0.5, 0.8, 0.2)});
-			ecs::AddComponent(playerNameText, Transform{ .position = Vector3(-2, 2, 1) , .scale = Vector3(0.1)});
+			ecs::AddComponent(playerNameText, TextRenderer{ .font = resources::niagaraFont, .text = "P" + to_string(i + 1), .color = Vector3(0.5, 0.8, 0.2) });
+			ecs::AddComponent(playerNameText, Transform{ .position = Vector3(-2, 2, 1) , .scale = Vector3(0.1) });
 			TransformSystem::AddParent(playerNameText, player);
 
 			//Create the player's rendered entity
 			ecs::AddComponent(playerRender, Transform{ .rotation = Vector3(45, 0, 0) });
-			ecs::AddComponent(playerRender, ModelRenderer{ .model = resources::laMuerteModel});
+			ecs::AddComponent(playerRender, ModelRenderer{ .model = shipModels[shipTypes[i]] });
 			TransformSystem::AddParent(playerRender, player);
 
 			//Create the players's torpedo indicators
@@ -438,9 +455,9 @@ public:
 			TransformSystem::AddParent(torpIndicator2, player);
 		}
 	}
-
-	Vector3 avgPosition;
-	std::array<float, 4> playerBounds{ -INFINITY, -INFINITY, INFINITY, INFINITY };
 };
 
-ecs::Entity PlayerController::playerWin = playerWin;
+//Static member definitions
+ecs::Entity PlayerController::winScreen = winScreen;
+bool PlayerController::hasWon = false;
+int PlayerController::lapCount = 1;
