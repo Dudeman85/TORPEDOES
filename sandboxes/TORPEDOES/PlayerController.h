@@ -15,34 +15,36 @@ struct Player
 
 	int id = 0;
 
-	//Movement stats
+	// Movement stats
 	float accelerationSpeed;
 	float rotationSpeed;
-	//Minimum acceleration while rotating
-	float minAcceleration = 100;
+	float minAcceleration = 100;	// Minimum acceleration while rotating
 
-	//Action cooldowns
-	float mainCooldown;
-	float specialCooldown;
+	// Action cooldowns
+	float shootCooldown = 0.2f;			// Time between shots
+	float specialCooldown = 0.2f;		// Time between special uses
+	float ammoRechargeCooldown = 5.f;	// Time between gaining ammo
 
-	//Action timers
-	float actionTimer1 = 0.0f;
-	float projectileRechargeTime = 0.0f;
-	float projectileShootCooldown = 0.0f;
+	int ammo = 0;
+	int maxAmmo = 2;
 
-	//Action functions
+	// Action timers
+	float _ammoRechargeTimer = 0.0f;
+	float _shootTimer = 0.0f;
+
+	// Action functions
 	std::function<void(ecs::Entity, int)> mainAction;
 	std::function<void(ecs::Entity, int)> specialAction;
 
-	//Checkpoint stuff
+	// Checkpoint stuff
 	int previousCheckpoint = -1;
 	int lap = 1;
 
-	//Hit by weapon stuff
+	// Hit by weapon stuff
 	bool isHit = false;
 	float hitTime = 0;
 
-	//Rendered Child entities
+	// Rendered Child entities
 	ecs::Entity renderedEntity;
 	ecs::Entity nameText;
 };
@@ -209,7 +211,7 @@ public:
 
 			// Movement
 
-				// Torpedo hit logic
+			// Torpedo hit logic
 			if (player.isHit == true)
 			{
 				// Rotate player 360 degrees
@@ -258,31 +260,45 @@ public:
 				forwardImpulse = forwardDirection * accelerationInput * dt * player.accelerationSpeed * 0.3;
 			}
 
-			// Check if the variable 'ProjectileInput' is true and if the projectile time is equal to or less than zero.
-			if (ProjetileInput && player.projectileShootCooldown <= 0.0f)
+			// Shooting
+
+			// Increase the projectile timers by the elapsed time (dt)
+			player._ammoRechargeTimer += dt;
+			player._shootTimer += dt;
+
+			// Check if the variable 'ProjectileInput' is true and if the projectile cooldown has passed.
+			if (player._shootTimer <= player.shootCooldown)
 			{
-				// Create a projectile using the parameters of the player object.
-				if (player.actionTimer1 <= 0.0f)
+				// If we pressed button and have ammo
+				if (ProjetileInput && (player.ammo >= 0))
 				{
+					// Create a projectile using the parameters of the player object.
 					CreateProjectile(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
-					// Reset the projectile time to a cooldown 
-					player.actionTimer1 = 5.f;
-					// Create a cooldown time between shots.
-					player.projectileShootCooldown = 0.2f;
+
+					// Reset ammo recharge time... Why do we do this?
+					player._ammoRechargeTimer = 0;
 				}
 
-				else if (player.projectileRechargeTime <= 0.0f)
+				// Reset the projectile time to a cooldown 
+				//player._ammo = 0;
+
+				/*
+				else if (player._projectileRechargeTime <= 0.2f)
 				{
 					CreateProjectile(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
-					player.projectileRechargeTime = 5.f;
-					player.projectileShootCooldown = 0.2f;
-				}
+					player._projectileTimer = 5.f;
+					player._projectileTimer = 0.2f;
+				}*/
 			}
 
-			// Decrease the projectile time by the elapsed time (dt)
-			player.actionTimer1 -= dt;
-			player.projectileRechargeTime -= dt;
-			player.projectileShootCooldown -= dt;
+			if (player._ammoRechargeTimer >= player.ammoRechargeCooldown)
+			{
+				if (player.ammo <= player.maxAmmo)
+				{
+					player.ammo++;
+					player._ammoRechargeTimer = 0;
+				}
+			}
 
 			collider.rotationOverride = modelTransform.rotation.y + 1080;
 
