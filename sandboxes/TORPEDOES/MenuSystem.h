@@ -31,7 +31,7 @@ struct PlayerSelection
 ECS_REGISTER_SYSTEM(PlayerSelectSystem, PlayerSelection, Transform)
 class PlayerSelectSystem : public ecs::System
 {
-	const float cooldownTime = 2;
+	const float cooldownTime = 1;
 	//ecs::Entity playerSelection;
 
 	bool isPlayersReady = false;
@@ -249,7 +249,7 @@ class PauseSystem : public ecs::System
 public:
 	float upTimer = 0;
 	float downTimer = 0;
-	const float delay = 0.2f;
+	const float delay = 2;
 	ecs::Entity currentSelection;
 	bool isGamePause = false;
 
@@ -266,21 +266,23 @@ public:
 		//printf("IN PauseSystem UPDATE()\n");
 		if (input::GetNewPress("Pause"))
 		{
-			printf("Pause\n");
+			
 			//isGamePause = !isGamePause;
 			ToggleShowUIMenu();
 		}
 		if (isGamePause)
 		{
-
-			printf("isGamePause is true\n");
+			//printf("isGamePause is true\n");
+			//printf("deltatime %d \n", deltaTime);
+			//printf("upTime %d \n", upTimer);
 			if (input::GetInputValue("Move0", GLFW_GAMEPAD_AXIS_LEFT_Y) >= 0.5f)
 			{
+			std::cout << "upTimer" << upTimer<<"\n";
 				upTimer += deltaTime;
 
 				if (upTimer >= delay)
 				{
-					printf("move up input\n");
+					printf("\n\n move up input\n\n");
 					MoveUpper();
 					upTimer = 0;
 				}

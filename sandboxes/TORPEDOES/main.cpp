@@ -77,13 +77,17 @@ void LoadLevel1(Camera* cam)
 void SetupInput()
 {
 	input::ConstructDigitalEvent("Pause");
-	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
+	//input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
 	// TODO: add controller pause key
 
 	for (size_t i = 0; i < 4; i++)
 	{
 		input::ConstructAnalogEvent("Move" + std::to_string(i));
+		input::ConstructAnalogEvent("Move" + std::to_string(i));
 
+		input::ConstructDigitalEvent("Menu" + std::to_string(i));
+		input::ConstructDigitalEvent("Pause" + std::to_string(i));
+		input::ConstructDigitalEvent("Select" + std::to_string(i));
 		input::ConstructDigitalEvent("Shoot" + std::to_string(i));
 		input::ConstructDigitalEvent("Boost" + std::to_string(i));
 
@@ -100,9 +104,12 @@ void SetupInput()
 
 	input::bindDigitalInput(GLFW_KEY_N, { "Shoot0" });
 	input::bindDigitalInput(GLFW_KEY_M, { "Boost0" });
+	input::bindDigitalInput(GLFW_KEY_U, { "Menu" });
+	input::bindDigitalInput(GLFW_GAMEPAD_BUTTON_B, { "Menu" });
 
  	input::bindAnalogInput(GLFW_KEY_UP, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y);
 	input::bindAnalogInput(GLFW_KEY_DOWN, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y, -1);
+	input::bindAnalogInput(GLFW_KEY_U, { "Select" }, GLFW_GAMEPAD_BUTTON_B);
 	/*
 	input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft0" });
 	input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight0" });
@@ -169,8 +176,9 @@ int main()
 			pauseSystem->isGamePause = true;
 			pauseSystem->Update();
 		}
-		if (input::GetNewPress("SelectShip"))
+		if (input::GetNewPress("Menu"))
 		{
+			printf("Ship selection menu open");
 			ShipSelectionSystem->isShipSelectionMenuOn = true;
 		
 			ShipSelectionSystem->ToggleMenuPlayerSelection();
