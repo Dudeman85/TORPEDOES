@@ -23,7 +23,7 @@ namespace resources
 	void LoadResources(Camera* cam)
 	{
 		uiTextures = engine::PreloadTextures("GUI");
-		menuTextures = engine::PreloadTextures("menuUI");
+		menuTextures = engine::PreloadTextures("menuUI", true, GL_LINEAR_MIPMAP_NEAREST);
 
 		models = engine::PreloadModels("3dmodels");
 
