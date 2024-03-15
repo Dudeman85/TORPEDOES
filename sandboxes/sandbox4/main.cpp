@@ -5,85 +5,33 @@
 //Sanity saver
 using namespace engine;
 
-ecs::Entity entity;
-ecs::Entity entity2;
-
-int level = 0;
-
-Texture* strawberry;
-
-//Load some models
-Model* ship;
-Tilemap* tilemap;
-
-void CreateLevel1(Camera* cam)
+ECS_REGISTER_COMPONENT(TestComponent)
+struct TestComponent
 {
-	level = 1;
+	ecs::Entity toDelete;
+};
 
-	delete tilemap;
-	tilemap = new Tilemap(cam);
-	tilemap->loadMap("level1.tmx");
-	spriteRenderSystem->SetTilemap(tilemap);
-	collisionSystem->SetTilemap(tilemap);
-
-	//Create a new entity
-	entity = ecs::NewEntity();
-	//Add the transform and SpriteRenderer components required for rendering a sprite
-	ecs::AddComponent(entity, Transform{ .position = Vector3(10, 10, 0), .rotation = Vector3(54, 45, 0), .scale = Vector3(30) });
-	ecs::AddComponent(entity, SpriteRenderer{ .texture = strawberry });
-	ecs::AddComponent(entity, ModelRenderer{ .model = ship });
-	ecs::AddComponent(entity, Rigidbody{});
-
-	//Create a new entity
-	entity2 = ecs::NewEntity();
-	//Add the transform and SpriteRenderer components required for rendering a sprite
-	ecs::AddComponent(entity2, Transform{ .position = Vector3(0, 0, -10), .rotation = Vector3(90, 0, 0), .scale = Vector3(0.5) });
-	ecs::AddComponent(entity2, SpriteRenderer{ .texture = strawberry });
-	ecs::AddComponent(entity2, ModelRenderer{ .model = ship });
-	ecs::AddComponent(entity2, Timer{ .duration = 5, .callback = ecs::DestroyEntity, .running = true });
-
-	TransformSystem::AddParent(entity2, entity);
-}
-void UnloadLevel(bool everything = false)
+ECS_REGISTER_SYSTEM(TestSystem, TestComponent)
+class TestSystem : public ecs::System
 {
-	level = 0;
-	ecs::DestroyAllEntities(everything);
-	spriteRenderSystem->RemoveTilemap();
-	collisionSystem->RemoveTilemap();
-}
+public:
+	void Update()
+	{
+		int i = 0;
 
-void CreateLevel2(Camera* cam)
-{
-	level = 2;
+		// Iterate through entities in the system
+		for (auto itr = entities.begin(); itr != entities.end();)
+		{			// Get the entity and increment the iterator
+			ecs::Entity entity = *itr++;
+		
+			auto& comp = ecs::GetComponent<TestComponent>(entity);
 
-	delete tilemap;
-	tilemap = new Tilemap(cam);
-	tilemap->loadMap("torptest.tmx");
-	spriteRenderSystem->SetTilemap(tilemap);
-	collisionSystem->SetTilemap(tilemap);
+			ecs::DestroyEntity(comp.toDelete);
 
-	//Create a new entity
-	entity = ecs::NewEntity();
-	//Add the transform and SpriteRenderer components required for rendering a sprite
-	ecs::AddComponent(entity, Transform{ .position = Vector3(1, 0, 0), .rotation = Vector3(0, 0, 0), .scale = Vector3(30) });
-	ecs::AddComponent(entity, SpriteRenderer{ .texture = strawberry });
-	ecs::AddComponent(entity, Rigidbody{});
-
-	//Create a new persistent entity
-	entity2 = ecs::NewEntity();
-	//Add the transform and SpriteRenderer components required for rendering a sprite
-	ecs::AddComponent(entity2, Transform{ .position = Vector3(500, 500, 0), .rotation = Vector3(0, 0, 90), .scale = Vector3(50) });
-	ecs::AddComponent(entity2, SpriteRenderer{ .texture = strawberry });
-	ecs::AddTag(entity2, "persistent");
-}
-
-void LoadModels()
-{
-	//Load some sprites
-	strawberry = new Texture("testAssets/strawberry.png");
-	//Load some models
-	ship = new Model("testAssets/Achelous.obj");
-}
+			cout << "Completed Iterations: " << i++ << endl;
+		}
+	}
+};
 
 int main()
 {
@@ -104,15 +52,20 @@ int main()
 	//Set the bacground color
 	SpriteRenderSystem::SetBackgroundColor(0, 150, 0);
 
-	LoadModels();
-
-	CreateLevel1(&cam);
-
-	TimerSystem::ScheduleFunction([]() { std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n"; }, 1, false, ScheduledFunction::Type::seconds);
-	TimerSystem::ScheduleFunction([]() { std::cout << "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\n"; }, 2, true, ScheduledFunction::Type::seconds);
+	auto testSystem = ecs::GetSystem<TestSystem>();
 
 
-	std::unordered_map<std::string, Texture*> textures = engine::PreloadTextures("testAssets");
+	ecs::Entity e1 = ecs::NewEntity();
+	ecs::Entity e2 = ecs::NewEntity();
+	ecs::Entity e3 = ecs::NewEntity();
+	ecs::Entity e4 = ecs::NewEntity();
+
+
+	ecs::AddComponent(e1, TestComponent{e2});
+	ecs::AddComponent(e2, TestComponent{e3});
+	ecs::AddComponent(e3, TestComponent{e4});
+	ecs::AddComponent(e4, TestComponent{e1});
+
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -121,21 +74,7 @@ int main()
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
-		//Getting basic input and moving
-		if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-		{
-			UnloadLevel();
-			CreateLevel1(&cam);
-		}
-		if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-		{
-			UnloadLevel();
-			CreateLevel2(&cam);
-		}
-		if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
-		{
-			UnloadLevel(true);
-		}
+		testSystem->Update();
 
 		//Update all engine systems, this usually should go last in the game loop
 		Update(&cam);

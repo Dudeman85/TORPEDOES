@@ -47,7 +47,7 @@ static void OnTopedoCollision(Collision collision)
 				ecs::Entity torpedo = ecs::NewEntity();
 	ecs::AddComponent(torpedo, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
 	ecs::AddComponent(torpedo, Rigidbody{ .velocity = direction * projectileSpeed });
-	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::torpedoModel });
+	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models["torpedo.obj"]});
 	std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
 	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnTopedoCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
 	ecs::AddComponent(torpedo, Torpedo{ .ownerID = owerID });
