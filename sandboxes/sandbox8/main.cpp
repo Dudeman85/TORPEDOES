@@ -70,6 +70,7 @@ void LoadLevel1(Camera* cam)
 
 int main()
 {
+
 	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window");
 
 	EngineInit();
@@ -89,6 +90,7 @@ int main()
 	resources::LoadResources(&cam);
 
 	input::initialize(window);
+
 
 	std::shared_ptr<PauseSystem> pauseSystem = ecs::GetSystem<PauseSystem>();
 	pauseSystem->Init(window);
