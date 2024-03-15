@@ -324,5 +324,5 @@ void Tilemap::initGLStuff(const tmx::Map& map)
 
 std::shared_ptr<engine::Texture> Tilemap::loadTexture(const std::string& path)
 {
-	return std::make_shared<engine::Texture>(path.c_str(), GL_NEAREST, false, false);
+	return std::make_shared<engine::Texture>(path.c_str(), GL_NEAREST, false);
 }
