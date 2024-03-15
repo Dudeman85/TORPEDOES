@@ -53,14 +53,6 @@ public:
 	ecs::Entity currentSelection;
 	bool isGamePause;
 
-	~PauseSystem() {
-		delete currentSelected_Texture;
-		//TODO DELETE ALL TEXTURES
-		for (Texture* texture : allTextures)
-		{
-			delete texture;
-		}
-	}
 	void Update()
 	{
 		printf("IN MENU SYSTEM UPDATE()\n");

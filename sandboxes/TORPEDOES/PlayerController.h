@@ -11,8 +11,6 @@ enum ShipType { torpedoBoat, submarine, cannonBoat, hedgehogBoat, pirateShip };
 ECS_REGISTER_COMPONENT(Player)
 struct Player
 {
-	ShipType shipType; //This might not be necessary
-
 	int id = 0;
 
 	//Movement stats
@@ -89,7 +87,7 @@ public:
 			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 
 		//Initialize ship type models
-		shipModels.insert({ ShipType::torpedoBoat, resources::models["LaMuerte.obj"]});
+		shipModels.insert({ ShipType::torpedoBoat, resources::models["LaMuerte.obj"] });
 		shipModels.insert({ ShipType::submarine, resources::models["LaMuerte.obj"] });
 		shipModels.insert({ ShipType::cannonBoat, resources::models["LaMuerte.obj"] });
 		shipModels.insert({ ShipType::hedgehogBoat, resources::models["LaMuerte.obj"] });
@@ -171,7 +169,11 @@ public:
 			{
 				player.isHit = true;
 				CreateAnimation(projectransfor.position + rigidbody.velocity / 15);
-				ecs::DestroyEntity(collision.b);
+
+				//Destroy torpedo at end of frame
+				//TODO: actually fix entity deletion bug
+				std::function<void()> destroyTorpedo = [collision]() { ecs::DestroyEntity(collision.b); };
+				TimerSystem::ScheduleFunction(destroyTorpedo, -1);
 			}
 		}
 	}

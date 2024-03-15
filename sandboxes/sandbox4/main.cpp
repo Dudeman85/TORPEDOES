@@ -108,15 +108,21 @@ int main()
 
 	CreateLevel1(&cam);
 
-	TimerSystem::ScheduleFunction([]() { std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n"; }, 1, false, ScheduledFunction::Type::seconds);
-	TimerSystem::ScheduleFunction([]() { std::cout << "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\n"; }, 2, true, ScheduledFunction::Type::seconds);
-
-
 	std::unordered_map<std::string, Texture*> textures = engine::PreloadTextures("testAssets");
+
+	double timer = 0;
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
+		if (timer < 0)
+		{
+			std::cout << "second\n";
+			timer = 1;
+		}
+		else
+			timer -= engine::deltaTime;
+
 		//Close window when Esc is pressed
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
