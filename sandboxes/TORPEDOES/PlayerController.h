@@ -11,38 +11,38 @@ enum ShipType { torpedoBoat, submarine, cannonBoat, hedgehogBoat, pirateShip };
 ECS_REGISTER_COMPONENT(Player)
 struct Player
 {
-	ShipType shipType; //This might not be necessary
-
 	int id = 0;
 
-	//Movement stats
+	// Movement stats
 	float accelerationSpeed;
 	float rotationSpeed;
-	//Minimum acceleration while rotating
-	float minAcceleration = 100;
+	float minAcceleration = 100;	// Minimum acceleration while rotating
 
-	//Action cooldowns
-	float mainCooldown;
-	float specialCooldown;
+	// Action cooldowns
+	float shootCooldown = 0.2f;			// Time between shots
+	float specialCooldown = 0.2f;		// Time between special uses
+	float ammoRechargeCooldown = 0.5f;	// Time between gaining ammo
 
-	//Action timers
-	float actionTimer1 = 0.0f;
-	float projectileRechargeTime = 0.0f;
-	float projectileShootCooldown = 0.0f;
+	int ammo = 0;
+	int maxAmmo = 2;
 
-	//Action functions
+	// Action timers
+	float _ammoRechargeTimer = 0.0f;
+	float _shootTimer = 0.0f;
+
+	// Action functions
 	std::function<void(ecs::Entity, int)> mainAction;
 	std::function<void(ecs::Entity, int)> specialAction;
 
-	//Checkpoint stuff
+	// Checkpoint stuff
 	int previousCheckpoint = -1;
 	int lap = 1;
 
-	//Hit by weapon stuff
+	// Hit by weapon stuff
 	bool isHit = false;
 	float hitTime = 0;
 
-	//Rendered Child entities
+	// Rendered Child entities
 	ecs::Entity renderedEntity;
 	ecs::Entity nameText;
 };
@@ -75,24 +75,24 @@ public:
 		//Create the entity to be shown at a win
 		winScreen = ecs::NewEntity();
 		ecs::AddComponent(winScreen, TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.5, 2, 1), .scale = Vector3(0.03f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-		ecs::AddComponent(winScreen, SpriteRenderer{ .texture = resources::winSprite, .enabled = false, .uiElement = true });
+		ecs::AddComponent(winScreen, SpriteRenderer{ .texture = resources::uiTextures["winner.png"], .enabled = false, .uiElement = true });
 		ecs::AddComponent(winScreen, Transform{ .position = Vector3(0, 0, 0.5f), .scale = Vector3(0.3f) });
 
 		//Initialize each ship type's stats
 		shipComponents.insert({ ShipType::torpedoBoat,
-			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 		shipComponents.insert({ ShipType::submarine,
-			Player{.accelerationSpeed = 800, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.accelerationSpeed = 800, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 		shipComponents.insert({ ShipType::cannonBoat,
-			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 		shipComponents.insert({ ShipType::hedgehogBoat,
-			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 
 		//Initialize ship type models
-		shipModels.insert({ ShipType::torpedoBoat, resources::laMuerteModel });
-		shipModels.insert({ ShipType::submarine, resources::checkPointModel });
-		shipModels.insert({ ShipType::cannonBoat, resources::laMuerteModel });
-		shipModels.insert({ ShipType::hedgehogBoat, resources::laMuerteModel });
+		shipModels.insert({ ShipType::torpedoBoat, resources::models["LaMuerte.obj"] });
+		shipModels.insert({ ShipType::submarine, resources::models["LaMuerte.obj"] });
+		shipModels.insert({ ShipType::cannonBoat, resources::models["LaMuerte.obj"] });
+		shipModels.insert({ ShipType::hedgehogBoat, resources::models["LaMuerte.obj"] });
 	}
 
 	//Get the min and max bounds of every player
@@ -171,7 +171,11 @@ public:
 			{
 				player.isHit = true;
 				CreateAnimation(projectransfor.position + rigidbody.velocity / 15);
-				ecs::DestroyEntity(collision.b);
+
+				//Destroy torpedo at end of frame
+				//TODO: actually fix entity deletion bug
+				std::function<void()> destroyTorpedo = [collision]() { ecs::DestroyEntity(collision.b); };
+				TimerSystem::ScheduleFunction(destroyTorpedo, -1);
 			}
 		}
 	}
@@ -207,9 +211,9 @@ public:
 			accelerationInput = std::clamp(accelerationInput, -1.0f, 1.0f);
 			rotateInput = std::clamp(rotateInput, -1.0f, 1.0f);
 
-			// Movement
+			/* Movement */
 
-				// Torpedo hit logic
+			// Torpedo hit logic
 			if (player.isHit == true)
 			{
 				// Rotate player 360 degrees
@@ -224,7 +228,6 @@ public:
 				else
 				{
 					// Ignore all input
-					return;
 
 					player.hitTime += dt; // Increment duration of hit time
 				}
@@ -240,16 +243,10 @@ public:
 			if (rotateInput != 0.0f)
 			{
 				//Slow rotation based on throttle setting
-				//TODO: this function could be improved
+				//TODO: this function could be improved by testing
 				float rotationScalar = 1 - log10(2.0f * std::max(0.5f, accelerationInput));
-				if (player.id == 0)
-				{
-					std::cout << accelerationInput << std::endl;
-					std::cout << rotationScalar << std::endl;
-
-				}
 				// Apply forward impulse if rotating or receiving a rotation command
-				TransformSystem::Rotate(player.renderedEntity, 0, -rotateInput * player.rotationSpeed * dt, 0);
+				TransformSystem::Rotate(player.renderedEntity, 0, -rotateInput * player.rotationSpeed * rotationScalar * dt, 0);
 				forwardImpulse = forwardDirection * player.minAcceleration * dt;
 			}
 
@@ -265,36 +262,47 @@ public:
 				forwardImpulse = forwardDirection * accelerationInput * dt * player.accelerationSpeed * 0.3;
 			}
 
-			// Check if the variable 'ProjectileInput' is true and if the projectile time is equal to or less than zero.
-			if (ProjetileInput && player.projectileShootCooldown <= 0.0f)
-			{
-				// Create a projectile using the parameters of the player object.
-				if (player.actionTimer1 <= 0.0f)
-				{
-					CreateProjectile(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
-					// Reset the projectile time to a cooldown 
-					player.actionTimer1 = 5.f;
-					// Create a cooldown time between shots.
-					player.projectileShootCooldown = 0.2f;
-				}
-
-				else if (player.projectileRechargeTime <= 0.0f)
-				{
-					CreateProjectile(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
-					player.projectileRechargeTime = 5.f;
-					player.projectileShootCooldown = 0.2f;
-				}
-			}
-
-			// Decrease the projectile time by the elapsed time (dt)
-			player.actionTimer1 -= dt;
-			player.projectileRechargeTime -= dt;
-			player.projectileShootCooldown -= dt;
-
 			collider.rotationOverride = modelTransform.rotation.y + 1080;
 
 			// Apply the resulting impulse to the object
 			PhysicsSystem::Impulse(entity, forwardImpulse);
+
+			/* Shooting */
+
+			// Increase the projectile timers by the elapsed time (dt)
+			player._shootTimer += dt;
+
+			// Check if the variable 'ProjectileInput' is true and if the projectile cooldown has passed.
+			if (player._shootTimer >= player.shootCooldown)
+			{
+				// If we pressed button and have ammo
+				if (ProjetileInput && (player.ammo > 0))
+				{
+					// Create a projectile using the parameters of the player object.
+					CreateProjectile(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
+
+					player.ammo--;
+
+					// Reset the projectile shoot time 
+					player._shootTimer = 0;
+
+					if(player.id == 0)
+					std::cout << "ammo: " << player.ammo << "\n";
+				}
+			}
+
+			// If not max ammo
+			if (player.ammo < player.maxAmmo)
+			{
+				player._ammoRechargeTimer += dt;
+
+				if (player._ammoRechargeTimer >= player.ammoRechargeCooldown)
+				{
+					// Add ammo
+					player.ammo++;
+					player._ammoRechargeTimer = 0;
+				}
+			}
 		}
 	}
 
@@ -336,10 +344,10 @@ public:
 			TransformSystem::AddParent(playerRender, player);
 
 			//Create the players's torpedo indicators
-			ecs::AddComponent(torpIndicator1, SpriteRenderer{ .texture = resources::torpReadyTexture });
+			ecs::AddComponent(torpIndicator1, SpriteRenderer{ .texture = resources::uiTextures["UI_Green_Torpedo_Icon.png"] });
 			ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(-2, -2, 10), .scale = Vector3(2, .5, 1) });
 			TransformSystem::AddParent(torpIndicator1, player);
-			ecs::AddComponent(torpIndicator2, SpriteRenderer{ .texture = resources::torpReadyTexture });
+			ecs::AddComponent(torpIndicator2, SpriteRenderer{ .texture = resources::uiTextures["UI_Green_Torpedo_Icon.png"] });
 			ecs::AddComponent(torpIndicator2, Transform{ .position = Vector3(2, -2, 10), .scale = Vector3(2, .5, 1) });
 			TransformSystem::AddParent(torpIndicator2, player);
 		}

@@ -16,7 +16,7 @@ struct Player
 	float rotationSpeed = 50; // Rotation speed
 	float projectileTime = 0;
 	int lap = 0;
-	float actionTimer1 = 0.0f;
+	float _actionTimer1 = 0.0f;
 	float projectileRechargeTime = 0.0f;
 	float projectileShootCooldown = 0.0f;
 	int previousCheckpoint = -1;
@@ -170,11 +170,11 @@ public:
 			if (ProjetileInput && player.projectileShootCooldown <= 0.0f)
 			{
 				// "Create a projectile using the parameters of the player object."
-				if (player.actionTimer1 <= 0.0f)
+				if (player._actionTimer1 <= 0.0f)
 				{
 					CreateProjectile(forwardDirection, player.projectileSpeed, transform.position, transform.rotation);
 					// Reset the projectile time to a cooldown 
-					player.actionTimer1 = 5.0f;
+					player._actionTimer1 = 5.0f;
 					// "Create a cooldown time between shots."
 					player.projectileShootCooldown = 0.2f;
 				}
@@ -190,7 +190,7 @@ public:
 
 
 			// Decrease the projectile time by the elapsed time (dt)
-			player.actionTimer1 -= dt;
+			player._actionTimer1 -= dt;
 			player.projectileRechargeTime -= dt;
 			player.projectileShootCooldown -= dt;
 

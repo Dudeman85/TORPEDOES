@@ -52,7 +52,7 @@ namespace engine
             // Load .png as texture
             if (extension == "png")
             {
-                textures.emplace(name, new Texture(pathName, filteringType, true, false));
+                textures.emplace(name, new Texture(pathName, filteringType, true));
             }
         }
 
@@ -68,6 +68,8 @@ namespace engine
         for (const auto& directoryEntry : std::filesystem::directory_iterator(path))
         {
             std::string pathName = directoryEntry.path().string();
+            //Windows is stupid
+            std::replace(pathName.begin(), pathName.end(), '\\', '/');
 
             //If the item is a directory and recursive is enabled
             if (is_directory(directoryEntry.path()) && includeSubdirectories)
@@ -103,7 +105,7 @@ namespace engine
             // Load .obj as model
             if (extension == "obj")
             {
-                models.emplace(name, new Model(pathName, false));
+                models.emplace(name, new Model(pathName));
             }
         }
 
