@@ -91,7 +91,6 @@ int main()
 
 	input::initialize(window);
 
-
 	std::shared_ptr<PauseSystem> pauseSystem = ecs::GetSystem<PauseSystem>();
 	pauseSystem->Init(window);
 	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();

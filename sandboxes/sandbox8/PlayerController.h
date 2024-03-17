@@ -311,7 +311,7 @@ public:
 				{
 				
 
-					CreateHedgehog(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
+					CreateHedgehog(forwardDirection,  transform.position, modelTransform.rotation, player.id);
 					// Reset the projectile time to a cooldown 
 					player.projectileTime1 = 0.0f;
 					// Create a cooldown time between shots.
@@ -320,7 +320,7 @@ public:
 
 				else if (player.projectileTime2 <= 0.0f)
 				{
-					CreateHedgehog(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
+					CreateHedgehog(forwardDirection, transform.position, modelTransform.rotation, player.id);
 					player.projectileTime2 = 0.0f;
 					player.projectileTime3 = 0.2f;
 				}

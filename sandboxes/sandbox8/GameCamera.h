@@ -3,7 +3,7 @@
 #include "PlayerController.h"
 
 float camScale = 1.0;
-float camScaleMin = 600.0f;
+float camScaleMin = 1400.0f;
 float camScaleMax = 1650.0f;
 const float aspectRatio = 16.f / 9.f;
 float camPadding = 100;

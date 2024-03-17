@@ -56,23 +56,30 @@ void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPos
 	ecs::AddComponent(torpedo, Torpedo{ .ownerID = owerID });
 }
 
-void CreateHedgehog(Vector2 direction , float hedgehogSpeed , Vector3 spanwPposition , Vector3 sapawnRotation , int owerID)
+
+
+void CreateHedgehog(Vector2 direction,   Vector3 spanwPposition , Vector3 sapawnRotation , int owerID)
 {
+	float hedgehogSpeedVo = 500.0f;
+	float G = 25.0f ; //Gravity
+	float angleShot = engine::Radians(70); 
+
+	float vx = cos(angleShot) * hedgehogSpeedVo; // componenti in X
+	float vy = sin(angleShot) * hedgehogSpeedVo; // componeti in Y
 	
-	 float angleShot = engine::Radians(45);
-
-	float vx = angleShot * direction.x * hedgehogSpeed ;
-	float vy = angleShot * direction.y * hedgehogSpeed  / 100.0f  ;
-
 	ecs::Entity hedgehog = ecs::NewEntity();
 	ecs::AddComponent(hedgehog, Transform{ .position = spanwPposition, .rotation = sapawnRotation, .scale = Vector3(100) });
 
-	ecs::AddComponent(hedgehog, Rigidbody{ .velocity = Vector3(vx , vy, 0.0f)});
+    Vector3 finalVelocity = direction * Vector3(vx, vy, 0.0f) - (Vector3(0, G, 0) * deltaTime);
+
+	ecs::AddComponent(hedgehog, Rigidbody{ .velocity = finalVelocity });
 
 	ecs::AddComponent(hedgehog, ModelRenderer{ .model = resources::hedgehogModel });
 	std::vector<Vector2> Hedgehogverts{ Vector2(0.2, 0.25), Vector2(0.2, -0.25), Vector2(-0.2, -0.25), Vector2(-0.2, 0.25) };
 	ecs::AddComponent(hedgehog, PolygonCollider{ .vertices = Hedgehogverts, .callback = OnTopedoCollision, .trigger = true, .visualise = true,  .rotationOverride = sapawnRotation.y });
 	ecs::AddComponent(hedgehog, Torpedo{ .ownerID = owerID });
+	std::cout << "vx: " << vx << ", vy: " << vy << std::endl;
+	std::cout << "Final Velocity: " << finalVelocity.ToString() << std::endl;
 }
 
 
