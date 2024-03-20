@@ -36,13 +36,11 @@ namespace engine
 		}
 
 		///Load a texture from path
-		Texture(std::string path, unsigned int filteringType = GL_NEAREST, bool flip = true, bool relativePath = true)
+		Texture(std::string path, unsigned int filteringType = GL_NEAREST, bool flip = true)
 		{
 			//Flip the image when loading into an OpenGL texture
 			stbi_set_flip_vertically_on_load(flip);
-			//Load image
-			if (relativePath)
-				path = assetPath + path;
+
 			int width, height, nrChannels;
 			unsigned char* imageData = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
 

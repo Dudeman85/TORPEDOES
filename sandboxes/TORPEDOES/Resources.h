@@ -1,25 +1,33 @@
 #pragma once
 #include <engine/Application.h>
+#include <engine/ResourceManagement.h>
 
 namespace resources
 {
+	std::unordered_map<std::string, Texture*> uiTextures;
+	std::unordered_map<std::string, Texture*> menuTextures;
+
+	std::unordered_map<std::string, Model*> models;
+
 	Font* niagaraFont;
-	Model* checkPointModel;
-	Model* finishLineModel;
-	Texture* winSprite;
+
 	Tilemap* level1Map;
+
 	Animation explosionAnimation;
 	Animation crowdAnims;
-	Animation countdownAnim;
+	Animation countdownAnim;	
 
+	
+	//Load all the global resources here
+	//Stuff that is only used in one system can be loaded there 
 	void LoadResources(Camera* cam)
 	{
+		uiTextures = engine::PreloadTextures("GUI");
+		menuTextures = engine::PreloadTextures("menuUI", true, GL_LINEAR_MIPMAP_NEAREST);
+
+		models = engine::PreloadModels("3dmodels");
+
 		niagaraFont = new Font("Niagara Solid.ttf", 0, 0, 48);
-
-		checkPointModel = new Model("/3dmodels/Checkpoint.obj");
-		finishLineModel = new Model("/3dmodels/Finish_line.obj");
-
-		winSprite = new Texture("/GUI/winner.png");
 
 		level1Map = new Tilemap(cam);
 		level1Map->loadMap("/levels/level1.tmx");
@@ -31,6 +39,20 @@ namespace resources
 
 	void UnloadResources()
 	{
+		for (const auto model : models)
+		{
+			delete model.second;
+		}
+		for (const auto texture : uiTextures)
+		{
+			delete texture.second;
+		}
+		for (const auto texture : menuTextures)
+		{
+			delete texture.second;
+		}
 
+		delete niagaraFont;
+		delete level1Map;
 	}
 }

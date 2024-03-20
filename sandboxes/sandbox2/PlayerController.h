@@ -11,17 +11,17 @@ struct Player
 
 	float projectileSpeed = 300;               // Attack state
 	bool attackHeld = false;     // Indicates if the attack button is held
-	float acerationSpeed = 1;    // Acceleration speed
-	float minAceleration = 1;    // Minimum acceleration while rotating
+	float accelerationSpeed = 1;    // Acceleration speed
+	float minAcceleration = 1;    // Minimum acceleration while rotating
 	float rotationSpeed = 50; // Rotation speed
 	float projectileTime = 0;
 	int lap = 0;
-	float projectileTime1 = 0.0f;
-	float projectileTime2 = 0.0f;
-	float projectileTime3 = 0.0f;
+	float _actionTimer1 = 0.0f;
+	float projectileRechargeTime = 0.0f;
+	float projectileShootCooldown = 0.0f;
 	int previousCheckpoint = -1;
 
-	int playerID;
+	int id;
 };
 struct CheckPoint
 {
@@ -95,7 +95,7 @@ public:
 			float rotateInput = 0;
 			bool ProjetileInput = 0;
 			// Get keyboard input
-			if (player.playerID == 0)
+			if (player.id == 0)
 			{
 				//Player 0 only gets keyboard input
 				accelerationInput += +glfwGetKey(window, GLFW_KEY_A) - glfwGetKey(window, GLFW_KEY_Z);
@@ -105,12 +105,12 @@ public:
 			else
 			{
 				// Check joystick input
-				int present = glfwJoystickPresent(player.playerID - 1);
+				int present = glfwJoystickPresent(player.id - 1);
 				// If the joystick is present, check its state
 				if (present == GLFW_TRUE)
 				{
 					GLFWgamepadstate state;
-					glfwGetGamepadState(player.playerID - 1, &state);
+					glfwGetGamepadState(player.id - 1, &state);
 					// Get joystick input, such as rotation and acceleration
 				   // Also check if the left and right buttons are pressed
 					float rightStickX = state.axes[0];
@@ -150,49 +150,49 @@ public:
 			{
 				// Apply forward impulse if rotating or receiving a rotation command
 				TransformSystem::Rotate(entity, 0, -rotateInput * player.rotationSpeed * dt, 0);
-				forwardImpulse = forwardDirection * player.minAceleration * dt;
+				forwardImpulse = forwardDirection * player.minAcceleration * dt;
 			}
 
 			// Apply acceleration impulse if positive input is received
 			if (accelerationInput > 0.0f)
 			{
 
-				forwardImpulse = forwardDirection * accelerationInput * dt * player.acerationSpeed;
+				forwardImpulse = forwardDirection * accelerationInput * dt * player.accelerationSpeed;
 			}
 			// Apply deceleration impulse if negative input is received
 			if (accelerationInput < 0.0f)
 			{
 
-				forwardImpulse = forwardDirection * accelerationInput * dt * player.acerationSpeed * 0.3;
+				forwardImpulse = forwardDirection * accelerationInput * dt * player.accelerationSpeed * 0.3;
 			}
 
 			// "Check if the variable 'ProjectileInput' is true and if the projectile time is equal to or less than zero."
-			if (ProjetileInput && player.projectileTime3 <= 0.0f)
+			if (ProjetileInput && player.projectileShootCooldown <= 0.0f)
 			{
 				// "Create a projectile using the parameters of the player object."
-				if (player.projectileTime1 <= 0.0f)
+				if (player._actionTimer1 <= 0.0f)
 				{
 					CreateProjectile(forwardDirection, player.projectileSpeed, transform.position, transform.rotation);
 					// Reset the projectile time to a cooldown 
-					player.projectileTime1 = 5.0f;
+					player._actionTimer1 = 5.0f;
 					// "Create a cooldown time between shots."
-					player.projectileTime3 = 0.2f;
+					player.projectileShootCooldown = 0.2f;
 				}
 
-				else if (player.projectileTime2 <= 0.0f)
+				else if (player.projectileRechargeTime <= 0.0f)
 				{
 					CreateProjectile(forwardDirection, player.projectileSpeed, transform.position, transform.rotation);
-					player.projectileTime2 = 5.0f;
-					player.projectileTime3 = 0.2f;
+					player.projectileRechargeTime = 5.0f;
+					player.projectileShootCooldown = 0.2f;
 				}
 
 			}
 
 
 			// Decrease the projectile time by the elapsed time (dt)
-			player.projectileTime1 -= dt;
-			player.projectileTime2 -= dt;
-			player.projectileTime3 -= dt;
+			player._actionTimer1 -= dt;
+			player.projectileRechargeTime -= dt;
+			player.projectileShootCooldown -= dt;
 
 
 			collider.rotationOverride = transform.rotation.y + 1080;

@@ -172,10 +172,14 @@ int main()
         std::string eventName = "Move" + to_string(i);
 
         input::ConstructAnalogEvent(eventName);
-        input::bindAnalogControllerInput(GLFW_JOYSTICK_4, { GLFW_GAMEPAD_AXIS_LEFT_X, GLFW_GAMEPAD_AXIS_LEFT_Y }, { eventName });
-
-        std::cout << eventName << "\n";
+        input::bindAnalogControllerInput(i, { GLFW_GAMEPAD_AXIS_LEFT_X, GLFW_GAMEPAD_AXIS_LEFT_Y }, { eventName });
     }
+    
+    input::bindAnalogInput(GLFW_KEY_RIGHT, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_X);
+    input::bindAnalogInput(GLFW_KEY_LEFT, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_X, -1);
+    
+    input::bindAnalogInput(GLFW_KEY_UP, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y);
+    input::bindAnalogInput(GLFW_KEY_DOWN, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y, -1);
     
     input::ConstructDigitalEvent("shootEvent");
 
@@ -211,9 +215,7 @@ int main()
             std::cout << message << "\n";
         }
 
-        //std::cout << moveforward1->getValue(0) << " " << moveforward1->getValue(1) << "\n";
-
-        // TODO: Add & test API functions for easy creation, modification & access of all above
+        std::cout << input::GetInputValue("Move0", 0) << input::GetInputValue("Move0", 1) << "\n";
     }
 
     input::uninitialize();
