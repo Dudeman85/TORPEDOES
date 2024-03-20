@@ -29,8 +29,133 @@ source distribution.
 
 void TMVariables::fetchData(const std::string tilemapPath)
 {
+	// Temporal class for TMap
+	// used to store values to struct
+	TMap tmap;
+
+	// Temporal class for TGroup
+	// used to store values to struct
+	TGroup tgroup;
+
+	// Temporal class for TObject
+	// used to store values to struct
+	TObject tobject;
+
+	// Temporal class for TLayer
+	// used to store values to struct
+	TLayer tlayer;
+
+	// Temporal class for TSet
+	// used to store values to struct
+	TSet tset;
+
+	// Temporal class for TTile
+	// used to store values to struct
+	TTile ttile;
+
+	// map class for tmx::Map functions
 	tmx::Map map;
+	// Loading tilemap from filepath.
 	map.load(tilemapPath);
+	// Get all the tilesets from
+	// tilemap
+	const auto& tilesets = map.getTilesets();
+	// Iterate through tilesets
+	for (const auto& tileset : tilesets)
+	{
+		// Get the list of tiles
+		// in this tileset
+		const auto& tiles = tileset.getTiles();
+		// Iterate through the tiles
+		for (const auto& tile : tiles)
+		{
+			// Get the tile properties
+			const auto& properties = tile.properties;
+			// Iterate through tile properties
+			for (const auto& property : properties)
+			{
+				// Insert the property values in to struct
+				ttile.tile.insert(property.getName(), property.getStringValue());
+			}
+			// Insert the tile into
+			// tileset struct
+			tset.tiles.push_back(ttile);
+		}
+		// Get the tileset properties
+		const auto& properties = tileset.getProperties();
+		// Iterate the property values in to struct
+		for (const auto& property : properties)
+		{
+			// Insert the property values in to struct
+			tset.tileset.insert(property.getName(), property.getStringValue());
+		}
+		// Insert the tileset
+		// in to tilemap struct
+		tmap.tilesets.push_back(tset);
+	}
+
+	// Get all the layers
+	// from tilemap
+	const auto& aLayers = map.getLayers();
+	// Iterate through all layers
+	for (const auto& layer : aLayers)
+	{
+		// get layer's type
+		const auto& layerType = layer->getType();
+		// The different layertypes handling
+		// in switch function
+		switch (layerType)
+		{
+			// Group layer's handling
+		case tmx::Layer::Type::Group:
+			// Get this group layer's properties
+			const auto& properties = layer->getProperties();
+			// Iterate the property values in to struct
+			for (const auto& property : properties)
+			{
+				// Insert the property values in to struct
+				tgroup.group.insert(property.getName(), property.getStringValue());
+			}
+			// Insert the group layer
+			// in to tilemap struct
+			tmap.groups.push_back(tgroup);
+			break;
+			//  Object layer's handling
+		case tmx::Layer::Type::Object:
+			// Get this object layer's  properties
+			const auto& properties = layer->getProperties();
+			// Iterate the property values in to struct
+			for (const auto& property : properties)
+			{
+				// Insert the property values in to struct
+				tobject.object.insert(property.getName(), property.getStringValue());
+			}
+			// Insert the object layer
+			// in to tilemap struct
+			tmap.objects.push_back(tobject);
+			break;
+
+			// Tile layer's handling
+		case tmx::Layer::Type::Tile:
+			// Get this Tile layer's properties
+			const auto& properties = layer->getProperties();
+			// Iterate the property values in to struct
+			for (const auto& property : properties)
+			{
+				// Insert the propety values in to struct
+				tlayer.layer.emplace(property.getName(), property.getStringValue());
+			}
+			// Insert the tile layer
+			// in to tilemap struct
+			tmap.layers.push_back(tlayer);
+			break;
+		default:
+			break;
+		}
+	}
+
+	// 
+
 
 
 }
