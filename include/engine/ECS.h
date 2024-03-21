@@ -43,6 +43,161 @@ namespace engine::ecs
 
 	//ENTITY MANAGEMENT DATA
 
+	//Custom container class for storing a system's entities
+	class EntityList
+	{
+	private:
+		//Array of entities, order is not guaranteed to remain the same
+		Entity* entities;
+		uint32_t size;
+		uint32_t maxSize;
+		//Does the entities array contain any invalid entities
+		bool packed = true;
+
+		//Resize the entities list
+		void resize(uint32_t newSize)
+		{
+			Entity* newList = new Entity[newSize];
+			std::memcpy(newList, entities, size);
+			delete entities;
+			entities = newList;
+		}
+
+	public:
+		class Iterator
+		{
+		private:
+			Entity* currentPtr;
+			EntityList* parentList;
+
+		public:
+			Iterator(Entity* current, EntityList* list)
+			{
+				currentPtr = current;
+				parentList = list;
+			}
+			//Prefix, handles all logic
+			Iterator& operator++()
+			{
+				//If the entity is invalid, skip it
+				do
+				{
+					currentPtr++;
+					//Check if the pointer is out of bounds, meaning end of list
+					if (currentPtr == &parentList->entities[parentList->size])
+					{
+						if (!parentList->packed)
+							parentList->pack();
+						break;
+					}
+				} while (*currentPtr == 0);
+
+				return *this;
+			}
+			//Postfix
+			//TODO: change to actual postfix
+			Iterator operator++(int)
+			{
+				Iterator ret = *this;
+				++(*this);
+				return ret;
+			}
+			bool operator==(const Iterator& rhs)
+			{
+				return currentPtr == rhs.currentPtr;
+			}
+			bool operator!=(const Iterator& rhs)
+			{
+				return currentPtr != rhs.currentPtr;
+			}
+			Entity& operator*() const
+			{
+				return *currentPtr;
+			}
+		};
+
+		Iterator begin()
+		{
+			return Iterator(&entities[0], this);
+		}
+		Iterator end()
+		{
+			return Iterator(&entities[size], this);
+		}
+
+		EntityList()
+		{
+			size = 0;
+			maxSize = 10;
+			entities = new Entity[maxSize];
+		}
+		~EntityList()
+		{
+			delete entities;
+		}
+
+		//Add an entity to the end of the list
+		void insert(Entity e)
+		{
+			//Add 100 or double capacity to the list, whichever is less
+			if (size >= maxSize)
+				resize(maxSize + std::min(maxSize, (uint32_t)100));
+
+			//Add the new entity
+			entities[size] = e;
+			size++;
+		}
+
+		//Remove an entity from the list
+		//Size is not updated, so pack() should be called shortly after
+		void erase(Entity e)
+		{
+			//Look through the array and set the entity to 0
+			for (uint32_t i = 0; i < size; i++)
+			{
+				if (entities[i] == e)
+				{
+					entities[i] = 0;
+					packed = false;
+					return;
+				}
+			}
+		}
+
+		//Packs the array tightly, removing holes
+		void pack()
+		{
+			//Look through the array
+			uint32_t iterations = size;
+			for (uint32_t i = 0; i < iterations; i++)
+			{
+				//Check for invalid entity
+				if (entities[i] == 0)
+				{
+					//Find the next valid entity to fill the gap, from back to front
+					uint32_t replacementIndex = size - 1;
+					while (entities[replacementIndex] == 0)
+					{
+						replacementIndex--;
+						size--;
+					}
+					//The list ends at i
+					if (replacementIndex <= i)
+					{
+						break;
+					}
+					//Move the replacement entity to the hole
+					entities[i] = entities[replacementIndex];
+					entities[replacementIndex] = 0;
+					size--;
+				}
+			}
+
+			packed = true;
+			//TODO: decrease size maybe
+		}
+	};
+
 	//All currently available and used Entity IDs
 	std::stack<Entity> availableEntities;
 	std::set<Entity> usedEntities;
@@ -76,7 +231,7 @@ namespace engine::ecs
 	{
 	public:
 		///Set of every entity containing the required components for the system
-		std::set<Entity> entities;
+		EntityList entities;
 	};
 	//Map of each system accessible by its type name
 	std::unordered_map<const char*, std::shared_ptr<System>> systems;
@@ -474,7 +629,7 @@ namespace engine::ecs
 		//Make more entity IDs available in batches of 100
 		if (availableEntities.size() == 0)
 		{
-			for (size_t i = entityCount + 99; i >= entityCount; i--)
+			for (uint32_t i = entityCount + 99; i >= entityCount; i--)
 			{
 				availableEntities.push(i);
 			}
