@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <thread>
 #include <optional>
 #include <map>
@@ -209,6 +210,11 @@ namespace input
 		float Default;
 	};
 
+	static float map_value(float value, float from_min, float from_max, float to_min, float to_max)
+	{
+		return (value - from_min) / (from_max - from_min) * (to_max - to_min) + to_min;
+	}
+
 	class AnalogInputEvent : public InputEvent
 	{
 	public:
@@ -220,7 +226,7 @@ namespace input
 		std::map<InputState*, MinMaxDefault> OutputStatesToMinMaxDefaultValues;
 		std::map<float*, InputState*> OutputValuesToOutputStates;
 
-		std::multimap<int, float*> AxesToOutputValues;
+		std::multimap<int, std::pair<float*, MinMaxDefault>> AxesToOutputValues;
 
 		std::map<int, float> totalValues;
 		bool totalValuesUpdated = false;
@@ -277,7 +283,7 @@ namespace input
 				
 				for (auto it = AxesToOutputValues.begin(); it != AxesToOutputValues.end(); ++it) 
 				{
-					output[it->first] += *it->second;
+					output[it->first] += input::map_value(*it->second.first, -1, 1, it->second.second.Min, it->second.second.Max);
 				}
 				totalValues = output;
 				totalValuesUpdated = true;
@@ -740,10 +746,10 @@ namespace input
 			
 			// Create a new output value
 			float* outputValue = new float;
-			bindedOutputValues.push_back(outputValue);
+			bindedOutputValues.push_back(outputValue);		
 
 			// Add output value to it's axis
-			inputEvent.first->AxesToOutputValues.insert({inputEvent.second.axis, outputValue}); 
+			inputEvent.first->AxesToOutputValues.insert({inputEvent.second.axis, {outputValue, inputEvent.second.minMaxDefault} });
 
 			// Bind the output value to the output state
 			inputEvent.first->OutputValuesToOutputStates.insert({outputValue, &inputButton->buttonOutputState});
@@ -831,19 +837,19 @@ namespace input
 		}
 	};
 
-	void bindAnalogControllerInput(AnalogControllerInput* inputButton, std::vector<int> axes, std::vector<AnalogInputEvent*> inputEvents)
+	void bindAnalogControllerInput(AnalogControllerInput* inputButton, std::vector<inputEventData> axisEventDatas, std::vector<AnalogInputEvent*> inputEvents)
 	{
 		// Bind all specified events to AnalogInput
 		for (auto inputEvent : inputEvents)
 		{
 			// Bind all specified axes to event
-			for (int axis : axes)
+			for (auto& axisEventData : axisEventDatas)
 			{
-				inputEvent->AxesToOutputValues.insert({axis, &inputButton->axisToValue[axis]});
+				inputEvent->AxesToOutputValues.insert({ axisEventData.axis, {&inputButton->axisToValue[axisEventData.axis], axisEventData.minMaxDefault} });
 			}
 		}
 	}
-	static void bindAnalogControllerInput(int joystick, std::vector<int> axes, std::vector<AnalogInputEvent*> inputEvents)
+	static void bindAnalogControllerInput(int joystick, std::vector<inputEventData> axisEventDatas, std::vector<AnalogInputEvent*> inputEvents)
 	{
 		// Find inputKey
 		auto it = joystickToAnalogInput.find(joystick);
@@ -851,15 +857,15 @@ namespace input
 		// Check if the key exists in the map
 		if (it != joystickToAnalogInput.end())
 		{
-			bindAnalogControllerInput(it->second, axes, inputEvents);
+			bindAnalogControllerInput(it->second, axisEventDatas, inputEvents);
 		}
 		else
 		{
 			// Construct a new AnalogControllerInput to bind
-			bindAnalogControllerInput(new AnalogControllerInput(joystick), axes, inputEvents);
+			bindAnalogControllerInput(new AnalogControllerInput(joystick), axisEventDatas, inputEvents);
 		}
 	}
-	static void bindAnalogControllerInput(int joystick, std::vector<int> axes, std::vector<std::string> analogInputEventNames)
+	static void bindAnalogControllerInput(int joystick, std::vector<inputEventData> axisEventDatas, std::vector<std::string> analogInputEventNames)
 	{
 		std::vector<AnalogInputEvent*> digitalInputEventsToBind;
 
@@ -879,7 +885,7 @@ namespace input
 			}
 		}
 
-		bindAnalogControllerInput(joystick, axes, digitalInputEventsToBind);
+		bindAnalogControllerInput(joystick, axisEventDatas, digitalInputEventsToBind);
 	}
 
 	// Function prototype for the key callback
@@ -1079,6 +1085,25 @@ namespace input
 			if (it.second->name == eventName)
 			{
 				return it.second->getValue(axis);
+			}
+		}
+		std::cout << "WARNING: Attempting to test state of unknown event: " << eventName << "\n";
+
+		return 0;
+	}
+	static const float GetInputValue(std::string eventName, std::vector<int> axes)
+	{
+		float inputValue = 0;
+
+		for (auto it : nameToAnalogInputEvent)
+		{
+			if (it.second->name == eventName)
+			{
+				for (int axis : axes)
+				{
+					inputValue += it.second->getValue(axis);
+				}
+				return inputValue;
 			}
 		}
 		std::cout << "WARNING: Attempting to test state of unknown event: " << eventName << "\n";

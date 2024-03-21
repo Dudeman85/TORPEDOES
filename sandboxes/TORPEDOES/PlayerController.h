@@ -178,18 +178,21 @@ public:
 			{
 				for (auto hitProjectile : player.hitProjectiles)
 				{
-					// If player has already been hit by stop, add a new hit
-					if (hitProjectile.first->hitType != HitStates::Stop)
+					// If player has been hit by stop, do not add current hit
+					if (hitProjectile.first->hitType == HitStates::Stop)
 					{
-						if (projectile.hitType == HitStates::Stop)
-						{
-							// If current hit is stop, clear all other hits
-							player.hitProjectiles.clear();
-						}
-						// Add the new hit
-						player.hitProjectiles.insert({&projectile, 0.f});
+						goto SkipAddingHit;
 					}
 				}
+				// If current hit is stop, clear all other hits
+				if (projectile.hitType == HitStates::Stop)
+				{
+					player.hitProjectiles.clear();
+				}
+				SkipAddingHit:
+
+				// Add the new hit
+				player.hitProjectiles.insert({ &projectile, 0.f });
 				
 				CreateAnimation(projectransfor.position + rigidbody.velocity / 15);
 
@@ -225,7 +228,16 @@ public:
 			PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
 
 			// Initialize inputs
-			float accelerationInput = input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_Y);
+			float accelerationInput =
+			input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_RIGHT_Y) * -1
+			- input::map_value(input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_TRIGGER), -1, 1, 0, 1)
+			+ input::map_value(input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER), -1, 1, 0, 1);
+			
+			if (player.id == 1)
+			{
+				std::cout << "hello " << accelerationInput << "\n";
+			}
+
 			float rotateInput = input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_X);
 			bool projetileInput = input::GetPressed("Shoot" + std::to_string(player.id));
 
