@@ -5,10 +5,29 @@
 
 using namespace engine;
 
-ECS_REGISTER_COMPONENT(Torpedo)
-struct Torpedo
+enum HitStates 
+{ 
+	None,			// Does nothing when hitting player
+	Additive,		// Adds hitSpeedFactor additively:			100% + 50% + 50% = 200%
+	Multiplicative,	// Adds hitSpeedFactor multiplicatively:	100% + 50% + 50% = 225%		Decreases are weaker, increases are stronger 
+	Stop			// Stops and forces target to spin in place
+};
+
+ECS_REGISTER_COMPONENT(Projectile)
+struct Projectile
 {
 	int ownerID = 0;
+
+	/* Hit */
+
+	HitStates hitType = HitStates::Stop;
+	float hitSpeedFactor = -0.05f;		// If hitType is not Stop, scale of speed change when hit
+	float hitTime = 2.0f;				// Time the hit lasts
+
+	/* Files */
+
+	std::string hitAnimation = "explosion";
+	std::string model = "torpedo.obj";
 };
 
 //Temporary functin for testing
@@ -42,13 +61,14 @@ static void OnTopedoCollision(Collision collision)
 					}
 				}
 			}
-			void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 sapawnRotation, int owerID)
-			{
-				ecs::Entity torpedo = ecs::NewEntity();
-	ecs::AddComponent(torpedo, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
+void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 spawnRotation, int id)
+{
+	ecs::Entity torpedo = ecs::NewEntity();
+	ecs::AddComponent(torpedo, Transform{ .position = spawnPosition, .rotation = spawnRotation, .scale = Vector3(10) });
 	ecs::AddComponent(torpedo, Rigidbody{ .velocity = direction * projectileSpeed });
-	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models["torpedo.obj"]});
+	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models["torpedo.obj"] });
 	std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnTopedoCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
-	ecs::AddComponent(torpedo, Torpedo{ .ownerID = owerID });
+	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnTopedoCollision, .trigger = true, .visualise = false,  .rotationOverride = spawnPosition.y });
+	ecs::AddComponent(torpedo, Projectile{ .ownerID = id });
+
 }

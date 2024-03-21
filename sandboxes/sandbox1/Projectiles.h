@@ -54,7 +54,7 @@ static void CreateAnimation(Vector3 animPosition)
 		ecs::Entity torpedo = ecs::NewEntity();
 	    ecs::AddComponent(torpedo, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
 	   ecs::AddComponent(torpedo, Rigidbody{ .velocity = direction * projectileSpeed });
-	   ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::torpedoModel });
+	   ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models["torpedo.obj"] });
 	   std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
 	   ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnTopedoCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
 	  ecs::AddComponent(torpedo, Torpedo{ .ownerID = owerID });
@@ -94,7 +94,7 @@ static void CreateAnimation(Vector3 animPosition)
 		ecs::Entity shell = ecs::NewEntity();
 		ecs::AddComponent(shell, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(30) });
 		ecs::AddComponent(shell, Rigidbody{ .velocity = direction * projectileSpeed });
-		ecs::AddComponent(shell, ModelRenderer{ .model = resources::shellModel });
+		ecs::AddComponent(shell, ModelRenderer{ .model = resources::models["Weapon_HedgehogAmmo.obj"] });
 		std::vector<Vector2> Shellverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
 		ecs::AddComponent(shell, PolygonCollider{ .vertices = Shellverts, .callback = OnCannonCollision, .trigger = true, .visualise = false});
 		ecs::AddComponent(shell, Cannon{ .ownerID = owerID });

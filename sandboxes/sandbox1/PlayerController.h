@@ -7,6 +7,7 @@
 // Declaration of the entity component system (ECS) instance
 using namespace engine;
 enum ShipType { torpedoBoat, submarine, cannonBoat, hedgehogBoat, pirateShip };
+enum HitType { heavyHit, lightHit};
 
 ECS_REGISTER_COMPONENT(Player)
 struct Player
@@ -19,7 +20,7 @@ struct Player
 	float accelerationSpeed;
 	float rotationSpeed;
 	//Minimum acceleration while rotating
-	float minAcceleration = 100;
+	float minTurningSpeed = 100;
 
 	//Action cooldowns
 	float mainCooldown;
@@ -75,7 +76,7 @@ public:
 		//Create the entity to be shown at a win
 		winScreen = ecs::NewEntity();
 		ecs::AddComponent(winScreen, TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.5, 2, 1), .scale = Vector3(0.03f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-		ecs::AddComponent(winScreen, SpriteRenderer{ .texture = resources::winSprite, .enabled = false, .uiElement = true });
+		ecs::AddComponent(winScreen, SpriteRenderer{ resources::uiTextures["winner.png"] });
 		ecs::AddComponent(winScreen, Transform{ .position = Vector3(0, 0, 0.5f), .scale = Vector3(0.3f) });
 
 		//Initialize each ship type's stats
@@ -89,10 +90,10 @@ public:
 			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 
 		//Initialize ship type models
-		shipModels.insert({ ShipType::torpedoBoat, resources::laMuerteModel });
-		shipModels.insert({ ShipType::submarine, resources::checkPointModel });
-		shipModels.insert({ ShipType::cannonBoat, resources::laMuerteModel });
-		shipModels.insert({ ShipType::hedgehogBoat, resources::laMuerteModel });
+		shipModels.insert({ ShipType::torpedoBoat, resources::models["LaMuerte.obj"] });
+		shipModels.insert({ ShipType::submarine, resources::models["LaMuerte.obj"] });
+		shipModels.insert({ ShipType::cannonBoat, resources::models["LaMuerte.obj"] });
+		shipModels.insert({ ShipType::hedgehogBoat, resources::models["LaMuerte.obj"] });
 	}
 
 	std::array<float, 4> GetPlayerBounds()
@@ -183,7 +184,7 @@ public:
 			if (player.id != shell.ownerID)
 			{
 				player.isHit = true;
-				CreateAnimation(projectransfor.position + rigidbody.velocity / 15);
+				CreateCannonAnimation(projectransfor.position + rigidbody.velocity / 15);
 				ecs::DestroyEntity(collision.b);
 			}
 		}
@@ -355,7 +356,7 @@ public:
 				float rotationScalar = 1 - log10(2.0f * std::max(0.5f, accelerationInput));
 				// Apply forward impulse if rotating or receiving a rotation command
 				TransformSystem::Rotate(player.renderedEntity, 0, -rotateInput * player.rotationSpeed * rotationScalar * dt, 0);
-				forwardImpulse = forwardDirection * player.minAcceleration * dt;
+				forwardImpulse = forwardDirection * player.minTurningSpeed * dt;
 			}
 
 
@@ -447,10 +448,11 @@ public:
 			TransformSystem::AddParent(playerRender, player);
 
 			//Create the players's torpedo indicators
-			ecs::AddComponent(torpIndicator1, SpriteRenderer{ .texture = resources::torpReadyTexture });
+			//Create the players's torpedo indicators
+			ecs::AddComponent(torpIndicator1, SpriteRenderer{ .texture = resources::uiTextures["UI_Green_Torpedo_Icon.png"] });
 			ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(-2, -2, 10), .scale = Vector3(2, .5, 1) });
 			TransformSystem::AddParent(torpIndicator1, player);
-			ecs::AddComponent(torpIndicator2, SpriteRenderer{ .texture = resources::torpReadyTexture });
+			ecs::AddComponent(torpIndicator2, SpriteRenderer{ .texture = resources::uiTextures["UI_Green_Torpedo_Icon.png"] });
 			ecs::AddComponent(torpIndicator2, Transform{ .position = Vector3(2, -2, 10), .scale = Vector3(2, .5, 1) });
 			TransformSystem::AddParent(torpIndicator2, player);
 		}

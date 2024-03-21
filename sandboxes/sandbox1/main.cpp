@@ -6,6 +6,7 @@
 #include "GameCamera.h"
 
 int checkPointNumber = 0;
+int activeMapLayer = 0;
 
 void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, Model* checkPointModel, float hitboxrotation, bool finish_line = false)
 {
@@ -46,8 +47,21 @@ void LoadLevel1(Camera* cam)
 {
 	collisionSystem->cam = cam;
 
-	//TimerSystem::ScheduleFunction([]() {resources::level1Map->enabledLayers[1] =! resources::level1Map->enabledLayers[1]; }, 0.2, true, ScheduledFunction::Type::seconds);
-	//resources::level1Map->enabledLayers[1] = true;
+	/*TimerSystem::ScheduleFunction(
+		[]() {
+			resources::level1Map->enabledLayers[0] = false;
+			resources::level1Map->enabledLayers[1] = false;
+			resources::level1Map->enabledLayers[2] = false;
+			resources::level1Map->enabledLayers[3] = false;
+			resources::level1Map->enabledLayers[activeMapLayer] = true;
+			activeMapLayer++;
+			if (activeMapLayer >1)
+			{
+				activeMapLayer = 0;
+			}
+		}, 0.3, true, ScheduledFunction::Type::seconds);
+	resources::level1Map->enabledLayers[1] = true;*/
+
 	//Set this level's tilemap
 	spriteRenderSystem->SetTilemap(resources::level1Map);
 	collisionSystem->SetTilemap(resources::level1Map);
@@ -57,8 +71,8 @@ void LoadLevel1(Camera* cam)
 	ecs::GetSystem<PlayerController>()->CreatePlayers(4, Vector2(1434.0f, -1370.0f), ships);
 
 	//Make all the checkpoints manually
-	CreateCheckpoint(Vector3(586.608276, -1249.448486, 100.000000), Vector3(45.000000, 40.070156, 0.000000), Vector3(17), resources::checkPointModel, 90.0f);
-	CreateCheckpoint(Vector3(1513.692383, -1462.996187, 50.000000), Vector3(90.000000, 90.901711, 0.000000), Vector3(14), resources::finishLineModel, -1, true); // 10
+	CreateCheckpoint(Vector3(586.608276, -1249.448486, 100.000000), Vector3(45.000000, 40.070156, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 90.0f);
+	CreateCheckpoint(Vector3(1513.692383, -1462.996187, 50.000000), Vector3(90.000000, 90.901711, 0.000000), Vector3(14), resources::models["Finish_line.obj"], -1, true); // 10
 
 	//Make the crowds manually
 	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims);
