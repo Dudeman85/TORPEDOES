@@ -154,8 +154,14 @@ void TMVariables::fetchData(const std::string tilemapPath)
 		}
 	}
 
-	// 
+	// Get the given tilemap
+	// properties
+	const auto& properties = map.getProperties();
 
-
-
+	// Iterate the property values in to struct
+	for (const auto& property : properties)
+	{
+		// Insert the property values in to struct
+		tmap.tilemap.emplace(property.getName(), property.getStringValue());
+	}
 }

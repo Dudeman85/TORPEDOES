@@ -16,7 +16,7 @@ int main()
 	engine::SpriteRenderSystem::SetBackgroundColor(0, 150, 0);
 
 
-	TMap map;
+	Tilemap map;
 	map.setup("Sandbox2/Tiled/tilemaps/TestMap.tmx");
 	/*Tilemap map(&cam);
 	map.loadMap("Sandbox2/Tiled/tilemaps/TestMap.tmx");

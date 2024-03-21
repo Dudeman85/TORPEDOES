@@ -27,7 +27,17 @@ source distribution.
 
 #include <engine/Tilemap.h>
 
-void TMap::setup(const string tilemap)
+Tilemap::Tilemap(Camera* cam)
+{
+	m_shader = new Shader(
+		R"(
+		#version 332 core
+		
+)"
+	)
+}
+
+void Tilemap::setup(const string tilemap)
 {
 	TMVariables mapVAr;
 	mapVAr.fetchData(assetPath + tilemap);
