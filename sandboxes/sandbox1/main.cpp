@@ -47,7 +47,7 @@ void LoadLevel1(Camera* cam)
 {
 	collisionSystem->cam = cam;
 
-	TimerSystem::ScheduleFunction(
+	/*TimerSystem::ScheduleFunction(
 		[]() {
 			resources::level1Map->enabledLayers[0] = false;
 			resources::level1Map->enabledLayers[1] = false;
@@ -60,7 +60,8 @@ void LoadLevel1(Camera* cam)
 				activeMapLayer = 0;
 			}
 		}, 0.3, true, ScheduledFunction::Type::seconds);
-	resources::level1Map->enabledLayers[1] = true;
+	resources::level1Map->enabledLayers[1] = true;*/
+
 	//Set this level's tilemap
 	spriteRenderSystem->SetTilemap(resources::level1Map);
 	collisionSystem->SetTilemap(resources::level1Map);

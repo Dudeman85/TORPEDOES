@@ -7,6 +7,7 @@
 // Declaration of the entity component system (ECS) instance
 using namespace engine;
 enum ShipType { torpedoBoat, submarine, cannonBoat, hedgehogBoat, pirateShip };
+enum HitType { heavyHit, lightHit};
 
 ECS_REGISTER_COMPONENT(Player)
 struct Player
