@@ -210,6 +210,37 @@ namespace input
 		float Default;
 	};
 
+	MinMaxDefault controllerMixedInput = {-1, 1, 0};			// Values for default mixed positive & negative input
+	MinMaxDefault controllerMixedInputFlipped = {1, -1, 0};		// Flipped values for default mixed positive & negative input
+	MinMaxDefault digitalPositiveInput = {0, 1, 0};				// Values for default keyboard positive input
+	MinMaxDefault digitalNegativeInput = {0, -1, 0};			// Values for default keyboard negative input
+
+	struct InputEventData
+	{
+		MinMaxDefault minMaxDefault;
+		int axis;
+
+		// Define hash function for InputEventData
+		struct Hash 
+		{
+			std::size_t operator()(const InputEventData& eventData) const 
+			{
+				// Just hash axis
+				return std::hash<int>()(eventData.axis);
+			}
+		};
+
+		// Define equality comparison function for InputEventData
+		struct Equal 
+		{
+			bool operator()(const InputEventData& eventData1, const InputEventData& eventData2) const 
+			{
+				// Just compare axis
+				return eventData1.axis == eventData2.axis;
+			}
+		};
+	};
+
 	static float map_value(float value, float from_min, float from_max, float to_min, float to_max)
 	{
 		return (value - from_min) / (from_max - from_min) * (to_max - to_min) + to_min;
@@ -226,7 +257,7 @@ namespace input
 		std::map<InputState*, MinMaxDefault> OutputStatesToMinMaxDefaultValues;
 		std::map<float*, InputState*> OutputValuesToOutputStates;
 
-		std::multimap<int, std::pair<float*, MinMaxDefault>> AxesToOutputValues;
+		std::unordered_multimap<InputEventData, std::pair<float*, MinMaxDefault>, InputEventData::Hash, InputEventData::Equal> InputEventDataToOutputValues;
 
 		std::map<int, float> totalValues;
 		bool totalValuesUpdated = false;
@@ -264,7 +295,6 @@ namespace input
 						break;
 					}
 				}
-				
 			}
 		}
 
@@ -281,9 +311,9 @@ namespace input
 				// Update total value
 				std::map<int, float> output;
 				
-				for (auto it = AxesToOutputValues.begin(); it != AxesToOutputValues.end(); ++it) 
+				for (auto it = InputEventDataToOutputValues.begin(); it != InputEventDataToOutputValues.end(); ++it)
 				{
-					output[it->first] += input::map_value(*it->second.first, -1, 1, it->second.second.Min, it->second.second.Max);
+					output[it->first.axis] += input::map_value(*it->second.first, it->second.second.Min, it->second.second.Max, it->first.minMaxDefault.Min, it->first.minMaxDefault.Max);
 				}
 				totalValues = output;
 				totalValuesUpdated = true;
@@ -309,23 +339,23 @@ namespace input
 		// Every output state of InputButton this is binded to
 		std::vector<InputState*> outputStates;
 
-		const bool isPressed()
+		const bool isPressed() const
 		{
 			return pressed != eventStates::Not;
 		}
-		const bool isReleased()
+		const bool isReleased() const
 		{
 			return released != eventStates::Not;
 		}
-		const bool isNewPress()
+		const bool isNewPress() const
 		{
 			return (pressed == eventStates::NewOn);
 		}
-		const bool isNewRelease()
+		const bool isNewRelease() const
 		{
 			return (released == eventStates::NewOn);
 		}
-		const bool isChanged()
+		const bool isChanged() const
 		{
 			return (isNewPress() || isNewRelease());
 		}
@@ -727,19 +757,13 @@ namespace input
 		bindDigitalControllerInput(joystick, button, digitalInputEventsToBind);
 	}
 
-	struct inputEventData
-	{
-		MinMaxDefault minMaxDefault;
-		int axis; 
-	};
-
 	// List that saves all outputvalues for deletion
 	std::vector<float*> bindedOutputValues;
 
-	static void bindAnalogInput(DigitalInput* inputButton, std::map<AnalogInputEvent*, inputEventData> inputEvents)
+	static void bindAnalogInput(DigitalInput* inputButton, MinMaxDefault inputMinMaxDefault, std::map<AnalogInputEvent*, InputEventData> inputEvents)
 	{
 		// Bind all specified events to DigitalInput
-		for (auto inputEvent : inputEvents)
+		for (auto& inputEvent : inputEvents)
 		{
 			// Bind the output state
 			inputEvent.first->OutputStatesToMinMaxDefaultValues.insert({&inputButton->buttonOutputState, inputEvent.second.minMaxDefault});
@@ -749,13 +773,13 @@ namespace input
 			bindedOutputValues.push_back(outputValue);		
 
 			// Add output value to it's axis
-			inputEvent.first->AxesToOutputValues.insert({inputEvent.second.axis, {outputValue, inputEvent.second.minMaxDefault} });
+			inputEvent.first->InputEventDataToOutputValues.insert({ {inputEvent.second.minMaxDefault, inputEvent.second.axis}, { outputValue, inputMinMaxDefault } });
 
 			// Bind the output value to the output state
 			inputEvent.first->OutputValuesToOutputStates.insert({outputValue, &inputButton->buttonOutputState});
 		}
 	}
-	static void bindAnalogInput(inputKey key, std::map<AnalogInputEvent*, inputEventData> inputEvents)
+	static void bindAnalogInput(inputKey key, MinMaxDefault inputMinMaxDefault, std::map<AnalogInputEvent*, InputEventData> inputEvents)
 	{
 		// Find inputKey
 		auto it = inputKeytoDigitalInput.find(key);
@@ -763,17 +787,17 @@ namespace input
 		// Check if the key exists in the map
 		if (it != inputKeytoDigitalInput.end())
 		{
-			bindAnalogInput(it->second, inputEvents);
+			bindAnalogInput(it->second, inputMinMaxDefault, inputEvents);
 		}
 		else
 		{
 			// Construct a new inputButton to bind
-			bindAnalogInput(new DigitalInput(key), inputEvents);
+			bindAnalogInput(new DigitalInput(key), inputMinMaxDefault, inputEvents);
 		}
 	}
-	static void bindAnalogInput(inputKey key, std::vector<std::string> analogInputEventName, int axis, float maxValue = 1, float minValue = 0, float defaultValue = 0)
+	static void bindAnalogInput(inputKey key, MinMaxDefault inputMinMaxDefault, std::vector<std::string> analogInputEventName, int axis, float maxValue = 1, float minValue = 0, float defaultValue = 0)
 	{
-		std::map<AnalogInputEvent*, inputEventData> AnalogInputEventsToBind;
+		std::map<AnalogInputEvent*, InputEventData> AnalogInputEventsToBind;
 
 		// Find by AnalogInputEvent name
 		for (const auto& analogInputEventName : analogInputEventName)
@@ -791,7 +815,7 @@ namespace input
 			}
 		}
 
-		bindAnalogInput(key, AnalogInputEventsToBind);
+		bindAnalogInput(key, inputMinMaxDefault, AnalogInputEventsToBind);
 	}
 
 	class AnalogControllerInput;
@@ -837,7 +861,7 @@ namespace input
 		}
 	};
 
-	void bindAnalogControllerInput(AnalogControllerInput* inputButton, std::vector<inputEventData> axisEventDatas, std::vector<AnalogInputEvent*> inputEvents)
+	void bindAnalogControllerInput(AnalogControllerInput* inputButton, std::vector<InputEventData> axisEventDatas, std::vector<AnalogInputEvent*> inputEvents)
 	{
 		// Bind all specified events to AnalogInput
 		for (auto inputEvent : inputEvents)
@@ -845,11 +869,11 @@ namespace input
 			// Bind all specified axes to event
 			for (auto& axisEventData : axisEventDatas)
 			{
-				inputEvent->AxesToOutputValues.insert({ axisEventData.axis, {&inputButton->axisToValue[axisEventData.axis], axisEventData.minMaxDefault} });
+				inputEvent->InputEventDataToOutputValues.insert({ {axisEventData.minMaxDefault, axisEventData.axis}, {&inputButton->axisToValue[axisEventData.axis], controllerMixedInput} });
 			}
 		}
 	}
-	static void bindAnalogControllerInput(int joystick, std::vector<inputEventData> axisEventDatas, std::vector<AnalogInputEvent*> inputEvents)
+	static void bindAnalogControllerInput(int joystick, std::vector<InputEventData> axisEventDatas, std::vector<AnalogInputEvent*> inputEvents)
 	{
 		// Find inputKey
 		auto it = joystickToAnalogInput.find(joystick);
@@ -865,7 +889,7 @@ namespace input
 			bindAnalogControllerInput(new AnalogControllerInput(joystick), axisEventDatas, inputEvents);
 		}
 	}
-	static void bindAnalogControllerInput(int joystick, std::vector<inputEventData> axisEventDatas, std::vector<std::string> analogInputEventNames)
+	static void bindAnalogControllerInput(int joystick, std::vector<InputEventData> axisEventDatas, std::vector<std::string> analogInputEventNames)
 	{
 		std::vector<AnalogInputEvent*> digitalInputEventsToBind;
 
@@ -1052,14 +1076,14 @@ namespace input
 
 	static void ConstructAnalogEvents(std::vector<std::string> Eventnames)
 	{
-		for (auto eventName : Eventnames)
+		for (auto& eventName : Eventnames)
 		{
 			ConstructAnalogEvent(eventName);
 		}
 	}
 	static void ConstructDigitalEvents(std::vector<std::string> Eventnames)
 	{
-		for (auto eventName : Eventnames)
+		for (auto& eventName : Eventnames)
 		{
 			ConstructDigitalEvent(eventName);
 		}
@@ -1067,7 +1091,7 @@ namespace input
 
 	static const std::optional<std::map<int, float>> GetInputValues(std::string eventName)
 	{
-		for (auto it : nameToAnalogInputEvent)
+		for (auto& it : nameToAnalogInputEvent)
 		{
 			if (it.second->name == eventName)
 			{
@@ -1080,7 +1104,7 @@ namespace input
 	}
 	static const float GetInputValue(std::string eventName, int axis)
 	{
-		for (auto it : nameToAnalogInputEvent)
+		for (auto& it : nameToAnalogInputEvent)
 		{
 			if (it.second->name == eventName)
 			{
@@ -1091,11 +1115,11 @@ namespace input
 
 		return 0;
 	}
-	static const float GetInputValue(std::string eventName, std::vector<int> axes)
+	static const float GetTotalInputValue(std::string eventName, std::vector<int> axes)
 	{
 		float inputValue = 0;
 
-		for (auto it : nameToAnalogInputEvent)
+		for (auto& it : nameToAnalogInputEvent)
 		{
 			if (it.second->name == eventName)
 			{
@@ -1110,10 +1134,28 @@ namespace input
 
 		return 0;
 	}
+	static const float GetTotalInputValue(std::string eventName)
+	{
+		float totalValue = 0;
+		for (auto& it : nameToAnalogInputEvent)
+		{
+			if (it.second->name == eventName)
+			{
+				for (auto& axisToValue : it.second->getValues())
+				{
+					totalValue += axisToValue.second;
+				}
+				return totalValue;
+			}
+		}
+		std::cout << "WARNING: Attempting to test state of unknown event: " << eventName << "\n";
+
+		return 0;
+	}
 
 	static bool GetNewPress(std::string eventName)
 	{
-		for (auto it : nameToDigitalInputEvent)
+		for (auto& it : nameToDigitalInputEvent)
 		{
 			if (it.second->name == eventName)
 			{
@@ -1126,7 +1168,7 @@ namespace input
 	}
 	static bool GetPressed(std::string eventName)
 	{
-		for (auto it : nameToDigitalInputEvent)
+		for (auto& it : nameToDigitalInputEvent)
 		{
 			if (it.second->name != eventName)
 			{
@@ -1140,7 +1182,7 @@ namespace input
 	}
 	static bool GetReleased(std::string eventName)
 	{
-		for (auto it : nameToDigitalInputEvent)
+		for (auto& it : nameToDigitalInputEvent)
 		{
 			if (it.second->name != eventName)
 			{
@@ -1154,7 +1196,7 @@ namespace input
 	}
 	static bool GetNewRelease(std::string eventName)
 	{
-		for (auto it : nameToDigitalInputEvent)
+		for (auto& it : nameToDigitalInputEvent)
 		{
 			if (it.second->name != eventName)
 			{
@@ -1168,7 +1210,7 @@ namespace input
 	}
 	static bool GetChanged(std::string eventName)
 	{
-		for (auto it : nameToDigitalInputEvent)
+		for (auto& it : nameToDigitalInputEvent)
 		{
 			if (it.second->name != eventName)
 			{

@@ -83,30 +83,33 @@ void SetupInput()
 
 	for (size_t i = 0; i < 4; i++)
 	{
-		input::ConstructAnalogEvent("Move" + std::to_string(i));
+		input::ConstructAnalogEvent("Throttle" + std::to_string(i));
+		input::ConstructAnalogEvent("Turn" + std::to_string(i));
 
 		input::ConstructDigitalEvent("Shoot" + std::to_string(i));
 		input::ConstructDigitalEvent("Boost" + std::to_string(i));
 
 		// Controller input
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
-		input::bindAnalogControllerInput(i, { GLFW_GAMEPAD_AXIS_LEFT_X, GLFW_GAMEPAD_AXIS_LEFT_Y }, { "Move" + std::to_string(i) });
+		//input::bindAnalogControllerInput(i, { GLFW_GAMEPAD_AXIS_LEFT_X, GLFW_GAMEPAD_AXIS_LEFT_Y }, { "Move" + std::to_string(i) });
 
+		/*
 		input::bindAnalogControllerInput(i, 
 		{ 
-			//{ {-1, 1, 0}, GLFW_GAMEPAD_AXIS_LEFT_X },
+			{ {-1, 1, 0}, GLFW_GAMEPAD_AXIS_LEFT_X },
 			{ {0, 1, 0}, GLFW_GAMEPAD_AXIS_LEFT_TRIGGER },
 			{ {-1, 0, 0}, GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER }
-		}, { "Move" + std::to_string(i) });
+		}, { "Throttle" + std::to_string(i) });*/
 	}
 	
 	// Keyboard input for player 0
-	input::bindAnalogInput(GLFW_KEY_RIGHT, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_X);
-	input::bindAnalogInput(GLFW_KEY_LEFT, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_X, -1);
-	input::bindAnalogInput(GLFW_KEY_A, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y);
-	input::bindAnalogInput(GLFW_KEY_Z, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y, -1);
-	input::bindAnalogInput(GLFW_KEY_A, { "Move0" }, GLFW_GAMEPAD_AXIS_RIGHT_Y);
-	input::bindAnalogInput(GLFW_KEY_Z, { "Move0" }, GLFW_GAMEPAD_AXIS_RIGHT_Y, -1);
+	input::bindAnalogInput(GLFW_KEY_RIGHT,	input::digitalPositiveInput, { "Turn0" }, 0);
+	input::bindAnalogInput(GLFW_KEY_LEFT,	input::digitalNegativeInput, { "Turn0" }, 0, -1);
+
+	input::bindAnalogInput(GLFW_KEY_A,		input::digitalPositiveInput, { "Throttle0" }, 0);
+	input::bindAnalogInput(GLFW_KEY_Z,		input::digitalNegativeInput, { "Throttle0" }, 0, -1);
+	input::bindAnalogInput(GLFW_KEY_UP,		input::digitalPositiveInput, { "Throttle0" }, 0);
+	input::bindAnalogInput(GLFW_KEY_DOWN,	input::digitalNegativeInput, { "Throttle0" }, 0, -1);
 
 	input::bindDigitalInput(GLFW_KEY_N, { "Shoot0" });
 	input::bindDigitalInput(GLFW_KEY_M, { "Boost0" });
