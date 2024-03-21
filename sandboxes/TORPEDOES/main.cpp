@@ -90,6 +90,7 @@ void SetupInput()
 
 		// Controller input
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
+		input::bindAnalogControllerInput(i, { GLFW_GAMEPAD_AXIS_LEFT_X, GLFW_GAMEPAD_AXIS_LEFT_Y }, { "Move" + std::to_string(i) });
 
 		input::bindAnalogControllerInput(i, 
 		{ 
@@ -102,6 +103,8 @@ void SetupInput()
 	// Keyboard input for player 0
 	input::bindAnalogInput(GLFW_KEY_RIGHT, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_X);
 	input::bindAnalogInput(GLFW_KEY_LEFT, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_X, -1);
+	input::bindAnalogInput(GLFW_KEY_A, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y);
+	input::bindAnalogInput(GLFW_KEY_Z, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y, -1);
 	input::bindAnalogInput(GLFW_KEY_A, { "Move0" }, GLFW_GAMEPAD_AXIS_RIGHT_Y);
 	input::bindAnalogInput(GLFW_KEY_Z, { "Move0" }, GLFW_GAMEPAD_AXIS_RIGHT_Y, -1);
 

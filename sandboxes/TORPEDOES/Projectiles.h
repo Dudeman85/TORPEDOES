@@ -61,13 +61,14 @@ static void OnTopedoCollision(Collision collision)
 					}
 				}
 			}
-			void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 spawnRotation, int id)
-			{
-				ecs::Entity torpedo = ecs::NewEntity();
+void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 spawnRotation, int id)
+{
+	ecs::Entity torpedo = ecs::NewEntity();
 	ecs::AddComponent(torpedo, Transform{ .position = spawnPosition, .rotation = spawnRotation, .scale = Vector3(10) });
 	ecs::AddComponent(torpedo, Rigidbody{ .velocity = direction * projectileSpeed });
-	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models["torpedo.obj"]});
+	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models["torpedo.obj"] });
 	std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
 	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnTopedoCollision, .trigger = true, .visualise = false,  .rotationOverride = spawnPosition.y });
 	ecs::AddComponent(torpedo, Projectile{ .ownerID = id });
+
 }
