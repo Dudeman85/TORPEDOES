@@ -24,3 +24,85 @@ and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any
 source distribution.
 *********************************************************************/
+
+#include <engine/MapLayer.h>
+
+MapLayer::MapLayer(tmx::Map& map, const std::string tilemap, std::vector <std::shared_ptr<engine::Texture>>& textures)
+{
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	fetchData(map, tilemap);
+}
+
+void MapLayer::fetchData(tmx::Map& map, const std::string tilemap)
+{
+	// Temporal class for TiledMap
+	// used to store values to struct
+	TiledMap tMap;
+
+	// Temporal class for TiledGroup
+	// used to store values to struct
+	TiledGroup tGroup;
+
+	// Temporal class for TiledObject
+	// used to store values to struct
+	TiledObject tObject;
+
+	// Temporal class for TiledLayer
+	// used to store values to struct
+	TiledLayer tLayer;
+
+	// Temporal class for TiledSed
+	// used to store values to struct
+	TiledSet tSet;
+
+	// Temporal class for TiledTile
+	// used to store values to struct
+	TiledTile tTile;
+
+	// Get all the tilesets from tilemap
+	const auto& tilesets = map.getTilesets();
+
+	// Iterate through all tilesets
+	for (const auto& tileset : tilesets)
+	{
+		// Get all tiles from this tileset
+		// as a list
+		const auto& tiles = tileset.getTiles();
+
+		// Iterate through the tiles
+		for (const auto& tile : tiles)
+		{
+			// Get the tile properties
+			const auto& tileProperties = tile.properties;
+
+			// Iterate through tile properties
+			for (const auto& tileProperty : tileProperties)
+			{
+				// Insert the property values into struct
+				tTile.tile.insert(tileProperty.getName(), tileProperty.getStringValue());
+			}
+
+			// Insert the tile into tileset
+			// struct
+			tSet.tiles.push_back(tTile);
+		}
+
+		// Get the tileset properties
+		const auto& tilesetProperties = tileset.getProperties();
+
+		// Iterate the property values into struct
+		for (const auto& tilesetProperty : tilesetProperties)
+		{
+			// Insert the property values into struct
+			tSet.tileset.insert(tilesetProperty.getName(), tilesetProperty.getStringValue());
+		}
+
+		// Insert the tileset into tilemap
+		// struct
+		tMap.tilesets.push_back(tSet);
+	}
+
+	// 
+}

@@ -27,13 +27,91 @@ source distribution.
 
 #pragma once
 
+#include <engine/GL/Texture.h>
+#include <tmxlite/Map.hpp>
+#include <map>
+#include <string>
+#include <vector>
+#include <memory>
+
+// Tiled map struct declaration
+struct TiledMap;
+// Tiled group struct declaration
+struct TiledGroup;
+// Tiled object struct declaration
+struct TiledObject;
+// Tiled layer struct declaration
+struct TiledLayer;
+// Tiled set struct declaration
+struct TiledSet;
+// Tiled tile struct declaration
+struct TiledTile;
+
+// Tiled Tilemap struct
+struct TiledMap
+{
+	// Tilemap's properties map list
+	std::map<std::string, std::string> tilemap;
+	// Tilemap's all Group layers vector
+	std::vector<TiledGroup> groups;
+	// Tilemap's all Object layers vector
+	std::vector<TiledObject> objects;
+	// Tilemap's all Tile layers vector
+	std::vector<TiledLayer> layers;
+	// Tilemap's all tilesets vector
+	std::vector<TiledSet> tilesets;
+};
+
+// Tiled Group layer struct
+struct TiledGroup
+{
+	// Group layers properties map list
+	std::map<std::string, std::string> group;
+};
+
+// Tiled Object layer struct
+struct TiledObject
+{
+	// Object layers properties map list
+	std::map<std::string, std::string> object;
+};
+
+// Tiled Tile layer struct
+struct TiledLayer
+{
+	// Tile layers properties map list
+	std::map<std::string, std::string> layer;
+};
+
+// Tiled Tileset struct
+struct TiledSet
+{
+	// Tileset's properties map list
+	std::map<std::string, std::string> tileset;
+	// Tileset's all tiles vector
+	std::vector<TiledTile> tiles;
+};
+
+// Tiled Tile struct
+struct TiledTile
+{
+	// Tile's properties map list
+	std::map<std::string, std::string> tile;
+};
+
 class MapLayer final
 {
-
 public:
-	//  Constructor
-	MapLayer();
-
+	// Constructor
+	MapLayer(tmx::Map& map, const std::string tilemap, std::vector <std::shared_ptr<engine::Texture>>& textures);
 	// Destructor
 	~MapLayer();
+
+	// fetchData(tmx::Map& map, const std::string tilemap)
+	// function to get data from tsx and tmx files
+	void fetchData(tmx::Map& map, const std::string tilemap);
+
+private:
+	// Vertex Array Object
+	unsigned int VAO;
 };
