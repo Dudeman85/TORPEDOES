@@ -19,7 +19,7 @@ struct Player
 	float accelerationSpeed;
 	float rotationSpeed;
 	//Minimum acceleration while rotating
-	float minAcceleration = 100;
+	float minTurningSpeed = 100;
 
 	//Action cooldowns
 	float mainCooldown;
@@ -355,7 +355,7 @@ public:
 				float rotationScalar = 1 - log10(2.0f * std::max(0.5f, accelerationInput));
 				// Apply forward impulse if rotating or receiving a rotation command
 				TransformSystem::Rotate(player.renderedEntity, 0, -rotateInput * player.rotationSpeed * rotationScalar * dt, 0);
-				forwardImpulse = forwardDirection * player.minAcceleration * dt;
+				forwardImpulse = forwardDirection * player.minTurningSpeed * dt;
 			}
 
 

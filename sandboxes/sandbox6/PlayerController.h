@@ -11,7 +11,7 @@ struct Player
 	float projectileSpeed = 500;  // Attack state
 	bool attackHeld = false;     // Indicates if the attack button is held
 	float accelerationSpeed = 1;    // Acceleration speed
-	float minAcceleration = 1;    // Minimum acceleration while rotating
+	float minTurningSpeed = 1;    // Minimum acceleration while rotating
 	float rotationSpeed = 75;    // Rotation speed
 	float projectileTime = 0;    // projectile Time 
 	int lap = 1;
@@ -334,7 +334,7 @@ public:
 			{
 				// Apply forward impulse if rotating or receiving a rotation command
 				TransformSystem::Rotate(entity, 0, -rotateInput * player.rotationSpeed * dt, 0);
-				forwardImpulse = forwardDirection * player.minAcceleration * dt;
+				forwardImpulse = forwardDirection * player.minTurningSpeed * dt;
 			}
 
 			// Apply acceleration impulse if positive input is received

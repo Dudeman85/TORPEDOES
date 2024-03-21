@@ -70,38 +70,43 @@ namespace engine
 
 		void Update()
 		{
-			//Iterate through scheduled functions
+			// Iterate through scheduled functions
 			for (auto itr = schedule.begin(); itr != schedule.end();)
 			{
-				//Get the entity and increment the iterator
+				// Get the entity and increment the iterator
 				ScheduledFunction& future = *itr;
 
-				//If timer is not done
-				if (future.timePassed < future.duration)
+				if (future.type == ScheduledFunction::Type::seconds)
 				{
-					if (future.type == ScheduledFunction::Type::seconds)
-						//If timer is realtime, add deltaTime
-						future.timePassed += deltaTime;
-					else
-						//If timer is in frames add one
-						future.timePassed++;
+					// Timer is realtime, add deltaTime
+					future.timePassed += deltaTime;
 				}
 				else
 				{
-					future.timePassed = 0;
+					// Timer is in frames, add one frame
+					future.timePassed++;
+				}
+
+				// Whether timer is done
+				while (future.timePassed >= future.duration)
+				{
+					future.timePassed -= future.duration;
 
 					future.function();
 
-					//Delete the event if not repeating
+					// If not repeating, delete the event
 					if (!future.repeat)
 					{
 						itr = schedule.erase(itr);
+						break;
 					}
 				}
 
-				//itr can get a new value so make sure it is not end
+				// Iterator can get a new value so make sure it is not at end
 				if (itr != schedule.end())
+				{
 					itr++;
+				}
 			}
 
 			//Iterate through entities
