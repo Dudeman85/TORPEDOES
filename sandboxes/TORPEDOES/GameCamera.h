@@ -42,12 +42,18 @@ static void UpdateCam(Camera* cam, Tilemap* map)
 	float bottomDiff = playerBounds[2] - camBounds[2];
 	float leftDiff = playerBounds[3] - camBounds[3];
 
+	//Zoom out
 	if (topDiff < zoomOutThreshold || rightDiff < zoomOutThreshold || bottomDiff < zoomOutThreshold || leftDiff < zoomOutThreshold)
 	{
 		camScale += zoomSpeed;
 	}
-	else if
+	//Zoom in
+	else if (topDiff > zoomInThreshold || rightDiff > zoomInThreshold || bottomDiff > zoomInThreshold || leftDiff > zoomInThreshold)
+	{
+		camScale -= zoomSpeed;
+	}
 
+	//Restrict camera to size of tilemap
 
 	//OLD CAMERA IMPLEMENTATION
 
