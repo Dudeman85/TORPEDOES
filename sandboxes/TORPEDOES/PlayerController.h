@@ -83,6 +83,26 @@ void CreateTorpedo(ecs::Entity entity)
 	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .visualise = false,  .rotationOverride = transform.position.y });
 }
 
+void CreateShell(ecs::Entity entity)
+{
+	Player& player = ecs::GetComponent<Player>(entity);
+	Transform& transform = ecs::GetComponent<Transform>(entity);
+	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
+
+	float speed = 500;
+
+	ecs::Entity shell = ecs::NewEntity();
+	ecs::AddComponent(shell, Projectile{ .ownerID = player.id, .speed = 500, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
+
+	Projectile& shellProjectile = ecs::GetComponent<Projectile>(shell);
+
+	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(10) });
+	ecs::AddComponent(shell, Rigidbody{ .velocity = player._forwardDirection * shellProjectile.speed });
+	ecs::AddComponent(shell, ModelRenderer{ .model = resources::models[shellProjectile.model = "Weapon_HedgehogAmmo.obj"] });
+	std::vector<Vector2> Shellverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
+	ecs::AddComponent(shell, PolygonCollider{ .vertices = Shellverts, .callback = OnProjectileCollision, .trigger = true, .visualise = false,  .rotationOverride = transform.position.y });
+}
+
 // Player controller System. Requires Player , Tranform , Rigidbody , PolygonCollider
 ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonCollider)
 class PlayerController : public ecs::System
@@ -113,15 +133,15 @@ public:
 		shipComponents.insert({ ShipType::submarine,
 			Player{.forwardSpeed = 800, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = CreateTorpedo, .specialAction = CreateTorpedo } });
 		shipComponents.insert({ ShipType::cannonBoat,
-			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = CreateTorpedo, .specialAction = CreateTorpedo } });
+			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = CreateShell, .specialAction = CreateTorpedo } });
 		shipComponents.insert({ ShipType::hedgehogBoat,
 			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = CreateTorpedo, .specialAction = CreateTorpedo } });
 
 		//Initialize ship type models
-		shipModels.insert({ ShipType::torpedoBoat, resources::models["LaMuerte.obj"] });
-		shipModels.insert({ ShipType::submarine, resources::models["LaMuerte.obj"] });
-		shipModels.insert({ ShipType::cannonBoat, resources::models["LaMuerte.obj"] });
-		shipModels.insert({ ShipType::hedgehogBoat, resources::models["LaMuerte.obj"] });
+		shipModels.insert({ ShipType::torpedoBoat, resources::models["Ship_PT_109_Torpedo.obj"] });
+		shipModels.insert({ ShipType::submarine, resources::models["Ship_U_99_Submarine.obj"] });
+		shipModels.insert({ ShipType::cannonBoat, resources::models["Ship_Yamato_Cannon.obj"] });
+		shipModels.insert({ ShipType::hedgehogBoat, resources::models["Ship_HMCS_Sackville_Hedgehog.obj"] });
 	}
 
 	//Get the min and max bounds of every player
@@ -441,7 +461,7 @@ public:
 			TransformSystem::AddParent(playerNameText, player);
 
 			//Create the player's rendered entity
-			ecs::AddComponent(playerRender, Transform{ .rotation = Vector3(45, 0, 0) });
+			ecs::AddComponent(playerRender, Transform{ .rotation = Vector3(45, 0, 0), .scale = Vector3(1.5) });
 			ecs::AddComponent(playerRender, ModelRenderer{ .model = shipModels[shipTypes[i]] });
 			TransformSystem::AddParent(playerRender, player);
 
