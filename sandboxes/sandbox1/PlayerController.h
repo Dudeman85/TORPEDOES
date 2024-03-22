@@ -1,49 +1,55 @@
 #pragma once 
+#include <bitset>
 #include <engine/Application.h>
 #include "Resources.h"
 #include "Projectiles.h"
-//#include "engine/Input.h"
+#include "engine/Input.h"
 
 // Declaration of the entity component system (ECS) instance
 using namespace engine;
 enum ShipType { torpedoBoat, submarine, cannonBoat, hedgehogBoat, pirateShip };
-enum HitType { heavyHit, lightHit};
+//enum HitType { heavyHit, lightHit};
 
 ECS_REGISTER_COMPONENT(Player)
 struct Player
 {
-	ShipType shipType; //This might not be necessary
-
 	int id = 0;
 
-	//Movement stats
-	float accelerationSpeed;
-	float rotationSpeed;
-	//Minimum acceleration while rotating
-	float minTurningSpeed = 100;
+	// Movement stats
+	float forwardSpeed = 400;
+	float reverseSpeed = 133;
 
-	//Action cooldowns
-	float mainCooldown;
-	float specialCooldown;
+	float offtrackSpeedScale = 0.991f;
 
-	//Action timers
-	float actionTimer1 = 0.0f;
-	float projectileRechargeTime = 0.0f;
-	float projectileShootCooldown = 0.0f;
+	float rotationSpeed = 100;
+	float minSpeedWhileTurning = 60;
 
-	//Action functions
+	float _speedScale = 1;
+
+	// Action cooldowns
+	float shootCooldown = 0.2f;			// Time between shots
+	float specialCooldown = 0.2f;		// Time between special uses
+	float ammoRechargeCooldown = 1.f;	// Time between gaining ammo
+
+	int ammo = 0;
+	int maxAmmo = 2;
+
+	// Action timers
+	float _ammoRechargeTimer = 0.0f;
+	float _shootTimer = 0.0f;
+
+	// Action functions
 	std::function<void(ecs::Entity, int)> mainAction;
 	std::function<void(ecs::Entity, int)> specialAction;
 
-	//Checkpoint stuff
+	// Checkpoint
 	int previousCheckpoint = -1;
 	int lap = 1;
 
-	//Hit by weapon stuff
-	bool isHit = false;
-	float hitTime = 0;
+	// Hit
+	std::vector<std::pair <Projectile, float>> hitProjectiles;
 
-	//Rendered Child entities
+	// Rendered child entities
 	ecs::Entity renderedEntity;
 	ecs::Entity nameText;
 };
@@ -81,19 +87,19 @@ public:
 
 		//Initialize each ship type's stats
 		shipComponents.insert({ ShipType::torpedoBoat,
-			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 		shipComponents.insert({ ShipType::submarine,
-			Player{.accelerationSpeed = 800, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.forwardSpeed = 800, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 		shipComponents.insert({ ShipType::cannonBoat,
-			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 		shipComponents.insert({ ShipType::hedgehogBoat,
-			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .mainCooldown = 5, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
 
 		//Initialize ship type models
-		shipModels.insert({ ShipType::torpedoBoat, resources::models["LaMuerte.obj"] });
-		shipModels.insert({ ShipType::submarine, resources::models["LaMuerte.obj"] });
-		shipModels.insert({ ShipType::cannonBoat, resources::models["LaMuerte.obj"] });
-		shipModels.insert({ ShipType::hedgehogBoat, resources::models["LaMuerte.obj"] });
+		shipModels.insert({ ShipType::torpedoBoat, resources::models["Ship_PT_109_Torpedo.obj"] });
+		shipModels.insert({ ShipType::submarine, resources::models["Ship_U_99_Submarine.obj"] });
+		shipModels.insert({ ShipType::cannonBoat, resources::models["Ship_Yamato_Cannon.obj"] });
+		shipModels.insert({ ShipType::hedgehogBoat, resources::models["Ship_HMCS_Sackville_Hedgehog.obj"] });
 	}
 
 	std::array<float, 4> GetPlayerBounds()
@@ -131,7 +137,7 @@ public:
 		// Slow player down when off track
 		if (collision.type == Collision::Type::tilemapCollision)
 		{
-			ecs::GetComponent<Rigidbody>(collision.a).velocity *= 0.991f;
+			ecs::GetComponent<Rigidbody>(collision.a).velocity *= player.offtrackSpeedScale;
 		}
 
 		// Check if the collision involves a checkpoint
@@ -162,34 +168,42 @@ public:
 			}
 		}
 		// Check if the collision involves a projectile
-		else if (ecs::HasComponent<Torpedo>(collision.b))
+		else if (ecs::HasComponent<Projectile>(collision.b))
 		{
 			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(collision.b);
 			Transform& projectransfor = ecs::GetComponent<Transform>(collision.b);
-			Torpedo& torpedo = ecs::GetComponent<Torpedo>(collision.b); // Entity is collision.b 
+			Projectile& projectile = ecs::GetComponent<Projectile>(collision.b); // Entity is collision.b 
 
-			if (player.id != torpedo.ownerID)
+			if (player.id != projectile.ownerID)
 			{
-				player.isHit = true;
+				for (auto hitProjectile : player.hitProjectiles)
+				{
+					// If player has been hit by stop, do not add current hit
+					if (hitProjectile.first.hitType == HitStates::Stop)
+					{
+						goto SkipAddingHit;
+					}
+				}
+				// If current hit is stop, clear all other hits
+				if (projectile.hitType == HitStates::Stop)
+				{
+					player.hitProjectiles.clear();
+				}
+				
+			SkipAddingHit:
+				// Add the new hit
+				player.hitProjectiles.push_back({ projectile, 0.f });
+
 				CreateAnimation(projectransfor.position + rigidbody.velocity / 15);
-				ecs::DestroyEntity(collision.b);
-			}
-		}
-		else if (ecs::HasComponent<Cannon>(collision.b))
-		{
-			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(collision.b);
-			Transform& projectransfor = ecs::GetComponent<Transform>(collision.b);
-			Cannon& shell = ecs::GetComponent<Cannon>(collision.b); // Entity is collision.b 
 
-			if (player.id != shell.ownerID)
-			{
-				player.isHit = true;
-				CreateCannonAnimation(projectransfor.position + rigidbody.velocity / 15);
-				ecs::DestroyEntity(collision.b);
+				//Destroy torpedo at end of frame
+				//TODO: actually fix entity deletion bug
+				std::function<void()> destroyTorpedo = [collision]() { ecs::DestroyEntity(collision.b); };
+				TimerSystem::ScheduleFunction(destroyTorpedo, -1);
 			}
 		}
 	}
-	/// PlayerControlle Update 
+	/// PlayerController Update 
 	void Update(GLFWwindow* window, float dt)
 	{
 		//Don't do anything until countdown is done
@@ -198,149 +212,70 @@ public:
 			countdownTimer -= dt;
 			return;
 		}
+
 		// Iterate through entities in the system
 		for (auto itr = entities.begin(); itr != entities.end();)
 		{
-			//Get the entity and increment the iterator
+			// Get the entity and increment the iterator
 			ecs::Entity entity = *itr++;
 
-			// Get player, transform, and rigidbody components
+			// Get necessary components
 			Player& player = ecs::GetComponent<Player>(entity);
 			Transform& transform = ecs::GetComponent<Transform>(entity);
 			Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(entity);
 			PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
 
-			//initialize input zero 
-			float accelerationInput = 0;
-			float rotateInput = 0;
-			bool ProjetileInput = 0;
-			// Starte Time 
-			if (countdownTimer <= 0)
-			{
-				accelerationInput = 0;
-				rotateInput = 0;
-				ProjetileInput = 0;
-				// Get keyboard input		 
-				if (player.id == 0)
-				{
-					//Player 0 only gets keyboard input
-					accelerationInput += +glfwGetKey(window, GLFW_KEY_A) - glfwGetKey(window, GLFW_KEY_Z);
-					rotateInput += -glfwGetKey(window, GLFW_KEY_COMMA) + glfwGetKey(window, GLFW_KEY_PERIOD);
-					ProjetileInput = glfwGetKey(window, GLFW_KEY_SPACE);
-				}
-				else
-				{
-					// Check joystick input
-					int present = glfwJoystickPresent(player.id - 1);
-					// If the joystick is present, check its state
-					if (present == GLFW_TRUE)
-					{
-						GLFWgamepadstate state;
-						glfwGetGamepadState(player.id - 1, &state);
-						// Get joystick input, such as rotation and acceleration
-					   // Also check if the left and right buttons are pressed
-						//float rightStickX = state.axes[0];
+			// Initialize inputs
+			float accelerationInput = input::GetTotalInputValue("Throttle" + std::to_string(player.id));
 
-						// Get joystick axes' values
-						int count;
-						const float* axesStartPointer = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &count);
-						const float* axesStartPointer1 = glfwGetJoystickAxes(GLFW_JOYSTICK_2, &count);
-						// Two first values are same input
-						const float* axesThirdPointer = axesStartPointer + 1;
-						const float* axesThirdPointer1 = axesStartPointer1 + 1;
-						// First value is X input
-						float rightStickX = *axesStartPointer;
-						// Third value is Y input
-						float rightStickY = *axesThirdPointer;
-
-						float rightStickX1 = *axesStartPointer1;
-
-						float rightStickY1 = *axesThirdPointer1;
-
-						//std::cout << *axesStartPointer << "\n";
-
-						const unsigned char* buttonpointer = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &count);
-						const unsigned char* buttonpointer1 = glfwGetJoystickButtons(GLFW_JOYSTICK_2, &count);
-
-						const unsigned char* buttonsecondpointer = buttonpointer + 1;
-						const unsigned char* buttonsecondpointer1 = buttonpointer1 + 1;
-
-
-
-						std::cout << static_cast<float>(*buttonpointer) << " " << static_cast<float>(*buttonsecondpointer) << "\n";
-
-
-
-
-						const float* next = axesStartPointer + 1; // Increment the pointer by 1 to move to the next element
-						for (int i = 1; i < count; i++) // Start from 1 since you already printed the first element
-						{
-							//std::cout << *next << "\n";
-							next = next + 1; // Increment the pointer by 1 to move to the next element
-						}
-
-						const int buttonLeft = state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT];
-						const int buttonRight = state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT];
-						const int button_A = state.buttons[GLFW_GAMEPAD_BUTTON_A];
-
-						// Calculate acceleration based on joystick values
-						// and check if it's rotating left or right
-						//const float ltValue = state.axes[4]; // Left trigger
-						//const float rtValue = state.axes[5]; // Right trigger
-						//accelerationInput += +rtValue - ltValue;
-						if (player.id == 1)
-						{
-							accelerationInput += rightStickY;
-							rotateInput += rightStickX;
-							ProjetileInput = static_cast<float>(*buttonpointer);
-						}
-						else if (player.id == 2)
-						{
-							accelerationInput += rightStickY1;
-							rotateInput += rightStickX1;
-							ProjetileInput = static_cast<float>(*buttonpointer1);
-						}
-
-						/*accelerationInput += rightStickY;
-						rotateInput += +buttonRight - buttonLeft;
-						ProjetileInput = button_A;
-
-						// Deadzone for the right joystick
-						if (fabs(rightStickX) > 0.2)
-						{
-							// Set rotation input to rigth sticke
-							rotateInput += rightStickX;
-						}*/
-					}
-				}
-			}
-			if (player.id == 0)
-				countdownTimer -= dt;
-			//printf("starTimer: %i\n", int(starTimer));
-			// topedo hit logica 
-			if (player.isHit == true)
-			{
-				// Rotate player 360 degrees
-				TransformSystem::Rotate(player.renderedEntity, 0, 360.0f * dt, 0);
-
-				// Restabilize player when hit time has gone by
-				if (player.hitTime >= 2)
-				{
-					player.isHit = false;
-					player.hitTime = 0.0f;
-				}
-				else
-				{
-					// Ignore all input
-
-					player.hitTime += dt; // Increment duration of hit time
-				}
-			}
-
+			float rotateInput = input::GetInputValue("Turn" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_X);
+			bool projetileInput = input::GetPressed("Shoot" + std::to_string(player.id));
 
 			accelerationInput = std::clamp(accelerationInput, -1.0f, 1.0f);
 			rotateInput = std::clamp(rotateInput, -1.0f, 1.0f);
+
+			/* Projectile hit logic  */
+
+			for (auto it = player.hitProjectiles.begin(); it != player.hitProjectiles.end();)
+			{
+				// Increase the timer value
+				it->second += engine::deltaTime;
+
+				if (it->second >= it->first.hitTime)
+				{
+					it = player.hitProjectiles.erase(it); // Erase the element and move iterator to the next element
+				}
+				else
+				{
+					++it; // Move to the next element
+				}
+			}
+
+			player._speedScale = 1.f; // 100%
+			for (auto& hitProjectile : player.hitProjectiles)
+			{
+				switch (hitProjectile.first.hitType)
+				{
+				case HitStates::Stop:
+					// Rotate player
+					TransformSystem::Rotate(player.renderedEntity, 0, 360.0f * dt, 0);
+					break;
+				case HitStates::Additive:
+					player._speedScale += hitProjectile.first.hitSpeedFactor;
+					
+					break;
+				case HitStates::Multiplicative:
+					player._speedScale += (player._speedScale *= hitProjectile.first.hitSpeedFactor);
+					break;
+				default:
+					break;
+				}
+			}
+			if (player.id == 1) {
+				std::cout << player._speedScale << "\n";
+			}
+			/* Movement */
 
 			// CALCULATE POSITION AND ROTATE 
 			// Calculate the forward direction
@@ -349,61 +284,111 @@ public:
 
 			// Initialize the impulse as zero
 			Vector2 forwardImpulse(0.0f, 0.0f);
+
 			if (rotateInput != 0.0f)
 			{
-				//Slow rotation based on throttle setting
-				//TODO: this function could be improved by testing
-				float rotationScalar = 1 - log10(2.0f * std::max(0.5f, accelerationInput));
+				// Slow rotation based on throttle setting
+				// TODO: this function could be improved by testing
+				float rotationScalar = 1 - log10(2.0f * max(0.5f, accelerationInput));
+
 				// Apply forward impulse if rotating or receiving a rotation command
 				TransformSystem::Rotate(player.renderedEntity, 0, -rotateInput * player.rotationSpeed * rotationScalar * dt, 0);
-				forwardImpulse = forwardDirection * player.minTurningSpeed * dt;
-			}
 
+				// Set min speed while turning
+				// TODO: This is ignored when giving even slightly input for reverse or forward!
+				forwardImpulse = forwardDirection * dt * player._speedScale * player.minSpeedWhileTurning;
+			}
 
 			// Apply acceleration impulse if positive input is received
 			if (accelerationInput > 0.0f)
 			{
-				forwardImpulse = forwardDirection * accelerationInput * dt * player.accelerationSpeed;
+				forwardImpulse = forwardDirection * accelerationInput * dt * player.forwardSpeed;
 			}
 			// Apply deceleration impulse if negative input is received
 			if (accelerationInput < 0.0f)
 			{
-				// TODO: Deacceleration rate
-				forwardImpulse = forwardDirection * accelerationInput * dt * player.accelerationSpeed * 0.3;
+				forwardImpulse = forwardDirection * accelerationInput * dt * player.reverseSpeed;
 			}
-
-			// Check if the variable 'ProjectileInput' is true and if the projectile time is equal to or less than zero.
-			if (ProjetileInput && player.projectileShootCooldown <= 0.0f)
-			{
-				// Create a projectile using the parameters of the player object.
-				if (player.actionTimer1 <= 0.0f)
-				{
-					CreateCannonProjectile(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
-					// Reset the projectile time to a cooldown 
-					player.actionTimer1 = 1.f;
-					// Create a cooldown time between shots.
-					player.projectileShootCooldown = 0.2f;
-				}
-
-				else if (player.projectileRechargeTime <= 0.0f)
-				{
-					CreateCannonProjectile(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
-					player.projectileRechargeTime = 1.f;
-					player.projectileShootCooldown = 0.2f;
-				}
-			}
-
-			
-
-			// Decrease the projectile time by the elapsed time (dt)
-			player.actionTimer1 -= dt;
-			player.projectileRechargeTime -= dt;
-			player.projectileShootCooldown -= dt;
 
 			collider.rotationOverride = modelTransform.rotation.y + 1080;
 
 			// Apply the resulting impulse to the object
-			PhysicsSystem::Impulse(entity, forwardImpulse);
+			PhysicsSystem::Impulse(entity, forwardImpulse* player._speedScale);
+
+			/* Shooting */
+
+			bool reachedMaxAmmoThisFrame = false;
+			bool shotThisFrame = false;
+
+			// If not max ammo
+			if (player.ammo < player.maxAmmo)
+			{
+				player._ammoRechargeTimer += dt;
+
+				while (player._ammoRechargeTimer >= player.ammoRechargeCooldown)
+				{
+					// Add ammo
+					player.ammo++;
+
+					if (player.ammo < player.maxAmmo)
+					{
+						// Not max ammo, continue recharge
+						player._ammoRechargeTimer -= player.ammoRechargeCooldown;
+					}
+					else
+					{
+						// Max ammo, handle recharge after shooting
+						player.ammo = player.maxAmmo;
+						reachedMaxAmmoThisFrame = true;
+						break;
+					}
+				}
+			}
+
+			// Increase the projectile timer
+			player._shootTimer += dt;
+
+			// If the projectile cooldown has passed
+			while (player._shootTimer >= player.shootCooldown)
+			{
+				if (!projetileInput)
+				{
+					// We haven't pressed the shoot button, keep shootTimer at max value
+					player._shootTimer = player.shootCooldown;
+					break;
+				}
+
+				if (player.ammo <= 0)
+				{
+					player.ammo = 0;
+					// We don't have ammo, keep shootTimer at max value
+					player._shootTimer = player.shootCooldown;
+					break;
+				}
+
+				// Create a projectile using the parameters of the player object.
+				CreateCannonProjectile(forwardDirection, 700, transform.position, modelTransform.rotation, player.id);
+
+				player.ammo--;
+
+				// Decrease the projectile shoot time 
+				player._shootTimer -= player.shootCooldown;
+			}
+
+			// Max ammo, stop rechage
+			if (reachedMaxAmmoThisFrame)
+			{
+				if (player.ammo < player.maxAmmo)
+				{
+					// Not max ammo, continue recharge
+					player._ammoRechargeTimer -= player.ammoRechargeCooldown;
+				}
+				else
+				{
+					// Max ammo, ignore recharge done for next ammo
+					player._ammoRechargeTimer = 0;
+				}
+			}
 		}
 	}
 
@@ -443,11 +428,10 @@ public:
 			TransformSystem::AddParent(playerNameText, player);
 
 			//Create the player's rendered entity
-			ecs::AddComponent(playerRender, Transform{ .rotation = Vector3(45, 0, 0) });
+			ecs::AddComponent(playerRender, Transform{ .rotation = Vector3(45, 0, 0), .scale = Vector3(3) });
 			ecs::AddComponent(playerRender, ModelRenderer{ .model = shipModels[shipTypes[i]] });
 			TransformSystem::AddParent(playerRender, player);
 
-			//Create the players's torpedo indicators
 			//Create the players's torpedo indicators
 			ecs::AddComponent(torpIndicator1, SpriteRenderer{ .texture = resources::uiTextures["UI_Green_Torpedo_Icon.png"] });
 			ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(-2, -2, 10), .scale = Vector3(2, .5, 1) });
