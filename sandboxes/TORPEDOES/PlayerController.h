@@ -437,7 +437,7 @@ public:
 
 			//Create the player's name tag
 			ecs::AddComponent(playerNameText, TextRenderer{ .font = resources::niagaraFont, .text = "P" + to_string(i + 1), .color = Vector3(0.5, 0.8, 0.2) });
-			ecs::AddComponent(playerNameText, Transform{ .position = Vector3(-2, 2, 1) , .scale = Vector3(0.1) });
+			ecs::AddComponent(playerNameText, Transform{ .position = Vector3(-2, 2, 51) , .scale = Vector3(0.1, 0.075, 0.1) });
 			TransformSystem::AddParent(playerNameText, player);
 
 			//Create the player's rendered entity
@@ -447,10 +447,10 @@ public:
 
 			//Create the players's torpedo indicators
 			ecs::AddComponent(torpIndicator1, SpriteRenderer{ .texture = resources::uiTextures["UI_Green_Torpedo_Icon.png"] });
-			ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(-2, -2, 10), .scale = Vector3(2, .5, 1) });
+			ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(-2, -2, 50), .scale = Vector3(2, .5, 1) });
 			TransformSystem::AddParent(torpIndicator1, player);
 			ecs::AddComponent(torpIndicator2, SpriteRenderer{ .texture = resources::uiTextures["UI_Green_Torpedo_Icon.png"] });
-			ecs::AddComponent(torpIndicator2, Transform{ .position = Vector3(2, -2, 10), .scale = Vector3(2, .5, 1) });
+			ecs::AddComponent(torpIndicator2, Transform{ .position = Vector3(2, -2, 50), .scale = Vector3(2, .5, 1) });
 			TransformSystem::AddParent(torpIndicator2, player);
 		}
 	}
