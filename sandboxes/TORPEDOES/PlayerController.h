@@ -101,11 +101,8 @@ public:
 	{
 		std::array<float, 4> playerBounds{ -INFINITY, -INFINITY, INFINITY, INFINITY };
 
-		for (auto itr = entities.begin(); itr != entities.end();)
+		for (ecs::Entity entity : entities)
 		{
-			//Get the entity and increment the iterator
-			ecs::Entity entity = *itr++;
-
 			Transform& transform = ecs::GetComponent<Transform>(entity);
 
 			if (playerBounds[0] < transform.position.y)
@@ -190,11 +187,8 @@ public:
 		}
 
 		// Iterate through entities in the system
-		for (auto itr = entities.begin(); itr != entities.end();)
+		for (ecs::Entity entity : entities)
 		{
-			// Get the entity and increment the iterator
-			ecs::Entity entity = *itr++;
-
 			// Get necessary components
 			Player& player = ecs::GetComponent<Player>(entity);
 			Transform& transform = ecs::GetComponent<Transform>(entity);

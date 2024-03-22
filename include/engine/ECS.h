@@ -10,14 +10,14 @@
 #include <memory>
 #include <functional>
 
-/// Allow max components to be determined outside this file
+//Allow max components to be determined outside this file
 #ifndef ECS_MAX_COMPONENTS
 #define ECS_MAX_COMPONENTS 100
 #elif ECS_MAX_COMPONENTS > UINT16_MAX
 #error The maximum possible number of components is 65535
 #endif
 
-//Macto to register a component outside main
+//Macro to register a component outside main
 #define ECS_REGISTER_COMPONENT(COMPONENT) \
 struct COMPONENT; \
 inline bool COMPONENT##Registered = ( ecs::RegisterComponent<COMPONENT>(), true );
@@ -43,7 +43,7 @@ namespace engine::ecs
 
 	//ENTITY MANAGEMENT DATA
 
-	//Custom container class for storing a system's entities
+	//Custom container class for storing a system's entities, not suitable for anythin else
 	class EntityList
 	{
 	private:
@@ -55,7 +55,7 @@ namespace engine::ecs
 		bool packed = true;
 
 		//Resize the entities array
-		void resize(uint32_t newSize)
+		void Resize(uint32_t newSize)
 		{
 			Entity* newArray = new Entity[newSize];
 
@@ -99,6 +99,11 @@ namespace engine::ecs
 			//Postfix
 			Iterator operator++(int)
 			{
+				//Deprecation Warning
+				#ifdef _DEBUG
+				std::cout << warningFormat << "ECS WARNING: Postfix can cause crashes when deleting entities. Use \"for (ecs::Entity entity : entities)\" instead" << normalFormat << std::endl;
+				#endif
+
 				Iterator ret = *this;
 				++(*this);
 				return ret;
@@ -119,7 +124,7 @@ namespace engine::ecs
 
 		Iterator begin()
 		{
-			if(!packed)
+			if (!packed)
 				Pack();
 			return Iterator(&entities[0], this);
 		}
@@ -155,8 +160,8 @@ namespace engine::ecs
 		{
 			//Add 100 or double capacity to the list, whichever is less
 			if (size >= maxSize)
-				resize(maxSize + std::min(maxSize, (uint32_t)100));
-			
+				Resize(maxSize + std::min(maxSize, (uint32_t)100));
+
 			//Look through the array and make sure the entity is not in it
 			for (uint32_t i = 0; i < size; i++)
 			{
@@ -191,6 +196,10 @@ namespace engine::ecs
 		//This is currently called when calling begin()
 		void Pack()
 		{
+			//If the array is already packed nothing needs to be done
+			if (packed)
+				return;
+
 			//Look through the array
 			uint32_t iterations = size;
 			for (uint32_t i = 0; i < iterations; i++)
@@ -222,7 +231,9 @@ namespace engine::ecs
 			}
 
 			packed = true;
-			//TODO: decrease size maybe
+			//Resize to keep the free space between 50 and 150
+			if (maxSize - size > 150)
+				Resize(size + 50);
 		}
 	};
 
@@ -237,7 +248,7 @@ namespace engine::ecs
 
 	//COMPONENT MANAGEMENT DATA
 
-	///Interface for each component array type
+	//Interface for each component array type
 	class IComponentArray
 	{
 	public:
@@ -254,11 +265,11 @@ namespace engine::ecs
 
 	//SYSTEM MANAGEMENT DATA
 
-	///Base class all systems inherit from
+	//Base class all systems inherit from
 	class System
 	{
 	public:
-		///Set of every entity containing the required components for the system
+		//Set of every entity containing the required components for the system
 		EntityList entities;
 	};
 	//Map of each system accessible by its type name
@@ -273,7 +284,7 @@ namespace engine::ecs
 
 	//INTERNAL FUNCTIONS
 
-	///Implementation internal class to interface with each type of component array
+	//Implementation internal class to interface with each type of component array
 	template<typename T>
 	class ComponentArray : public IComponentArray
 	{
@@ -298,13 +309,13 @@ namespace engine::ecs
 			return entityToIndex.count(entity);
 		}
 
-		///Get a component from an entity
+		//Get a component from an entity
 		T& GetComponent(Entity entity)
 		{
 			return components[entityToIndex[entity]];
 		}
 
-		///Add a component to an entity, returns a reference to that component
+		//Add a component to an entity, returns a reference to that component
 		void AddComponent(Entity entity, T component)
 		{
 			entityToIndex[entity] = components.size();
@@ -312,7 +323,7 @@ namespace engine::ecs
 			components.push_back(component);
 		}
 
-		///Removes a component from an entity
+		//Removes a component from an entity
 		void RemoveComponent(Entity entity) override
 		{
 			//Call the component destructor
@@ -349,12 +360,12 @@ namespace engine::ecs
 			if ((signature & systemSignatures[system.first]) == systemSignatures[system.first])
 			{
 				//Add the entity to the system's set
-				system.second->entities.insert(entity);
+				system.second->entities.Insert(entity);
 			}
 			else
 			{
 				//Remove the entity from the system's set
-				system.second->entities.erase(entity);
+				system.second->entities.Erase(entity);
 			}
 		}
 	}

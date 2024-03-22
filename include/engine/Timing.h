@@ -105,11 +105,8 @@ namespace engine
 			}
 
 			//Iterate through entities
-			for (auto itr = entities.begin(); itr != entities.end();)
+			for (ecs::Entity entity : entities)
 			{
-				//Get the entity and increment the iterator
-				ecs::Entity entity = *itr++;
-
 				Timer& timer = ecs::GetComponent<Timer>(entity);
 
 				//If timer is not done
