@@ -103,15 +103,15 @@ void SetupInput()
 	}
 	
 	// Keyboard input for player 0
-	input::bindAnalogInput(GLFW_KEY_RIGHT,	input::digitalPositiveInput, { "Turn0" }, 0);
-	input::bindAnalogInput(GLFW_KEY_LEFT,	input::digitalNegativeInput, { "Turn0" }, 0, -1);
+	input::bindAnalogInput(GLFW_KEY_RIGHT,	input::digitalPositiveInput, { "Turn2" }, 0);
+	input::bindAnalogInput(GLFW_KEY_LEFT,	input::digitalNegativeInput, { "Turn2" }, 0, -1);
 
-	input::bindAnalogInput(GLFW_KEY_A,		input::digitalPositiveInput, { "Throttle0" }, 0);
-	input::bindAnalogInput(GLFW_KEY_Z,		input::digitalNegativeInput, { "Throttle0" }, 0, -1);
-	input::bindAnalogInput(GLFW_KEY_UP,		input::digitalPositiveInput, { "Throttle0" }, 0);
-	input::bindAnalogInput(GLFW_KEY_DOWN,	input::digitalNegativeInput, { "Throttle0" }, 0, -1);
+	input::bindAnalogInput(GLFW_KEY_A,		input::digitalPositiveInput, { "Throttle2" }, 0);
+	input::bindAnalogInput(GLFW_KEY_Z,		input::digitalNegativeInput, { "Throttle2" }, 0, -1);
+	input::bindAnalogInput(GLFW_KEY_UP,		input::digitalPositiveInput, { "Throttle2" }, 0);
+	input::bindAnalogInput(GLFW_KEY_DOWN,	input::digitalNegativeInput, { "Throttle2" }, 0, -1);
 
-	input::bindDigitalInput(GLFW_KEY_N, { "Shoot0" });
+	input::bindDigitalInput(GLFW_KEY_N, { "Shoot2" });
 	input::bindDigitalInput(GLFW_KEY_M, { "Boost0" });
 }
 

@@ -281,10 +281,10 @@ public:
 						TransformSystem::Rotate(player.renderedEntity, 0, 360.0f * dt, 0);
 					break;
 					case HitStates::Additive:
-						player._speedScale += hitProjectile.first.hitSpeedFactor;
+						player._speedScale += std::max(hitProjectile.first.hitSpeedFactor, 0.f);
 						break;
 					case HitStates::Multiplicative:
-						player._speedScale += (player._speedScale *= hitProjectile.first.hitSpeedFactor);
+						player._speedScale += std::max(player._speedScale *= hitProjectile.first.hitSpeedFactor, 0.f);
 						break;
 					default:
 						break;
@@ -439,7 +439,7 @@ public:
 			playerComponent.nameText = playerNameText;
 
 			ecs::AddComponent(player, Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
-			ecs::AddComponent(player, Rigidbody{ .drag = 0.025 });
+			ecs::AddComponent(player, Rigidbody{ .drag = 0.025, .restitution = 1 });
 			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
 			ecs::AddComponent(player, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
 
