@@ -31,7 +31,7 @@ struct Projectile
 };
 
 ECS_REGISTER_COMPONENT(Hedgehog)
-struct Hedgehog
+struct  Hedgehog: public Projectile 
 {
 	float distanceTraveled = 0.0f;
 	int ownerID = 0;
@@ -80,8 +80,6 @@ void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPos
 }
 
 ECS_REGISTER_SYSTEM(HeggehogSynten, Rigidbody, Transform, Hedgehog)
-
-
 class HeggehogSynten : public ecs::System
 {
 	const float hedgehogSpeedVo = 500.0f;
@@ -103,17 +101,24 @@ public:
 			{
 				// Calcula la distancia recorrida sumando la distancia del paso actual
 				hedgehogComp.distanceTraveled += hedgehogSpeedVo * deltaTime; // deltaTime es el tiempo transcurrido desde el último frame
-
+				
+				// Calcula el coficiente entre la distacia recorida y la distacia maxima 
 				float distanceRatio = hedgehogComp.distanceTraveled / maxDistance;
+
+				//// Calcula la rotación en función de la distancia recorrida
+				TransformSystem::Rotate(entity, Vector3(0, 0,-1.5f));
+
+				// Calcula la escala en funcion de la distancia recorrida
 				float scale = maxScale - (maxScale - minScale) * (2 * abs(0.5 - distanceRatio));
-				float hedgehogRotation = maxRotation - (maxRotation - minRotation) * (2 * abs(0.5 - distanceRatio));
 
 				// Actualiza la escala del objeto
 				ecs::GetComponent<Transform>(entity).scale = Vector3(scale);
+
+				
+				
+
 				Transform& transformComp = ecs::GetComponent<Transform>(entity);
-				transformComp.rotation.z = hedgehogRotation;
 			}
-			// Verifica si se ha superado la distancia máxima permitida
 			else
 			{
 				// Si se supera la distancia máxima, detén el movimiento del objeto

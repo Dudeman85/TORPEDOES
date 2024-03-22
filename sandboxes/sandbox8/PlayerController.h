@@ -225,8 +225,9 @@ public:
 			PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
 
 			// Initialize inputs
-			float accelerationInput = input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_Y);
-			float rotateInput = input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_X);
+			float accelerationInput = input::GetTotalInputValue("Throttle" + std::to_string(player.id));
+
+			float rotateInput = input::GetInputValue("Turn" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_X);
 			bool projetileInput = input::GetPressed("Shoot" + std::to_string(player.id));
 
 			accelerationInput = std::clamp(accelerationInput, -1.0f, 1.0f);
