@@ -25,6 +25,7 @@ struct Player
 	float minSpeedWhileTurning = 60;
 
 	float _speedScale = 1;
+	Vector2 _forwardDirection;
 
 	// Action cooldowns
 	float shootCooldown = 0.2f;			// Time between shots
@@ -37,17 +38,18 @@ struct Player
 	// Action timers
 	float _ammoRechargeTimer = 0.0f;
 	float _shootTimer = 0.0f;
+	float _specialTimer = 0.0f;
 
 	// Action functions
-	std::function<void(ecs::Entity, int)> mainAction;
-	std::function<void(ecs::Entity, int)> specialAction;
+	std::function<void(ecs::Entity)> mainAction;
+	std::function<void(ecs::Entity)> specialAction;
 
 	// Checkpoint
 	int previousCheckpoint = -1;
 	int lap = 1;
 
 	// Hit
-	std::map<Projectile*, float> hitProjectiles;
+	std::vector<std::pair<Projectile, float>> hitProjectiles;
 
 	// Rendered child entities
 	ecs::Entity renderedEntity;
@@ -60,6 +62,74 @@ struct CheckPoint
 	int checkPointID = 0;
 	bool Finish_line = false;
 };
+
+void CreateTorpedo(ecs::Entity entity)
+{
+	Player& player = ecs::GetComponent<Player>(entity);
+	Transform& transform = ecs::GetComponent<Transform>(entity);
+	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
+	
+	float speed = 500;
+
+	ecs::Entity torpedo = ecs::NewEntity();
+	ecs::AddComponent(torpedo, Projectile{ .ownerID = player.id, .speed = 500 });
+
+	Projectile& torpedoProjectile = ecs::GetComponent<Projectile>(torpedo);
+
+	ecs::AddComponent(torpedo, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(10) });
+	ecs::AddComponent(torpedo, Rigidbody{ .velocity = player._forwardDirection * torpedoProjectile.speed });
+	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models[torpedoProjectile.model] });
+	std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
+	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .visualise = false,  .rotationOverride = transform.position.y });
+}
+
+void CreateHedgehog(ecs::Entity entity)
+{
+	Player& player = ecs::GetComponent<Player>(entity);
+	Transform& transform = ecs::GetComponent<Transform>(entity);
+	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
+
+	float hedgehogSpeedVo = 500.0f;
+	float distanceTraveled = 0.0f;
+
+
+	ecs::Entity hedgehog = ecs::NewEntity();
+	ecs::AddComponent(hedgehog, Transform{ .position = transform.position, .rotation = modelTransform.rotation });
+
+	Vector3 finalVelocity = Vector3(player._forwardDirection.x, player._forwardDirection.y, 0.0f) * hedgehogSpeedVo;
+
+
+	ecs::AddComponent(hedgehog, Rigidbody{ .velocity = finalVelocity });
+
+	ecs::AddComponent(hedgehog, ModelRenderer{ .model = resources::models["hedgehog.obj"] });
+	std::vector<Vector2> Hedgehogverts{ Vector2(0.2, 0.25), Vector2(0.2, -0.25), Vector2(-0.2, -0.25), Vector2(-0.2, 0.25) };
+	ecs::AddComponent(hedgehog, PolygonCollider{ .vertices = Hedgehogverts, .callback = OnProjectileCollision, .trigger = true, .visualise = true,  .rotationOverride = transform.position.y });
+	ecs::AddComponent(hedgehog, Projectile{ .ownerID = player.id });
+	ecs::AddComponent(hedgehog, Hedgehog{});
+
+
+
+}
+
+void CreateShell(ecs::Entity entity)
+{
+	Player& player = ecs::GetComponent<Player>(entity);
+	Transform& transform = ecs::GetComponent<Transform>(entity);
+	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
+
+	float speed = 500;
+
+	ecs::Entity shell = ecs::NewEntity();
+	ecs::AddComponent(shell, Projectile{ .ownerID = player.id, .speed = 500, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
+
+	Projectile& shellProjectile = ecs::GetComponent<Projectile>(shell);
+
+	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(10) });
+	ecs::AddComponent(shell, Rigidbody{ .velocity = player._forwardDirection * shellProjectile.speed });
+	ecs::AddComponent(shell, ModelRenderer{ .model = resources::models[shellProjectile.model = "Weapon_HedgehogAmmo.obj"] });
+	std::vector<Vector2> Shellverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
+	ecs::AddComponent(shell, PolygonCollider{ .vertices = Shellverts, .callback = OnProjectileCollision, .trigger = true, .visualise = false,  .rotationOverride = transform.position.y });
+}
 
 // Player controller System. Requires Player , Tranform , Rigidbody , PolygonCollider
 ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonCollider)
@@ -87,19 +157,19 @@ public:
 
 		//Initialize each ship type's stats
 		shipComponents.insert({ ShipType::torpedoBoat,
-			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = CreateTorpedo, .specialAction = CreateTorpedo } });
 		shipComponents.insert({ ShipType::submarine,
-			Player{.forwardSpeed = 800, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.forwardSpeed = 800, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = CreateTorpedo, .specialAction = CreateTorpedo } });
 		shipComponents.insert({ ShipType::cannonBoat,
-			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = CreateShell, .specialAction = CreateTorpedo } });
 		shipComponents.insert({ ShipType::hedgehogBoat,
-			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = CreateHedgehog, .specialAction = CreateTorpedo } });
 
 		//Initialize ship type models
-		shipModels.insert({ ShipType::torpedoBoat, resources::models["LaMuerte.obj"] });
-		shipModels.insert({ ShipType::submarine, resources::models["LaMuerte.obj"] });
-		shipModels.insert({ ShipType::cannonBoat, resources::models["LaMuerte.obj"] });
-		shipModels.insert({ ShipType::hedgehogBoat, resources::models["LaMuerte.obj"] });
+		shipModels.insert({ ShipType::torpedoBoat, resources::models["Ship_PT_109_Torpedo.obj"] });
+		shipModels.insert({ ShipType::submarine, resources::models["Ship_U_99_Submarine.obj"] });
+		shipModels.insert({ ShipType::cannonBoat, resources::models["Ship_Yamato_Cannon.obj"] });
+		shipModels.insert({ ShipType::hedgehogBoat, resources::models["Ship_HMCS_Sackville_Hedgehog.obj"] });
 	}
 
 	//Get the min and max bounds of every player
@@ -107,11 +177,8 @@ public:
 	{
 		std::array<float, 4> playerBounds{ -INFINITY, -INFINITY, INFINITY, INFINITY };
 
-		for (auto itr = entities.begin(); itr != entities.end();)
+		for (ecs::Entity entity : entities)
 		{
-			//Get the entity and increment the iterator
-			ecs::Entity entity = *itr++;
-
 			Transform& transform = ecs::GetComponent<Transform>(entity);
 
 			if (playerBounds[0] < transform.position.y)
@@ -131,14 +198,11 @@ public:
 		// collision.a is always a player
 		// Get references to the involved components
 		Player& player = ecs::GetComponent<Player>(collision.a);
-		Transform& playertranform = ecs::GetComponent<Transform>(collision.a);
-		PolygonCollider& playerCollider = ecs::GetComponent<PolygonCollider>(collision.a);
 
 		// Slow player down when off track
 		if (collision.type == Collision::Type::tilemapCollision)
 		{
-			// TODO: Replace with a bool, this should instead be a flat decrease, not % of current speed
-			ecs::GetComponent<Rigidbody>(collision.a).velocity *= (player.offtrackSpeedScale - engine::deltaTime);
+			ecs::GetComponent<Rigidbody>(collision.a).velocity *= player.offtrackSpeedScale;
 		}
 
 		// Check if the collision involves a checkpoint
@@ -171,36 +235,32 @@ public:
 		// Check if the collision involves a projectile
 		else if (ecs::HasComponent<Projectile>(collision.b))
 		{
-			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(collision.b);
-			Transform& projectransfor = ecs::GetComponent<Transform>(collision.b);
-			Projectile& projectile = ecs::GetComponent<Projectile>(collision.b); // Entity is collision.b 
+			Projectile& projectile = ecs::GetComponent<Projectile>(collision.b); // projectile is collision.b 
 
 			if (player.id != projectile.ownerID)
 			{
-				for (auto hitProjectile : player.hitProjectiles)
+				for (auto& hitProjectile : player.hitProjectiles)
 				{
 					// If player has been hit by stop, do not add current hit
-					if (hitProjectile.first->hitType == HitStates::Stop)
+					if (hitProjectile.first.hitType == HitStates::Stop)
 					{
 						goto SkipAddingHit;
 					}
 				}
-				// If current hit is stop, clear all other hits
+				// If the new hit is stop, clear all other hits
 				if (projectile.hitType == HitStates::Stop)
 				{
 					player.hitProjectiles.clear();
 				}
-				SkipAddingHit:
-
 				// Add the new hit
-				player.hitProjectiles.insert({ &projectile, 0.f });
+				player.hitProjectiles.push_back({ projectile, 0.f });
+
+				SkipAddingHit:
 				
-				CreateAnimation(projectransfor.position + rigidbody.velocity / 15);
+				CreateAnimation(collision.b);
 
 				//Destroy torpedo at end of frame
-				//TODO: actually fix entity deletion bug
-				std::function<void()> destroyTorpedo = [collision]() { ecs::DestroyEntity(collision.b); };
-				TimerSystem::ScheduleFunction(destroyTorpedo, -1);
+				ecs::DestroyEntity(collision.b);
 			}
 		}
 	}
@@ -216,30 +276,18 @@ public:
 		}
 
 		// Iterate through entities in the system
-		for (auto itr = entities.begin(); itr != entities.end();)
+		for (ecs::Entity entity : entities)
 		{
-			// Get the entity and increment the iterator
-			ecs::Entity entity = *itr++;
-
 			// Get necessary components
 			Player& player = ecs::GetComponent<Player>(entity);
 			Transform& transform = ecs::GetComponent<Transform>(entity);
 			Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(entity);
 			PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
-
-			// Initialize inputs
-			float accelerationInput =
-			input::GetTotalInputValue("Throttle" + std::to_string(player.id)) * -1;
-			//- input::map_value(input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_TRIGGER), -1, 1, 0, 1)
-			//+ input::map_value(input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER), -1, 1, 0, 1);
 			
-			if (player.id == 1)
-			{
-				std::cout << "hello " << accelerationInput << "\n";
-				std::cout << "dumb " << input::GetInputValue("Throttle1", 0) << "\n";
-			}
-
+			// Initialize inputs
+			float accelerationInput = input::GetTotalInputValue("Throttle" + std::to_string(player.id));
+			
 			float rotateInput = input::GetInputValue("Turn" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_X);
 			bool projetileInput = input::GetPressed("Shoot" + std::to_string(player.id));
 
@@ -253,7 +301,7 @@ public:
 				// Increase the timer value
 				it->second += engine::deltaTime;
 
-				if (it->second >= it->first->hitTime)
+				if (it->second >= it->first.hitTime)
 				{
 					it = player.hitProjectiles.erase(it); // Erase the element and move iterator to the next element
 				}
@@ -266,17 +314,17 @@ public:
 			player._speedScale = 1; // 100%
 			for (auto& hitProjectile : player.hitProjectiles)
 			{
-				switch (hitProjectile.first->hitType)
+				switch (hitProjectile.first.hitType)
 				{
 					case HitStates::Stop:
 						// Rotate player
 						TransformSystem::Rotate(player.renderedEntity, 0, 360.0f * dt, 0);
 					break;
 					case HitStates::Additive:
-						player._speedScale += hitProjectile.first->hitSpeedFactor;
+						player._speedScale += max(hitProjectile.first.hitSpeedFactor, 0.f);
 						break;
 					case HitStates::Multiplicative:
-						player._speedScale += (player._speedScale *= hitProjectile.first->hitSpeedFactor);
+						player._speedScale += max(player._speedScale *= hitProjectile.first.hitSpeedFactor, 0.f);
 						break;
 					default:
 						break;
@@ -292,36 +340,43 @@ public:
 
 			// Initialize the impulse as zero
 			Vector2 forwardImpulse(0.0f, 0.0f);
-			
-			if (rotateInput != 0.0f)
-			{
-				// Slow rotation based on throttle setting
-				// TODO: this function could be improved by testing
-				float rotationScalar = 1 - log10(2.0f * std::max(0.5f, accelerationInput));
-
-				// Apply forward impulse if rotating or receiving a rotation command
-				TransformSystem::Rotate(player.renderedEntity, 0, -rotateInput * player.rotationSpeed * rotationScalar * dt, 0);
-
-				// Set min speed while turning
-				// TODO: This is ignored when giving even slightly input for reverse or forward!
-				forwardImpulse = forwardDirection * dt * player._speedScale * player.minSpeedWhileTurning;
-			}
 
 			// Apply acceleration impulse if positive input is received
 			if (accelerationInput > 0.0f)
 			{
-				forwardImpulse = forwardDirection * accelerationInput * dt * player._speedScale * player.forwardSpeed;
+				forwardImpulse = forwardDirection * accelerationInput * dt * player.forwardSpeed;
 			}
 			// Apply deceleration impulse if negative input is received
 			if (accelerationInput < 0.0f)
 			{
-				forwardImpulse = forwardDirection * accelerationInput * dt * player._speedScale * player.reverseSpeed;
+				forwardImpulse = forwardDirection * accelerationInput * dt * player.reverseSpeed;
+			}
+			if (rotateInput != 0.0f)
+			{
+				// Slow rotation based on throttle setting
+				// TODO: this function could be improved by testing
+				float rotationScalar = 1 - log10(2.0f * max(0.5f, accelerationInput));
+
+				float trueRotateInput = -rotateInput * player.rotationSpeed * rotationScalar * dt;
+
+				// Apply forward impulse if rotating or receiving a rotation command
+				TransformSystem::Rotate(player.renderedEntity, 0, trueRotateInput, 0);
+
+				// Set min speed while turning
+
+				// TODO: Scale based on rotation speed
+				Vector2 minRotateImpulse = forwardDirection * dt * player._speedScale * std::abs(trueRotateInput) * player.minSpeedWhileTurning;
+
+				if (minRotateImpulse.Length() > forwardImpulse.Length())
+				{
+					forwardImpulse = minRotateImpulse;
+				}
 			}
 
 			collider.rotationOverride = modelTransform.rotation.y + 1080;
 
 			// Apply the resulting impulse to the object
-			PhysicsSystem::Impulse(entity, forwardImpulse);
+			PhysicsSystem::Impulse(entity, forwardImpulse * player._speedScale);
 
 			/* Shooting */
 
@@ -375,7 +430,8 @@ public:
 				}
 
 				// Create a projectile using the parameters of the player object.
-				CreateProjectile(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
+				player._forwardDirection = forwardDirection;
+				player.mainAction(entity);
 
 				player.ammo--;
 
@@ -423,7 +479,7 @@ public:
 			playerComponent.nameText = playerNameText;
 
 			ecs::AddComponent(player, Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
-			ecs::AddComponent(player, Rigidbody{ .drag = 0.025 });
+			ecs::AddComponent(player, Rigidbody{ .drag = 0.025, .restitution = 1 });
 			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
 			ecs::AddComponent(player, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
 
@@ -433,7 +489,7 @@ public:
 			TransformSystem::AddParent(playerNameText, player);
 
 			//Create the player's rendered entity
-			ecs::AddComponent(playerRender, Transform{ .rotation = Vector3(45, 0, 0) });
+			ecs::AddComponent(playerRender, Transform{ .rotation = Vector3(45, 0, 0), .scale = Vector3(1.5) });
 			ecs::AddComponent(playerRender, ModelRenderer{ .model = shipModels[shipTypes[i]] });
 			TransformSystem::AddParent(playerRender, player);
 

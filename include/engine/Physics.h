@@ -43,10 +43,8 @@ namespace engine
 		void Update(float deltaTime)
 		{
 			//For each entity
-			for (auto itr = entities.begin(); itr != entities.end();)
+			for (ecs::Entity entity : entities)
 			{
-				ecs::Entity entity = *itr++;
-
 				//Get required components
 				Transform& transform = ecs::GetComponent<Transform>(entity);
 				Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(entity);

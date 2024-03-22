@@ -54,7 +54,7 @@ void LoadLevel1(Camera* cam)
 	collisionSystem->SetTilemap(resources::level1Map);
 	PhysicsSystem::SetTileProperty(1, TileProperty{ true });
 
-	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::torpedoBoat, ShipType::torpedoBoat, ShipType::torpedoBoat};
+	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::torpedoBoat, ShipType::hedgehogBoat, ShipType::torpedoBoat};
 	ecs::GetSystem<PlayerController>()->CreatePlayers(4, Vector2(1434.0f, -1370.0f), ships);
 
 	//Make all the checkpoints manually
@@ -91,27 +91,27 @@ void SetupInput()
 
 		// Controller input
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
-		//input::bindAnalogControllerInput(i, { GLFW_GAMEPAD_AXIS_LEFT_X, GLFW_GAMEPAD_AXIS_LEFT_Y }, { "Move" + std::to_string(i) });
-
-		/*
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "Boost" + std::to_string(i) });
+		
 		input::bindAnalogControllerInput(i, 
 		{ 
-			{ {-1, 1, 0}, GLFW_GAMEPAD_AXIS_LEFT_X },
-			{ {0, 1, 0}, GLFW_GAMEPAD_AXIS_LEFT_TRIGGER },
-			{ {-1, 0, 0}, GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER }
-		}, { "Throttle" + std::to_string(i) });*/
+			{ input::digitalPositiveInput, GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER }, 
+			{ input::digitalNegativeInput, GLFW_GAMEPAD_AXIS_LEFT_TRIGGER }
+		}, { "Throttle" + std::to_string(i) });
+
+		input::bindAnalogControllerInput(i, { { {-1, 1, 0}, GLFW_GAMEPAD_AXIS_LEFT_X }, }, { "Turn" + std::to_string(i) });
 	}
-	
+
 	// Keyboard input for player 0
-	input::bindAnalogInput(GLFW_KEY_RIGHT,	input::digitalPositiveInput, { "Turn0" }, 0);
-	input::bindAnalogInput(GLFW_KEY_LEFT,	input::digitalNegativeInput, { "Turn0" }, 0, -1);
+	input::bindAnalogInput(GLFW_KEY_RIGHT,	input::digitalPositiveInput, { "Turn2" }, 0);
+	input::bindAnalogInput(GLFW_KEY_LEFT,	input::digitalNegativeInput, { "Turn2" }, 0, -1);
 
-	input::bindAnalogInput(GLFW_KEY_A,		input::digitalPositiveInput, { "Throttle0" }, 0);
-	input::bindAnalogInput(GLFW_KEY_Z,		input::digitalNegativeInput, { "Throttle0" }, 0, -1);
-	input::bindAnalogInput(GLFW_KEY_UP,		input::digitalPositiveInput, { "Throttle0" }, 0);
-	input::bindAnalogInput(GLFW_KEY_DOWN,	input::digitalNegativeInput, { "Throttle0" }, 0, -1);
+	input::bindAnalogInput(GLFW_KEY_A,		input::digitalPositiveInput, { "Throttle2" }, 0);
+	input::bindAnalogInput(GLFW_KEY_Z,		input::digitalNegativeInput, { "Throttle2" }, 0, -1);
+	input::bindAnalogInput(GLFW_KEY_UP,		input::digitalPositiveInput, { "Throttle2" }, 0);
+	input::bindAnalogInput(GLFW_KEY_DOWN,	input::digitalNegativeInput, { "Throttle2" }, 0, -1);
 
-	input::bindDigitalInput(GLFW_KEY_N, { "Shoot0" });
+	input::bindDigitalInput(GLFW_KEY_N, { "Shoot2" });
 	input::bindDigitalInput(GLFW_KEY_M, { "Boost0" });
 
 	/*
@@ -121,7 +121,7 @@ void SetupInput()
 	input::bindDigitalInput(GLFW_KEY_DOWN, { "MoveDown0" });
 	input::bindDigitalInput(GLFW_KEY_ENTER, { "Select0" });
 	*/
-	
+
 }
 
 int main()
@@ -145,6 +145,7 @@ int main()
 	pauseSystem->Init(window);
 	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
 	playerController->Init();
+	std::shared_ptr<HeggehogSynten> heggehogSynten = ecs::GetSystem<HeggehogSynten>();
 
 	//Bind all input actions
 	SetupInput();
@@ -162,6 +163,8 @@ int main()
 			glfwSetWindowShouldClose(window, true);
 
 		input::update();
+
+		heggehogSynten->Update();
 
 		UpdateCam(window, cam, resources::level1Map);
 		engine::Update(&cam);
