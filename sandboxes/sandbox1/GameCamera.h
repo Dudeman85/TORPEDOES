@@ -2,23 +2,25 @@
 #include <engine/Tilemap.h>
 #include "PlayerController.h"
 
-	float camScale = 1.0;
-	float camScaleMin = 600.0f;
-	float camScaleMax = 1650.0f;
-	const float aspectRatio = 16.f / 9.f;
-	float camPadding = 100;
-	float camDeadzone = 10;
+float camScale = 1.0;
+float camScaleMin = 600.0f;
+float camScaleMax = 1650.0f;
+const float aspectRatio = 16.f / 9.f;
+float camPadding = 100;
+float camDeadzone = 10;
 
-static void UpdateCam(GLFWwindow* window, Camera& cam, Tilemap *map) {
-	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
+static void UpdateCam(GLFWwindow* window, engine::Camera& cam, Tilemap *map) 
+{
+	std::shared_ptr<PlayerController> playerController = engine::ecs::GetSystem<PlayerController>();
 	
-
 	// Calculate the Bounding Box
-	std::array<float, 4> camBounds{
-		cam.position.y * 2 + cam.height / 2,		//top
-			cam.position.x * 2 + cam.width / 2,		//right
-			cam.position.y * 2 - cam.height / 2,	//bottom
-			cam.position.x * 2 - cam.width / 2 };	//left
+	std::array<float, 4> camBounds
+	{
+		cam.position.y * 2 + cam.height / 2,	//top
+		cam.position.x * 2 + cam.width / 2,		//right
+		cam.position.y * 2 - cam.height / 2,	//bottom
+		cam.position.x * 2 - cam.width / 2		//left
+	};	
 
 	float zoomOutThreshold = -camPadding * 2.5f;
 	float zoomInThreshold = camPadding * 2.0f;
@@ -52,11 +54,10 @@ static void UpdateCam(GLFWwindow* window, Camera& cam, Tilemap *map) {
 	}
 
 	// Clamp the camera zoom between min and max and set it's dimensions
-	camScale = clamp(camScale, camScaleMin, camScaleMax);
+	camScale = std::clamp(camScale, camScaleMin, camScaleMax);
 	cam.height = camScale;
 	cam.width = cam.height * aspectRatio;
 
-	
 	// Calculate the center point of the bounding box
 	float boundingBoxWidth = playerBounds[1] - playerBounds[3];
 	float boundingBoxHeight = playerBounds[0] - playerBounds[2];
@@ -64,19 +65,17 @@ static void UpdateCam(GLFWwindow* window, Camera& cam, Tilemap *map) {
 
 	// Adjust the camera position based on the center of the bounding box
 	Vector3 camPos;
-	camPos.x = clamp(boundingBoxCenter.x, map->position.x + cam.width / 2, map->position.x + map->bounds.width - cam.width / 2);
-	camPos.y = clamp(boundingBoxCenter.y, map->position.y - map->bounds.height + cam.height / 2, map->position.y - cam.height / 2);
+	camPos.x = std::clamp(boundingBoxCenter.x, map->position.x + cam.width / 2, map->position.x + map->bounds.width - cam.width / 2);
+	camPos.y = std::clamp(boundingBoxCenter.y, map->position.y - map->bounds.height + cam.height / 2, map->position.y - cam.height / 2);
 	camPos.z = 1500;
 	cam.SetPosition(camPos);
 
 	// Calculate the desired zoom level and adjust the camera zoom.
 	float desiredZoom = max(boundingBoxWidth / (cam.width * aspectRatio), boundingBoxHeight / cam.height);
 
-
 	// Adjust the camera zoom only if the desired zoom exceeds the established limits
 	if (desiredZoom > camScaleMin && desiredZoom < camScaleMax)
 	{
 		camScale = desiredZoom;
 	}
-
 }

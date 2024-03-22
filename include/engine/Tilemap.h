@@ -50,9 +50,9 @@ public:
 	void draw(float layer);
 
 	///Get the position of a tile in world coordinates
-	engine::Vector2 GetTilePosition(unsigned int x, unsigned int y);
+	Vector2 GetTilePosition(unsigned int x, unsigned int y);
 	///Check larger area collisionbox
-	std::vector<engine::Vector2> CheckCollisionBox(engine::Vector2 topLeft, engine::Vector2 bottomRight);
+	std::vector<Vector2> CheckCollisionBox(Vector2 topLeft, Vector2 bottomRight);
 	///Check the smaller Collisions that are turned on upon the larger collision box colliding
 	unsigned int checkCollision(float x, float y);
 	///The size of a tile

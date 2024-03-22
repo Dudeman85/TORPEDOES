@@ -2,8 +2,6 @@
 #include <engine/Application.h>
 #include "Resources.h"
 
-using namespace engine;
-
 enum HitStates 
 { 
 	None,			// Does nothing when hitting player
@@ -39,42 +37,42 @@ struct  Hedgehog : public Projectile
 };
 
 //Temporary function for testing
- void SpawnProjectile(ecs::Entity p, int playerID)
+ void SpawnProjectile(engine::ecs::Entity p, int playerID)
 {
-	std::cout << ecs::GetComponent<Transform>(p).position.ToString();
+	std::cout << engine::ecs::GetComponent<engine::Transform>(p).position.ToString();
 }
 
-static void CreateAnimation(ecs::Entity entity)
+static void CreateAnimation(engine::ecs::Entity entity)
 {
-	Projectile& projectile = ecs::GetComponent<Projectile>(entity);
-	Transform& transform = ecs::GetComponent<Transform>(entity);
+	Projectile& projectile = engine::ecs::GetComponent<Projectile>(entity);
+	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(entity);
 	Vector3 animPosition = transform.position;
 	animPosition.z += 100;
 
-	ecs::Entity torpedoAnim = ecs::NewEntity();
-	ecs::AddComponent(torpedoAnim, Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20) });
-	ecs::AddComponent(torpedoAnim, SpriteRenderer{ });
-	ecs::AddComponent(torpedoAnim, Animator{ .onAnimationEnd = ecs::DestroyEntity });
-	AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, projectile.hitAnimation);
-	AnimationSystem::PlayAnimation(torpedoAnim, projectile.hitAnimation, false);
+	engine::ecs::Entity torpedoAnim = engine::ecs::NewEntity();
+	engine::ecs::AddComponent(torpedoAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20) });
+	engine::ecs::AddComponent(torpedoAnim, engine::SpriteRenderer{ });
+	engine::ecs::AddComponent(torpedoAnim, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
+	engine::AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, projectile.hitAnimation);
+	engine::AnimationSystem::PlayAnimation(torpedoAnim, projectile.hitAnimation, false);
 
 };
 
-static void OnProjectileCollision(Collision collision)
+static void OnProjectileCollision(engine::Collision collision)
 {
-	if (collision.type == Collision::Type::tilemapTrigger)
+	if (collision.type == engine::Collision::Type::tilemapTrigger)
 	{
 		if (collision.b != 1)
 		{   
 			// Do animation projectile impact animation
 			CreateAnimation(collision.a);
-			ecs::DestroyEntity(collision.a);
+			engine::ecs::DestroyEntity(collision.a);
 		}
 	}
 }
 
-ECS_REGISTER_SYSTEM(HeggehogSynten, Rigidbody, Transform, Hedgehog)
-class HeggehogSynten : public ecs::System
+ECS_REGISTER_SYSTEM(HedgehogSystem, engine::Rigidbody, engine::Transform, Hedgehog)
+class HedgehogSystem : public engine::ecs::System
 {
 	const float hedgehogSpeedVo = 500.0f;
 	const float maxDistance = 700.0f;
@@ -88,38 +86,33 @@ public:
 		// Iterate through entities in the system
 		for (auto itr = entities.begin(); itr != entities.end();)
 		{			// Get the entity and increment the iterator
-			ecs::Entity entity = *itr++;
-			Hedgehog& hedgehogComp = ecs::GetComponent<Hedgehog>(entity);
+			engine::ecs::Entity entity = *itr++;
+			Hedgehog& hedgehogComp = engine::ecs::GetComponent<Hedgehog>(entity);
 
 			if (hedgehogComp.distanceTraveled < maxDistance)
 			{
 				// Calcula la distancia recorrida sumando la distancia del paso actual
-				hedgehogComp.distanceTraveled += hedgehogSpeedVo * deltaTime; // deltaTime es el tiempo transcurrido desde el último frame
+				hedgehogComp.distanceTraveled += hedgehogSpeedVo * engine::deltaTime; // deltaTime es el tiempo transcurrido desde el último frame
 
 				// Calcula el coficiente entre la distacia recorida y la distacia maxima 
 				float distanceRatio = hedgehogComp.distanceTraveled / maxDistance;
 
 				//// Calcula la rotación en función de la distancia recorrida
-				TransformSystem::Rotate(entity, Vector3(0, 0, -1.5f ));
+				engine::TransformSystem::Rotate(entity, Vector3(0, 0, -1.5f ));
 
 				// Calcula la escala en funcion de la distancia recorrida
 				float scale = maxScale - (maxScale - minScale) * (2 * abs(0.5 - distanceRatio));
 			
 				// Actualiza la escala del objeto
-				ecs::GetComponent<Transform>(entity).scale = Vector3(scale);
+				engine::ecs::GetComponent<engine::Transform>(entity).scale = Vector3(scale);
 
-				
 			}
 			else
 			{
 				// Si se supera la distancia máxima, detén el movimiento del objeto
-				ecs::DestroyEntity(entity);
+				engine::ecs::DestroyEntity(entity);
 				continue;
 			}
-			
-			
-			
-			
 		};
 	}
 };

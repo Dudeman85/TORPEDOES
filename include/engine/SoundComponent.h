@@ -29,8 +29,8 @@ struct ListeningComponent
 };
 
 // Player controller System. Requires Player , Tranform , Rigidbody , PolygonCollider
-ECS_REGISTER_SYSTEM(SoundSystem, SoundComponent, Transform)
-class SoundSystem : public ecs::System
+ECS_REGISTER_SYSTEM(SoundSystem, SoundComponent, engine::Transform)
+class SoundSystem : public engine::ecs::System
 {
 private:
 	// variables:

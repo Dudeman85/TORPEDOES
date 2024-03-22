@@ -14,7 +14,7 @@ GLFWwindow* initializeGLFW(int width, int height, const char* title)
 {
     // Create a GLFW window
 
-    GLFWwindow* window = CreateGLWindow(width, height, title);
+    GLFWwindow* window = engine::CreateGLWindow(width, height, title);
 
     return window;
 }
@@ -175,11 +175,11 @@ int main()
         //input::bindAnalogControllerInput(i, { GLFW_GAMEPAD_AXIS_LEFT_X, GLFW_GAMEPAD_AXIS_LEFT_Y }, { eventName });
     }
     
-    input::bindAnalogInput(GLFW_KEY_RIGHT, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_X);
-    input::bindAnalogInput(GLFW_KEY_LEFT, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_X, -1);
+    //input::bindAnalogInput(GLFW_KEY_RIGHT, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_X);
+    //input::bindAnalogInput(GLFW_KEY_LEFT, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_X, -1);
     
-    input::bindAnalogInput(GLFW_KEY_UP, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y);
-    input::bindAnalogInput(GLFW_KEY_DOWN, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y, -1);
+    //input::bindAnalogInput(GLFW_KEY_UP, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y);
+    //input::bindAnalogInput(GLFW_KEY_DOWN, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y, -1);
     
     input::ConstructDigitalEvent("shootEvent");
 

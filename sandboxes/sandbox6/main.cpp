@@ -5,37 +5,33 @@
 #include "MenuSystem.h"	   
 int checkPointNumber = 0;
 
-void createChepoint(Vector3 position, Vector3 rotation, Vector3 scale, Model& checkPointModel, float hitboxrotation, bool finish_line = false)
+void createChepoint(Vector3 position, Vector3 rotation, Vector3 scale, engine::Model& checkPointModel, float hitboxrotation, bool finish_line = false)
 {
-	ecs::Entity checkpoint = ecs::NewEntity();
+	engine::ecs::Entity checkpoint = ecs::NewEntity();
 
-	ecs::AddComponent(checkpoint, Transform{ .position = position , .rotation = rotation , .scale = scale });
-	ecs::AddComponent(checkpoint, ModelRenderer{ .model = &checkPointModel });
-	ecs::AddComponent(checkpoint, CheckPoint{ .checkPointID = checkPointNumber , .Finish_line = finish_line });
+	engine::ecs::AddComponent(checkpoint, engine::Transform{ .position = position , .rotation = rotation , .scale = scale });
+	engine::ecs::AddComponent(checkpoint, engine::ModelRenderer{ .model = &checkPointModel });
+	engine::ecs::AddComponent(checkpoint, CheckPoint{ .checkPointID = checkPointNumber , .Finish_line = finish_line });
 	std::vector<Vector2> CheckpointcolliderVerts{ Vector2(4, 8), Vector2(4, -8), Vector2(-4, -8), Vector2(-4, 8) };
-	ecs::AddComponent(checkpoint, PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = false, .rotationOverride = hitboxrotation }));
+	engine::ecs::AddComponent(checkpoint, engine::PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = false, .rotationOverride = hitboxrotation }));
 
 	checkPointNumber++;
 };
 
-
-
-
 int main()
 {
-	string username = "";
-	string lap = "1";
-	vector<string> playerNames(4);
-	vector<int> playerCheckpoints(4);
+	std::string username = "";
+	std::string lap = "1";
+	std::vector<string> playerNames(4);
+	std::vector<int> playerCheckpoints(4);
 	for (int i = 0; i < playerNames.size(); ++i)
 	{
-		cout << "Please enter Player's " + to_string(i + 1) + " name: ";
-		cin >> username;
+		std::cout << "Please enter Player's " + to_string(i + 1) + " name: ";
+		std::cin >> username;
 		playerNames[i] = username;
 	}
 
 	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window");
-
 
 	EngineInit();
 
@@ -43,9 +39,6 @@ int main()
 	ecs::GetSystem<PauseSystem>()->Init(window);
 
 	auto& isGamePause = ecs::GetSystem<PauseSystem>()->isGamePause;
-	
-
-	
 
 	//INPUTS  START	
 	input::ConstructDigitalEvent("MoveUp");
@@ -63,7 +56,6 @@ int main()
 	input::bindDigitalInput(GLFW_KEY_ENTER, { "Select" });
 	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
 
-
 	engine::Camera cam = engine::Camera(1120, 630);
 	cam.SetPosition(Vector3(0, 0, 1500));
 	//cam.perspective = true;
@@ -77,44 +69,44 @@ int main()
 	//engine.physicsSystem->gravity = Vector2(0, -981);
 	collisionSystem->cam = &cam;
 
-	Model model("3dmodels/LaMuerte.obj");
-	Model checkPointModel("3dmodels/Checkpoint.obj");
-	Model model2("3dmodels/Finish_line.obj");
-	Texture torprldtexture = Texture("GUI/torpedoReloading.png");
-	Texture torprdytexture = Texture("GUI/torpedoReady.png");
+	engine::Model model("3dmodels/LaMuerte.obj");
+	engine::Model checkPointModel("3dmodels/Checkpoint.obj");
+	engine::Model model2("3dmodels/Finish_line.obj");
+	engine::Texture torprldtexture = Texture("GUI/torpedoReloading.png");
+	engine::Texture torprdytexture = Texture("GUI/torpedoReady.png");
 	// Font http address:
 	// https://www.dafont.com/stencil-ww-ii.font
-	Font stencilFont("Stencil WW II.ttf", 0, 0, 48);
+	engine::Font stencilFont("Stencil WW II.ttf", 0, 0, 48);
 
 
-	Texture* winSprite = new Texture("GUI/winner.png");
-	ecs::Entity playerWin = ecs::NewEntity();
-	ecs::AddComponent(playerWin, TextRenderer{ .font = &stencilFont, .text = "", .offset = Vector3(-1.0f, 1.1f, 1.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	ecs::AddComponent(playerWin, SpriteRenderer{ .texture = winSprite, .enabled = false, .uiElement = true });
-	ecs::AddComponent(playerWin, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(0.5f) });
-	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
+	engine::Texture* winSprite = new engine::Texture("GUI/winner.png");
+	engine::ecs::Entity playerWin = ecs::NewEntity();
+	engine::ecs::AddComponent(playerWin, engine::TextRenderer{ .font = &stencilFont, .text = "", .offset = Vector3(-1.0f, 1.1f, 1.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
+	engine::ecs::AddComponent(playerWin, engine::SpriteRenderer{ .texture = winSprite, .enabled = false, .uiElement = true });
+	engine::ecs::AddComponent(playerWin, engine::Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(0.5f) });
+	std::shared_ptr<PlayerController> playerController = engine::ecs::GetSystem<PlayerController>();
 	playerController->Init();
-	std::shared_ptr<PauseSystem> pauseSystem = ecs::GetSystem<PauseSystem>();
+	std::shared_ptr<PauseSystem> pauseSystem = engine::ecs::GetSystem<PauseSystem>();
 
 	PlayerController::playerWin = playerWin;
 
-	ecs::Entity pFont1 = ecs::NewEntity();
-	ecs::Entity pFont2 = ecs::NewEntity();
-	ecs::Entity pFont3 = ecs::NewEntity();
-	ecs::Entity pFont4 = ecs::NewEntity();
-	ecs::Entity pSFont1 = ecs::NewEntity();
-	ecs::Entity pSFont2 = ecs::NewEntity();
-	ecs::Entity pSFont3 = ecs::NewEntity();
-	ecs::Entity pSFont4 = ecs::NewEntity();
+	engine::ecs::Entity pFont1 = engine::ecs::NewEntity();
+	engine::ecs::Entity pFont2 = engine::ecs::NewEntity();
+	engine::ecs::Entity pFont3 = engine::ecs::NewEntity();
+	engine::ecs::Entity pFont4 = engine::ecs::NewEntity();
+	engine::ecs::Entity pSFont1 = engine::ecs::NewEntity();
+	engine::ecs::Entity pSFont2 = engine::ecs::NewEntity();
+	engine::ecs::Entity pSFont3 = engine::ecs::NewEntity();
+	engine::ecs::Entity pSFont4 = engine::ecs::NewEntity();
 
-	ecs::AddComponent(pSFont1, TextRenderer{ .font = &stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	ecs::AddComponent(pSFont1, Transform{ .position = Vector3(-0.65, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
-	ecs::AddComponent(pSFont2, TextRenderer{ .font = &stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	ecs::AddComponent(pSFont2, Transform{ .position = Vector3(-0.15, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
-	ecs::AddComponent(pSFont3, TextRenderer{ .font = &stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	ecs::AddComponent(pSFont3, Transform{ .position = Vector3(0.25, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
-	ecs::AddComponent(pSFont4, TextRenderer{ .font = &stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-	ecs::AddComponent(pSFont4, Transform{ .position = Vector3(0.75, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
+	engine::ecs::AddComponent(pSFont2, engine::Transform{ .position = Vector3(-0.15, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
+	engine::ecs::AddComponent(pSFont1, engine::TextRenderer{ .font = &stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
+	engine::ecs::AddComponent(pSFont1, engine::Transform{ .position = Vector3(-0.65, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
+	engine::ecs::AddComponent(pSFont2, engine::TextRenderer{ .font = &stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
+	engine::ecs::AddComponent(pSFont3, engine::TextRenderer{ .font = &stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
+	engine::ecs::AddComponent(pSFont3, engine::Transform{ .position = Vector3(0.25, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
+	engine::ecs::AddComponent(pSFont4, engine::TextRenderer{ .font = &stencilFont, .text = lap + "/3", .offset = Vector3(1.2f, -0.3f, 0.0f), .scale = Vector3(0.02f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
+	engine::ecs::AddComponent(pSFont4, engine::Transform{ .position = Vector3(0.75, -0.9, -0.5), .scale = Vector3(0.05, 0.085, 1) });
 
 	/*
 	AudioEngine engineSpeaker;
@@ -142,15 +134,15 @@ int main()
 	cheerSpeaker.setLinearDistance(0.5f, 50.f, 350.f, 0.9f);
 	*/
 
-	ecs::Entity laMuerte = ecs::NewEntity();
-	ecs::AddComponent(pFont1, TextRenderer{ .font = &stencilFont, .text = playerNames[0], .offset = Vector3(1.0f, -1.0f, 0), .scale = Vector3(0.5f), .color = Vector3(0.5f, 0.8f, 0.2f) });
-	ecs::AddComponent(pFont1, Transform{ .position = Vector3(1434.0f,-1449.0f, 100.0f) });
-	ecs::AddComponent(laMuerte, Transform{ .position = Vector3(1474.321533, -1435.868286, 100.000000), .rotation = Vector3(45.000000, 0.0000, 0.000000), .scale = Vector3(7) });
-	ecs::AddComponent(laMuerte, Player{ .accelerationSpeed = 300.0f, .minTurningSpeed = 120.0f, .id = 0, .nameText = pFont1, .playername = playerNames[0], .playerLap = lap });
-	ecs::AddComponent(laMuerte, ModelRenderer{ .model = &model });
-	ecs::AddComponent(laMuerte, Rigidbody{ .drag = 0.025f });
+	engine::ecs::Entity laMuerte = ecs::NewEntity();
+	engine::ecs::AddComponent(pFont1, engine::TextRenderer{ .font = &stencilFont, .text = playerNames[0], .offset = Vector3(1.0f, -1.0f, 0), .scale = Vector3(0.5f), .color = Vector3(0.5f, 0.8f, 0.2f) });
+	engine::ecs::AddComponent(pFont1, engine::Transform{ .position = Vector3(1434.0f,-1449.0f, 100.0f) });
+	engine::ecs::AddComponent(laMuerte, engine::Transform{ .position = Vector3(1474.321533, -1435.868286, 100.000000), .rotation = Vector3(45.000000, 0.0000, 0.000000), .scale = Vector3(7) });
+	engine::ecs::AddComponent(laMuerte, Player{ .accelerationSpeed = 300.0f, .minTurningSpeed = 120.0f, .id = 0, .nameText = pFont1, .playername = playerNames[0], .playerLap = lap });
+	engine::ecs::AddComponent(laMuerte, engine::ModelRenderer{ .model = &model });
+	engine::ecs::AddComponent(laMuerte, engine::Rigidbody{ .drag = 0.025f });
 	vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
-	ecs::AddComponent(laMuerte, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision , .visualise = false });
+	engine::ecs::AddComponent(laMuerte, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision , .visualise = false });
 	//engineSpeaker2.Play(engineSound);
 	//engineSpeaker2.SetLooping(1);
 
@@ -466,14 +458,13 @@ int main()
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			//Keep the camera in bounds of the tilemap and set it to the average position of the players
-		Vector3 avgPos = playerController->avgPosition / playerController->entities.size();
+		//Keep the camera in bounds of the tilemap and set it to the average position of the players
+		//Vector3 avgPos = playerController->avgPosition / playerController->entities.size();
 
 		//// Center the camera on the average position of the players
-		float camPosX = clamp(avgPos.x, map.position.x + cam.width / 2, map.position.x + map.bounds.width - cam.width / 2);
-		float camPosY = clamp(avgPos.y, map.position.y - map.bounds.height + cam.height / 2, map.position.y - cam.height / 2);
-		cam.SetPosition(Vector3(camPosX, camPosY, 1500));
-
+		//float camPosX = std::clamp(avgPos.x, map.position.x + cam.width / 2, map.position.x + map.bounds.width - cam.width / 2);
+		//float camPosY = std::clamp(avgPos.y, map.position.y - map.bounds.height + cam.height / 2, map.position.y - cam.height / 2);
+		//cam.SetPosition(Vector3(camPosX, camPosY, 1500));
 
 		//Calculate the Bounding Box
 		std::array<float, 4> camBounds{
@@ -525,9 +516,9 @@ int main()
 		Vector2 boundingBoxCenter = Vector2(playerController->playerBounds[3] + boundingBoxWidth * 0.5f, playerController->playerBounds[2] + boundingBoxHeight * 0.5f);
 
 		//Ajustar la posicin de la cmara segn el centro de la bounding box
-		camPosX = clamp(boundingBoxCenter.x, map.position.x + cam.width / 2, map.position.x + map.bounds.width - cam.width / 2);
-		camPosY = clamp(boundingBoxCenter.y, map.position.y - map.bounds.height + cam.height / 2, map.position.y - cam.height / 2);
-		cam.SetPosition(Vector3(camPosX, camPosY, 1500));
+		//camPosX = clamp(boundingBoxCenter.x, map.position.x + cam.width / 2, map.position.x + map.bounds.width - cam.width / 2);
+		//camPosY = clamp(boundingBoxCenter.y, map.position.y - map.bounds.height + cam.height / 2, map.position.y - cam.height / 2);
+		//cam.SetPosition(Vector3(camPosX, camPosY, 1500));
 
 		// Calculate the desired zoom level and adjust the camera zoom.
 		float aspectRatio = cam.width / cam.height;

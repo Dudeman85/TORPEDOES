@@ -39,8 +39,8 @@ struct Player
 	float _shootTimer = 0.0f;
 
 	// Action functions
-	std::function<void(ecs::Entity, int)> mainAction;
-	std::function<void(ecs::Entity, int)> specialAction;
+	std::function<void(engine::ecs::Entity, int)> mainAction;
+	std::function<void(engine::ecs::Entity, int)> specialAction;
 
 	// Checkpoint
 	int previousCheckpoint = -1;
@@ -50,8 +50,8 @@ struct Player
 	std::map<Projectile*, float> hitProjectiles;
 
 	// Rendered child entities
-	ecs::Entity renderedEntity;
-	ecs::Entity nameText;
+	engine::ecs::Entity renderedEntity;
+	engine::ecs::Entity nameText;
 };
 
 ECS_REGISTER_COMPONENT(CheckPoint)
@@ -62,10 +62,10 @@ struct CheckPoint
 };
 
 // Player controller System. Requires Player , Tranform , Rigidbody , PolygonCollider
-ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonCollider)
-class PlayerController : public ecs::System
+ECS_REGISTER_SYSTEM(PlayerController, Player, engine::Transform, engine::Rigidbody, engine::PolygonCollider)
+class PlayerController : public engine::ecs::System
 {
-	static ecs::Entity winScreen;
+	static engine::ecs::Entity winScreen;
 	static bool hasWon;
 	static int lapCount; // How many laps to race through
 
@@ -80,10 +80,10 @@ public:
 	void Init()
 	{
 		//Create the entity to be shown at a win
-		winScreen = ecs::NewEntity();
-		ecs::AddComponent(winScreen, TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.5, 2, 1), .scale = Vector3(0.03f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
-		ecs::AddComponent(winScreen, SpriteRenderer{ .texture = resources::uiTextures["winner.png"], .enabled = false, .uiElement = true });
-		ecs::AddComponent(winScreen, Transform{ .position = Vector3(0, 0, 0.5f), .scale = Vector3(0.3f) });
+		winScreen = engine::ecs::NewEntity();
+		engine::ecs::AddComponent(winScreen, TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.5, 2, 1), .scale = Vector3(0.03f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
+		engine::ecs::AddComponent(winScreen, SpriteRenderer{ .texture = resources::uiTextures["winner.png"], .enabled = false, .uiElement = true });
+		engine::ecs::AddComponent(winScreen, Transform{ .position = Vector3(0, 0, 0.5f), .scale = Vector3(0.3f) });
 
 		//Initialize each ship type's stats
 		shipComponents.insert({ ShipType::torpedoBoat,
@@ -110,9 +110,9 @@ public:
 		for (auto itr = entities.begin(); itr != entities.end();)
 		{
 			//Get the entity and increment the iterator
-			ecs::Entity entity = *itr++;
+			engine::ecs::Entity entity = *itr++;
 
-			Transform& transform = ecs::GetComponent<Transform>(entity);
+			engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(entity);
 
 			if (playerBounds[0] < transform.position.y)
 				playerBounds[0] = transform.position.y;
@@ -130,20 +130,20 @@ public:
 	{
 		// collision.a is always a player
 		// Get references to the involved components
-		Player& player = ecs::GetComponent<Player>(collision.a);
-		Transform& playertranform = ecs::GetComponent<Transform>(collision.a);
-		PolygonCollider& playerCollider = ecs::GetComponent<PolygonCollider>(collision.a);
+		Player& player = engine::ecs::GetComponent<Player>(collision.a);
+		engine::Transform& playertranform = engine::ecs::GetComponent<engine::Transform>(collision.a);
+		engine::PolygonCollider& playerCollider = engine::ecs::GetComponent<engine::PolygonCollider>(collision.a);
 
 		// Slow player down when off track
 		if (collision.type == Collision::Type::tilemapCollision)
 		{
-			ecs::GetComponent<Rigidbody>(collision.a).velocity *= player.offtrackSpeedScale;
+			engine::ecs::GetComponent<engine::Rigidbody>(collision.a).velocity *= player.offtrackSpeedScale;
 		}
 
 		// Check if the collision involves a checkpoint
-		if (ecs::HasComponent<CheckPoint>(collision.b))
+		if (engine::ecs::HasComponent<CheckPoint>(collision.b))
 		{
-			CheckPoint& checkpoint = ecs::GetComponent<CheckPoint>(collision.b);	// Get checkpoint component
+			CheckPoint& checkpoint = engine::ecs::GetComponent<CheckPoint>(collision.b);	// Get checkpoint component
 			if (player.previousCheckpoint + 1 == checkpoint.checkPointID)			// Check whether player collided with next checkpoint
 			{
 				player.previousCheckpoint = checkpoint.checkPointID;				// Set as previous checkpoint
@@ -155,8 +155,8 @@ public:
 						{
 							//Display the win screen
 							hasWon = true;
-							ecs::GetComponent<TextRenderer>(winScreen).text = "Player " + std::to_string(player.id + 1);
-							ecs::GetComponent<SpriteRenderer>(winScreen).enabled = true;
+							engine::ecs::GetComponent<engine::TextRenderer>(winScreen).text = "Player " + std::to_string(player.id + 1);
+							engine::ecs::GetComponent<engine::SpriteRenderer>(winScreen).enabled = true;
 						}
 					}
 					else
@@ -168,11 +168,11 @@ public:
 			}
 		}
 		// Check if the collision involves a projectile
-		else if (ecs::HasComponent<Projectile>(collision.b))
+		else if (engine::ecs::HasComponent<Projectile>(collision.b))
 		{
-			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(collision.b);
-			Transform& projectransfor = ecs::GetComponent<Transform>(collision.b);
-			Projectile& projectile = ecs::GetComponent<Projectile>(collision.b); // Entity is collision.b 
+			engine::Rigidbody& rigidbody = engine::ecs::GetComponent<engine::Rigidbody>(collision.b);
+			engine::Transform& projectransfor = engine::ecs::GetComponent<engine::Transform>(collision.b);
+			Projectile& projectile = engine::ecs::GetComponent<Projectile>(collision.b); // Entity is collision.b 
 
 			if (player.id != projectile.ownerID)
 			{
@@ -196,7 +196,7 @@ public:
 				//Destroy torpedo at end of frame
 				//TODO: actually fix entity deletion bug
 				std::function<void()> destroyTorpedo = [collision]() { ecs::DestroyEntity(collision.b); };
-				TimerSystem::ScheduleFunction(destroyTorpedo, -1);
+				engine::TimerSystem::ScheduleFunction(destroyTorpedo, -1);
 			}
 		}
 	}
@@ -215,14 +215,14 @@ public:
 		for (auto itr = entities.begin(); itr != entities.end();)
 		{
 			// Get the entity and increment the iterator
-			ecs::Entity entity = *itr++;
+			engine::ecs::Entity entity = *itr++;
 
 			// Get necessary components
-			Player& player = ecs::GetComponent<Player>(entity);
-			Transform& transform = ecs::GetComponent<Transform>(entity);
-			Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
-			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(entity);
-			PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
+			Player& player = engine::ecs::GetComponent<Player>(entity);
+			Transform& transform = engine::ecs::GetComponent<Transform>(entity);
+			Transform& modelTransform = engine::ecs::GetComponent<Transform>(player.renderedEntity);
+			Rigidbody& rigidbody = engine::ecs::GetComponent<Rigidbody>(entity);
+			PolygonCollider& collider = engine::ecs::GetComponent<PolygonCollider>(entity);
 
 			// Initialize inputs
 			float accelerationInput = input::GetTotalInputValue("Throttle" + std::to_string(player.id));
@@ -396,43 +396,42 @@ public:
 		for (int i = 0; i < count; i++)
 		{
 			//Make all the necessary entities
-			ecs::Entity player = ecs::NewEntity();
-			ecs::Entity playerNameText = ecs::NewEntity();
-			ecs::Entity playerRender = ecs::NewEntity();
-			ecs::Entity torpIndicator1 = ecs::NewEntity();
-			ecs::Entity torpIndicator2 = ecs::NewEntity();
-
+			engine::ecs::Entity player = engine::ecs::NewEntity();
+			engine::ecs::Entity playerNameText = engine::ecs::NewEntity();
+			engine::ecs::Entity playerRender = engine::ecs::NewEntity();
+			engine::ecs::Entity torpIndicator1 = engine::ecs::NewEntity();
+			engine::ecs::Entity torpIndicator2 = engine::ecs::NewEntity();
 
 			//Create the player entity which contains everything but rendering
 			//Player component is a bit special
-			ecs::AddComponent(player, shipComponents[shipTypes[i]]);
-			Player& playerComponent = ecs::GetComponent<Player>(player);
+			engine::ecs::AddComponent(player, shipComponents[shipTypes[i]]);
+			Player& playerComponent = engine::ecs::GetComponent<Player>(player);
 			playerComponent.id = i;
 			playerComponent.renderedEntity = playerRender;
 			playerComponent.nameText = playerNameText;
 
-			ecs::AddComponent(player, Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
-			ecs::AddComponent(player, Rigidbody{ .drag = 0.025 });
-			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
-			ecs::AddComponent(player, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
+			engine::ecs::AddComponent(player, engine::Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
+			engine::ecs::AddComponent(player, engine::Rigidbody{ .drag = 0.025 });
+			std::vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
+			engine::ecs::AddComponent(player, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
 
 			//Create the player's name tag
-			ecs::AddComponent(playerNameText, TextRenderer{ .font = resources::niagaraFont, .text = "P" + to_string(i + 1), .color = Vector3(0.5, 0.8, 0.2) });
-			ecs::AddComponent(playerNameText, Transform{ .position = Vector3(-2, 2, 1) , .scale = Vector3(0.1) });
-			TransformSystem::AddParent(playerNameText, player);
+			engine::ecs::AddComponent(playerNameText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "P" + to_string(i + 1), .color = Vector3(0.5, 0.8, 0.2) });
+			engine::ecs::AddComponent(playerNameText, engine::Transform{ .position = Vector3(-2, 2, 1) , .scale = Vector3(0.1) });
+			engine::TransformSystem::AddParent(playerNameText, player);
 
 			//Create the player's rendered entity
-			ecs::AddComponent(playerRender, Transform{ .rotation = Vector3(45, 0, 0) });
-			ecs::AddComponent(playerRender, ModelRenderer{ .model = shipModels[shipTypes[i]] });
-			TransformSystem::AddParent(playerRender, player);
+			engine::ecs::AddComponent(playerRender, engine::Transform{ .rotation = Vector3(45, 0, 0) });
+			engine::ecs::AddComponent(playerRender, engine::ModelRenderer{ .model = shipModels[shipTypes[i]] });
+			engine::TransformSystem::AddParent(playerRender, player);
 
 			//Create the players's torpedo indicators
-			ecs::AddComponent(torpIndicator1, SpriteRenderer{ .texture = resources::uiTextures["UI_Green_Torpedo_Icon.png"] });
-			ecs::AddComponent(torpIndicator1, Transform{ .position = Vector3(-2, -2, 10), .scale = Vector3(2, .5, 1) });
-			TransformSystem::AddParent(torpIndicator1, player);
-			ecs::AddComponent(torpIndicator2, SpriteRenderer{ .texture = resources::uiTextures["UI_Green_Torpedo_Icon.png"] });
-			ecs::AddComponent(torpIndicator2, Transform{ .position = Vector3(2, -2, 10), .scale = Vector3(2, .5, 1) });
-			TransformSystem::AddParent(torpIndicator2, player);
+			engine::ecs::AddComponent(torpIndicator1, engine::SpriteRenderer{ .texture = resources::uiTextures["UI_Green_Torpedo_Icon.png"] });
+			engine::ecs::AddComponent(torpIndicator1, engine::Transform{ .position = Vector3(-2, -2, 10), .scale = Vector3(2, .5, 1) });
+			engine::TransformSystem::AddParent(torpIndicator1, player);
+			engine::ecs::AddComponent(torpIndicator2, engine::SpriteRenderer{ .texture = resources::uiTextures["UI_Green_Torpedo_Icon.png"] });
+			engine::ecs::AddComponent(torpIndicator2, engine::Transform{ .position = Vector3(2, -2, 10), .scale = Vector3(2, .5, 1) });
+			engine::TransformSystem::AddParent(torpIndicator2, player);
 		}
 	}
 };

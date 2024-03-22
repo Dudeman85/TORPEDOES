@@ -5,7 +5,6 @@
 
 class AudioEngine;
 
-using engine::Vector3;
 ///Class to create and store audio data
 class Audio
 {
