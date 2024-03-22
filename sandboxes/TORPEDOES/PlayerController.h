@@ -137,8 +137,7 @@ public:
 		// Slow player down when off track
 		if (collision.type == Collision::Type::tilemapCollision)
 		{
-			// TODO: Replace with a bool, this should instead be a flat decrease, not % of current speed
-			ecs::GetComponent<Rigidbody>(collision.a).velocity *= (player.offtrackSpeedScale - engine::deltaTime);
+			ecs::GetComponent<Rigidbody>(collision.a).velocity *= player.offtrackSpeedScale;
 		}
 
 		// Check if the collision involves a checkpoint
@@ -229,17 +228,8 @@ public:
 			PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
 
 			// Initialize inputs
-			float accelerationInput =
-			input::GetTotalInputValue("Throttle" + std::to_string(player.id)) * -1;
-			//- input::map_value(input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_TRIGGER), -1, 1, 0, 1)
-			//+ input::map_value(input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER), -1, 1, 0, 1);
+			float accelerationInput = input::GetTotalInputValue("Throttle" + std::to_string(player.id));
 			
-			if (player.id == 1)
-			{
-				std::cout << "hello " << accelerationInput << "\n";
-				std::cout << "dumb " << input::GetInputValue("Throttle1", 0) << "\n";
-			}
-
 			float rotateInput = input::GetInputValue("Turn" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_X);
 			bool projetileInput = input::GetPressed("Shoot" + std::to_string(player.id));
 
