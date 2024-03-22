@@ -31,7 +31,7 @@ namespace input
 
 	enum class eventStates
 	{
-		Not,	// This staate is (still not on
+		Not,	// This staate is (still) not on
 		On,		// This state is (still) on
 		NewOn	// This state was turned on
 	};
@@ -191,7 +191,7 @@ namespace input
 	std::map<std::string, AnalogInputEvent*> nameToAnalogInputEvent;	// All AnalogInputEvents
 	std::map<std::string, DigitalInputEvent*> nameToDigitalInputEvent;	// All DigitalInputEvents
 
-	// Base InputEvent
+	// Base InputEvent: Each InputEvent can can be binded to any number of physical buttons, called inputs
 	class InputEvent
 	{
 	public:
@@ -203,6 +203,7 @@ namespace input
 		std::string name;
 	};
 
+	// Used to describe mapped range of input: Either raw input or engine input	
 	struct MinMaxDefault
 	{
 		float Min;
@@ -210,17 +211,21 @@ namespace input
 		float Default;
 	};
 
-	MinMaxDefault controllerMixedInput = {-1, 1, 0};			// Values for default mixed positive & negative input
-	MinMaxDefault controllerMixedInputFlipped = {1, -1, 0};		// Flipped values for default mixed positive & negative input
-	MinMaxDefault digitalPositiveInput = {0, 1, 0};				// Values for default keyboard positive input
-	MinMaxDefault digitalNegativeInput = {0, -1, 0};			// Values for default keyboard negative input
+	/* Default controlled mapped values */
+
+	MinMaxDefault controllerMixedInput = {-1, 1, 0};			// Values for default mixed positive & negative input: Default 0, 1 when towards axis direction, -1 when against axis direction
+	MinMaxDefault controllerMixedInputFlipped = {1, -1, 0};		// Flipped values for default mixed positive & negative input: Default 0, -1 when towards axis direction, 1 when against axis direction
+
+	/* Default digital mapped values */
+
+	MinMaxDefault digitalPositiveInput = {0, 1, 0};				// Values for default keyboard positive input: 0 for not pressed, 1 for pressed.
+	MinMaxDefault digitalNegativeInput = {0, -1, 0};			// Values for default keyboard negative input: 0 for not pressed, -1 for pressed.
 
 	struct InputEventData
 	{
 		MinMaxDefault minMaxDefault;
 		int axis;
 
-		// Define hash function for InputEventData
 		struct Hash 
 		{
 			std::size_t operator()(const InputEventData& eventData) const 
@@ -230,7 +235,6 @@ namespace input
 			}
 		};
 
-		// Define equality comparison function for InputEventData
 		struct Equal 
 		{
 			bool operator()(const InputEventData& eventData1, const InputEventData& eventData2) const 
@@ -241,11 +245,13 @@ namespace input
 		};
 	};
 
+	// Maps a value from one range to another
 	static float map_value(float value, float from_min, float from_max, float to_min, float to_max)
 	{
 		return (value - from_min) / (from_max - from_min) * (to_max - to_min) + to_min;
 	}
 
+	// InputEvent that handles analog ínput, such as 0...1 inclusive values
 	class AnalogInputEvent : public InputEvent
 	{
 	public:
@@ -254,12 +260,17 @@ namespace input
 			nameToAnalogInputEvent[name] = this;
 		}
 
+		// Pointer to the input value's minMaxDefault values
 		std::map<InputState*, MinMaxDefault> OutputStatesToMinMaxDefaultValues;
+		// Pointer to the input value's input state
 		std::map<float*, InputState*> OutputValuesToOutputStates;
 
+		// Holds input axis key and pointer to the input value, as well as the MinMaxDefault for the axis and input value
 		std::unordered_multimap<InputEventData, std::pair<float*, MinMaxDefault>, InputEventData::Hash, InputEventData::Equal> InputEventDataToOutputValues;
 
+		// Total input values of each axis
 		std::map<int, float> totalValues;
+		// Whether we have updated the values: This prevents the total values from being calculated multiple times per frame
 		bool totalValuesUpdated = false;
 
 		// Turns all outputStates into outputValues
@@ -300,7 +311,7 @@ namespace input
 
 		void inputPollingFinished()
 		{
-			// We are not guaranteed to keep the same totalValue, as we've finished input polling
+			// We is no longer any guarantee to keep the same totalValue, as we've finished input polling
 			totalValuesUpdated = false;
 		}
 
@@ -328,9 +339,11 @@ namespace input
 		}
 	};
 
+	// InputEvent that handles digital inputs, which are always either true or false
 	class DigitalInputEvent : public InputEvent
 	{
 	public:
+		// Places allocated memory into a list
 		DigitalInputEvent(std::string inputName) : InputEvent(inputName)
 		{
 			nameToDigitalInputEvent[name] = this;
@@ -371,12 +384,14 @@ namespace input
 				switch (*outputState)
 				{
 				case input::InputState::Released:
+					// If state was new on, do not override
 					if (released != eventStates::NewOn)
 					{ 
 						released = eventStates::On;
 					}
 					break;
 				case input::InputState::Pressed:
+					// If state was new on, do not override
 					if (pressed != eventStates::NewOn)
 					{
 						pressed = eventStates::On;
@@ -386,14 +401,14 @@ namespace input
 					released = eventStates::NewOn;
 					if (pressed == eventStates::NewOn)
 					{
-						return; // All states are on, testing cannot wield any changes
+						return; // All states are newly on, testing cannot wield any changes
 					}
 					break;
 				case input::InputState::NewPress:
 					pressed = eventStates::NewOn;
 					if (released == eventStates::NewOn)
 					{
-						return; // All states are on, testing cannot wield any changes
+						return; // All states are newly on, testing cannot wield any changes
 					}
 					break;
 				case input::InputState::NewReleaseNewPress:
@@ -401,7 +416,7 @@ namespace input
 					// Key was newly released and newly pressed last update
 					pressed = eventStates::NewOn;
 					released = eventStates::NewOn;
-					return; // All states are on, testing cannot wield any changes
+					return; // All states are newly on, testing cannot wield any changes
 					break;
 				default:
 					break;
@@ -418,18 +433,19 @@ namespace input
 	class DigitalInput;
 	std::map<inputKey, DigitalInput*> inputKeytoDigitalInput;	// All DigitalInputs
 
+	// Handles physical buttons that give either true or false input, such as most keyboards
 	class DigitalInput
 	{
 	public:
-		// Don't call
+		// Never call this: It's a memory leak unless from a child class!
 		DigitalInput()
 		{
-
+			
 		}
 
+		// Places allocated memory into a list
 		DigitalInput(inputKey key)
 		{
-			//inputButtons.push_back(this);
 			inputKeytoDigitalInput[key] = this;
 		}
 
@@ -527,13 +543,15 @@ namespace input
 	class DigitalControllerInput;
 	std::map<std::pair<int, int>, DigitalControllerInput*> inputButtonToDigitalControllerInput;	// All DigitalControllerInputs
 
+	// Handles controllers' physical buttons that give either true or false input
 	class DigitalControllerInput : public DigitalInput
 	{
 	public:
 		int joystick;
 		inputButton button;
 
-		DigitalControllerInput(inputButton setButton, int setJoystick)
+		// Places allocated memory into a list
+		DigitalControllerInput(inputButton setButton, int setJoystick) : DigitalInput()
 		{
 			joystick = setJoystick;
 			button = setButton;
@@ -588,9 +606,7 @@ namespace input
 				// There is a cosmic chance that at point, the disconnect happens and game crashes. But oh well
 
 				// Set button state
-				bool a = !(*(buttonsStart + button) == GLFW_PRESS);
-
-				pressState(a);
+				pressState(!(*(buttonsStart + button) == GLFW_PRESS));
 			}
 		}
 
@@ -818,10 +834,11 @@ namespace input
 		bindAnalogInput(key, inputMinMaxDefault, AnalogInputEventsToBind);
 	}
 
-	class AnalogControllerInput;
-	std::map<int, AnalogControllerInput*> joystickToAnalogInput;	// All AnalogInputs
+	class AnalogInput;
+	std::map<int, AnalogInput*> joystickToAnalogInput;	// All AnalogInputs
 
-	class AnalogControllerInput
+	// Handles analog buttons that give, for example -1...1 inclusive input, such as joysticks
+	class AnalogInput
 	{
 	public:
 		// n-dimensional analog input
@@ -830,7 +847,7 @@ namespace input
 		float min = -1;
 		float max = 1;
 
-		AnalogControllerInput(float joystick)
+		AnalogInput(float joystick)
 		{
 			joystickToAnalogInput[joystick] = this;
 		}
@@ -861,7 +878,7 @@ namespace input
 		}
 	};
 
-	void bindAnalogControllerInput(AnalogControllerInput* inputButton, std::vector<InputEventData> axisEventDatas, std::vector<AnalogInputEvent*> inputEvents)
+	void bindAnalogControllerInput(AnalogInput* inputButton, std::vector<InputEventData> axisEventDatas, std::vector<AnalogInputEvent*> inputEvents)
 	{
 		// Bind all specified events to AnalogInput
 		for (auto inputEvent : inputEvents)
@@ -886,7 +903,7 @@ namespace input
 		else
 		{
 			// Construct a new AnalogControllerInput to bind
-			bindAnalogControllerInput(new AnalogControllerInput(joystick), axisEventDatas, inputEvents);
+			bindAnalogControllerInput(new AnalogInput(joystick), axisEventDatas, inputEvents);
 		}
 	}
 	static void bindAnalogControllerInput(int joystick, std::vector<InputEventData> axisEventDatas, std::vector<std::string> analogInputEventNames)
@@ -973,13 +990,13 @@ namespace input
 
 	// Sets window with key callbacks
 	// Place as late into initialization as possible to increase load times while pressing keys
-	// Should be a singleton, lazy-evaluation calls this late as possible
+	// TODO: Should be a singleton, lazy-evaluation calls this late as possible
 	static void initialize(GLFWwindow* window)
 	{
 		// Set the key callback function
 		glfwSetKeyCallback(window, keyCallback);
 	}
-	// Updates all inputs. Call BEFORE polling input events (such as before gameloop)
+	// Updates all inputs. Call BEFORE using inputs (such as before gameloop)
 	static void update()
 	{
 		// Update DigitalInputEvents
