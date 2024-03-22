@@ -137,7 +137,8 @@ public:
 		// Slow player down when off track
 		if (collision.type == Collision::Type::tilemapCollision)
 		{
-			ecs::GetComponent<Rigidbody>(collision.a).velocity *= player.offtrackSpeedScale;
+			// TODO: Replace with a bool, this should instead be a flat decrease, not % of current speed
+			ecs::GetComponent<Rigidbody>(collision.a).velocity *= (player.offtrackSpeedScale - engine::deltaTime);
 		}
 
 		// Check if the collision involves a checkpoint
@@ -178,18 +179,21 @@ public:
 			{
 				for (auto hitProjectile : player.hitProjectiles)
 				{
-					// If player has already been hit by stop, add a new hit
-					if (hitProjectile.first->hitType != HitStates::Stop)
+					// If player has been hit by stop, do not add current hit
+					if (hitProjectile.first->hitType == HitStates::Stop)
 					{
-						if (projectile.hitType == HitStates::Stop)
-						{
-							// If current hit is stop, clear all other hits
-							player.hitProjectiles.clear();
-						}
-						// Add the new hit
-						player.hitProjectiles.insert({&projectile, 0.f});
+						goto SkipAddingHit;
 					}
 				}
+				// If current hit is stop, clear all other hits
+				if (projectile.hitType == HitStates::Stop)
+				{
+					player.hitProjectiles.clear();
+				}
+				SkipAddingHit:
+
+				// Add the new hit
+				player.hitProjectiles.insert({ &projectile, 0.f });
 				
 				CreateAnimation(projectransfor.position + rigidbody.velocity / 15);
 
@@ -225,8 +229,18 @@ public:
 			PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
 
 			// Initialize inputs
-			float accelerationInput = input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_Y);
-			float rotateInput = input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_X);
+			float accelerationInput =
+			input::GetTotalInputValue("Throttle" + std::to_string(player.id)) * -1;
+			//- input::map_value(input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_TRIGGER), -1, 1, 0, 1)
+			//+ input::map_value(input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER), -1, 1, 0, 1);
+			
+			if (player.id == 1)
+			{
+				std::cout << "hello " << accelerationInput << "\n";
+				std::cout << "dumb " << input::GetInputValue("Throttle1", 0) << "\n";
+			}
+
+			float rotateInput = input::GetInputValue("Turn" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_X);
 			bool projetileInput = input::GetPressed("Shoot" + std::to_string(player.id));
 
 			accelerationInput = std::clamp(accelerationInput, -1.0f, 1.0f);
@@ -289,6 +303,7 @@ public:
 				TransformSystem::Rotate(player.renderedEntity, 0, -rotateInput * player.rotationSpeed * rotationScalar * dt, 0);
 
 				// Set min speed while turning
+				// TODO: This is ignored when giving even slightly input for reverse or forward!
 				forwardImpulse = forwardDirection * dt * player._speedScale * player.minSpeedWhileTurning;
 			}
 
