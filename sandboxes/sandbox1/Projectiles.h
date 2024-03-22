@@ -4,17 +4,32 @@
 #include "Resources.h"
 
 using namespace engine;
-
-ECS_REGISTER_COMPONENT(Torpedo)
-struct Torpedo
+enum HitStates
 {
-	int ownerID = 0;
-};	
-ECS_REGISTER_COMPONENT(Cannon)
-struct Cannon
-{
-	int ownerID = 0;
+	None,			// Does nothing when hitting player
+	Additive,		// Adds hitSpeedFactor additively:			100% + 50% + 50% = 200%
+	Multiplicative,	// Adds hitSpeedFactor multiplicatively:	100% + 50% + 50% = 225%		Decreases are weaker, increases are stronger 
+	Stop			// Stops and forces target to spin in place
 };
+
+ECS_REGISTER_COMPONENT(Projectile)
+struct Projectile
+{
+	int ownerID = 0;
+
+	/* Hit */
+
+	HitStates hitType = HitStates::Stop;
+	float hitSpeedFactor = -0.05f;		// If hitType is not Stop, scale of speed change when hit
+	float hitTime = 2.0f;				// Time the hit lasts
+
+	/* Files */
+
+	std::string hitAnimation = "explosion";
+	std::string torpModel = "torpedo.obj";
+	std::string cannonModel = "Weapon_HedgehogAmmo.obj";
+};
+
 
 //Temporary functin for testing
 void SpawnProjectile(ecs::Entity p, int playerID)
@@ -54,10 +69,10 @@ static void CreateAnimation(Vector3 animPosition)
 		ecs::Entity torpedo = ecs::NewEntity();
 	    ecs::AddComponent(torpedo, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
 	   ecs::AddComponent(torpedo, Rigidbody{ .velocity = direction * projectileSpeed });
-	   ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::torpedoModel });
+	   ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models["torpedo.obj"] });
 	   std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
 	   ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnTopedoCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
-	  ecs::AddComponent(torpedo, Torpedo{ .ownerID = owerID });
+	  ecs::AddComponent(torpedo, Projectile{ .ownerID = owerID });
     }
 
 
@@ -92,10 +107,10 @@ static void CreateAnimation(Vector3 animPosition)
 	void CreateCannonProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 sapawnRotation, int owerID)
 	{
 		ecs::Entity shell = ecs::NewEntity();
-		ecs::AddComponent(shell, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(30) });
+		ecs::AddComponent(shell, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
 		ecs::AddComponent(shell, Rigidbody{ .velocity = direction * projectileSpeed });
-		ecs::AddComponent(shell, ModelRenderer{ .model = resources::shellModel });
+		ecs::AddComponent(shell, ModelRenderer{ .model = resources::models["Weapon_HedgehogAmmo.obj"] });
 		std::vector<Vector2> Shellverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
 		ecs::AddComponent(shell, PolygonCollider{ .vertices = Shellverts, .callback = OnCannonCollision, .trigger = true, .visualise = false});
-		ecs::AddComponent(shell, Cannon{ .ownerID = owerID });
+		ecs::AddComponent(shell, Projectile{ .ownerID = owerID, .hitType = HitStates::Additive, .hitSpeedFactor = -0.5f, .hitTime = 10.5f});
 	}

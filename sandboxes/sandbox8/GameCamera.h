@@ -3,7 +3,7 @@
 #include "PlayerController.h"
 
 float camScale = 1.0;
-float camScaleMin = 1400.0f;
+float camScaleMin = 1600.0f;
 float camScaleMax = 1650.0f;
 const float aspectRatio = 16.f / 9.f;
 float camPadding = 100;
@@ -80,4 +80,5 @@ static void UpdateCam(GLFWwindow* window, Camera& cam, Tilemap* map) {
 		camScale = desiredZoom;
 	}
 
+	modelRenderSystem->SetLight(Vector3(cam.position.x, cam.position.y, 1500), Vector3(255));
 }

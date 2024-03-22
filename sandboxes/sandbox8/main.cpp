@@ -1,6 +1,4 @@
-#define WIN32_LEAN_AND_MEAN
-//#include <engine/Tilemap.h>
-//#include "PlayerController.h"
+#include "PlayerController.h"
 #include "engine/Input.h"  
 #include "MenuSystem.h"	
 #include "GameCamera.h"
@@ -30,123 +28,150 @@ void CreateCrowd(Vector3 pos, Animation& anim)
 	AnimationSystem::PlayAnimation(crowd, "CrowdCheer", true);
 }
 
-void LoadLevel1(Camera* cam)
+//Play the countdown timer and freeze players untill it is done
+void PlayCountdown()
 {
-	collisionSystem->cam = cam;
-
-	//Set this level's tilemap
-	spriteRenderSystem->SetTilemap(resources::level1Map);
-	collisionSystem->SetTilemap(resources::level1Map);
-	PhysicsSystem::SetTileProperty(1, TileProperty{ true });
-
-	ecs::GetSystem<PlayerController>()->CreatePlayers(4, Vector2(1434.0f, -1370.0f));
-
-	//Make all the checkpoints manually
-	CreateCheckpoint(Vector3(2100.226807, -963.837402, 100.000000), Vector3(30.000000, 159.245773, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 0
-	CreateCheckpoint(Vector3(2957.365723, -828.268005, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 1
-	CreateCheckpoint(Vector3(3387.268555, -355.873444, 100.000000), Vector3(45.000000, 99.936874, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 2
-	CreateCheckpoint(Vector3(3655.793701, -1339.042236, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 3
-	CreateCheckpoint(Vector3(2795.650391, -1489.039795, 100.000000), Vector3(45.000000, -368.616577, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 4
-	CreateCheckpoint(Vector3(2597.463135, -684.973389, 100.000000), Vector3(45.000000, 180.022018, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 5
-	CreateCheckpoint(Vector3(1668.260010, -990.794373, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 6 
-	CreateCheckpoint(Vector3(1043.635132, -875.206543, 100.000000), Vector3(45.000000, 179.241272, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 7
-	CreateCheckpoint(Vector3(943.931152, -293.566711, 100.000000), Vector3(45.000000, 107.476852, 0.000000), Vector3(17), resources::checkPointModel, 45.0f); // 8
-	CreateCheckpoint(Vector3(586.608276, -1249.448486, 100.000000), Vector3(45.000000, 40.070156, 0.000000), Vector3(17), resources::checkPointModel, 90.0f); // 9
-	CreateCheckpoint(Vector3(1513.692383, -1462.996187, 50.000000), Vector3(90.000000, 90.901711, 0.000000), Vector3(14), resources::finishLineModel, -1, true); // 10
-
-	//Make the crowds manually
-	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims);
-	CreateCrowd({ 1545, -1715, 11 }, resources::crowdAnims);
-	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims);
-
-	//Play the countdown
 	ecs::Entity countdown = ecs::NewEntity();
 	ecs::AddComponent(countdown, Transform{ .position = Vector3(1475, -1270, 10), .scale = Vector3(60, 100, 0) });
 	ecs::AddComponent(countdown, SpriteRenderer{});
 	ecs::AddComponent(countdown, Animator{ .onAnimationEnd = ecs::DestroyEntity });
 	AnimationSystem::AddAnimation(countdown, resources::countdownAnim, "CountDown");
 	AnimationSystem::PlayAnimation(countdown, "CountDown", false);
+	ecs::GetSystem<PlayerController>()->countdownTimer = 5;
+}
+
+//Create everything for level 1
+void LoadLevel1(Camera* cam)
+{
+	collisionSystem->cam = cam;
+
+	//TEST
+	//resources::level1Map->enabledLayers[1] = false;
+
+	//Set this level's tilemap
+	spriteRenderSystem->SetTilemap(resources::level1Map);
+	collisionSystem->SetTilemap(resources::level1Map);
+	PhysicsSystem::SetTileProperty(1, TileProperty{ true });
+
+	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::torpedoBoat, ShipType::torpedoBoat, ShipType::torpedoBoat };
+	ecs::GetSystem<PlayerController>()->CreatePlayers(4, Vector2(1434.0f, -1370.0f), ships);
+
+	//Make all the checkpoints manually
+	CreateCheckpoint(Vector3(2100.226807, -963.837402, 100.000000), Vector3(30.000000, 159.245773, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 45.0f);
+	CreateCheckpoint(Vector3(2597.463135, -684.973389, 100.000000), Vector3(45.000000, 180.022018, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 45.0f);
+	CreateCheckpoint(Vector3(1668.260010, -990.794373, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 45.0f);
+	CreateCheckpoint(Vector3(1043.635132, -875.206543, 100.000000), Vector3(45.000000, 179.241272, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 45.0f);
+	CreateCheckpoint(Vector3(943.931152, -293.566711, 100.000000), Vector3(45.000000, 107.476852, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 45.0f);
+	CreateCheckpoint(Vector3(586.608276, -1249.448486, 100.000000), Vector3(45.000000, 40.070156, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 90.0f);
+	CreateCheckpoint(Vector3(1513.692383, -1462.996187, 50.000000), Vector3(90.000000, 90.901711, 0.000000), Vector3(14), resources::models["Finish_line.obj"], -1, true); // 10
+
+	//Make the crowds manually
+	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims);
+	CreateCrowd({ 1545, -1715, 11 }, resources::crowdAnims);
+	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims);
+
+	PlayCountdown();
+}
+
+//Bind all input events here
+void SetupInput()
+{
+	input::ConstructDigitalEvent("Pause");
+	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
+	// TODO: add controller pause key
+
+	for (size_t i = 0; i < 4; i++)
+	{
+		input::ConstructAnalogEvent("Move" + std::to_string(i));
+
+		input::ConstructDigitalEvent("Shoot" + std::to_string(i));
+		input::ConstructDigitalEvent("Boost" + std::to_string(i));
+
+		// Controller input
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
+		input::bindAnalogControllerInput(i, { GLFW_GAMEPAD_AXIS_LEFT_X, GLFW_GAMEPAD_AXIS_LEFT_Y }, { "Move" + std::to_string(i) });
+	}
+
+	// Keyboard input for player 0
+	input::bindAnalogInput(GLFW_KEY_RIGHT, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_X);
+	input::bindAnalogInput(GLFW_KEY_LEFT, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_X, -1);
+	input::bindAnalogInput(GLFW_KEY_A, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y);
+	input::bindAnalogInput(GLFW_KEY_Z, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y, -1);
+
+	input::bindDigitalInput(GLFW_KEY_N, { "Shoot0" });
+	input::bindDigitalInput(GLFW_KEY_M, { "Boost0" });
+
+	/*
+	input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft0" });
+	input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight0" });
+	input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp0" });
+	input::bindDigitalInput(GLFW_KEY_DOWN, { "MoveDown0" });
+	input::bindDigitalInput(GLFW_KEY_ENTER, { "Select0" });
+	*/
+
 }
 
 int main()
 {
-
 	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window");
 
 	EngineInit();
 
+	//Make the camera
 	engine::Camera cam = engine::Camera(1120, 630);
 	cam.SetPosition(Vector3(0, 0, 1500));
-	//cam.perspective = true;
 	cam.SetRotation(Vector3(0, 0, 0));
-	float camScale = 1.0;
-	float camScaleMin = 600.0f;
-	float camScaleMax = 1650.0f;
-	float aspectRatio = 16.f / 9.f;
-	float camPadding = 100;
-	float camDeadzone = 10;
 
 	//Loads all globally used resources
 	resources::LoadResources(&cam);
 
 	input::initialize(window);
 
+	//Get pointers and call init of every custom system
 	std::shared_ptr<PauseSystem> pauseSystem = ecs::GetSystem<PauseSystem>();
 	pauseSystem->Init(window);
 	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
 	playerController->Init();
+	std::shared_ptr<HeggehogSynten> heggehogSynten = ecs::GetSystem<HeggehogSynten>();
 
-	////////////////////////////     INPUTS  STARTS		/////////////////	 INPUTS  STARTS		//////////	
-	input::ConstructDigitalEvent("MoveUp");
-	input::ConstructDigitalEvent("MoveDown");
-	input::ConstructDigitalEvent("Select");
-	input::ConstructDigitalEvent("Pause");
-	input::ConstructDigitalEvent("MoveRight");
-	input::ConstructDigitalEvent("MoveLeft");
 
-	//TODO: add controller input
-	input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft" });
-	input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight" });
-	input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp" });
-	input::bindDigitalInput(GLFW_KEY_DOWN, { "MoveDown" });
-	input::bindDigitalInput(GLFW_KEY_ENTER, { "Select" });
-	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
-	////////////////////////////     INPUTS  Ends    //////////////////     INPUTS  Ends      //////////
+	//Bind all input actions
+	SetupInput();
 
 	//Load the first level
 	LoadLevel1(&cam);
 
+	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
-		input::update();
+		glfwPollEvents();
+		
+		heggehogSynten->Update();
+
+
+		//Close window when Esc is pressed
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
-		// SetLitght position to Camara position & LitghtColor  
-		modelRenderSystem->SetLight(Vector3(cam.position.x, cam.position.y, 1500), Vector3(255));
-
+		input::update();
+		
 		UpdateCam(window, cam, resources::level1Map);
 		engine::Update(&cam);
-
 
 		// playerControl Update for frame if not paused
 		if (!pauseSystem->isGamePause)
 		{
-
 			playerController->Update(window, deltaTime);
-
 		}
-		// if paused  or Pause pressed update PauseSystem
+		// if paused or Pause pressed update PauseSystem
 		if (pauseSystem->isGamePause || input::GetNewPress("Pause"))
 		{
-			printf(" P  pauseSystem");
 			pauseSystem->Update();
 		}
 
-
 		glfwSwapBuffers(window);
-		glfwPollEvents();
 	}
+
 	input::uninitialize();
 	ecs::DestroyAllEntities(true);
 	glfwTerminate();

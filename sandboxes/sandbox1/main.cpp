@@ -6,6 +6,7 @@
 #include "GameCamera.h"
 
 int checkPointNumber = 0;
+int activeMapLayer = 0;
 
 void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, Model* checkPointModel, float hitboxrotation, bool finish_line = false)
 {
@@ -46,25 +47,88 @@ void LoadLevel1(Camera* cam)
 {
 	collisionSystem->cam = cam;
 
-	//TimerSystem::ScheduleFunction([]() {resources::level1Map->enabledLayers[1] =! resources::level1Map->enabledLayers[1]; }, 0.2, true, ScheduledFunction::Type::seconds);
-	//resources::level1Map->enabledLayers[1] = true;
+	/*TimerSystem::ScheduleFunction(
+		[]() {
+			resources::level1Map->enabledLayers[0] = false;
+			resources::level1Map->enabledLayers[1] = false;
+			resources::level1Map->enabledLayers[2] = false;
+			resources::level1Map->enabledLayers[3] = false;
+			resources::level1Map->enabledLayers[activeMapLayer] = true;
+			activeMapLayer++;
+			if (activeMapLayer >1)
+			{
+				activeMapLayer = 0;
+			}
+		}, 0.3, true, ScheduledFunction::Type::seconds);
+	resources::level1Map->enabledLayers[1] = true;*/
+
 	//Set this level's tilemap
 	spriteRenderSystem->SetTilemap(resources::level1Map);
 	collisionSystem->SetTilemap(resources::level1Map);
 	PhysicsSystem::SetTileProperty(1, TileProperty{ true });
 
-	std::vector<ShipType> ships{ShipType::cannonBoat, ShipType::torpedoBoat, ShipType::torpedoBoat, ShipType::torpedoBoat};
+	std::vector<ShipType> ships{ShipType::cannonBoat, ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat};
 	ecs::GetSystem<PlayerController>()->CreatePlayers(4, Vector2(1434.0f, -1370.0f), ships);
 
 	//Make all the checkpoints manually
-	CreateCheckpoint(Vector3(586.608276, -1249.448486, 100.000000), Vector3(45.000000, 40.070156, 0.000000), Vector3(17), resources::checkPointModel, 90.0f);
-	CreateCheckpoint(Vector3(1513.692383, -1462.996187, 50.000000), Vector3(90.000000, 90.901711, 0.000000), Vector3(14), resources::finishLineModel, -1, true); // 10
+	CreateCheckpoint(Vector3(586.608276, -1249.448486, 100.000000), Vector3(45.000000, 40.070156, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 90.0f);
+	CreateCheckpoint(Vector3(1513.692383, -1462.996187, 50.000000), Vector3(90.000000, 90.901711, 0.000000), Vector3(14), resources::models["Finish_line.obj"], -1, true); // 10
 
 	//Make the crowds manually
 	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims);
 	CreateCrowd({ 1545, -1715, 11 }, resources::crowdAnims);
 	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims);
 	PlayCountdown();
+}
+
+//Bind all input events here
+void SetupInput()
+{
+	input::ConstructDigitalEvent("Pause");
+	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
+	// TODO: add controller pause key
+
+	for (size_t i = 0; i < 4; i++)
+	{
+		input::ConstructAnalogEvent("Throttle" + std::to_string(i));
+		input::ConstructAnalogEvent("Turn" + std::to_string(i));
+
+		input::ConstructDigitalEvent("Shoot" + std::to_string(i));
+		input::ConstructDigitalEvent("Boost" + std::to_string(i));
+
+		// Controller input
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "Boost" + std::to_string(i) });
+
+		input::bindAnalogControllerInput(i,
+			{
+				{ input::digitalPositiveInput, GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER },
+				{ input::digitalNegativeInput, GLFW_GAMEPAD_AXIS_LEFT_TRIGGER }
+			}, { "Throttle" + std::to_string(i) });
+
+		input::bindAnalogControllerInput(i, { { {-1, 1, 0}, GLFW_GAMEPAD_AXIS_LEFT_X }, }, { "Turn" + std::to_string(i) });
+	}
+
+	// Keyboard input for player 0
+	input::bindAnalogInput(GLFW_KEY_PERIOD, input::digitalPositiveInput, { "Turn1" }, 0);
+	input::bindAnalogInput(GLFW_KEY_COMMA, input::digitalNegativeInput, { "Turn1" }, 0);
+
+	input::bindAnalogInput(GLFW_KEY_A, input::digitalPositiveInput, { "Throttle1" }, 0);
+	input::bindAnalogInput(GLFW_KEY_Z, input::digitalNegativeInput, { "Throttle1" }, 0);
+	input::bindAnalogInput(GLFW_KEY_UP, input::digitalPositiveInput, { "Throttle0" }, 0);
+	input::bindAnalogInput(GLFW_KEY_DOWN, input::digitalNegativeInput, { "Throttle0" }, 0);
+
+	input::bindDigitalInput(GLFW_KEY_SPACE, { "Shoot1" });
+	input::bindDigitalInput(GLFW_KEY_M, { "Boost0" });
+
+	/*
+	input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft0" });
+	input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight0" });
+	input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp0" });
+	input::bindDigitalInput(GLFW_KEY_DOWN, { "MoveDown0" });
+	input::bindDigitalInput(GLFW_KEY_ENTER, { "Select0" });
+	*/
+
 }
 
 int main()
@@ -90,7 +154,7 @@ int main()
 	playerController->Init();
 
 	//Bind all input actions
-	//SetupInput();
+	SetupInput();
 
 	//Load the first level
 	LoadLevel1(&cam);

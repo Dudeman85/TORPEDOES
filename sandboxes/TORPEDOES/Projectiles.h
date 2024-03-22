@@ -1,54 +1,67 @@
 #pragma once 
 #include <engine/Application.h>
-#include "PlayerController.h"
 #include "Resources.h"
 
 using namespace engine;
 
-ECS_REGISTER_COMPONENT(Torpedo)
-struct Torpedo
-{
-	int ownerID = 0;
+enum HitStates 
+{ 
+	None,			// Does nothing when hitting player
+	Additive,		// Adds hitSpeedFactor additively:			100% + 50% + 50% = 200%
+	Multiplicative,	// Adds hitSpeedFactor multiplicatively:	100% + 50% + 50% = 225%		Decreases are weaker, increases are stronger 
+	Stop			// Stops and forces target to spin in place
 };
 
-//Temporary functin for testing
-void SpawnProjectile(ecs::Entity p, int playerID)
+ECS_REGISTER_COMPONENT(Projectile)
+struct Projectile
+{
+	int ownerID = 0;
+
+	float speed = 500;
+
+	/* Hit */
+
+	HitStates hitType = HitStates::Stop;
+	float hitSpeedFactor = -0.05f;		// If hitType is not Stop, scale of speed change when hit
+	float hitTime = 2.0f;				// Time the hit lasts
+
+	/* Files */
+
+	std::string hitAnimation = "explosion";
+	std::string model = "torpedo.obj";
+};
+
+//Temporary function for testing
+ void SpawnProjectile(ecs::Entity p, int playerID)
 {
 	std::cout << ecs::GetComponent<Transform>(p).position.ToString();
 }
 
-static void CreateAnimation(Vector3 animPosition)
+static void CreateAnimation(ecs::Entity entity)
 {
-	ecs::Entity torpedoAnim = ecs::NewEntity();
+	Projectile& projectile = ecs::GetComponent<Projectile>(entity);
+	Transform& transform = ecs::GetComponent<Transform>(entity);
+	Vector3 animPosition = transform.position;
 	animPosition.z += 100;
+
+	ecs::Entity torpedoAnim = ecs::NewEntity();
 	ecs::AddComponent(torpedoAnim, Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20) });
 	ecs::AddComponent(torpedoAnim, SpriteRenderer{ });
 	ecs::AddComponent(torpedoAnim, Animator{ .onAnimationEnd = ecs::DestroyEntity });
-	AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, "explosion");
-	AnimationSystem::PlayAnimation(torpedoAnim, "explosion", false);
+	AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, projectile.hitAnimation);
+	AnimationSystem::PlayAnimation(torpedoAnim, projectile.hitAnimation, false);
 
 };
 
-// check if projectil collision tilemap Trigger
-static void OnTopedoCollision(Collision collision)
-			{
-				Transform& torpedotransfor = ecs::GetComponent<Transform>(collision.a);
-				if (collision.type == Collision::Type::tilemapTrigger)
-				{
-					if (collision.b != 1)
-					{   // Do animation where projectile impact 
-						CreateAnimation(torpedotransfor.position);
-						ecs::DestroyEntity(collision.a);
-					}
-				}
-			}
-			void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 sapawnRotation, int owerID)
-			{
-				ecs::Entity torpedo = ecs::NewEntity();
-	ecs::AddComponent(torpedo, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
-	ecs::AddComponent(torpedo, Rigidbody{ .velocity = direction * projectileSpeed });
-	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models["torpedo.obj"]});
-	std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnTopedoCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
-	ecs::AddComponent(torpedo, Torpedo{ .ownerID = owerID });
+static void OnProjectileCollision(Collision collision)
+{
+	if (collision.type == Collision::Type::tilemapTrigger)
+	{
+		if (collision.b != 1)
+		{   
+			// Do animation projectile impact animation
+			CreateAnimation(collision.a);
+			ecs::DestroyEntity(collision.a);
+		}
+	}
 }

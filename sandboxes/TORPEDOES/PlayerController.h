@@ -1,4 +1,6 @@
 #pragma once 
+#include <bitset>
+
 #include <engine/Application.h>
 #include "Resources.h"
 #include "Projectiles.h"
@@ -7,7 +9,6 @@
 using namespace engine;
 
 enum ShipType { torpedoBoat, submarine, cannonBoat, hedgehogBoat, pirateShip };
-enum HitState { noHit, torpedoHit, cannonHit, hedgehogHit };
 
 ECS_REGISTER_COMPONENT(Player)
 struct Player
@@ -15,14 +16,21 @@ struct Player
 	int id = 0;
 
 	// Movement stats
-	float accelerationSpeed;
-	float rotationSpeed;
-	float minAcceleration = 100;	// Minimum acceleration while rotating
+	float forwardSpeed = 400;
+	float reverseSpeed = 133;
+
+	float offtrackSpeedScale = 0.991f;
+
+	float rotationSpeed = 100;
+	float minSpeedWhileTurning = 60;
+
+	float _speedScale = 1;
+	Vector2 _forwardDirection;
 
 	// Action cooldowns
 	float shootCooldown = 0.2f;			// Time between shots
 	float specialCooldown = 0.2f;		// Time between special uses
-	float ammoRechargeCooldown = 0.5f;	// Time between gaining ammo
+	float ammoRechargeCooldown = 1.f;	// Time between gaining ammo
 
 	int ammo = 0;
 	int maxAmmo = 2;
@@ -30,20 +38,20 @@ struct Player
 	// Action timers
 	float _ammoRechargeTimer = 0.0f;
 	float _shootTimer = 0.0f;
+	float _specialTimer = 0.0f;
 
 	// Action functions
-	std::function<void(ecs::Entity, int)> mainAction;
-	std::function<void(ecs::Entity, int)> specialAction;
+	std::function<void(ecs::Entity)> mainAction;
+	std::function<void(ecs::Entity)> specialAction;
 
-	// Checkpoint stuff
+	// Checkpoint
 	int previousCheckpoint = -1;
 	int lap = 1;
 
-	// Hit by weapon stuff
-	HitState hitStatus = HitState::noHit;
-	float hitTime = 0;
+	// Hit
+	std::vector<std::pair<Projectile, float>> hitProjectiles;
 
-	// Rendered Child entities
+	// Rendered child entities
 	ecs::Entity renderedEntity;
 	ecs::Entity nameText;
 };
@@ -54,6 +62,26 @@ struct CheckPoint
 	int checkPointID = 0;
 	bool Finish_line = false;
 };
+
+void CreateTorpedo(ecs::Entity entity)
+{
+	Player& player = ecs::GetComponent<Player>(entity);
+	Transform& transform = ecs::GetComponent<Transform>(entity);
+	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
+	
+	float speed = 500;
+
+	ecs::Entity torpedo = ecs::NewEntity();
+	ecs::AddComponent(torpedo, Projectile{ .ownerID = player.id, .speed = 500 });
+
+	Projectile& torpedoProjectile = ecs::GetComponent<Projectile>(torpedo);
+
+	ecs::AddComponent(torpedo, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(10) });
+	ecs::AddComponent(torpedo, Rigidbody{ .velocity = player._forwardDirection * torpedoProjectile.speed });
+	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models[torpedoProjectile.model] });
+	std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
+	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .visualise = false,  .rotationOverride = transform.position.y });
+}
 
 // Player controller System. Requires Player , Tranform , Rigidbody , PolygonCollider
 ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonCollider)
@@ -81,13 +109,13 @@ public:
 
 		//Initialize each ship type's stats
 		shipComponents.insert({ ShipType::torpedoBoat,
-			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = CreateTorpedo, .specialAction = CreateTorpedo } });
 		shipComponents.insert({ ShipType::submarine,
-			Player{.accelerationSpeed = 800, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.forwardSpeed = 800, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = CreateTorpedo, .specialAction = CreateTorpedo } });
 		shipComponents.insert({ ShipType::cannonBoat,
-			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = CreateTorpedo, .specialAction = CreateTorpedo } });
 		shipComponents.insert({ ShipType::hedgehogBoat,
-			Player{.accelerationSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = CreateTorpedo, .specialAction = CreateTorpedo } });
 
 		//Initialize ship type models
 		shipModels.insert({ ShipType::torpedoBoat, resources::models["LaMuerte.obj"] });
@@ -122,13 +150,11 @@ public:
 		// collision.a is always a player
 		// Get references to the involved components
 		Player& player = ecs::GetComponent<Player>(collision.a);
-		Transform& playertranform = ecs::GetComponent<Transform>(collision.a);
-		PolygonCollider& playerCollider = ecs::GetComponent<PolygonCollider>(collision.a);
 
 		// Slow player down when off track
 		if (collision.type == Collision::Type::tilemapCollision)
 		{
-			ecs::GetComponent<Rigidbody>(collision.a).velocity *= 0.991f;
+			ecs::GetComponent<Rigidbody>(collision.a).velocity *= player.offtrackSpeedScale;
 		}
 
 		// Check if the collision involves a checkpoint
@@ -159,16 +185,31 @@ public:
 			}
 		}
 		// Check if the collision involves a projectile
-		else if (ecs::HasComponent<Torpedo>(collision.b))
+		else if (ecs::HasComponent<Projectile>(collision.b))
 		{
-			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(collision.b);
-			Transform& projectransfor = ecs::GetComponent<Transform>(collision.b);
-			Torpedo& torpedo = ecs::GetComponent<Torpedo>(collision.b); // Entity is collision.b 
+			Projectile& projectile = ecs::GetComponent<Projectile>(collision.b); // projectile is collision.b 
 
-			if (player.id != torpedo.ownerID)
+			if (player.id != projectile.ownerID)
 			{
-				player.hitStatus = HitState::torpedoHit;
-				CreateAnimation(projectransfor.position + rigidbody.velocity / 15);
+				for (auto& hitProjectile : player.hitProjectiles)
+				{
+					// If player has been hit by stop, do not add current hit
+					if (hitProjectile.first.hitType == HitStates::Stop)
+					{
+						goto SkipAddingHit;
+					}
+				}
+				// If the new hit is stop, clear all other hits
+				if (projectile.hitType == HitStates::Stop)
+				{
+					player.hitProjectiles.clear();
+				}
+				// Add the new hit
+				player.hitProjectiles.push_back({ projectile, 0.f });
+
+				SkipAddingHit:
+				
+				CreateAnimation(collision.b);
 
 				//Destroy torpedo at end of frame
 				ecs::DestroyEntity(collision.b);
@@ -197,41 +238,52 @@ public:
 			PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
 			
 			// Initialize inputs
-			float accelerationInput = input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_Y);
-			float rotateInput = input::GetInputValue("Move" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_X);
-			bool ProjetileInput = input::GetPressed("Shoot" + std::to_string(player.id));
+			float accelerationInput = input::GetTotalInputValue("Throttle" + std::to_string(player.id));
+			
+			float rotateInput = input::GetInputValue("Turn" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_X);
+			bool projetileInput = input::GetPressed("Shoot" + std::to_string(player.id));
 
 			accelerationInput = std::clamp(accelerationInput, -1.0f, 1.0f);
 			rotateInput = std::clamp(rotateInput, -1.0f, 1.0f);
 
-			/* Movement */
+			/* Projectile hit logic  */
 
-			// Torpedo hit logic
-			switch (player.hitStatus)
+			for (auto it = player.hitProjectiles.begin(); it != player.hitProjectiles.end();)
 			{
-			case HitState::torpedoHit:
-				// Rotate player 360 degrees
-				TransformSystem::Rotate(player.renderedEntity, 0, 360.0f * dt, 0);
+				// Increase the timer value
+				it->second += engine::deltaTime;
 
-				// Restabilize player when hit time has gone by
-				if (player.hitTime >= 2)
+				if (it->second >= it->first.hitTime)
 				{
-					player.hitStatus = HitState::noHit;
-					player.hitTime = 0.0f;
+					it = player.hitProjectiles.erase(it); // Erase the element and move iterator to the next element
 				}
 				else
 				{
-					// Ignore all input
-
-					player.hitTime += dt; // Increment duration of hit time
+					++it; // Move to the next element
 				}
-				break;
-
-			case HitState::cannonHit:
-				break;
-			default:
-				break;
 			}
+
+			player._speedScale = 1; // 100%
+			for (auto& hitProjectile : player.hitProjectiles)
+			{
+				switch (hitProjectile.first.hitType)
+				{
+					case HitStates::Stop:
+						// Rotate player
+						TransformSystem::Rotate(player.renderedEntity, 0, 360.0f * dt, 0);
+					break;
+					case HitStates::Additive:
+						player._speedScale += std::max(hitProjectile.first.hitSpeedFactor, 0.f);
+						break;
+					case HitStates::Multiplicative:
+						player._speedScale += std::max(player._speedScale *= hitProjectile.first.hitSpeedFactor, 0.f);
+						break;
+					default:
+						break;
+				}
+			}
+
+			/* Movement */
 
 			// CALCULATE POSITION AND ROTATE 
 			// Calculate the forward direction
@@ -240,66 +292,116 @@ public:
 
 			// Initialize the impulse as zero
 			Vector2 forwardImpulse(0.0f, 0.0f);
-			if (rotateInput != 0.0f)
-			{
-				//Slow rotation based on throttle setting
-				//TODO: this function could be improved by testing
-				float rotationScalar = 1 - log10(2.0f * std::max(0.5f, accelerationInput));
-				// Apply forward impulse if rotating or receiving a rotation command
-				TransformSystem::Rotate(player.renderedEntity, 0, -rotateInput * player.rotationSpeed * rotationScalar * dt, 0);
-				forwardImpulse = forwardDirection * player.minAcceleration * dt;
-			}
 
 			// Apply acceleration impulse if positive input is received
 			if (accelerationInput > 0.0f)
 			{
-				forwardImpulse = forwardDirection * accelerationInput * dt * player.accelerationSpeed;
+				forwardImpulse = forwardDirection * accelerationInput * dt * player.forwardSpeed;
 			}
 			// Apply deceleration impulse if negative input is received
 			if (accelerationInput < 0.0f)
 			{
-				// TODO: Deacceleration rate
-				forwardImpulse = forwardDirection * accelerationInput * dt * player.accelerationSpeed * 0.3;
+				forwardImpulse = forwardDirection * accelerationInput * dt * player.reverseSpeed;
+			}
+			if (rotateInput != 0.0f)
+			{
+				// Slow rotation based on throttle setting
+				// TODO: this function could be improved by testing
+				float rotationScalar = 1 - log10(2.0f * std::max(0.5f, accelerationInput));
+
+				float trueRotateInput = -rotateInput * player.rotationSpeed * rotationScalar * dt;
+
+				// Apply forward impulse if rotating or receiving a rotation command
+				TransformSystem::Rotate(player.renderedEntity, 0, trueRotateInput, 0);
+
+				// Set min speed while turning
+
+				// TODO: Scale based on rotation speed
+				Vector2 minRotateImpulse = forwardDirection * dt * player._speedScale * std::abs(trueRotateInput) * player.minSpeedWhileTurning;
+
+				if (minRotateImpulse.Length() > forwardImpulse.Length())
+				{
+					forwardImpulse = minRotateImpulse;
+				}
 			}
 
 			collider.rotationOverride = modelTransform.rotation.y + 1080;
 
 			// Apply the resulting impulse to the object
-			PhysicsSystem::Impulse(entity, forwardImpulse);
+			PhysicsSystem::Impulse(entity, forwardImpulse * player._speedScale);
 
 			/* Shooting */
 
-			// Increase the projectile timers by the elapsed time (dt)
-			player._shootTimer += dt;
-
-			// Check if the variable 'ProjectileInput' is true and if the projectile cooldown has passed.
-			if (player._shootTimer >= player.shootCooldown)
-			{
-				// If we pressed button and have ammo
-				if (ProjetileInput && (player.ammo > 0))
-				{
-					// Create a projectile using the parameters of the player object.
-					CreateProjectile(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
-
-					player.ammo--;
-
-					// Reset the projectile shoot time 
-					player._shootTimer = 0;
-
-					if (player.id == 0)
-						std::cout << "ammo: " << player.ammo << "\n";
-				}
-			}
+			bool reachedMaxAmmoThisFrame = false;
+			bool shotThisFrame = false;
 
 			// If not max ammo
 			if (player.ammo < player.maxAmmo)
 			{
 				player._ammoRechargeTimer += dt;
 
-				if (player._ammoRechargeTimer >= player.ammoRechargeCooldown)
+				while (player._ammoRechargeTimer >= player.ammoRechargeCooldown)
 				{
 					// Add ammo
 					player.ammo++;
+
+					if (player.ammo < player.maxAmmo)
+					{
+						// Not max ammo, continue recharge
+						player._ammoRechargeTimer -= player.ammoRechargeCooldown;
+					}
+					else
+					{
+						// Max ammo, handle recharge after shooting
+						player.ammo = player.maxAmmo;
+						reachedMaxAmmoThisFrame = true;
+						break;
+					}
+				}
+			}
+
+			// Increase the projectile timer
+			player._shootTimer += dt;
+
+			// If the projectile cooldown has passed
+			while (player._shootTimer >= player.shootCooldown)
+			{
+				if (!projetileInput)
+				{
+					// We haven't pressed the shoot button, keep shootTimer at max value
+					player._shootTimer = player.shootCooldown;
+					break;
+				}
+
+				if (player.ammo <= 0)
+				{
+					player.ammo = 0;
+					// We don't have ammo, keep shootTimer at max value
+					player._shootTimer = player.shootCooldown;
+					break;
+				}
+
+				// Create a projectile using the parameters of the player object.
+				player._forwardDirection = forwardDirection;
+				player.mainAction(entity);
+
+				player.ammo--;
+
+				// Decrease the projectile shoot time 
+				player._shootTimer -= player.shootCooldown;
+			}
+
+			// Max ammo, stop rechage
+			if (reachedMaxAmmoThisFrame)
+			{
+				if (player.ammo < player.maxAmmo)
+				{
+					// Not max ammo, continue recharge
+					player._ammoRechargeTimer -= player.ammoRechargeCooldown;
+				}
+				else
+				{
+					// Max ammo, ignore recharge done for next ammo
 					player._ammoRechargeTimer = 0;
 				}
 			}
@@ -329,7 +431,7 @@ public:
 			playerComponent.nameText = playerNameText;
 
 			ecs::AddComponent(player, Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
-			ecs::AddComponent(player, Rigidbody{ .drag = 0.025 });
+			ecs::AddComponent(player, Rigidbody{ .drag = 0.025, .restitution = 1 });
 			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
 			ecs::AddComponent(player, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
 

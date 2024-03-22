@@ -1,39 +1,33 @@
 #pragma once
 #include <engine/Application.h>
+#include <engine/ResourceManagement.h>
 
 namespace resources
 {
+	std::unordered_map<std::string, Texture*> uiTextures;
+	std::unordered_map<std::string, Texture*> menuTextures;
+
+	std::unordered_map<std::string, Model*> models;
+
 	Font* niagaraFont;
 
-	Texture* winSprite;
-	Texture* torpCooldownTexture;
-	Texture* torpReadyTexture;
-
-	Model* torpedoModel;
-	Model* laMuerteModel;
-	Model* checkPointModel;
-	Model* finishLineModel;
-	Model* hedgehogModel;
+	Tilemap* level1Map;
 
 	Animation explosionAnimation;
 	Animation crowdAnims;
 	Animation countdownAnim;
 
-	Tilemap* level1Map;
 
+	//Load all the global resources here
+	//Stuff that is only used in one system can be loaded there 
 	void LoadResources(Camera* cam)
 	{
+		uiTextures = engine::PreloadTextures("GUI");
+		menuTextures = engine::PreloadTextures("menuUI", true, GL_LINEAR_MIPMAP_NEAREST);
+
+		models = engine::PreloadModels("3dmodels");
+
 		niagaraFont = new Font("Niagara Solid.ttf", 0, 0, 48);
-
-		checkPointModel = new Model("/3dmodels/Checkpoint.obj");
-		finishLineModel = new Model("/3dmodels/Finish_line.obj");
-		torpedoModel = new Model("/3dmodels/torpedo.obj");
-		laMuerteModel = new Model("/3dmodels/LaMuerte.obj");
-		hedgehogModel = new Model("/3dmodels/hedgehog.obj");
-
-		torpCooldownTexture = new Texture("/GUI/UI_Red_Torpedo_Icon.png");
-		torpReadyTexture = new Texture("/GUI/UI_Green_Torpedo_Icon.png");
-		winSprite = new Texture("/GUI/winner.png");
 
 		level1Map = new Tilemap(cam);
 		level1Map->loadMap("/levels/level1.tmx");
@@ -45,10 +39,20 @@ namespace resources
 
 	void UnloadResources()
 	{
+		for (const auto model : models)
+		{
+			delete model.second;
+		}
+		for (const auto texture : uiTextures)
+		{
+			delete texture.second;
+		}
+		for (const auto texture : menuTextures)
+		{
+			delete texture.second;
+		}
+
 		delete niagaraFont;
-		delete checkPointModel;
-		delete finishLineModel;
-		delete winSprite;
 		delete level1Map;
 	}
 }
