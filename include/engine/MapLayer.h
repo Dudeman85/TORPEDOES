@@ -103,15 +103,18 @@ class MapLayer final
 {
 public:
 	// Constructor
-	MapLayer(tmx::Map& map, const std::string tilemap, std::vector <std::shared_ptr<engine::Texture>>& textures);
+	MapLayer(tmx::Map& map, std::vector <std::shared_ptr<engine::Texture>>& textures);
 	// Destructor
 	~MapLayer();
 
 	// fetchData(tmx::Map& map, const std::string tilemap)
-	// function to get data from tsx and tmx files
-	void fetchData(tmx::Map& map, const std::string tilemap);
+// function to get data from tsx and tmx files
+	TiledMap fetchData(tmx::Map& map, const std::string tilemap);
 
 private:
 	// Vertex Array Object
 	unsigned int VAO;
+
+	//
+	void createSubsets(tmx::Map& map, TiledMap tilemap);
 };

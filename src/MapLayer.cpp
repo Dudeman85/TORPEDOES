@@ -27,15 +27,13 @@ source distribution.
 
 #include <engine/MapLayer.h>
 
-MapLayer::MapLayer(tmx::Map& map, const std::string tilemap, std::vector <std::shared_ptr<engine::Texture>>& textures)
+MapLayer::MapLayer(tmx::Map& map, std::vector <std::shared_ptr<engine::Texture>>& textures)
 {
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
-
-	fetchData(map, tilemap);
 }
 
-void MapLayer::fetchData(tmx::Map& map, const std::string tilemap)
+TiledMap MapLayer::fetchData(tmx::Map& map, const std::string tilemap)
 {
 	// Temporal class for TiledMap
 	// used to store values to struct
@@ -104,5 +102,86 @@ void MapLayer::fetchData(tmx::Map& map, const std::string tilemap)
 		tMap.tilesets.push_back(tSet);
 	}
 
-	// 
+	// Get all the different layers
+	// from the tilemap
+	const auto& alayers = map.getLayers();
+
+	// Iterate through all layers
+	for (const auto& layer : alayers)
+	{
+		// Get current layer's type
+		const auto& cLayerType = layer->getType();
+
+		// The different layer types handling
+		// in switch loop
+		switch (cLayerType)
+		{
+			// Group layers handling
+		case tmx::Layer::Type::Group:
+			// Get current group layers properties
+			const auto& groupProperties = layer->getProperties();
+			// Iterate the property values into struct
+			for (const auto& groupProperty : groupProperties)
+			{
+				// Insert the property values into struct
+				tGroup.group.insert(groupProperty.getName(), groupProperty.getStringValue());
+			}
+
+			// Insert the group layer into
+			// tilemap struct
+			tMap.groups.push_back(tGroup);
+
+			break;
+
+			// Object layers handling
+		case tmx::Layer::Type::Object:
+			// Get current object layers properties
+			const auto& objectProperties = layer->getProperties();
+			// Iterate the property values into struct
+			for (const auto& objectProperty : objectProperties)
+			{
+				// Insert the property values into struct
+				tObject.object.insert(objectProperty.getName(), objectProperty.getStringValue());
+			}
+
+			// Insert the object layer into
+			// tilemap struct
+			tMap.objects.push_back(tObject);
+
+			break;
+
+			// Tile layers handling
+		case tmx::Layer::Type::Tile:
+			// Get current tile layers properties
+			const auto& tileProperties = layer->getProperties();
+			// Iterate the property values into struct
+			for (const auto& tileProperty : tileProperties)
+			{
+				// Insert the property values into struct
+				tLayer.layer.insert(tileProperty.getName(), tileProperty.getStringValue());
+			}
+
+			// Insert the tile layer into
+			// tilemap struct
+			tMap.layers.push_back(tLayer);
+
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	// Get the current tilemaps properties
+	const auto& mapProperties = map.getProperties();
+
+	// Iterate the property values into struct
+	for (const auto& mapProperty : mapProperties)
+	{
+		// Inset the property values into struct
+		tMap.tilemap.insert(mapProperty.getName(), mapProperty.getStringValue());
+	}
+
+	// return Tiledmap value
+	return tMap;
 }

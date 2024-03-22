@@ -28,7 +28,7 @@ source distribution.
 #pragma once
 
 #include <tmxlite/Map.hpp>
-#include <engine/TMVariables.h>
+#include <engine/MapLayer.h>
 #include <engine/Constants.h>
 #include <engine/GL/Camera.h>
 #include <engine/GL/Shader.h>
@@ -46,17 +46,16 @@ class Tilemap final
 public:
 
 	// Constructor
-	Tilemap(Camera* cam);
+	Tilemap(const string mapPath, Camera* cam);
 
 	// Destructor
 	~Tilemap(){}
 
-	// setup() -function to get properties and
-	// set them into correct struct properties
-	void setup(const string tilemap);
-
 private:
-
+	// Maplayer class
+	MapLayer maplayer;
+	// TiledMap variable that has all properties stored
+	TiledMap tiledmap;
 	// Shader and camera variables.
 	Shader m_shader;
 	Camera camera;
