@@ -129,11 +129,8 @@ public:
 	{
 		std::array<float, 4> playerBounds{ -INFINITY, -INFINITY, INFINITY, INFINITY };
 
-		for (auto itr = entities.begin(); itr != entities.end();)
+		for (ecs::Entity entity : entities)
 		{
-			//Get the entity and increment the iterator
-			ecs::Entity entity = *itr++;
-
 			Transform& transform = ecs::GetComponent<Transform>(entity);
 
 			if (playerBounds[0] < transform.position.y)
@@ -215,9 +212,7 @@ public:
 				CreateAnimation(collision.b);
 
 				//Destroy torpedo at end of frame
-				//TODO: actually fix entity deletion bug
-				std::function<void()> destroyTorpedo = [collision]() { ecs::DestroyEntity(collision.b); };
-				TimerSystem::ScheduleFunction(destroyTorpedo, -1);
+				ecs::DestroyEntity(collision.b);
 			}
 		}
 	}
@@ -233,18 +228,15 @@ public:
 		}
 
 		// Iterate through entities in the system
-		for (auto itr = entities.begin(); itr != entities.end();)
+		for (ecs::Entity entity : entities)
 		{
-			// Get the entity and increment the iterator
-			ecs::Entity entity = *itr++;
-
 			// Get necessary components
 			Player& player = ecs::GetComponent<Player>(entity);
 			Transform& transform = ecs::GetComponent<Transform>(entity);
 			Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(entity);
 			PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
-
+			
 			// Initialize inputs
 			float accelerationInput = input::GetTotalInputValue("Throttle" + std::to_string(player.id));
 			
@@ -281,10 +273,10 @@ public:
 						TransformSystem::Rotate(player.renderedEntity, 0, 360.0f * dt, 0);
 					break;
 					case HitStates::Additive:
-						player._speedScale += hitProjectile.first.hitSpeedFactor;
+						player._speedScale += std::max(hitProjectile.first.hitSpeedFactor, 0.f);
 						break;
 					case HitStates::Multiplicative:
-						player._speedScale += (player._speedScale *= hitProjectile.first.hitSpeedFactor);
+						player._speedScale += std::max(player._speedScale *= hitProjectile.first.hitSpeedFactor, 0.f);
 						break;
 					default:
 						break;
@@ -439,7 +431,7 @@ public:
 			playerComponent.nameText = playerNameText;
 
 			ecs::AddComponent(player, Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
-			ecs::AddComponent(player, Rigidbody{ .drag = 0.025 });
+			ecs::AddComponent(player, Rigidbody{ .drag = 0.025, .restitution = 1 });
 			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
 			ecs::AddComponent(player, PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
 
