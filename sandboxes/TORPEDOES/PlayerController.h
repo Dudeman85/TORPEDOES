@@ -49,7 +49,7 @@ struct Player
 	int lap = 1;
 
 	// Hit
-	std::map<Projectile*, float> hitProjectiles;
+	std::vector<std::pair<Projectile, float>> hitProjectiles;
 
 	// Rendered child entities
 	ecs::Entity renderedEntity;
@@ -153,8 +153,6 @@ public:
 		// collision.a is always a player
 		// Get references to the involved components
 		Player& player = ecs::GetComponent<Player>(collision.a);
-		Transform& playertranform = ecs::GetComponent<Transform>(collision.a);
-		PolygonCollider& playerCollider = ecs::GetComponent<PolygonCollider>(collision.a);
 
 		// Slow player down when off track
 		if (collision.type == Collision::Type::tilemapCollision)
@@ -192,31 +190,28 @@ public:
 		// Check if the collision involves a projectile
 		else if (ecs::HasComponent<Projectile>(collision.b))
 		{
-			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(collision.b);
-			Transform& projectileTransform = ecs::GetComponent<Transform>(collision.b);
-			Projectile& projectile = ecs::GetComponent<Projectile>(collision.b); // Entity is collision.b 
+			Projectile& projectile = ecs::GetComponent<Projectile>(collision.b); // projectile is collision.b 
 
 			if (player.id != projectile.ownerID)
 			{
-				for (auto hitProjectile : player.hitProjectiles)
+				for (auto& hitProjectile : player.hitProjectiles)
 				{
 					// If player has been hit by stop, do not add current hit
-					if (hitProjectile.first->hitType == HitStates::Stop)
+					if (hitProjectile.first.hitType == HitStates::Stop)
 					{
 						goto SkipAddingHit;
 					}
 				}
-				// If current hit is stop, clear all other hits
+				// If the new hit is stop, clear all other hits
 				if (projectile.hitType == HitStates::Stop)
 				{
 					player.hitProjectiles.clear();
 				}
-				SkipAddingHit:
-
 				// Add the new hit
-				player.hitProjectiles.insert({ &projectile, 0.f });
+				player.hitProjectiles.push_back({ projectile, 0.f });
+
+				SkipAddingHit:
 				
-				//CreateAnimation(projectileTransform.position + rigidbody.velocity / 15);
 				CreateAnimation(collision.b);
 
 				//Destroy torpedo at end of frame
@@ -266,7 +261,7 @@ public:
 				// Increase the timer value
 				it->second += engine::deltaTime;
 
-				if (it->second >= it->first->hitTime)
+				if (it->second >= it->first.hitTime)
 				{
 					it = player.hitProjectiles.erase(it); // Erase the element and move iterator to the next element
 				}
@@ -279,17 +274,17 @@ public:
 			player._speedScale = 1; // 100%
 			for (auto& hitProjectile : player.hitProjectiles)
 			{
-				switch (hitProjectile.first->hitType)
+				switch (hitProjectile.first.hitType)
 				{
 					case HitStates::Stop:
 						// Rotate player
 						TransformSystem::Rotate(player.renderedEntity, 0, 360.0f * dt, 0);
 					break;
 					case HitStates::Additive:
-						player._speedScale += hitProjectile.first->hitSpeedFactor;
+						player._speedScale += hitProjectile.first.hitSpeedFactor;
 						break;
 					case HitStates::Multiplicative:
-						player._speedScale += (player._speedScale *= hitProjectile.first->hitSpeedFactor);
+						player._speedScale += (player._speedScale *= hitProjectile.first.hitSpeedFactor);
 						break;
 					default:
 						break;
@@ -305,36 +300,43 @@ public:
 
 			// Initialize the impulse as zero
 			Vector2 forwardImpulse(0.0f, 0.0f);
-			
+
+			// Apply acceleration impulse if positive input is received
+			if (accelerationInput > 0.0f)
+			{
+				forwardImpulse = forwardDirection * accelerationInput * dt * player.forwardSpeed;
+			}
+			// Apply deceleration impulse if negative input is received
+			if (accelerationInput < 0.0f)
+			{
+				forwardImpulse = forwardDirection * accelerationInput * dt * player.reverseSpeed;
+			}
 			if (rotateInput != 0.0f)
 			{
 				// Slow rotation based on throttle setting
 				// TODO: this function could be improved by testing
 				float rotationScalar = 1 - log10(2.0f * std::max(0.5f, accelerationInput));
 
+				float trueRotateInput = -rotateInput * player.rotationSpeed * rotationScalar * dt;
+
 				// Apply forward impulse if rotating or receiving a rotation command
-				TransformSystem::Rotate(player.renderedEntity, 0, -rotateInput * player.rotationSpeed * rotationScalar * dt, 0);
+				TransformSystem::Rotate(player.renderedEntity, 0, trueRotateInput, 0);
 
 				// Set min speed while turning
-				// TODO: This is ignored when giving even slightly input for reverse or forward!
-				forwardImpulse = forwardDirection * dt * player._speedScale * player.minSpeedWhileTurning;
-			}
 
-			// Apply acceleration impulse if positive input is received
-			if (accelerationInput > 0.0f)
-			{
-				forwardImpulse = forwardDirection * accelerationInput * dt * player._speedScale * player.forwardSpeed;
-			}
-			// Apply deceleration impulse if negative input is received
-			if (accelerationInput < 0.0f)
-			{
-				forwardImpulse = forwardDirection * accelerationInput * dt * player._speedScale * player.reverseSpeed;
+				// TODO: Scale based on rotation speed
+				Vector2 minRotateImpulse = forwardDirection * dt * player._speedScale * std::abs(trueRotateInput) * player.minSpeedWhileTurning;
+
+				if (minRotateImpulse.Length() > forwardImpulse.Length())
+				{
+					forwardImpulse = minRotateImpulse;
+				}
 			}
 
 			collider.rotationOverride = modelTransform.rotation.y + 1080;
 
 			// Apply the resulting impulse to the object
-			PhysicsSystem::Impulse(entity, forwardImpulse);
+			PhysicsSystem::Impulse(entity, forwardImpulse * player._speedScale);
 
 			/* Shooting */
 
