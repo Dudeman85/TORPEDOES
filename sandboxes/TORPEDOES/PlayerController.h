@@ -83,6 +83,34 @@ void CreateTorpedo(ecs::Entity entity)
 	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .visualise = false,  .rotationOverride = transform.position.y });
 }
 
+void CreateHedgehog(ecs::Entity entity)
+{
+	Player& player = ecs::GetComponent<Player>(entity);
+	Transform& transform = ecs::GetComponent<Transform>(entity);
+	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
+
+	float hedgehogSpeedVo = 500.0f;
+	float distanceTraveled = 0.0f;
+
+
+	ecs::Entity hedgehog = ecs::NewEntity();
+	ecs::AddComponent(hedgehog, Transform{ .position = transform.position, .rotation = modelTransform.rotation });
+
+	Vector3 finalVelocity = Vector3(player._forwardDirection.x, player._forwardDirection.y, 0.0f) * hedgehogSpeedVo;
+
+
+	ecs::AddComponent(hedgehog, Rigidbody{ .velocity = finalVelocity });
+
+	ecs::AddComponent(hedgehog, ModelRenderer{ .model = resources::models["hedgehog.obj"] });
+	std::vector<Vector2> Hedgehogverts{ Vector2(0.2, 0.25), Vector2(0.2, -0.25), Vector2(-0.2, -0.25), Vector2(-0.2, 0.25) };
+	ecs::AddComponent(hedgehog, PolygonCollider{ .vertices = Hedgehogverts, .callback = OnProjectileCollision, .trigger = true, .visualise = true,  .rotationOverride = transform.position.y });
+	ecs::AddComponent(hedgehog, Projectile{ .ownerID = player.id });
+	ecs::AddComponent(hedgehog, Hedgehog{});
+
+
+
+}
+
 // Player controller System. Requires Player , Tranform , Rigidbody , PolygonCollider
 ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonCollider)
 class PlayerController : public ecs::System
@@ -115,7 +143,7 @@ public:
 		shipComponents.insert({ ShipType::cannonBoat,
 			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = CreateTorpedo, .specialAction = CreateTorpedo } });
 		shipComponents.insert({ ShipType::hedgehogBoat,
-			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = CreateTorpedo, .specialAction = CreateTorpedo } });
+			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = CreateHedgehog, .specialAction = CreateTorpedo } });
 
 		//Initialize ship type models
 		shipModels.insert({ ShipType::torpedoBoat, resources::models["LaMuerte.obj"] });
@@ -281,10 +309,10 @@ public:
 						TransformSystem::Rotate(player.renderedEntity, 0, 360.0f * dt, 0);
 					break;
 					case HitStates::Additive:
-						player._speedScale += std::max(hitProjectile.first.hitSpeedFactor, 0.f);
+						player._speedScale += max(hitProjectile.first.hitSpeedFactor, 0.f);
 						break;
 					case HitStates::Multiplicative:
-						player._speedScale += std::max(player._speedScale *= hitProjectile.first.hitSpeedFactor, 0.f);
+						player._speedScale += max(player._speedScale *= hitProjectile.first.hitSpeedFactor, 0.f);
 						break;
 					default:
 						break;
@@ -315,7 +343,7 @@ public:
 			{
 				// Slow rotation based on throttle setting
 				// TODO: this function could be improved by testing
-				float rotationScalar = 1 - log10(2.0f * std::max(0.5f, accelerationInput));
+				float rotationScalar = 1 - log10(2.0f * max(0.5f, accelerationInput));
 
 				float trueRotateInput = -rotateInput * player.rotationSpeed * rotationScalar * dt;
 

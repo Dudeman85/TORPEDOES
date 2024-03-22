@@ -54,7 +54,7 @@ void LoadLevel1(Camera* cam)
 	collisionSystem->SetTilemap(resources::level1Map);
 	PhysicsSystem::SetTileProperty(1, TileProperty{ true });
 
-	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::torpedoBoat, ShipType::torpedoBoat, ShipType::torpedoBoat};
+	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::torpedoBoat, ShipType::hedgehogBoat, ShipType::torpedoBoat};
 	ecs::GetSystem<PlayerController>()->CreatePlayers(4, Vector2(1434.0f, -1370.0f), ships);
 
 	//Make all the checkpoints manually
@@ -136,6 +136,7 @@ int main()
 	pauseSystem->Init(window);
 	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
 	playerController->Init();
+	std::shared_ptr<HeggehogSynten> heggehogSynten = ecs::GetSystem<HeggehogSynten>();
 
 	//Bind all input actions
 	SetupInput();
@@ -153,6 +154,8 @@ int main()
 			glfwSetWindowShouldClose(window, true);
 
 		input::update();
+
+		heggehogSynten->Update();
 
 		UpdateCam(window, cam, resources::level1Map);
 		engine::Update(&cam);

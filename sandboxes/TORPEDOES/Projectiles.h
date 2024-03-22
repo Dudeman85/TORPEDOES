@@ -31,6 +31,13 @@ struct Projectile
 	std::string model = "torpedo.obj";
 };
 
+ECS_REGISTER_COMPONENT(Hedgehog)
+struct  Hedgehog : public Projectile
+{
+	float distanceTraveled = 0.0f;
+
+};
+
 //Temporary function for testing
  void SpawnProjectile(ecs::Entity p, int playerID)
 {
@@ -65,3 +72,54 @@ static void OnProjectileCollision(Collision collision)
 		}
 	}
 }
+
+ECS_REGISTER_SYSTEM(HeggehogSynten, Rigidbody, Transform, Hedgehog)
+class HeggehogSynten : public ecs::System
+{
+	const float hedgehogSpeedVo = 500.0f;
+	const float maxDistance = 700.0f;
+	const float maxScale = 200.0f;
+	const float minScale = 100.0f;
+	const float minRotation = -50.0f;
+	const float maxRotation = +50.0f;
+public:
+	void Update()
+	{
+		// Iterate through entities in the system
+		for (auto itr = entities.begin(); itr != entities.end();)
+		{			// Get the entity and increment the iterator
+			ecs::Entity entity = *itr++;
+			Hedgehog& hedgehogComp = ecs::GetComponent<Hedgehog>(entity);
+
+			if (hedgehogComp.distanceTraveled < maxDistance)
+			{
+				// Calcula la distancia recorrida sumando la distancia del paso actual
+				hedgehogComp.distanceTraveled += hedgehogSpeedVo * deltaTime; // deltaTime es el tiempo transcurrido desde el último frame
+
+				// Calcula el coficiente entre la distacia recorida y la distacia maxima 
+				float distanceRatio = hedgehogComp.distanceTraveled / maxDistance;
+
+				//// Calcula la rotación en función de la distancia recorrida
+				TransformSystem::Rotate(entity, Vector3(0, 0, -1.5f));
+
+				// Calcula la escala en funcion de la distancia recorrida
+				float scale = maxScale - (maxScale - minScale) * (2 * abs(0.5 - distanceRatio));
+			
+				// Actualiza la escala del objeto
+				ecs::GetComponent<Transform>(entity).scale = Vector3(scale);
+				Transform& transformComp = ecs::GetComponent<Transform>(entity);
+				
+			}
+			else
+			{
+				// Si se supera la distancia máxima, detén el movimiento del objeto
+				ecs::DestroyEntity(entity);
+				break;
+			}
+			
+			
+			
+			
+		};
+	}
+};
