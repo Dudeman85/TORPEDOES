@@ -129,11 +129,8 @@ public:
 	{
 		std::array<float, 4> playerBounds{ -INFINITY, -INFINITY, INFINITY, INFINITY };
 
-		for (auto itr = entities.begin(); itr != entities.end();)
+		for (ecs::Entity entity : entities)
 		{
-			//Get the entity and increment the iterator
-			ecs::Entity entity = *itr++;
-
 			Transform& transform = ecs::GetComponent<Transform>(entity);
 
 			if (playerBounds[0] < transform.position.y)
@@ -215,9 +212,7 @@ public:
 				CreateAnimation(collision.b);
 
 				//Destroy torpedo at end of frame
-				//TODO: actually fix entity deletion bug
-				std::function<void()> destroyTorpedo = [collision]() { ecs::DestroyEntity(collision.b); };
-				TimerSystem::ScheduleFunction(destroyTorpedo, -1);
+				ecs::DestroyEntity(collision.b);
 			}
 		}
 	}
@@ -233,18 +228,15 @@ public:
 		}
 
 		// Iterate through entities in the system
-		for (auto itr = entities.begin(); itr != entities.end();)
+		for (ecs::Entity entity : entities)
 		{
-			// Get the entity and increment the iterator
-			ecs::Entity entity = *itr++;
-
 			// Get necessary components
 			Player& player = ecs::GetComponent<Player>(entity);
 			Transform& transform = ecs::GetComponent<Transform>(entity);
 			Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(entity);
 			PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
-
+			
 			// Initialize inputs
 			float accelerationInput = input::GetTotalInputValue("Throttle" + std::to_string(player.id));
 			

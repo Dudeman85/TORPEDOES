@@ -101,7 +101,7 @@ void SetupInput()
 
 		input::bindAnalogControllerInput(i, { { {-1, 1, 0}, GLFW_GAMEPAD_AXIS_LEFT_X }, }, { "Turn" + std::to_string(i) });
 	}
-	
+
 	// Keyboard input for player 0
 	input::bindAnalogInput(GLFW_KEY_RIGHT,	input::digitalPositiveInput, { "Turn2" }, 0);
 	input::bindAnalogInput(GLFW_KEY_LEFT,	input::digitalNegativeInput, { "Turn2" }, 0, -1);
@@ -113,6 +113,15 @@ void SetupInput()
 
 	input::bindDigitalInput(GLFW_KEY_N, { "Shoot2" });
 	input::bindDigitalInput(GLFW_KEY_M, { "Boost0" });
+
+	/*
+	input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft0" });
+	input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight0" });
+	input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp0" });
+	input::bindDigitalInput(GLFW_KEY_DOWN, { "MoveDown0" });
+	input::bindDigitalInput(GLFW_KEY_ENTER, { "Select0" });
+	*/
+
 }
 
 int main()

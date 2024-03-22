@@ -19,16 +19,30 @@ public:
 	{
 		int i = 0;
 
-		// Iterate through entities in the system
-		for (auto itr = entities.begin(); itr != entities.end();)
-		{			// Get the entity and increment the iterator
-			ecs::Entity entity = *itr++;
-		
+		/*
+		for (ecs::Entity entity : entities)
+		{
 			auto& comp = ecs::GetComponent<TestComponent>(entity);
 
-			ecs::DestroyEntity(comp.toDelete);
+			ecs::DestroyAllEntities();
+
+			if(ecs::EntityExists(comp.toDelete))
+				ecs::DestroyEntity(comp.toDelete);
 
 			cout << "Completed Iterations: " << i++ << endl;
+		}
+		*/
+		// Iterate through entities in the system
+		for (auto itr = entities.begin(); itr != entities.end();)
+		{
+			// Get the entity and increment the iterator
+			ecs::Entity entity = *itr++;
+
+			auto& comp = ecs::GetComponent<TestComponent>(entity);
+
+
+			cout << "Completed Iterations: " << i++ << endl;
+
 		}
 	}
 };
@@ -61,10 +75,10 @@ int main()
 	ecs::Entity e4 = ecs::NewEntity();
 
 
-	ecs::AddComponent(e1, TestComponent{e2});
-	ecs::AddComponent(e2, TestComponent{e3});
-	ecs::AddComponent(e3, TestComponent{e4});
-	ecs::AddComponent(e4, TestComponent{e1});
+	ecs::AddComponent(e1, TestComponent{ e2 });
+	ecs::AddComponent(e2, TestComponent{ e3 });
+	ecs::AddComponent(e3, TestComponent{ e4 });
+	ecs::AddComponent(e4, TestComponent{ e1 });
 
 
 	//Game Loop

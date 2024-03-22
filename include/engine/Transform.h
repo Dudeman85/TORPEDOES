@@ -38,11 +38,8 @@ namespace engine
 		///Call this every frame
 		void Update()
 		{
-			for (auto itr = entities.begin(); itr != entities.end();)
+			for (ecs::Entity entity : entities)
 			{
-				//Get the entity and increment the iterator
-				ecs::Entity entity = *itr++;
-
 				Transform& transform = ecs::GetComponent<Transform>(entity);
 				transform.staleCache = false;
 			}
