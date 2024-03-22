@@ -106,7 +106,7 @@ public:
 
 				float distanceRatio = hedgehogComp.distanceTraveled / maxDistance;
 				float scale = maxScale - (maxScale - minScale) * (2 * abs(0.5 - distanceRatio));
-				float hedgehogRotation = maxRotation - (maxRotation - minRotation) * (2 * /*abs(0.5*/ -( distanceRatio));
+				float hedgehogRotation = maxRotation - (maxRotation - minRotation) * (2 * abs(0.5 - distanceRatio));
 
 				// Actualiza la escala del objeto
 				ecs::GetComponent<Transform>(entity).scale = Vector3(scale);
