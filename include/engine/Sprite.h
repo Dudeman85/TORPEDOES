@@ -178,9 +178,8 @@ namespace engine
 			std::map<float, std::vector<ecs::Entity>> sortedUIElements;
 
 			//Sort the entities into sprite and UI layers
-			for (auto itr = entities.begin(); itr != entities.end();)
+			for (ecs::Entity entity : entities)
 			{
-				ecs::Entity entity = *itr++;
 				Transform& transform = ecs::GetComponent<Transform>(entity);
 				SpriteRenderer& renderer = ecs::GetComponent<SpriteRenderer>(entity);
 

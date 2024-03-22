@@ -19,18 +19,20 @@ public:
 	{
 		int i = 0;
 
-		/*
+		
 		for (ecs::Entity entity : entities)
 		{
 			auto& comp = ecs::GetComponent<TestComponent>(entity);
+
+			ecs::DestroyAllEntities();
 
 			if(ecs::EntityExists(comp.toDelete))
 				ecs::DestroyEntity(comp.toDelete);
 
 			cout << "Completed Iterations: " << i++ << endl;
 		}
-		*/
 		
+		/*
 		// Iterate through entities in the system
 		for (auto itr = entities.begin(); itr != entities.end();)
 		{
@@ -44,7 +46,7 @@ public:
 			cout << "Completed Iterations: " << i++ << endl;
 
 		}
-		
+		*/
 	}
 };
 

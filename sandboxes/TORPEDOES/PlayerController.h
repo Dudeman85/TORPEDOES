@@ -174,9 +174,7 @@ public:
 				CreateAnimation(projectransfor.position + rigidbody.velocity / 15);
 
 				//Destroy torpedo at end of frame
-				//TODO: actually fix entity deletion bug
-				std::function<void()> destroyTorpedo = [collision]() { ecs::DestroyEntity(collision.b); };
-				TimerSystem::ScheduleFunction(destroyTorpedo, -1);
+				ecs::DestroyEntity(collision.b);
 			}
 		}
 	}

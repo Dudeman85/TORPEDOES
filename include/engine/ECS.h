@@ -54,13 +54,17 @@ namespace engine::ecs
 		//Does the entities array contain any invalid entities
 		bool packed = true;
 
-		//Resize the entities list
+		//Resize the entities array
 		void resize(uint32_t newSize)
 		{
-			Entity* newList = new Entity[newSize];
-			std::memcpy(newList, entities, size);
-			delete entities;
-			entities = newList;
+			Entity* newArray = new Entity[newSize];
+
+			std::memcpy(newArray, entities, size * sizeof(Entity));
+
+			delete[] entities;
+
+			maxSize = newSize;
+			entities = newArray;
 		}
 
 	public:
@@ -86,8 +90,6 @@ namespace engine::ecs
 					//Check if the pointer is out of bounds, meaning end of list
 					if (currentPtr == &parentList->entities[parentList->size])
 					{
-						if (!parentList->packed)
-							parentList->pack();
 						break;
 					}
 				} while (*currentPtr == 0);
@@ -95,7 +97,6 @@ namespace engine::ecs
 				return *this;
 			}
 			//Postfix
-			//TODO: change to actual postfix
 			Iterator operator++(int)
 			{
 				Iterator ret = *this;
@@ -118,6 +119,8 @@ namespace engine::ecs
 
 		Iterator begin()
 		{
+			if(!packed)
+				Pack();
 			return Iterator(&entities[0], this);
 		}
 		Iterator end()
@@ -133,15 +136,35 @@ namespace engine::ecs
 		}
 		~EntityList()
 		{
-			delete entities;
+			delete[] entities;
 		}
 
-		//Add an entity to the end of the list
-		void insert(Entity e)
+		//Debug function, will print all entities
+		void PrintEntities()
+		{
+			std::cout << size << ": [";
+			for (uint32_t i = 0; i < size; i++)
+			{
+				std::cout << entities[i] << ", ";
+			}
+			std::cout << "]" << std::endl;
+		}
+
+		//Add an entity to the end of the list, if it does not exist in it
+		void Insert(Entity e)
 		{
 			//Add 100 or double capacity to the list, whichever is less
 			if (size >= maxSize)
 				resize(maxSize + std::min(maxSize, (uint32_t)100));
+			
+			//Look through the array and make sure the entity is not in it
+			for (uint32_t i = 0; i < size; i++)
+			{
+				if (entities[i] == e)
+				{
+					return;
+				}
+			}
 
 			//Add the new entity
 			entities[size] = e;
@@ -150,7 +173,7 @@ namespace engine::ecs
 
 		//Remove an entity from the list
 		//Size is not updated, so pack() should be called shortly after
-		void erase(Entity e)
+		void Erase(Entity e)
 		{
 			//Look through the array and set the entity to 0
 			for (uint32_t i = 0; i < size; i++)
@@ -165,7 +188,8 @@ namespace engine::ecs
 		}
 
 		//Packs the array tightly, removing holes
-		void pack()
+		//This is currently called when calling begin()
+		void Pack()
 		{
 			//Look through the array
 			uint32_t iterations = size;
@@ -174,18 +198,22 @@ namespace engine::ecs
 				//Check for invalid entity
 				if (entities[i] == 0)
 				{
+					if (size == 0)
+						break;
+
 					//Find the next valid entity to fill the gap, from back to front
 					uint32_t replacementIndex = size - 1;
 					while (entities[replacementIndex] == 0)
 					{
-						replacementIndex--;
 						size--;
+						if (replacementIndex == 0)
+							break;
+						replacementIndex--;
 					}
 					//The list ends at i
 					if (replacementIndex <= i)
-					{
 						break;
-					}
+
 					//Move the replacement entity to the hole
 					entities[i] = entities[replacementIndex];
 					entities[replacementIndex] = 0;
