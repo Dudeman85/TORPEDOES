@@ -91,10 +91,8 @@ namespace engine
 		void Update(Camera* cam)
 		{
 			//For each entity
-			for (auto itr = entities.begin(); itr != entities.end();)
+			for (ecs::Entity entity : entities)
 			{
-				ecs::Entity entity = *itr++;
-
 				//Get relevant components
 				Transform& transform = ecs::GetComponent<Transform>(entity);
 				ModelRenderer& modelRenderer = ecs::GetComponent<ModelRenderer>(entity);

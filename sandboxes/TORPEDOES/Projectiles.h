@@ -100,21 +100,21 @@ public:
 				float distanceRatio = hedgehogComp.distanceTraveled / maxDistance;
 
 				//// Calcula la rotación en función de la distancia recorrida
-				TransformSystem::Rotate(entity, Vector3(0, 0, -1.5f));
+				TransformSystem::Rotate(entity, Vector3(0, 0, -1.5f ));
 
 				// Calcula la escala en funcion de la distancia recorrida
 				float scale = maxScale - (maxScale - minScale) * (2 * abs(0.5 - distanceRatio));
 			
 				// Actualiza la escala del objeto
 				ecs::GetComponent<Transform>(entity).scale = Vector3(scale);
-				Transform& transformComp = ecs::GetComponent<Transform>(entity);
+
 				
 			}
 			else
 			{
 				// Si se supera la distancia máxima, detén el movimiento del objeto
 				ecs::DestroyEntity(entity);
-				break;
+				continue;
 			}
 			
 			

@@ -25,6 +25,7 @@ struct Player
 	float minSpeedWhileTurning = 60;
 
 	float _speedScale = 1;
+	Vector2 _forwardDirection;
 
 	// Action cooldowns
 	float shootCooldown = 0.2f;			// Time between shots
@@ -39,8 +40,8 @@ struct Player
 	float _shootTimer = 0.0f;
 
 	// Action functions
-	std::function<void(ecs::Entity, int)> mainAction;
-	std::function<void(ecs::Entity, int)> specialAction;
+	std::function<void(ecs::Entity)> mainAction;
+	std::function<void(ecs::Entity)> specialAction;
 
 	// Checkpoint
 	int previousCheckpoint = -1;
@@ -60,6 +61,48 @@ struct CheckPoint
 	int checkPointID = 0;
 	bool Finish_line = false;
 };
+
+
+void CreateTorpedo(ecs::Entity entity)
+{
+	Player& player = ecs::GetComponent<Player>(entity);
+	Transform& transform = ecs::GetComponent<Transform>(entity);
+	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
+
+	float speed = 500;
+
+	ecs::Entity torpedo = ecs::NewEntity();
+	ecs::AddComponent(torpedo, Projectile{ .ownerID = player.id, .speed = 500 });
+
+	Projectile& torpedoProjectile = ecs::GetComponent<Projectile>(torpedo);
+
+	ecs::AddComponent(torpedo, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(10) });
+	ecs::AddComponent(torpedo, Rigidbody{ .velocity = player._forwardDirection * torpedoProjectile.speed });
+	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models[torpedoProjectile.model] });
+	std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
+	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .visualise = false,  .rotationOverride = transform.position.y });
+}
+
+void CreateShell(ecs::Entity entity)
+{
+	Player& player = ecs::GetComponent<Player>(entity);
+	Transform& transform = ecs::GetComponent<Transform>(entity);
+	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
+
+	float speed = 500;
+
+	ecs::Entity shell = ecs::NewEntity();
+	ecs::AddComponent(shell, Projectile{ .ownerID = player.id, .speed = 500, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
+
+	Projectile& shellProjectile = ecs::GetComponent<Projectile>(shell);
+
+	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(10) });
+	ecs::AddComponent(shell, Rigidbody{ .velocity = player._forwardDirection * shellProjectile.speed });
+	ecs::AddComponent(shell, ModelRenderer{ .model = resources::models[shellProjectile.model = "Weapon_HedgehogAmmo.obj"] });
+	std::vector<Vector2> Shellverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
+	ecs::AddComponent(shell, PolygonCollider{ .vertices = Shellverts, .callback = OnProjectileCollision, .trigger = true, .visualise = false,  .rotationOverride = transform.position.y });
+}
+
 
 // Player controller System. Requires Player , Tranform , Rigidbody , PolygonCollider
 ECS_REGISTER_SYSTEM(PlayerController, Player, Transform, Rigidbody, PolygonCollider)
@@ -87,13 +130,13 @@ public:
 
 		//Initialize each ship type's stats
 		shipComponents.insert({ ShipType::torpedoBoat,
-			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = CreateTorpedo, .specialAction = CreateTorpedo } });
 		shipComponents.insert({ ShipType::submarine,
-			Player{.forwardSpeed = 800, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.forwardSpeed = 800, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = CreateTorpedo, .specialAction = CreateTorpedo } });
 		shipComponents.insert({ ShipType::cannonBoat,
-			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = CreateShell, .specialAction = CreateShell } });
 		shipComponents.insert({ ShipType::hedgehogBoat,
-			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = SpawnProjectile, .specialAction = SpawnProjectile } });
+			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 10, .mainAction = CreateTorpedo, .specialAction = CreateTorpedo } });
 
 		//Initialize ship type models
 		shipModels.insert({ ShipType::torpedoBoat, resources::models["Ship_PT_109_Torpedo.obj"] });
@@ -131,8 +174,6 @@ public:
 		// collision.a is always a player
 		// Get references to the involved components
 		Player& player = ecs::GetComponent<Player>(collision.a);
-		Transform& playertranform = ecs::GetComponent<Transform>(collision.a);
-		PolygonCollider& playerCollider = ecs::GetComponent<PolygonCollider>(collision.a);
 
 		// Slow player down when off track
 		if (collision.type == Collision::Type::tilemapCollision)
@@ -170,13 +211,11 @@ public:
 		// Check if the collision involves a projectile
 		else if (ecs::HasComponent<Projectile>(collision.b))
 		{
-			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(collision.b);
-			Transform& projectransfor = ecs::GetComponent<Transform>(collision.b);
-			Projectile& projectile = ecs::GetComponent<Projectile>(collision.b); // Entity is collision.b 
+			Projectile& projectile = ecs::GetComponent<Projectile>(collision.b); // projectile is collision.b 
 
 			if (player.id != projectile.ownerID)
 			{
-				for (auto hitProjectile : player.hitProjectiles)
+				for (auto& hitProjectile : player.hitProjectiles)
 				{
 					// If player has been hit by stop, do not add current hit
 					if (hitProjectile.first.hitType == HitStates::Stop)
@@ -184,17 +223,17 @@ public:
 						goto SkipAddingHit;
 					}
 				}
-				// If current hit is stop, clear all other hits
+				// If the new hit is stop, clear all other hits
 				if (projectile.hitType == HitStates::Stop)
 				{
 					player.hitProjectiles.clear();
 				}
-				
-			SkipAddingHit:
 				// Add the new hit
 				player.hitProjectiles.push_back({ projectile, 0.f });
 
-				CreateAnimation(projectransfor.position + rigidbody.velocity / 15);
+			SkipAddingHit:
+
+				CreateAnimation(collision.b);
 
 				//Destroy torpedo at end of frame
 				//TODO: actually fix entity deletion bug
@@ -203,6 +242,7 @@ public:
 			}
 		}
 	}
+
 	/// PlayerController Update 
 	void Update(GLFWwindow* window, float dt)
 	{
@@ -367,7 +407,8 @@ public:
 				}
 
 				// Create a projectile using the parameters of the player object.
-				CreateCannonProjectile(forwardDirection, 700, transform.position, modelTransform.rotation, player.id);
+				player._forwardDirection = forwardDirection;
+				player.mainAction(entity);
 
 				player.ammo--;
 
@@ -428,7 +469,7 @@ public:
 			TransformSystem::AddParent(playerNameText, player);
 
 			//Create the player's rendered entity
-			ecs::AddComponent(playerRender, Transform{ .rotation = Vector3(45, 0, 0), .scale = Vector3(3) });
+			ecs::AddComponent(playerRender, Transform{ .rotation = Vector3(45, 0, 0), .scale = Vector3(1.5) });
 			ecs::AddComponent(playerRender, ModelRenderer{ .model = shipModels[shipTypes[i]] });
 			TransformSystem::AddParent(playerRender, player);
 
