@@ -21,9 +21,11 @@ struct Player
 	float rotationSpeed = 100;
 	float minSpeedWhileTurning = 60;
 
-	float offtrackSpeedScale = 0.991f;
+	float offtrackSpeedScale = 0.6; //0.991f;
 
 	float _speedScale = 1;
+	float _boostScale = 1;
+	bool _offroadThisFrame = false;
 	Vector2 _forwardDirection;
 
 	// Action cooldowns
@@ -41,7 +43,7 @@ struct Player
 
 	// Action functions
 	std::function<void(engine::ecs::Entity)> mainAction;
-	std::function<void(engine::ecs::Entity, Vector2*)> specialAction;
+	std::function<void(engine::ecs::Entity)> specialAction;
 
 	// Checkpoint
 	int previousCheckpoint = -1;
@@ -131,27 +133,25 @@ void CreateShell(engine::ecs::Entity entity)
 	ecs::AddComponent(shell, PolygonCollider{ .vertices = Shellverts, .callback = OnProjectileCollision, .trigger = true, .visualise = false,  .rotationOverride = transform.position.y });
 }
 
-static void BoostEnd(Player &player, float boostStrenght)
+static void BoostEnd(engine::ecs::Entity entity, float boostStrenght)
 {
-	player._speedScale -= boostStrenght;
-	std::cout << "bye!!!" << "\n";
+	Player& player = engine::ecs::GetComponent<Player>(entity);
+	player._boostScale -= boostStrenght;
 }
 
 // Increases player speed for a short while
-void Boost(engine::ecs::Entity entity, Vector2 *forwardImpulse)
+void Boost(engine::ecs::Entity entity)
 {
 	using namespace engine;
 
 	double boostTime = 1;
-	float boostStrenght = 0.8f; // 80%
+	float boostStrenght = 0.4f;
 
 	Player &player = ecs::GetComponent<Player>(entity);
 
-	player._speedScale += boostStrenght;
+	player._boostScale += boostStrenght;
 
-	std::cout << "hello!!!" << "\n";
-
-	timerSystem->ScheduleFunction(&BoostEnd, boostTime, false, engine::ScheduledFunction::Type::seconds, player, boostStrenght);
+	timerSystem->ScheduleFunction(&BoostEnd, boostTime, false, engine::ScheduledFunction::Type::seconds, entity, boostStrenght);
 }
 
 // Player controller System. Requires Player , Tranform , Rigidbody , PolygonCollider
@@ -180,13 +180,13 @@ public:
 
 		//Initialize each ship type's stats
 		shipComponents.insert({ ShipType::torpedoBoat,
-			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 0.8, .mainAction = CreateTorpedo, .specialAction = Boost } });
+			Player{.forwardSpeed = 800, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 0.8, .mainAction = CreateTorpedo, .specialAction = Boost } });
 		shipComponents.insert({ ShipType::submarine,
 			Player{.forwardSpeed = 800, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 0.8, .mainAction = CreateTorpedo, .specialAction = Boost } });
 		shipComponents.insert({ ShipType::cannonBoat,
-			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 0.8, .mainAction = CreateShell, .specialAction = Boost } });
+			Player{.forwardSpeed = 800, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 0.8, .mainAction = CreateShell, .specialAction = Boost } });
 		shipComponents.insert({ ShipType::hedgehogBoat,
-			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 0.8, .mainAction = CreateHedgehog, .specialAction = Boost } });
+			Player{.forwardSpeed = 1600, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 0.8, .mainAction = CreateHedgehog, .specialAction = Boost } });
 
 		//Initialize ship type models
 		shipModels.insert({ ShipType::torpedoBoat, resources::models["Ship_PT_109_Torpedo.obj"] });
@@ -225,7 +225,8 @@ public:
 		// Slow player down when off track
 		if (collision.type == engine::Collision::Type::tilemapCollision)
 		{
-			engine::ecs::GetComponent<engine::Rigidbody>(collision.a).velocity *= player.offtrackSpeedScale;
+			player._offroadThisFrame = true;
+			//engine::ecs::GetComponent<engine::Rigidbody>(collision.a).velocity *= player.offtrackSpeedScale;
 		}
 
 		// Check if the collision involves a checkpoint
@@ -312,7 +313,6 @@ public:
 			float accelerationInput = input::GetTotalInputValue("Throttle" + std::to_string(player.id));
 			
 			float rotateInput = input::GetInputValue("Turn" + std::to_string(player.id), GLFW_GAMEPAD_AXIS_LEFT_X);
-			bool projetileInput = input::GetPressed("Shoot" + std::to_string(player.id));
 
 			accelerationInput = std::clamp(accelerationInput, -1.0f, 1.0f);
 			rotateInput = std::clamp(rotateInput, -1.0f, 1.0f);
@@ -327,15 +327,12 @@ public:
 				if (it->second >= it->first.hitTime)
 				{
 					it = player.hitProjectiles.erase(it); // Erase the element and move iterator to the next element
+					continue;
 				}
-				else
-				{
-					++it; // Move to the next element
-				}
+				++it; // Move to the next element
 			}
 
-			float oldSpeedScale = player._speedScale;
-
+			player._speedScale = 1.f; // 100%
 			for (auto& hitProjectile : player.hitProjectiles)
 			{
 				switch (hitProjectile.first.hitType)
@@ -345,10 +342,10 @@ public:
 						engine::TransformSystem::Rotate(player.renderedEntity, 0, 360.0f * dt, 0);
 					break;
 					case HitStates::Additive:
-						player._speedScale += max(hitProjectile.first.hitSpeedFactor, 0.f);
+						player._speedScale += std::max(hitProjectile.first.hitSpeedFactor, 0.f);
 						break;
 					case HitStates::Multiplicative:
-						player._speedScale += max(player._speedScale *= hitProjectile.first.hitSpeedFactor, 0.f);
+						player._speedScale += std::max(player._speedScale *= hitProjectile.first.hitSpeedFactor, 0.f);
 						break;
 					default:
 						break;
@@ -357,7 +354,7 @@ public:
 
 			/* Movement */
 
-			// CALCULATE POSITION AND ROTATE 
+			// CALCULATE POSITION AND ROTATION
 			// Calculate the forward direction
 			Vector2 forwardDirection = Vector2(cos(glm::radians(modelTransform.rotation.y)), sin(glm::radians(modelTransform.rotation.y)));
 			forwardDirection.Normalize();
@@ -368,12 +365,12 @@ public:
 			// Apply acceleration impulse if positive input is received
 			if (accelerationInput > 0.0f)
 			{
-				forwardImpulse = forwardDirection * accelerationInput * player.forwardSpeed;
+				forwardImpulse = forwardDirection * accelerationInput * dt * player.forwardSpeed;
 			}
 			// Apply deceleration impulse if negative input is received
 			if (accelerationInput < 0.0f)
 			{
-				forwardImpulse = forwardDirection * accelerationInput * player.reverseSpeed;
+				forwardImpulse = forwardDirection * accelerationInput * dt * player.reverseSpeed;
 			}
 			if (rotateInput != 0.0f)
 			{
@@ -388,8 +385,7 @@ public:
 
 				// Set min speed while turning
 
-				// TODO: Scale based on rotation speed
-				Vector2 minRotateImpulse = forwardDirection * std::abs(trueRotateInput) * player.minSpeedWhileTurning;
+				Vector2 minRotateImpulse = forwardDirection * std::abs(trueRotateInput) * player.minSpeedWhileTurning * dt;
 
 				if (minRotateImpulse.Length() > forwardImpulse.Length())
 				{
@@ -408,22 +404,33 @@ public:
 				if (!input::GetPressed("Boost" + std::to_string(player.id)))
 				{
 					// We haven't pressed the special button, keep _specialTimer at max value
-					player._specialTimer = player.shootCooldown;
+					player._specialTimer = player.specialCooldown;
 					break;
 				}
 
 				// Do special action
-				player.specialAction(entity, &forwardImpulse);
+				player.specialAction(entity);
 
 				// Decrease the action time 
 				player._specialTimer -= player.specialCooldown;
 			}
 
-			// Apply the resulting impulse to the object
-			engine::PhysicsSystem::Impulse(entity, forwardImpulse * player._speedScale * dt);
+			float finalBoostScale = player._boostScale;
+			if (player._offroadThisFrame)
+			{
+				if (player._boostScale <= 1)
+				{
+					// Ignore slower speed due to boost when already offtrack
+					finalBoostScale = player.offtrackSpeedScale;
+				}
+				// Ignore offtrack while boosting
+			}
 
-			// Undo the changes done to speedScale this update
-			player._speedScale = oldSpeedScale;
+			// Apply the final impulse to the object
+			engine::PhysicsSystem::Impulse(entity, (forwardImpulse * player._speedScale * finalBoostScale));
+
+			// Reset offroad status for this frame
+			player._offroadThisFrame = false;
 
 			/* Shooting */
 
@@ -461,7 +468,7 @@ public:
 			// If the projectile cooldown has passed
 			while (player._shootTimer >= player.shootCooldown)
 			{
-				if (!projetileInput)
+				if (!input::GetNewPress("Shoot" + std::to_string(player.id)))
 				{
 					// We haven't pressed the shoot button, keep shootTimer at max value
 					player._shootTimer = player.shootCooldown;
@@ -525,7 +532,7 @@ public:
 			playerComponent.nameText = playerNameText;
 
 			engine::ecs::AddComponent(player, engine::Transform{ .position = Vector3(startPos - offset * i, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
-			engine::ecs::AddComponent(player, engine::Rigidbody{ .drag = 0.025, .restitution = 1 });
+			engine::ecs::AddComponent(player, engine::Rigidbody{ .drag = 0.025 });
 			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
 			engine::ecs::AddComponent(player, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
 

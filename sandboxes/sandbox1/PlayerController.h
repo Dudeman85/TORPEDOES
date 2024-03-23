@@ -301,8 +301,7 @@ public:
 					engine::TransformSystem::Rotate(player.renderedEntity, 0, 360.0f * dt, 0);
 					break;
 				case HitStates::Additive:
-					player._speedScale += hitProjectile.first.hitSpeedFactor;
-					
+					player._speedScale += hitProjectile.first.hitSpeedFactor;				
 					break;
 				case HitStates::Multiplicative:
 					player._speedScale += (player._speedScale *= hitProjectile.first.hitSpeedFactor);
@@ -311,9 +310,7 @@ public:
 					break;
 				}
 			}
-			if (player.id == 1) {
-				std::cout << player._speedScale << "\n";
-			}
+
 			/* Movement */
 
 			// CALCULATE POSITION AND ROTATE 
