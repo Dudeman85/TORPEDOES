@@ -11,9 +11,8 @@ using namespace std::filesystem;
 AudioEngine::AudioEngine(float volume)
 {
 	engineConfig = ma_engine_config_init();
-	engineConfig.listenerCount = 1;
-	auto aresult = ma_engine_init(&engineConfig, &soundEngine);
-	if (aresult != MA_SUCCESS)
+	engineConfig.listenerCount = 1; 
+	if (ma_engine_init(&engineConfig, &soundEngine) != MA_SUCCESS)
 	{
 		throw std::runtime_error("Warning: Failed to initialize an audio engine");
 	}
@@ -48,7 +47,7 @@ Audio::Audio(AudioEngine* owningEngine, std::string soundName, bool loop, float 
 	setSound(soundName);
 	setLoop(loop);
 	setVolume(volume);
-	setDirection(location);
+	setAbsoluteDirection(location);
 }
 
 Audio::~Audio()
@@ -137,13 +136,13 @@ const bool Audio::getAtEnd()
 {
 	return ma_sound_at_end(audioSound);
 }
-void Audio::setDirection(Vector3 Location)
+void Audio::setAbsoluteDirection(Vector3 Location)
 {
 	ma_sound_set_pinned_listener_index(audioSound, 1);
 	ma_sound_set_positioning(audioSound, ma_positioning_relative);
 	ma_sound_set_position(audioSound, Location.x, Location.y, Location.z);
 }
-const Vector3 Audio::getDirection()
+const Vector3 Audio::getAbsoluteDirection()
 {
 	ma_vec3f direction = ma_sound_get_position(audioSound);
 	return Vector3(direction.x, direction.y, direction.z);

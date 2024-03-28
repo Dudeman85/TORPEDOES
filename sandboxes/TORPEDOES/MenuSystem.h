@@ -252,6 +252,8 @@ public:
 	void Selected()
 	{
 
+		engine::deltaTime;
+
 		PauseComponent& pauseComponent = engine::ecs::GetComponent<PauseComponent>(currentSelection);
 		engine::SpriteRenderer& pauseSpriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(currentSelection);
 		pauseSpriteRenderer.texture = pauseComponent.selectedTexture;

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="112" height="54" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="1">
+ <tileset firstgid="1" source="TORPEDOES_Tileset.tsx"/>
+ <layer id="1" name="Tile Layer 1" width="112" height="54">
+  <data encoding="base64" compression="zlib">
+   eJztllFyxDAIQ3eP1/tfqLPfjWsDQsIsmslfYgk9O8nrNRqNRn/187ZdKl/E1U3KHhT8OjFU9qBi15mf5V40v2x142ftD8lPcSbU/LK/PZZ70fwYUvFjfX+s/ijfrvyyv8Un61TcN94sqne1iqFqz5z4V+ZnZRfJtFpH/c7eZajKz8sOzRDNbeVlyWTJypjlJDMrF2teLz9LVgU/qx+TIULWdTP5oeX1Q2ZEzYzqMbtzpCK9Id4lGX1/C7/ovs9kpdoLT94VFZ3xdJ1It9mcTmeqKOTcmeeCyW3lWVFZs3fQDZ0Mv7Vu6CTz/YPMosim7uNUyp4U/yXebFWl6inrXycrX+TZ7JkUPXXlp5qL3ZVl/W/jl8EQLev6t/LzPBOZjcWwI79ovuF3dz7UbMPvXn6q87db/zZ+UU+vGOz+81n5qflZ91fUE5E3u6udZ+TKyGa5P+oZyane5xUYWtdU8FOzs+RgM6zOrwo7a6aqZ7ASv4pi9rjzfVo34mt9ttq524l9Djz+VfhVkzVr1jy7DF5fD4Nb2H1Uhd9JHsQVyVBJ3jkZM1Xlp2aImJE1k4rdiT9byDlZfSrZZfizLvZs3j4ZUrNgdanYMwypeWSwqzIbS+o5q/SA7OPGzB3Yofq4MXMXdk+6NfdoNBqNRh30C9bhJ10=
+  </data>
+ </layer>
+ <layer id="2" name="collider" width="112" height="54">
+  <data encoding="base64" compression="zlib">
+   eJztwQENAAAAwqD3T20PBxQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8GXoAAAQ==
+  </data>
+ </layer>
+</map>

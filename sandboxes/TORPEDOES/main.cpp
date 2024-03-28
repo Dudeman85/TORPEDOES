@@ -54,7 +54,7 @@ void LoadLevel1(engine::Camera* cam)
 	engine::collisionSystem->SetTilemap(resources::level1Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
-	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::torpedoBoat, ShipType::hedgehogBoat, ShipType::torpedoBoat};
+	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(4, Vector2(1434.0f, -1370.0f), ships);
 
 	//Make all the checkpoints manually
@@ -140,6 +140,12 @@ int main()
 	playerController->Init();
 	std::shared_ptr<HedgehogSystem> hedgehogSystem = engine::ecs::GetSystem<HedgehogSystem>();
 
+	std::shared_ptr<engine::SoundSystem> soundSystem = engine::ecs::GetSystem<engine::SoundSystem>();
+	soundSystem->AddSoundEngine("Gameplay");
+	soundSystem->AddSoundEngine("Boat");
+	soundSystem->AddSoundEngine("Background");
+	soundSystem->AddSoundEngine("Music");
+
 	//Bind all input actions
 	SetupInput();
 
@@ -157,6 +163,10 @@ int main()
 
 		input::update();
 
+		// Retarded, but required because "camera isn't component" or some bull
+		soundSystem->SetListeningPosition((cam.position.x, cam.position.y));
+		soundSystem->Update();
+
 		hedgehogSystem->Update();
 
 		UpdateCam(window, cam, resources::level1Map);
@@ -165,7 +175,7 @@ int main()
 		// playerControl Update for frame if not paused
 		if (!pauseSystem->isGamePause)
 		{
-			playerController->Update(window, engine::deltaTime);
+			playerController->Update(window);
 		}
 		// if paused or Pause pressed update PauseSystem
 		if (pauseSystem->isGamePause || input::GetNewPress("Pause"))
@@ -176,8 +186,11 @@ int main()
 		glfwSwapBuffers(window);
 	}
 
+	soundSystem->Uninitialize();
+
 	engine::UninitializeTimers();
 	input::uninitialize();
+
 	engine::ecs::DestroyAllEntities(true);
 	glfwTerminate();
 	return 0;
