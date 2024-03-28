@@ -3,56 +3,64 @@
 #include "PlayerController.h"
 #include "Resources.h"
 
-using namespace engine;
-using namespace resources;
+enum HitStates
+{
+	None,			// Does nothing when hitting player
+	Additive,		// Adds hitSpeedFactor additively:			100% + 50% + 50% = 200%
+	Multiplicative,	// Adds hitSpeedFactor multiplicatively:	100% + 50% + 50% = 225%		Decreases are weaker, increases are stronger 
+	Stop			// Stops and forces target to spin in place
+};
 
-
-Model* torpedomodel;
-
-ECS_REGISTER_COMPONENT(Torpedo)
-struct Torpedo
+ECS_REGISTER_COMPONENT(Projectile)
+struct Projectile
 {
 	int ownerID = 0;
-};	
 
+	float speed = 500;
 
-static void CreateAnimation(Vector3 animPosition)
+	/* Hit */
+
+	HitStates hitType = HitStates::Stop;
+	float hitSpeedFactor = -0.05f;		// If hitType is not Stop, scale of speed change when hit
+	float hitTime = 2.0f;				// Time the hit lasts
+
+	/* Files */
+
+	std::string hitAnimation = "explosion";
+	std::string model = "torpedo.obj";
+};
+
+//Temporary functin for testing
+void SpawnProjectile(engine::ecs::Entity p, int playerID)
 {
-	ecs::Entity torpedoAnim = ecs::NewEntity();
+	std::cout << engine::ecs::GetComponent<engine::Transform>(p).position.ToString();
+}
+
+static void CreateAnimation(engine::ecs::Entity entity)
+{
+	Projectile& projectile = engine::ecs::GetComponent<Projectile>(entity);
+	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(entity);
+	Vector3 animPosition = transform.position;
 	animPosition.z += 100;
-	ecs::AddComponent(torpedoAnim, Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20) });
-	ecs::AddComponent(torpedoAnim, SpriteRenderer{ });
-	ecs::AddComponent(torpedoAnim, Animator{ .onAnimationEnd = ecs::DestroyEntity });
-	AnimationSystem::AddAnimation(torpedoAnim, explosionAnimation, "explosion");
-	AnimationSystem::PlayAnimation(torpedoAnim, "explosion", false);
+
+	engine::ecs::Entity torpedoAnim = engine::ecs::NewEntity();
+	engine::ecs::AddComponent(torpedoAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20) });
+	engine::ecs::AddComponent(torpedoAnim, engine::SpriteRenderer{ });
+	engine::ecs::AddComponent(torpedoAnim, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
+	engine::AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, projectile.hitAnimation);
+	engine::AnimationSystem::PlayAnimation(torpedoAnim, projectile.hitAnimation, false);
 
 };
 
-
-// check if projectil collision tilemap Trigger
-	static void OnTopedoCollision(Collision collision)
+static void OnProjectileCollision(engine::Collision collision)
+{
+	if (collision.type == engine::Collision::Type::tilemapTrigger)
 	{
-		Transform& torpedotransfor = ecs::GetComponent<Transform>(collision.a);
-		if (collision.type == Collision::Type::tilemapTrigger)
+		if (collision.b != 1)
 		{
-			if (collision.b != 1)
-			{   // Do animation where projectile impact 
-				CreateAnimation(torpedotransfor.position);
-				ecs::DestroyEntity(collision.a);
-			}
+			// Do animation projectile impact animation
+			CreateAnimation(collision.a);
+			engine::ecs::DestroyEntity(collision.a);
 		}
-
 	}
-	void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 sapawnRotation, int owerID)
-    {
-		ecs::Entity torpedo = ecs::NewEntity();
-	    ecs::AddComponent(torpedo, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
-	   ecs::AddComponent(torpedo, Rigidbody{ .velocity = direction * projectileSpeed });
-	   ecs::AddComponent(torpedo, ModelRenderer{ .model = torpedomodel });
-	   std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-	   ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnTopedoCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
-	  ecs::AddComponent(torpedo, Torpedo{ .ownerID = owerID });
-    }
-
-
-	
+}

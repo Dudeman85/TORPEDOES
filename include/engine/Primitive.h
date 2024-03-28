@@ -17,7 +17,6 @@
 #include <engine/GL/Texture.h>
 #include <engine/GL/Camera.h>
 
-
 namespace engine
 {
 	///A class to create and store a primitive shape
@@ -279,9 +278,8 @@ namespace engine
 		void Update(Camera* cam)
 		{
 			//For each entity
-			for (auto itr = entities.begin(); itr != entities.end();)
+			for (ecs::Entity entity : entities)
 			{
-				ecs::Entity entity = *itr++;
 				//Get relevant components
 				Transform& transform = ecs::GetComponent<Transform>(entity);
 				PrimitiveRenderer& primitiveRenderer = ecs::GetComponent<PrimitiveRenderer>(entity);

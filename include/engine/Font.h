@@ -12,9 +12,6 @@
 #include <map>
 #include <exception>
 
-using namespace std;
-using namespace engine;
-
 ///Struct to store data about the characters
 struct Character
 {
@@ -41,7 +38,7 @@ namespace engine
 
 		unsigned int VAO, VBO;
 		///A map of all the characters
-		map<GLchar, Character> characters;
+		std::map<GLchar, Character> characters;
 
 	private:
 		// VAO & VBO function

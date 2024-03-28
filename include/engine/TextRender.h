@@ -107,7 +107,7 @@ namespace engine
 				glBindVertexArray(textRenderer.font->VAO);
 
 				// Renders text one letter at a time
-				string::const_iterator c;
+				std::string::const_iterator c;
 				float x = textRenderer.offset.x;
 				float y = textRenderer.offset.y;
 				for (c = textRenderer.text.begin(); c != textRenderer.text.end(); ++c)

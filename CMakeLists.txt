@@ -48,7 +48,6 @@ ELSE()
 	target_link_libraries(engine glfw tmxlite glm sndfile freetype assimp enet)
 ENDIF()
 
-
 target_include_directories(engine PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>

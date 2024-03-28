@@ -61,10 +61,8 @@ namespace engine
 			cam = camera;
 
 			//For each entity
-			for (auto itr = entities.begin(); itr != entities.end();)
+			for (ecs::Entity entity : entities)
 			{
-				ecs::Entity entity = *itr++;
-
 				PolygonCollider& collider = ecs::GetComponent<PolygonCollider>(entity);
 				Transform& transform = ecs::GetComponent<Transform>(entity);
 

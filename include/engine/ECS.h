@@ -10,22 +10,22 @@
 #include <memory>
 #include <functional>
 
-/// Allow max components to be determined outside this file
+//Allow max components to be determined outside this file
 #ifndef ECS_MAX_COMPONENTS
 #define ECS_MAX_COMPONENTS 100
 #elif ECS_MAX_COMPONENTS > UINT16_MAX
 #error The maximum possible number of components is 65535
 #endif
 
-//Macto to register a component outside main
+//Macro to register a component outside main
 #define ECS_REGISTER_COMPONENT(COMPONENT) \
 struct COMPONENT; \
-inline bool COMPONENT##Registered = ( ecs::RegisterComponent<COMPONENT>(), true );
+inline bool COMPONENT##Registered = ( engine::ecs::RegisterComponent<COMPONENT>(), true );
 
 //Macro to register a system and its components outside main
 #define ECS_REGISTER_SYSTEM(SYSTEM, ...) \
 class SYSTEM; \
-inline bool SYSTEM##Registered = ( ecs::RegisterSystem<SYSTEM, __VA_ARGS__>(), true );
+inline bool SYSTEM##Registered = ( engine::ecs::RegisterSystem<SYSTEM, __VA_ARGS__>(), true );
 
 
 namespace engine::ecs
@@ -43,6 +43,200 @@ namespace engine::ecs
 
 	//ENTITY MANAGEMENT DATA
 
+	//Custom container class for storing a system's entities, not suitable for anythin else
+	class EntityList
+	{
+	private:
+		//Array of entities, order is not guaranteed to remain the same
+		Entity* entities;
+		uint32_t size;
+		uint32_t maxSize;
+		//Does the entities array contain any invalid entities
+		bool packed = true;
+
+		//Resize the entities array
+		void Resize(uint32_t newSize)
+		{
+			Entity* newArray = new Entity[newSize];
+
+			std::memcpy(newArray, entities, size * sizeof(Entity));
+
+			delete[] entities;
+
+			maxSize = newSize;
+			entities = newArray;
+		}
+
+	public:
+		class Iterator
+		{
+		private:
+			Entity* currentPtr;
+			EntityList* parentList;
+
+		public:
+			Iterator(Entity* current, EntityList* list)
+			{
+				currentPtr = current;
+				parentList = list;
+			}
+			//Prefix, handles all logic
+			Iterator& operator++()
+			{
+				//If the entity is invalid, skip it
+				do
+				{
+					currentPtr++;
+					//Check if the pointer is out of bounds, meaning end of list
+					if (currentPtr == &parentList->entities[parentList->size])
+					{
+						break;
+					}
+				} while (*currentPtr == 0);
+
+				return *this;
+			}
+			//Postfix
+			Iterator operator++(int)
+			{
+				//Deprecation Warning
+				#ifdef _DEBUG
+				std::cout << warningFormat << "ECS WARNING: Postfix can cause crashes when deleting entities. Use \"for (ecs::Entity entity : entities)\" instead" << normalFormat << std::endl;
+				#endif
+
+				Iterator ret = *this;
+				++(*this);
+				return ret;
+			}
+			bool operator==(const Iterator& rhs)
+			{
+				return currentPtr == rhs.currentPtr;
+			}
+			bool operator!=(const Iterator& rhs)
+			{
+				return currentPtr != rhs.currentPtr;
+			}
+			Entity& operator*() const
+			{
+				return *currentPtr;
+			}
+		};
+
+		Iterator begin()
+		{
+			if (!packed)
+				Pack();
+			return Iterator(&entities[0], this);
+		}
+		Iterator end()
+		{
+			return Iterator(&entities[size], this);
+		}
+
+		EntityList()
+		{
+			size = 0;
+			maxSize = 10;
+			entities = new Entity[maxSize];
+		}
+		~EntityList()
+		{
+			delete[] entities;
+		}
+
+		//Debug function, will print all entities
+		void PrintEntities()
+		{
+			std::cout << size << ": [";
+			for (uint32_t i = 0; i < size; i++)
+			{
+				std::cout << entities[i] << ", ";
+			}
+			std::cout << "]" << std::endl;
+		}
+
+		//Add an entity to the end of the list, if it does not exist in it
+		void Insert(Entity e)
+		{
+			//Add 100 or double capacity to the list, whichever is less
+			if (size >= maxSize)
+				Resize(maxSize + std::min(maxSize, (uint32_t)100));
+
+			//Look through the array and make sure the entity is not in it
+			for (uint32_t i = 0; i < size; i++)
+			{
+				if (entities[i] == e)
+				{
+					return;
+				}
+			}
+
+			//Add the new entity
+			entities[size] = e;
+			size++;
+		}
+
+		//Remove an entity from the list
+		//Size is not updated, so pack() should be called shortly after
+		void Erase(Entity e)
+		{
+			//Look through the array and set the entity to 0
+			for (uint32_t i = 0; i < size; i++)
+			{
+				if (entities[i] == e)
+				{
+					entities[i] = 0;
+					packed = false;
+					return;
+				}
+			}
+		}
+
+		//Packs the array tightly, removing holes
+		//This is currently called when calling begin()
+		void Pack()
+		{
+			//If the array is already packed nothing needs to be done
+			if (packed)
+				return;
+
+			//Look through the array
+			uint32_t iterations = size;
+			for (uint32_t i = 0; i < iterations; i++)
+			{
+				//Check for invalid entity
+				if (entities[i] == 0)
+				{
+					if (size == 0)
+						break;
+
+					//Find the next valid entity to fill the gap, from back to front
+					uint32_t replacementIndex = size - 1;
+					while (entities[replacementIndex] == 0)
+					{
+						size--;
+						if (replacementIndex == 0)
+							break;
+						replacementIndex--;
+					}
+					//The list ends at i
+					if (replacementIndex <= i)
+						break;
+
+					//Move the replacement entity to the hole
+					entities[i] = entities[replacementIndex];
+					entities[replacementIndex] = 0;
+					size--;
+				}
+			}
+
+			packed = true;
+			//Resize to keep the free space between 50 and 150
+			if (maxSize - size > 150)
+				Resize(size + 50);
+		}
+	};
+
 	//All currently available and used Entity IDs
 	std::stack<Entity> availableEntities;
 	std::set<Entity> usedEntities;
@@ -54,7 +248,7 @@ namespace engine::ecs
 
 	//COMPONENT MANAGEMENT DATA
 
-	///Interface for each component array type
+	//Interface for each component array type
 	class IComponentArray
 	{
 	public:
@@ -71,12 +265,12 @@ namespace engine::ecs
 
 	//SYSTEM MANAGEMENT DATA
 
-	///Base class all systems inherit from
+	//Base class all systems inherit from
 	class System
 	{
 	public:
-		///Set of every entity containing the required components for the system
-		std::set<Entity> entities;
+		//Set of every entity containing the required components for the system
+		EntityList entities;
 	};
 	//Map of each system accessible by its type name
 	std::unordered_map<const char*, std::shared_ptr<System>> systems;
@@ -90,7 +284,7 @@ namespace engine::ecs
 
 	//INTERNAL FUNCTIONS
 
-	///Implementation internal class to interface with each type of component array
+	//Implementation internal class to interface with each type of component array
 	template<typename T>
 	class ComponentArray : public IComponentArray
 	{
@@ -115,13 +309,13 @@ namespace engine::ecs
 			return entityToIndex.count(entity);
 		}
 
-		///Get a component from an entity
+		//Get a component from an entity
 		T& GetComponent(Entity entity)
 		{
 			return components[entityToIndex[entity]];
 		}
 
-		///Add a component to an entity, returns a reference to that component
+		//Add a component to an entity, returns a reference to that component
 		void AddComponent(Entity entity, T component)
 		{
 			entityToIndex[entity] = components.size();
@@ -129,7 +323,7 @@ namespace engine::ecs
 			components.push_back(component);
 		}
 
-		///Removes a component from an entity
+		//Removes a component from an entity
 		void RemoveComponent(Entity entity) override
 		{
 			//Call the component destructor
@@ -166,12 +360,12 @@ namespace engine::ecs
 			if ((signature & systemSignatures[system.first]) == systemSignatures[system.first])
 			{
 				//Add the entity to the system's set
-				system.second->entities.insert(entity);
+				system.second->entities.Insert(entity);
 			}
 			else
 			{
 				//Remove the entity from the system's set
-				system.second->entities.erase(entity);
+				system.second->entities.Erase(entity);
 			}
 		}
 	}
@@ -474,7 +668,7 @@ namespace engine::ecs
 		//Make more entity IDs available in batches of 100
 		if (availableEntities.size() == 0)
 		{
-			for (size_t i = entityCount + 99; i >= entityCount; i--)
+			for (uint32_t i = entityCount + 99; i >= entityCount; i--)
 			{
 				availableEntities.push(i);
 			}

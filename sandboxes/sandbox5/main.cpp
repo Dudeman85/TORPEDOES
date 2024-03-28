@@ -14,7 +14,7 @@ GLFWwindow* initializeGLFW(int width, int height, const char* title)
 {
     // Create a GLFW window
 
-    GLFWwindow* window = CreateGLWindow(width, height, title);
+    GLFWwindow* window = engine::CreateGLWindow(width, height, title);
 
     return window;
 }
@@ -70,7 +70,7 @@ static void addTexture(const std::string& path, const std::string& name, const s
         return; // Wrong file format
     }
 
-    engine::Texture* NewTexture = new engine::Texture(path, filteringType, flip, false);
+    engine::Texture* NewTexture = new engine::Texture(path, filteringType, flip);
     
     if (!NewTexture)
     {
@@ -93,7 +93,7 @@ static void addModel(const std::string& path, const std::string& name, const std
     }
 
     // This is stupid: Why does model constructor add asset path?
-    engine::Model* newModel = new engine::Model(path, true);
+    engine::Model* newModel = new engine::Model(path);
 
     if (!newModel)
     {
@@ -172,14 +172,14 @@ int main()
         std::string eventName = "Move" + to_string(i);
 
         input::ConstructAnalogEvent(eventName);
-        input::bindAnalogControllerInput(i, { GLFW_GAMEPAD_AXIS_LEFT_X, GLFW_GAMEPAD_AXIS_LEFT_Y }, { eventName });
+        //input::bindAnalogControllerInput(i, { GLFW_GAMEPAD_AXIS_LEFT_X, GLFW_GAMEPAD_AXIS_LEFT_Y }, { eventName });
     }
     
-    input::bindAnalogInput(GLFW_KEY_RIGHT, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_X);
-    input::bindAnalogInput(GLFW_KEY_LEFT, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_X, -1);
+    //input::bindAnalogInput(GLFW_KEY_RIGHT, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_X);
+    //input::bindAnalogInput(GLFW_KEY_LEFT, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_X, -1);
     
-    input::bindAnalogInput(GLFW_KEY_UP, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y);
-    input::bindAnalogInput(GLFW_KEY_DOWN, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y, -1);
+    //input::bindAnalogInput(GLFW_KEY_UP, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y);
+    //input::bindAnalogInput(GLFW_KEY_DOWN, { "Move0" }, GLFW_GAMEPAD_AXIS_LEFT_Y, -1);
     
     input::ConstructDigitalEvent("shootEvent");
 
