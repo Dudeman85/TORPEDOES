@@ -103,7 +103,7 @@ public:
 				float distanceRatio = hedgehogComp.distanceTraveled / maxDistance;
 
 				//// Calcula la rotación en función de la distancia recorrida
-				engine::TransformSystem::Rotate(entity, Vector3(0, 0,-1.5f));
+				engine::TransformSystem::Rotate(entity, Vector3(0, 0,-1.65f));
 
 				// Calcula la escala en funcion de la distancia recorrida
 				float scale = maxScale - (maxScale - minScale) * (2 * abs(0.5 - distanceRatio));
@@ -141,3 +141,24 @@ void CreateHedgehog(Vector2 direction, Vector3 spanwPposition, Vector3 sapawnRot
 	engine::ecs::AddComponent(hedgehog, engine::PolygonCollider{ .vertices = Hedgehogverts, .callback = OnTopedoCollision, .trigger = true, .visualise = true,  .rotationOverride = sapawnRotation.y });
 	engine::ecs::AddComponent(hedgehog, Hedgehog{ .ownerID = owerID });
 }
+
+void CreateTridentHedgehogs(Vector2 direction, Vector3 spawnPosition, Vector3 spawnRotation, int ownerID)
+{
+	const float angleOffset = Radians(10.0f); // Ajuste de ángulo para las direcciones de los proyectiles
+	float playerAngle = atan2(direction.y, direction.y);
+
+	// Creamos los tres proyectiles (hedgehogs)
+	for (int i = 0; i < 3; ++i)
+	{
+		// Calculamos el ángulo para cada proyectil
+		float angle = playerAngle + i * angleOffset;
+
+		// Calculamos la dirección para cada proyectil
+		Vector2 modifiedDirection = Vector2(cos(angle ), sin(angle ));
+
+		// Creamos el hedgehog
+		CreateHedgehog(modifiedDirection, spawnPosition, spawnRotation, ownerID);
+	}
+}
+
+
