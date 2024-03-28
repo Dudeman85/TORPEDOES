@@ -99,10 +99,10 @@ void SetupInput()
 			{ input::digitalNegativeInput, GLFW_GAMEPAD_AXIS_LEFT_TRIGGER }
 		}, { "Throttle" + std::to_string(i) });
 
-		input::bindAnalogControllerInput(i, { { {-1, 1, 0}, GLFW_GAMEPAD_AXIS_LEFT_X }, }, { "Turn" + std::to_string(i) });
+		input::bindAnalogControllerInput(i, { { input::controllerMixedInput, GLFW_GAMEPAD_AXIS_LEFT_X }, }, { "Turn" + std::to_string(i) });
 	}
 
-	// Keyboard inpu
+	// Keyboard input
 	int KeyboardPlayer = 2;
 
 	input::bindAnalogInput(GLFW_KEY_RIGHT,	input::digitalPositiveInput, { "Turn" + std::to_string(KeyboardPlayer) }, 0);
