@@ -25,7 +25,7 @@
    eJzt2ttNwzAUxnG3HgBWAAQv5Y0BuL6UHbhDoTOAuElQiW1gERiJY6VHOQ1pIRGtE/n/k6zQxJacj1OnrewcAAAAAAAAkLa32BMAKngdH68L519mjGl6jffGx+I9xTaSNnR55iHjG/O6DVa8c6vS1nz2+qoTdz5/pfU8ijqL6rYl5x1pu37y/Kz3Z1M1fd0IjiTnY2knPl9HrEFL6r0tbiXnO2l9V57t5vjYtvdtU/UKf4dcQ8aHcaaTDK1jzTk8N8O5fqT5pKyNz86qhrEnkBDew4sT1k0+CyyOfjfl80E9YW3YkrZR8XtDCs+oeVjvZLVaNW/UE/KuU9+ory2/uQEAAAAAACCO945zH/yGtDCfkvUXeQNAUor7pTFf0/ZL4//Ymrb7pcuuox6boa1p3S9t2evk/ruy+rQZ2pouy9Ne1zHU/E/7ksVBoX51/7nNUGva9tvz+Xi9bsdM65uyM7n/85I1ebmbZ3gh7dJne89tv1Ofj9c+OmZW35Q9yP0/FnJSS93s+CTnn/3k/yBcu/f5eO1jx9p13vZN2Tf/f0Fe
   </data>
  </layer>
- <layer id="3" name="collider" width="92" height="56">
+ <layer id="3" name="collider" width="92" height="56" visible="0">
   <data encoding="base64" compression="zlib">
    eJzt2FGOgzAMBFCqHqD3v23FR9UIERg7HscOHslfq7WTF6Atn/e2faqqqqqqqqqqAtZruy+vIGsZLc/8ZqLes5LZ+BjUe3ayO7e5846SFaz3XHlHS3brPeXtG2tvpscsb8sZVt5Sh3Yea4Y2zDkW3prrzuNMpTleD4zvyaPex7VJfkftf5PE8yyRfWgy01sSr3sc/R2uyd19o+nxBG9NkOcU2kfzbka7XmtvdP0j3ujngrQXy4P93GZ6I58Lkr5Mb/ZZ/maUN793O4Pt3T47onp7WTO9z9YX1Rv5fvNE717f6N7aM5IE9R5Z+0xvSZjO7YxVvSVhX9fHOdbevd69Odbe0kT1trzGpd5IT21W8O71j+ZtcV7SOVm8z/qOJrq35TPFa69XkaxBsh/U1tJbukbPSOf37ksP7+zXuGZ+Fu+r/c0w18728LZ0ka6NkZGZFt53Z2BpMtPbYl42b4aB1RyJt3V5eaN7se6nnRHB29q9t6+R/7Va+6re7P1p1xzJm+keJeXtG7b1yPed1eJxbZf3P9G9V3PP4r2CO8v6zJzRP1PY1og3+k4ReQcWOei+M3lHs0ddVvCOXlm9s/p7eHvUbMeneVdVVa1dX4KFZKw=
   </data>
