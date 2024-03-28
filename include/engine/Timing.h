@@ -11,6 +11,9 @@
 
 namespace engine
 {
+	// All CallbackWrappers binded by ScheduleFunction
+	std::vector<CallbackWrapper*> _CallbackWrappers;
+
 	//Global timers, these are updated in TimerSystem::Update()
 	//How many seconds the last frame took
 	double deltaTime = 0;
@@ -103,8 +106,16 @@ namespace engine
 					// If not repeating, delete the event
 					if (!future.repeat)
 					{
+						// Remove function from _CallbackWrappers
+						auto it = std::find(_CallbackWrappers.begin(), _CallbackWrappers.end(), future.function);
+						if (it != _CallbackWrappers.end()) 
+						{
+							_CallbackWrappers.erase(it);
+						}
+
 						delete future.function;
 						future.function = nullptr;
+
 						itr = schedule.erase(itr);
 						break;
 					}
@@ -167,13 +178,26 @@ namespace engine
 		template<typename Function, typename... Args>
 		static inline ScheduledFunction& ScheduleFunction(Function&& CallbackFunction, double time, bool repeat = false, ScheduledFunction::Type durationType = ScheduledFunction::Type::seconds, Args&&... Arguments)
 		{
-			CallbackWrapper* wrapper = new CallbackWrapper(std::bind(std::forward<Function>(CallbackFunction), std::forward<Args>(Arguments)...)); // Memory leak lmao
+			CallbackWrapper* wrapper = new CallbackWrapper(std::bind(std::forward<Function>(CallbackFunction), std::forward<Args>(Arguments)...));
+			_CallbackWrappers.push_back(wrapper);
+
 			ScheduledFunction future = ScheduledFunction{ .type = durationType, .duration = time, .repeat = repeat, .function = wrapper };
-	
 			schedule.push_back(future);
+
+			// Why not return future? This is not thread-safe, and for no reason
 			return schedule.back();
 		}
 	};
+
+	// Clean up timer memory
+	void UninitializeTimers()
+	{
+		for (auto CallbackWrapperToDelete : _CallbackWrappers)
+		{
+			delete CallbackWrapperToDelete;
+		}
+	}
+
 }
 
 std::vector<engine::ScheduledFunction> engine::TimerSystem::schedule = schedule;

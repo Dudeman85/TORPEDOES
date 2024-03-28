@@ -5,8 +5,8 @@
 enum HitStates 
 { 
 	None,			// Does nothing when hitting player
-	Additive,		// Adds hitSpeedFactor additively:			100% + 50% + 50% = 200%
-	Multiplicative,	// Adds hitSpeedFactor multiplicatively:	100% + 50% + 50% = 225%		Decreases are weaker, increases are stronger 
+	Additive,		// Adds hitSpeedFactor additively:			100% + 50% + 50% = 200%		Flat increase/decrease
+	Multiplicative,	// Adds hitSpeedFactor multiplicatively:	100% + 50% + 50% = 225%		Stacked decreases become constantly weaker, stacked increases become constantly stronger 
 	Stop			// Stops and forces target to spin in place
 };
 

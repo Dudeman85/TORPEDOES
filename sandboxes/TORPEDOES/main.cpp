@@ -176,6 +176,7 @@ int main()
 		glfwSwapBuffers(window);
 	}
 
+	engine::UninitializeTimers();
 	input::uninitialize();
 	engine::ecs::DestroyAllEntities(true);
 	glfwTerminate();
