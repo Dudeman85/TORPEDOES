@@ -39,10 +39,11 @@ namespace engine
 				// Get necessary components
 				SoundComponent& soundComponent = engine::ecs::GetComponent<SoundComponent>(entity);
 				engine::Transform& soundTransform = engine::ecs::GetComponent<engine::Transform>(entity);
-			
+
 				for (auto& sound : soundComponent.Sounds)
 				{
 					sound.second->setAbsoluteDirection(ListeningPosition - soundTransform.position);
+					std::cout << "pos: " << (ListeningPosition - soundTransform.position).x << ", " << (ListeningPosition - soundTransform.position).y << "\n";
 				}
 			}
 		}
@@ -86,4 +87,9 @@ namespace engine
 			}
 		}
 	};
+
+	Audio* AddAudio(std::string AudioEngineName, std::string AudioFile, bool loop, float volume)
+	{
+		return engine::ecs::GetSystem<engine::SoundSystem>()->FindAudioEngine(AudioEngineName)->createAudio(AudioFile, loop, volume);
+	}
 };

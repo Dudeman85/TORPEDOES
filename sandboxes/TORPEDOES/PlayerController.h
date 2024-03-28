@@ -284,7 +284,7 @@ public:
 				CreateAnimation(collision.b);
 
 				engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(collision.a);
-				soundComponent.Sounds["Dink"]->unpause();
+				soundComponent.Sounds["Dink"]->play();
 
 				//Destroy torpedo at end of frame
 				engine::ecs::DestroyEntity(collision.b);
@@ -557,20 +557,15 @@ public:
 			engine::ecs::AddComponent(torpIndicator2, engine::Transform{ .position = Vector3(2, -2, 10), .scale = Vector3(2, .5, 1) });
 			engine::TransformSystem::AddParent(torpIndicator2, player);
 
+			// Works
+			Audio* audio = engine::AddAudio("Gameplay", "audio/dink.wav", false, 100000);
+			audio->pause();
 
-			engine::ecs::GetSystem<engine::SoundSystem>()->FindAudioEngine("Gameplay")->createAudio("audio/dink.wav");
-
-			// Create player sounds
 			engine::ecs::AddComponent(player, engine::SoundComponent{ .Sounds = 
 				{
-					{"Dink", engine::ecs::GetSystem<engine::SoundSystem>()->FindAudioEngine("Gameplay")->createAudio("audio/dink.wav", false)},
+					{"Dink", audio}
 				}}
 			);
-
-			for (auto& sound : engine::ecs::GetComponent<engine::SoundComponent>(player).Sounds)
-			{
-				//sound.second->pause();
-			}
 		}
 	}
 };
