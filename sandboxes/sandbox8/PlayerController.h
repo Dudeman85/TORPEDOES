@@ -364,7 +364,7 @@ public:
 				//CreateProjectile(forwardDirection, 500, transform.position, modelTransform.rotation, player.id);
 
 				// Author Leo
-				CreateHedgehog(forwardDirection, transform.position, modelTransform.rotation, player.id);
+				CreateTridentHedgehogs(forwardDirection, transform.position, modelTransform.rotation, player.id);
 
 				player.ammo--;
 
