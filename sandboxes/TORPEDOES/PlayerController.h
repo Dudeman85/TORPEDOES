@@ -7,6 +7,8 @@
 #include "engine/Input.h"
 #include "engine/Timing.h"
 
+#include "engine/SoundComponent.h"
+
 enum ShipType { torpedoBoat, submarine, cannonBoat, hedgehogBoat, pirateShip };
 
 ECS_REGISTER_COMPONENT(Player)
@@ -21,7 +23,7 @@ struct Player
 	float rotationSpeed = 100;
 	float minSpeedWhileTurning = 60;
 
-	float offtrackSpeedScale = 0.6; //0.991f;
+	float offtrackSpeedScale = 0.6;
 
 	float _speedScale = 1;
 	float _boostScale = 1;
@@ -280,6 +282,9 @@ public:
 				SkipAddingHit:
 				
 				CreateAnimation(collision.b);
+
+				engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(collision.a);
+				soundComponent.Sounds["Dink"]->unpause();
 
 				//Destroy torpedo at end of frame
 				engine::ecs::DestroyEntity(collision.b);
@@ -551,6 +556,21 @@ public:
 			engine::ecs::AddComponent(torpIndicator2, engine::SpriteRenderer{ .texture = resources::uiTextures["UI_Green_Torpedo_Icon.png"] });
 			engine::ecs::AddComponent(torpIndicator2, engine::Transform{ .position = Vector3(2, -2, 10), .scale = Vector3(2, .5, 1) });
 			engine::TransformSystem::AddParent(torpIndicator2, player);
+
+
+			engine::ecs::GetSystem<engine::SoundSystem>()->FindAudioEngine("Gameplay")->createAudio("audio/dink.wav");
+
+			// Create player sounds
+			engine::ecs::AddComponent(player, engine::SoundComponent{ .Sounds = 
+				{
+					{"Dink", engine::ecs::GetSystem<engine::SoundSystem>()->FindAudioEngine("Gameplay")->createAudio("audio/dink.wav", false)},
+				}}
+			);
+
+			for (auto& sound : engine::ecs::GetComponent<engine::SoundComponent>(player).Sounds)
+			{
+				//sound.second->pause();
+			}
 		}
 	}
 };

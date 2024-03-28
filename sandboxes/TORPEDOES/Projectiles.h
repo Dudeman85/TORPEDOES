@@ -55,7 +55,6 @@ static void CreateAnimation(engine::ecs::Entity entity)
 	engine::ecs::AddComponent(torpedoAnim, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
 	engine::AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, projectile.hitAnimation);
 	engine::AnimationSystem::PlayAnimation(torpedoAnim, projectile.hitAnimation, false);
-
 };
 
 static void OnProjectileCollision(engine::Collision collision)
