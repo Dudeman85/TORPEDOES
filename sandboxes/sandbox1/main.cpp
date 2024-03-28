@@ -8,44 +8,44 @@
 int checkPointNumber = 0;
 int activeMapLayer = 0;
 
-void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, Model* checkPointModel, float hitboxrotation, bool finish_line = false)
+void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine::Model* checkPointModel, float hitboxrotation, bool finish_line = false)
 {
-	ecs::Entity checkpoint = ecs::NewEntity();
+	engine::ecs::Entity checkpoint = engine::ecs::NewEntity();
 
-	ecs::AddComponent(checkpoint, Transform{ .position = position , .rotation = rotation , .scale = scale });
-	ecs::AddComponent(checkpoint, ModelRenderer{ .model = checkPointModel });
-	ecs::AddComponent(checkpoint, CheckPoint{ .checkPointID = checkPointNumber , .Finish_line = finish_line });
+	engine::ecs::AddComponent(checkpoint, engine::Transform{ .position = position , .rotation = rotation , .scale = scale });
+	engine::ecs::AddComponent(checkpoint, engine::ModelRenderer{ .model = checkPointModel });
+	engine::ecs::AddComponent(checkpoint, CheckPoint{ .checkPointID = checkPointNumber , .Finish_line = finish_line });
 	std::vector<Vector2> CheckpointcolliderVerts{ Vector2(4, 8), Vector2(4, -8), Vector2(-4, -8), Vector2(-4, 8) };
-	ecs::AddComponent(checkpoint, PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = false, .rotationOverride = hitboxrotation }));
+	engine::ecs::AddComponent(checkpoint, engine::PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = false, .rotationOverride = hitboxrotation }));
 
 	checkPointNumber++;
 };
 
-void CreateCrowd(Vector3 pos, Animation& anim)
+void CreateCrowd(Vector3 pos, engine::Animation& anim)
 {
-	ecs::Entity crowd = ecs::NewEntity();
-	ecs::AddComponent(crowd, Transform{ .position = pos, .scale = Vector3(100, 30, 0) });
-	ecs::AddComponent(crowd, SpriteRenderer{});
-	ecs::AddComponent(crowd, Animator{});
-	AnimationSystem::AddAnimation(crowd, anim, "CrowdCheer");
-	AnimationSystem::PlayAnimation(crowd, "CrowdCheer", true);
+	engine::ecs::Entity crowd = engine::ecs::NewEntity();
+	engine::ecs::AddComponent(crowd, engine::Transform{ .position = pos, .scale = Vector3(100, 30, 0) });
+	engine::ecs::AddComponent(crowd, engine::SpriteRenderer{});
+	engine::ecs::AddComponent(crowd, engine::Animator{});
+	engine::AnimationSystem::AddAnimation(crowd, anim, "CrowdCheer");
+	engine::AnimationSystem::PlayAnimation(crowd, "CrowdCheer", true);
 }
 
 //Play the countdown timer and freeze players untill it is done
 void PlayCountdown()
 {
-	ecs::Entity countdown = ecs::NewEntity();
-	ecs::AddComponent(countdown, Transform{ .position = Vector3(1475, -1270, 10), .scale = Vector3(60, 100, 0) });
-	ecs::AddComponent(countdown, SpriteRenderer{});
-	ecs::AddComponent(countdown, Animator{ .onAnimationEnd = ecs::DestroyEntity });
-	AnimationSystem::AddAnimation(countdown, resources::countdownAnim, "CountDown");
-	AnimationSystem::PlayAnimation(countdown, "CountDown", false);
-	ecs::GetSystem<PlayerController>()->countdownTimer = 5;
+	engine::ecs::Entity countdown = engine::ecs::NewEntity();
+	engine::ecs::AddComponent(countdown, engine::Transform{ .position = Vector3(1475, -1270, 10), .scale = Vector3(60, 100, 0) });
+	engine::ecs::AddComponent(countdown, engine::SpriteRenderer{});
+	engine::ecs::AddComponent(countdown, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
+	engine::AnimationSystem::AddAnimation(countdown, resources::countdownAnim, "CountDown");
+	engine::AnimationSystem::PlayAnimation(countdown, "CountDown", false);
+	engine::ecs::GetSystem<PlayerController>()->countdownTimer = 5;
 }
 
-void LoadLevel1(Camera* cam)
+void LoadLevel1(engine::Camera* cam)
 {
-	collisionSystem->cam = cam;
+	engine::collisionSystem->cam = cam;
 
 	/*TimerSystem::ScheduleFunction(
 		[]() {
@@ -63,9 +63,9 @@ void LoadLevel1(Camera* cam)
 	resources::level1Map->enabledLayers[1] = true;*/
 
 	//Set this level's tilemap
-	spriteRenderSystem->SetTilemap(resources::level1Map);
-	collisionSystem->SetTilemap(resources::level1Map);
-	PhysicsSystem::SetTileProperty(1, TileProperty{ true });
+	engine::spriteRenderSystem->SetTilemap(resources::level1Map);
+	engine::collisionSystem->SetTilemap(resources::level1Map);
+	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
 	std::vector<ShipType> ships{ShipType::cannonBoat, ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat};
 	ecs::GetSystem<PlayerController>()->CreatePlayers(1, Vector2(1434.0f, -1370.0f), ships);
@@ -135,7 +135,7 @@ int main()
 {
 	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window");
 
-	EngineInit();
+	engine::EngineInit();
 
 	//Make the camera
 	engine::Camera cam = engine::Camera(1120, 630);
@@ -148,9 +148,9 @@ int main()
 	input::initialize(window);
 
 	//Get pointers and call init of every custom system
-	std::shared_ptr<PauseSystem> pauseSystem = ecs::GetSystem<PauseSystem>();
+	std::shared_ptr<PauseSystem> pauseSystem = engine::ecs::GetSystem<PauseSystem>();
 	pauseSystem->Init(window);
-	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
+	std::shared_ptr<PlayerController> playerController = engine::ecs::GetSystem<PlayerController>();
 	playerController->Init();
 
 	//Bind all input actions
@@ -176,7 +176,7 @@ int main()
 		// playerControl Update for frame if not paused
 		if (!pauseSystem->isGamePause)
 		{
-			playerController->Update(window, deltaTime);
+			playerController->Update(window, engine::deltaTime);
 		}
 		// if paused or Pause pressed update PauseSystem
 		if (pauseSystem->isGamePause || input::GetNewPress("Pause"))
@@ -188,7 +188,7 @@ int main()
 	}
 
 	input::uninitialize();
-	ecs::DestroyAllEntities(true);
+	engine::ecs::DestroyAllEntities(true);
 	glfwTerminate();
 	return 0;
 }

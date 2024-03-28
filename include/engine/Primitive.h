@@ -17,7 +17,6 @@
 #include <engine/GL/Texture.h>
 #include <engine/GL/Camera.h>
 
-
 namespace engine
 {
 	///A class to create and store a primitive shape

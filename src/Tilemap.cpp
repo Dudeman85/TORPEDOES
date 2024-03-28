@@ -234,10 +234,10 @@ void Tilemap::loadMap(const std::string ownMap)
 }
 
 //Get the center position of a tile in world coordinates
-engine::Vector2 Tilemap::GetTilePosition(unsigned int x, unsigned int y)
+Vector2 Tilemap::GetTilePosition(unsigned int x, unsigned int y)
 {
 	//Move from top left to center position
-	engine::Vector2 position;
+	Vector2 position;
 	position.x += tileSize.x / 2;
 	position.y -= tileSize.y / 2;
 
@@ -250,13 +250,15 @@ engine::Vector2 Tilemap::GetTilePosition(unsigned int x, unsigned int y)
 }
 
 //Find any collision layer tiles in a box
-std::vector<engine::Vector2> Tilemap::CheckCollisionBox(engine::Vector2 topLeft, engine::Vector2 bottomRight)
+std::vector<Vector2> Tilemap::CheckCollisionBox(Vector2 topLeft, Vector2 bottomRight)
 {
 	//Log all tiles
-	std::vector<engine::Vector2> collisions;
+	std::vector<Vector2> collisions;
 
 	if (collisionLayer.empty())
+	{
 		return collisions;
+	}
 
 	//Calculate the x and y index bounds
 	int xMin = floor((topLeft.x + position.x) / tileSize.x);
@@ -274,7 +276,9 @@ std::vector<engine::Vector2> Tilemap::CheckCollisionBox(engine::Vector2 topLeft,
 			{
 				//If tile is in collision layer log it
 				if (collisionLayer[x][y] != 0)
-					collisions.push_back(engine::Vector2(x, y));
+				{ 
+					collisions.push_back(Vector2(x, y));
+				}
 			}
 		}
 	}

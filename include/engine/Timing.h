@@ -1,10 +1,19 @@
+#pragma once
+
+
 #include <chrono>
 #include <vector>
 #include <functional>
 #include <engine/ECS.h>
 
+#include "engine/Callback.h"
+#include <map>
+
 namespace engine
 {
+	// All CallbackWrappers binded by ScheduleFunction
+	std::vector<CallbackWrapper*> _CallbackWrappers;
+
 	//Global timers, these are updated in TimerSystem::Update()
 	//How many seconds the last frame took
 	double deltaTime = 0;
@@ -34,13 +43,13 @@ namespace engine
 		//How long the delay before calling is
 		double duration;
 		bool repeat = false;
-		std::function<void()> function;
+		CallbackWrapper* function;
 		double timePassed;
 	};
 
 	//Timer Component
-	ECS_REGISTER_COMPONENT(Timer)
-	struct Timer
+	ECS_REGISTER_COMPONENT(TimerComponent)
+	struct TimerComponent
 	{
 		//Duration of the timer in seconds
 		double duration = 0;
@@ -49,13 +58,13 @@ namespace engine
 		//Restart the timer after completion
 		bool repeat = false;
 		//Function to call after timer is done
-		std::function<void(ecs::Entity)> callback;
+		CallbackWrapper* callback = nullptr;
 		//Is the timer currently running
 		bool running = false;
 	};
 
 	//Timer System, Requires Timer
-	ECS_REGISTER_SYSTEM(TimerSystem, Timer)
+	ECS_REGISTER_SYSTEM(TimerSystem, TimerComponent)
 	class TimerSystem : public ecs::System
 	{
 	private:
@@ -64,7 +73,7 @@ namespace engine
 	public:
 		void Init()
 		{
-			//Start Time
+			// Start Time
 			_lastFrame = chrono::high_resolution_clock::now();
 		}
 
@@ -92,11 +101,21 @@ namespace engine
 				{
 					future.timePassed -= future.duration;
 
-					future.function();
+					future.function->Call();
 
 					// If not repeating, delete the event
 					if (!future.repeat)
 					{
+						// Remove function from _CallbackWrappers
+						auto it = std::find(_CallbackWrappers.begin(), _CallbackWrappers.end(), future.function);
+						if (it != _CallbackWrappers.end()) 
+						{
+							_CallbackWrappers.erase(it);
+						}
+
+						delete future.function;
+						future.function = nullptr;
+
 						itr = schedule.erase(itr);
 						break;
 					}
@@ -109,12 +128,12 @@ namespace engine
 				}
 			}
 
-			//Iterate through entities
+			// Iterate through entities
 			for (ecs::Entity entity : entities)
 			{
-				Timer& timer = ecs::GetComponent<Timer>(entity);
+				TimerComponent& timer = ecs::GetComponent<TimerComponent>(entity);
 
-				//If timer is not done
+				// If timer is not done
 				if (timer.timePassed < timer.duration)
 				{
 					timer.timePassed += deltaTime;
@@ -123,26 +142,30 @@ namespace engine
 				{
 					timer.timePassed = 0;
 
-					//Call callback if applicable
+					// Call callback if applicable
 					if (timer.callback)
-						timer.callback(entity);
-
-					//Stop timer if not repeating
+					{
+						timer.callback->Call();
+					}
+						
+					// Stop timer if not repeating
 					if (!timer.repeat)
+					{
 						timer.running = false;
+					}
 				}
 			}
 
-			//Update all the time stuff
+			// Update all the time stuff
 			CalculateDeltaTime();
 			frameCount++;
 			programTime += deltaTime;
 		}
 
-		//Shorthand for starting an entity's timer
-		static inline void StartTimer(ecs::Entity entity, double duration, bool repeat = false, std::function<void(ecs::Entity)> callback = nullptr)
+		// Shorthand for starting an entity's timer
+		static inline void StartTimer(ecs::Entity entity, double duration, bool repeat = false, CallbackWrapper* callback = nullptr)
 		{
-			Timer& timer = ecs::GetComponent<Timer>(entity);
+			TimerComponent& timer = ecs::GetComponent<TimerComponent>(entity);
 
 			timer.duration = duration;
 			timer.timePassed = 0;
@@ -151,14 +174,30 @@ namespace engine
 			timer.running = true;
 		}
 
-		//Schedule a function to be executed in n seconds or frames, returns a handle to that event
-		static ScheduledFunction& ScheduleFunction(std::function<void()> function, double time, bool repeat = false, ScheduledFunction::Type durationType = ScheduledFunction::Type::seconds)
+		// Schedule a function to be executed in n seconds or frames, returns a handle to that event
+		template<typename Function, typename... Args>
+		static inline ScheduledFunction& ScheduleFunction(Function&& CallbackFunction, double time, bool repeat = false, ScheduledFunction::Type durationType = ScheduledFunction::Type::seconds, Args&&... Arguments)
 		{
-			ScheduledFunction future = ScheduledFunction{ .type = durationType, .duration = time, .repeat = repeat, .function = function };
+			CallbackWrapper* wrapper = new CallbackWrapper(std::bind(std::forward<Function>(CallbackFunction), std::forward<Args>(Arguments)...));
+			_CallbackWrappers.push_back(wrapper);
+
+			ScheduledFunction future = ScheduledFunction{ .type = durationType, .duration = time, .repeat = repeat, .function = wrapper };
 			schedule.push_back(future);
+
+			// Why not return future? This is not thread-safe, and for no reason
 			return schedule.back();
 		}
 	};
+
+	// Clean up timer memory
+	void UninitializeTimers()
+	{
+		for (auto CallbackWrapperToDelete : _CallbackWrappers)
+		{
+			delete CallbackWrapperToDelete;
+		}
+	}
+
 }
 
-std::vector<ScheduledFunction> TimerSystem::schedule = schedule;
+std::vector<engine::ScheduledFunction> engine::TimerSystem::schedule = schedule;

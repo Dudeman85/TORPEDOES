@@ -36,8 +36,6 @@ namespace input
 		NewOn	// This state was turned on
 	};
 
-	using engine::Vector2;
-	
 	// Handles a specified input's values by saving all values and timestamps in InputSamples.
 	// From this, we can calculate whether input has been in a specified value range within an update iteration.
 	// We can also calculate the time an input has spent in the specified value range.
