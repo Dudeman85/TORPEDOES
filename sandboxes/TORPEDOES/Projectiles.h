@@ -38,9 +38,9 @@ struct  Hedgehog : public Projectile
 
 //Temporary function for testing
  void SpawnProjectile(engine::ecs::Entity p, int playerID)
-{
+ {
 	std::cout << engine::ecs::GetComponent<engine::Transform>(p).position.ToString();
-}
+ }
 
 static void CreateAnimation(engine::ecs::Entity entity)
 {
