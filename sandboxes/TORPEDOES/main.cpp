@@ -5,7 +5,7 @@
 #include "engine/SoundComponent.h"
 
 int checkPointNumber = 0;
-
+bool isGamePaused = false;
 void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine::Model* checkPointModel, float hitboxrotation, bool finish_line = false)
 {
 	engine::ecs::Entity checkpoint = engine::ecs::NewEntity();
@@ -79,6 +79,8 @@ void SetupInput()
 {
 	input::ConstructDigitalEvent("Pause");
 	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
+	input::ConstructDigitalEvent("Menu");
+	input::bindDigitalInput(GLFW_KEY_U, { "Menu" });
 	// TODO: add controller pause key
 
 	for (size_t i = 0; i < 4; i++)
@@ -113,7 +115,7 @@ void SetupInput()
 	input::bindAnalogInput(GLFW_KEY_UP,		input::digitalPositiveInput, { "Throttle" + std::to_string(KeyboardPlayer) }, 0);
 	input::bindAnalogInput(GLFW_KEY_DOWN,	input::digitalNegativeInput, { "Throttle" + std::to_string(KeyboardPlayer) }, 0);
 
-	input::bindDigitalInput(GLFW_KEY_N, { "Shoot" + std::to_string(KeyboardPlayer) });
+	input::bindDigitalInput(GLFW_KEY_N, { "Shoot" + std::to_string(KeyboardPlayer) });																  
 	input::bindDigitalInput(GLFW_KEY_M, { "Boost" + std::to_string(KeyboardPlayer) });
 }
 
@@ -140,7 +142,7 @@ int main()
 	playerController->Init();
 	std::shared_ptr<HedgehogSystem> hedgehogSystem = engine::ecs::GetSystem<HedgehogSystem>();
 
-	std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem = ecs::GetSystem<PlayerSelectSystem>();
+	std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem = engine::ecs::GetSystem<PlayerSelectSystem>();
 	ShipSelectionSystem->Init();
 
 	//Bind all input actions
@@ -166,27 +168,58 @@ int main()
 		engine::Update(&cam);
 
 		// playerControl Update for frame if not paused
-		if (!pauseSystem->isGamePause)
+		if (!pauseSystem->isGamePause || !ShipSelectionSystem->isShipSelectionMenuOn)
 		{
 			playerController->Update(window, engine::deltaTime);
 		}
+		else {
+			printf("\nNOT UPDATING playerController \n");
+		}
 		
 		// if paused or Pause pressed update PauseSystem
-		if (pauseSystem->isGamePause || input::GetNewPress("Pause"))
+		if (input::GetNewPress("Pause"))
 		{
 			pauseSystem->isGamePause = true;
+			isGamePaused = true;
+			printf("\nGamePause pressed\n");
+			pauseSystem->ToggleShowUIOptionsMenu();
 			pauseSystem->Update();
 		}
+		if (isGamePaused) 
+		{
+			//printf("\nGamePaused \n");
+			pauseSystem->Update();
+		}
+		//printf( "\npauseSystem->isGamePause value is:", pauseSystem->isGamePause);
+		//cout << "\npauseSystem->isGamePause value is:" << pauseSystem->isGamePause << "\n";
 		if (input::GetNewPress("Menu"))
 		{
-			printf("Ship selection menu open");
-			ShipSelectionSystem->isShipSelectionMenuOn = true;
-		
+			ShipSelectionSystem->isShipSelectionMenuOn = !ShipSelectionSystem->isShipSelectionMenuOn;
+			
+
+
+			if (ShipSelectionSystem->isShipSelectionMenuOn = false) 
+			{
+			
+
+			printf("\nShip selection menu open\n");
 			ShipSelectionSystem->ToggleMenuPlayerSelection();
-			continue;
+
+			}
+			else {
+			
+
+				printf("\nShip selection menu closed\n");
+				ShipSelectionSystem->ToggleMenuPlayerSelection();
+
+			}
+		
+			
+			std::cout << "is Ship selection open:" << ShipSelectionSystem->isShipSelectionMenuOn;
 		}
 		if (ShipSelectionSystem->isShipSelectionMenuOn)
 		{
+			printf("\nShipSelectionSystem->Update()\n");
 			ShipSelectionSystem->Update();
 		}
 
