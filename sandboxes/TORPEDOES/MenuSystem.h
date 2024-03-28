@@ -5,7 +5,24 @@
 #include <functional>
 #include "engine/Input.h"  
 
-//Pause Component
+ECS_REGISTER_COMPONENT(PlayerSelect)
+struct PlayerSelect
+{
+	engine::ecs::Entity upper, lower;
+	engine::Texture* selectedTexture;
+	engine::Texture* unselectedTexture;
+	std::function<void()> operation;
+	bool isOptionsMenu = false;
+	bool isSlider = false;
+	float sliderValue = 0;
+};
+ECS_REGISTER_SYSTEM(PlayerSelectSystem, PlayerSelect, engine::Transform)
+class PlayerSelectSystem : public engine::ecs::System
+{
+
+};
+
+
 ECS_REGISTER_COMPONENT(PauseComponent)
 struct PauseComponent
 {
@@ -63,7 +80,7 @@ public:
 			if (input::GetInputValue("Move0", GLFW_GAMEPAD_AXIS_LEFT_Y) >= 0.5f)
 			{
 				std::cout << "upTimer" << moveWaitedTimerUP << "\n";
-				moveWaitedTimerUP += deltaTime;
+				moveWaitedTimerUP += deltatime;
 
 				if (moveWaitedTimerUP >= delay)
 				{
