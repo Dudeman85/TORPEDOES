@@ -288,12 +288,12 @@ public:
 	}
 
 	/// PlayerController Update 
-	void Update(GLFWwindow* window, float dt)
+	void Update(GLFWwindow* window)
 	{
 		//Don't do anything until countdown is done
 		if (countdownTimer > 0)
 		{
-			countdownTimer -= dt;
+			countdownTimer -= engine::deltaTime;
 			return;
 		}
 
@@ -337,7 +337,7 @@ public:
 				{
 					case HitStates::Stop:
 						// Rotate player
-						engine::TransformSystem::Rotate(player.renderedEntity, 0, 360.0f * dt, 0);
+						engine::TransformSystem::Rotate(player.renderedEntity, 0, 360.0f * engine::deltaTime, 0);
 					break;
 					case HitStates::Additive:
 						player._speedScale += std::max(hitProjectile.first.hitSpeedFactor, 0.f);
@@ -363,12 +363,12 @@ public:
 			// Apply acceleration impulse if positive input is received
 			if (accelerationInput > 0.0f)
 			{
-				forwardImpulse = forwardDirection * accelerationInput * dt * player.forwardSpeed;
+				forwardImpulse = forwardDirection * accelerationInput * player.forwardSpeed;
 			}
 			// Apply deceleration impulse if negative input is received
 			if (accelerationInput < 0.0f)
 			{
-				forwardImpulse = forwardDirection * accelerationInput * dt * player.reverseSpeed;
+				forwardImpulse = forwardDirection * accelerationInput * player.reverseSpeed;
 			}
 			if (rotateInput != 0.0f)
 			{
@@ -376,14 +376,14 @@ public:
 				// TODO: this function could be improved by testing
 				float rotationScalar = 1 - log10(2.0f * std::max(0.5f, accelerationInput));
 
-				float trueRotateInput = -rotateInput * player.rotationSpeed * rotationScalar * dt;
+				float trueRotateInput = -rotateInput * player.rotationSpeed * rotationScalar;
 
 				// Apply forward impulse if rotating or receiving a rotation command
-				engine::TransformSystem::Rotate(player.renderedEntity, 0, trueRotateInput, 0);
+				engine::TransformSystem::Rotate(player.renderedEntity, 0, trueRotateInput * engine::deltaTime, 0);
 
 				// Set min speed while turning
 
-				Vector2 minRotateImpulse = forwardDirection * std::abs(trueRotateInput) * player.minSpeedWhileTurning * dt;
+				Vector2 minRotateImpulse = forwardDirection * std::abs(trueRotateInput) * player.minSpeedWhileTurning * engine::deltaTime;
 
 				if (minRotateImpulse.Length() > forwardImpulse.Length())
 				{
@@ -394,7 +394,7 @@ public:
 			collider.rotationOverride = modelTransform.rotation.y + 1080;
 
 			// Increase the special timer
-			player._specialTimer += dt;
+			player._specialTimer += engine::deltaTime;
 
 			// If the special cooldown has passed
 			while (player._specialTimer >= player.specialCooldown)
@@ -425,7 +425,7 @@ public:
 			}
 
 			// Apply the final impulse to the object
-			engine::PhysicsSystem::Impulse(entity, (forwardImpulse * player._speedScale * finalBoostScale));
+			engine::PhysicsSystem::Impulse(entity, (forwardImpulse * player._speedScale * finalBoostScale) * engine::deltaTime);
 
 			// Reset offroad status for this frame
 			player._offroadThisFrame = false;
@@ -438,7 +438,7 @@ public:
 			// If not max ammo
 			if (player.ammo < player.maxAmmo)
 			{
-				player._ammoRechargeTimer += dt;
+				player._ammoRechargeTimer += engine::deltaTime;
 
 				while (player._ammoRechargeTimer >= player.ammoRechargeCooldown)
 				{
@@ -461,7 +461,7 @@ public:
 			}
 
 			// Increase the projectile timer
-			player._shootTimer += dt;
+			player._shootTimer += engine::deltaTime;
 
 			// If the projectile cooldown has passed
 			while (player._shootTimer >= player.shootCooldown)

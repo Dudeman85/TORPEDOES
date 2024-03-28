@@ -165,7 +165,7 @@ int main()
 		// playerControl Update for frame if not paused
 		if (!pauseSystem->isGamePause)
 		{
-			playerController->Update(window, engine::deltaTime);
+			playerController->Update(window);
 		}
 		// if paused or Pause pressed update PauseSystem
 		if (pauseSystem->isGamePause || input::GetNewPress("Pause"))
