@@ -208,21 +208,7 @@ int main()
 			
 
 
-			if (ShipSelectionSystem->isShipSelectionMenuOn = false) 
-			{
-			
-
-			printf("\nShip selection menu open\n");
-			ShipSelectionSystem->ToggleMenuPlayerSelection();
-
-			}
-			else {
-			
-
-				printf("\nShip selection menu closed\n");
 				ShipSelectionSystem->ToggleMenuPlayerSelection();
-
-			}
 		
 			
 			std::cout << "is Ship selection open:" << ShipSelectionSystem->isShipSelectionMenuOn;

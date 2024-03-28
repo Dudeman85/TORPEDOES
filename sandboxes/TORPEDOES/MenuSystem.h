@@ -70,11 +70,11 @@ public:
 			//engine::ecs::AddComponent(pausedImage, PauseComponent{ .upper = pausedImage, .lower = optionsButton, .selectedTexture = resources::menuTextures["UI_Paused.png"], .unselectedTexture = resources::menuTextures["UI_Paused.png"], .operation = PauseSystem::OnResumePressed });
 
 
-			engine::ecs::AddComponent(arrowRight, engine::Transform{ .position = Vector3(0.5f,0,-0.1f), .rotation = 180, .scale = Vector3(0.2f) });
-			engine::ecs::AddComponent(arrowRight, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Paused.png"] , .enabled = false, .uiElement = true });
+			engine::ecs::AddComponent(arrowRight, engine::Transform{ .position = Vector3(0.5f,0,-0.1f), .rotation = Vector3(0,0,180), .scale = Vector3(0.04f)});
+			engine::ecs::AddComponent(arrowRight, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"] , .enabled = false, .uiElement = true });
 
-			engine::ecs::AddComponent(arrowLeft, engine::Transform{ .position = Vector3(-0.5f,0,-0.1f), .rotation = 0 , .scale = Vector3(0.2f) });
-			engine::ecs::AddComponent(arrowLeft, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Paused.png"] , .enabled = false, .uiElement = true });
+			engine::ecs::AddComponent(arrowLeft, engine::Transform{ .position = Vector3(-0.5f,0,-0.1f), .rotation = 0 , .scale = Vector3(0.04f) });
+			engine::ecs::AddComponent(arrowLeft, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"] , .enabled = false, .uiElement = true });
 
 			engine::ecs::AddComponent(shipModel, engine::Transform{ .position = Vector3(0,-0.2f,-0.1f) , .scale = 0 });
 			engine::ecs::AddComponent(shipModel, engine::ModelRenderer{ .model = resources::models["Ship_HMCS_Sackville_Hedgehog.obj"] });
@@ -162,10 +162,10 @@ public:
 			{
 				engine::ecs::GetComponent< engine::SpriteRenderer>(arrowRight).enabled = true;
 				engine::ecs::GetComponent< engine::SpriteRenderer>(arrowLeft).enabled = true;
-				engine::ecs::GetComponent< engine::Transform>(shipModel).scale = Vector3(1, 1, -0.1f);
+				engine::ecs::GetComponent< engine::Transform>(shipModel).scale = Vector3(0.1f, 0.1f, 0.1f);
 
 				engine::ecs::GetComponent< engine::TextRenderer>(readyText).text = "UNready";
-				engine::ecs::GetComponent< engine::Transform>(readyText).scale = 5;
+				engine::ecs::GetComponent< engine::Transform>(readyText).scale = Vector3(0.1f,0.1f,0.1f);
 
 				std::cout << "\nisShipSelectionMenuOn: " << isShipSelectionMenuOn << "\n";
 			}
@@ -175,10 +175,10 @@ public:
 
 				engine::ecs::GetComponent< engine::SpriteRenderer>(arrowRight).enabled = false;
 				engine::ecs::GetComponent< engine::SpriteRenderer>(arrowLeft).enabled = false;
-				engine::ecs::GetComponent< engine::Transform>(shipModel).scale = Vector3(0, 0, -0.1f);
+				engine::ecs::GetComponent< engine::Transform>(shipModel).scale = Vector3(1, 1, -0.1f);
 
 				engine::ecs::GetComponent< engine::TextRenderer>(readyText).text = "UNready";
-
+				engine::ecs::GetComponent< engine::TextRenderer>(readyText).scale = Vector3(1, 1, 1);
 				std::cout << "\nisShipSelectionMenuOn: " << isShipSelectionMenuOn << "\n";
 			}
 
