@@ -2,22 +2,18 @@
 #include <engine/Tilemap.h>
 #include "PlayerController.h"
 
-float camScale = 1.0;
-float camScaleMin = 600.0f;
-float camScaleMax = 1650.0f;
-const float aspectRatio = 16.f / 9.f;
-float camPadding = 100;
-float camDeadzone = 10;
-const float zoomThreshold = 5.0f;
-
 //New stuff
 const float aspectRatio = 16.f / 9.f;
+//Height of the camera, width is calculated automatically
+float camHeight = 1.f;
 //Maximum units a player can be from the camera's edge before zooming in
-const float zoomInThreshold = 500;
+const float zoomInThreshold = 400;
 //Minimum units a player can be from the camera's edge before zooming out
-const float zoomOutThreshold = 200;
+const float zoomOutThreshold = 300;
 //How fast the camera can zoom in or out
-const float zoomSpeed = 10;
+const float zoomSpeed = 30;
+//Minimum height the camera can have
+const float minHeight = 300;
 
 static void UpdateCam(Camera* cam, Tilemap* map)
 {
@@ -45,18 +41,38 @@ static void UpdateCam(Camera* cam, Tilemap* map)
 	//Zoom out
 	if (topDiff < zoomOutThreshold || rightDiff < zoomOutThreshold || bottomDiff < zoomOutThreshold || leftDiff < zoomOutThreshold)
 	{
-		camScale += zoomSpeed;
+		camHeight += zoomSpeed;
 	}
 	//Zoom in
 	else if (topDiff > zoomInThreshold || rightDiff > zoomInThreshold || bottomDiff > zoomInThreshold || leftDiff > zoomInThreshold)
 	{
-		camScale -= zoomSpeed;
+		camHeight -= zoomSpeed;
 	}
 
 	//Restrict camera to size of tilemap
+	const float maxHeight = map->bounds.height;
+	camHeight = std::clamp(camHeight, minHeight, maxHeight);
+
+	//Calculate the camera's position
+	Vector2 playersCenter(playerBounds[3] + (playerBounds[1] - playerBounds[3]) / 2, playerBounds[2] + (playerBounds[0] - playerBounds[2]) / 2);
+	const float positionXMax = map->position.x + map->bounds.width - (camHeight * aspectRatio) / 2;
+	const float positionXMin = map->position.x + (camHeight * aspectRatio) / 2;
+	const float positionYMax = map->position.y - camHeight / 2;
+	const float positionYMin = map->position.y - map->bounds.height + camHeight / 2;
+
+	//Set the camera to the center of the player box
+	Vector3 position;
+	position.x = std::clamp(playersCenter.x, positionXMin, positionXMax);
+	position.y = std::clamp(playersCenter.y, positionYMin, positionYMax);
+	position.z = 1500;
+
+	//Apply camera position and scale
+	cam->SetPosition(position);
+	cam->SetDimensions(std::floor(camHeight * aspectRatio), camHeight);
+
 
 	//OLD CAMERA IMPLEMENTATION
-
+	/*
 	camScaleMax = map->bounds.height - 1;
 
 
@@ -127,4 +143,5 @@ static void UpdateCam(Camera* cam, Tilemap* map)
 	}
 
 	modelRenderSystem->SetLight(Vector3(cam.position.x, cam.position.y, 1500), Vector3(255));
+	*/
 }

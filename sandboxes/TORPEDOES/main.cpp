@@ -163,7 +163,7 @@ int main()
 
 		input::update();
 
-		UpdateCam(window, cam, resources::level1Map);
+		UpdateCam(&cam, resources::level1Map);
 		engine::Update(&cam);
 
 		// playerControl Update for frame if not paused
