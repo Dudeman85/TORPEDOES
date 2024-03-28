@@ -4,6 +4,7 @@
 #include <engine/Application.h>
 #include <functional>
 #include "engine/Input.h"  
+#include "engine/Timing.h"
 
 ECS_REGISTER_COMPONENT(PlayerSelect)
 struct PlayerSelect
@@ -68,6 +69,7 @@ public:
 
 	void Update()
 	{
+
 		printf("IN MENU SYSTEM UPDATE()\n");
 		if (input::GetNewPress("Pause"))
 		{
@@ -77,10 +79,10 @@ public:
 		}
 		if (engine::ecs::GetSystem<PauseSystem>()->isGamePause)
 		{
-			if (input::GetInputValue("Move0", GLFW_GAMEPAD_AXIS_LEFT_Y) >= 0.5f)
+			if (input::GetInputValue("Turn", GLFW_GAMEPAD_AXIS_LEFT_Y) >= 0.5f)
 			{
 				std::cout << "upTimer" << moveWaitedTimerUP << "\n";
-				moveWaitedTimerUP += deltatime;
+				moveWaitedTimerUP += engine::deltatime;
 
 				if (moveWaitedTimerUP >= delay)
 				{
