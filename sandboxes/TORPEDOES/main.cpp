@@ -177,36 +177,27 @@ int main()
 		UpdateCam(window, cam, resources::level1Map);
 		engine::Update(&cam);
 
-		// playerControl Update for frame if not paused
-		if (!pauseSystem->isGamePause || !ShipSelectionSystem->isShipSelectionMenuOn)
-		{
-			playerController->Update(window);
-		}
-		else {
-			printf("\nNOT UPDATING playerController \n");
-		}
 		
 		// if paused or Pause pressed update PauseSystem
 		if (input::GetNewPress("Pause"))
 		{
-			pauseSystem->isGamePause = true;
-			isGamePaused = true;
-			printf("\nGamePause pressed\n");
+			pauseSystem->isGamePause = !(pauseSystem->isGamePause);
+			isGamePaused = !isGamePaused;
+			//printf("\nGamePause pressed\n");
 			pauseSystem->ToggleShowUIOptionsMenu();
-			pauseSystem->Update();
+																							
 		}
-		if (isGamePaused) 
+		if (pauseSystem->isGamePause)
 		{
 			//printf("\nGamePaused \n");
 			pauseSystem->Update();
 		}
-		//printf( "\npauseSystem->isGamePause value is:", pauseSystem->isGamePause);
-		//cout << "\npauseSystem->isGamePause value is:" << pauseSystem->isGamePause << "\n";
+	
 		if (input::GetNewPress("Menu"))
 		{
 			ShipSelectionSystem->isShipSelectionMenuOn = !ShipSelectionSystem->isShipSelectionMenuOn;
+			isGamePaused = !isGamePaused;
 			
-
 
 				ShipSelectionSystem->ToggleMenuPlayerSelection();
 		
@@ -215,10 +206,21 @@ int main()
 		}
 		if (ShipSelectionSystem->isShipSelectionMenuOn)
 		{
-			printf("\nShipSelectionSystem->Update()\n");
+			//printf("\nShipSelectionSystem->Update()\n");
 			ShipSelectionSystem->Update();
 		}
 
+		// playerControl Update for frame if not paused
+		//                           XOR gate true when only if out puts are different
+		/*if ((pauseSystem->isGamePause ^ ShipSelectionSystem->isShipSelectionMenuOn))*/
+		if(isGamePaused)
+		{
+			//printf("\nNOT UPDATING playerController \n");
+			
+		}
+		else {
+			playerController->Update(window);
+		}
 
 		glfwSwapBuffers(window);
 	}
