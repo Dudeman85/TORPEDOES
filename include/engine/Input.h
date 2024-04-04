@@ -209,6 +209,19 @@ namespace input
 		float Default;
 	};
 
+	struct MinMaxDefaultDeadzone : public MinMaxDefault
+	{
+		MinMaxDefaultDeadzone(MinMaxDefault a, float b = 0)
+		{
+			Min = a.Min;
+			Max = a.Max;
+			Default = a.Default;
+			Deadzone = b;
+		}
+
+		float Deadzone;
+	};
+
 	/* Default controlled mapped values */
 
 	MinMaxDefault controllerMixedInput = {-1, 1, 0};			// Values for default mixed positive & negative input: Default 0, 1 when towards axis direction, -1 when against axis direction
@@ -221,7 +234,7 @@ namespace input
 
 	struct InputEventData
 	{
-		MinMaxDefault minMaxDefault;
+		MinMaxDefaultDeadzone minMax;
 		int axis;
 
 		struct Hash 
@@ -244,9 +257,26 @@ namespace input
 	};
 
 	// Maps a value from one range to another
-	static float map_value(float value, float from_min, float from_max, float to_min, float to_max)
+	static float map_value(float from_value, float from_min, float from_max, float to_min, float to_max)
 	{
-		return (value - from_min) / (from_max - from_min) * (to_max - to_min) + to_min;
+		return (from_value - from_min) / (from_max - from_min) * (to_max - to_min) + to_min;
+	}
+
+	// Maps a value from one range to another
+	static float map_value(float from_value, float from_min, float from_max, float from_deadzone, float to_min, float to_max, float to_deadzone)
+	{
+		if (from_value <= from_deadzone)
+		{
+			from_value = from_min;
+		}
+
+		float temp = map_value(from_value, from_min, from_max, to_min, to_max);
+
+		if (temp <= to_deadzone)
+		{
+			temp = to_min;
+		}
+		return temp;
 	}
 
 	// InputEvent that handles analog ínput, such as 0...1 inclusive values
@@ -264,7 +294,7 @@ namespace input
 		std::map<float*, InputState*> OutputValuesToOutputStates;
 
 		// Holds input axis key and pointer to the input value, as well as the MinMaxDefault for the axis and input value
-		std::unordered_multimap<InputEventData, std::pair<float*, MinMaxDefault>, InputEventData::Hash, InputEventData::Equal> InputEventDataToOutputValues;
+		std::unordered_multimap<InputEventData, std::pair<float*, MinMaxDefaultDeadzone>, InputEventData::Hash, InputEventData::Equal> InputEventDataToOutputValues;
 
 		// Total input values of each axis
 		std::map<int, float> totalValues;
@@ -275,7 +305,7 @@ namespace input
 		// Call after updating all inputs, before handling the input axes
 		void turnOutputStatesToOutputValues()
 		{
-			for (auto OutputValueToOutputState : OutputValuesToOutputStates)
+			for (auto& OutputValueToOutputState : OutputValuesToOutputStates)
 			{
 				// Find the min, max and default values for this output
 				auto it = OutputStatesToMinMaxDefaultValues.find(OutputValueToOutputState.second);
@@ -317,13 +347,14 @@ namespace input
 		{
 			if (!totalValuesUpdated)
 			{
-				// Update total value
+				// Make empty output
 				std::map<int, float> output;
 				
 				for (auto it = InputEventDataToOutputValues.begin(); it != InputEventDataToOutputValues.end(); ++it)
 				{
-					output[it->first.axis] += input::map_value(*it->second.first, it->second.second.Min, it->second.second.Max, it->first.minMaxDefault.Min, it->first.minMaxDefault.Max);
+					output[it->first.axis] += input::map_value(*it->second.first, it->second.second.Min, it->second.second.Max, it->second.second.Deadzone, it->first.minMax.Min, it->first.minMax.Max, it->first.minMax.Deadzone);
 				}
+				// Update total value
 				totalValues = output;
 				totalValuesUpdated = true;
 			}
@@ -774,26 +805,26 @@ namespace input
 	// List that saves all outputvalues for deletion
 	std::vector<float*> bindedOutputValues;
 
-	static void bindAnalogInput(DigitalInput* inputButton, MinMaxDefault inputMinMaxDefault, std::map<AnalogInputEvent*, InputEventData> inputEvents)
+	static void bindAnalogInput(DigitalInput* inputButton, MinMaxDefault inputMinMaxDefault, float deadzone, std::map<AnalogInputEvent*, InputEventData> inputEvents)
 	{
 		// Bind all specified events to DigitalInput
 		for (auto& inputEvent : inputEvents)
 		{
 			// Bind the output state
-			inputEvent.first->OutputStatesToMinMaxDefaultValues.insert({&inputButton->buttonOutputState, inputEvent.second.minMaxDefault});
+			inputEvent.first->OutputStatesToMinMaxDefaultValues.insert({&inputButton->buttonOutputState, inputEvent.second.minMax});
 			
 			// Create a new output value
 			float* outputValue = new float;
 			bindedOutputValues.push_back(outputValue);		
 
 			// Add output value to it's axis
-			inputEvent.first->InputEventDataToOutputValues.insert({ {inputEvent.second.minMaxDefault, inputEvent.second.axis}, { outputValue, inputMinMaxDefault } });
+			inputEvent.first->InputEventDataToOutputValues.insert({ {inputEvent.second.minMax, inputEvent.second.axis}, { outputValue, {inputMinMaxDefault, deadzone} } });
 
 			// Bind the output value to the output state
 			inputEvent.first->OutputValuesToOutputStates.insert({outputValue, &inputButton->buttonOutputState});
 		}
 	}
-	static void bindAnalogInput(inputKey key, MinMaxDefault inputMinMaxDefault, std::map<AnalogInputEvent*, InputEventData> inputEvents)
+	static void bindAnalogInput(inputKey key, MinMaxDefault inputMinMaxDefault, float deadzone, std::map<AnalogInputEvent*, InputEventData> inputEvents)
 	{
 		// Find inputKey
 		auto it = inputKeytoDigitalInput.find(key);
@@ -801,15 +832,15 @@ namespace input
 		// Check if the key exists in the map
 		if (it != inputKeytoDigitalInput.end())
 		{
-			bindAnalogInput(it->second, inputMinMaxDefault, inputEvents);
+			bindAnalogInput(it->second, inputMinMaxDefault, deadzone, inputEvents);
 		}
 		else
 		{
 			// Construct a new inputButton to bind
-			bindAnalogInput(new DigitalInput(key), inputMinMaxDefault, inputEvents);
+			bindAnalogInput(new DigitalInput(key), inputMinMaxDefault, deadzone, inputEvents);
 		}
-	}
-	static void bindAnalogInput(inputKey key, MinMaxDefault inputMinMaxDefault, std::vector<std::string> analogInputEventName, int axis, float maxValue = 1, float minValue = 0, float defaultValue = 0)
+	}// TODO: WTF IS THE LAST MINMAX????
+	static void bindAnalogInput(inputKey key, MinMaxDefault inputMinMaxDefault, float deadzone, std::vector<std::string> analogInputEventName, int axis = 0)
 	{
 		std::map<AnalogInputEvent*, InputEventData> AnalogInputEventsToBind;
 
@@ -821,7 +852,7 @@ namespace input
 			// Check if the AnalogInputEvent's name exists in the map
 			if (it != nameToAnalogInputEvent.end())
 			{
-				AnalogInputEventsToBind.insert({it->second, {{minValue, maxValue, defaultValue}, axis}});
+				AnalogInputEventsToBind.insert({it->second, {{inputMinMaxDefault}, axis}});
 			}
 			else
 			{
@@ -829,7 +860,7 @@ namespace input
 			}
 		}
 
-		bindAnalogInput(key, inputMinMaxDefault, AnalogInputEventsToBind);
+		bindAnalogInput(key, inputMinMaxDefault, deadzone, AnalogInputEventsToBind);
 	}
 
 	class AnalogInput;
@@ -842,11 +873,17 @@ namespace input
 		// n-dimensional analog input
 		std::map<int, float> axisToValue;
 
-		float min = -1;
-		float max = 1;
+		float min = -1;			// Mininum value of analog input
+		float max = 1;			// Maximum value of analog input
 
-		AnalogInput(float joystick)
+		float deadzone = 1;		// When value is below this, it is trimmed to min
+
+		AnalogInput(float joystick, float minValue = -1, float maxValue = 1, float valueDeadzone = -1)
 		{
+			min = minValue;
+			max = maxValue;
+			deadzone = valueDeadzone;
+
 			joystickToAnalogInput[joystick] = this;
 		}
 
@@ -884,11 +921,11 @@ namespace input
 			// Bind all specified axes to event
 			for (auto& axisEventData : axisEventDatas)
 			{
-				inputEvent->InputEventDataToOutputValues.insert({ {axisEventData.minMaxDefault, axisEventData.axis}, {&inputButton->axisToValue[axisEventData.axis], controllerMixedInput} });
+				inputEvent->InputEventDataToOutputValues.insert({ {axisEventData.minMax, axisEventData.axis}, {&inputButton->axisToValue[axisEventData.axis], controllerMixedInput} });
 			}
 		}
 	}
-	static void bindAnalogControllerInput(int joystick, std::vector<InputEventData> axisEventDatas, std::vector<AnalogInputEvent*> inputEvents)
+	static void bindAnalogControllerInput(int joystick, std::vector<InputEventData> axisEventDatas, std::vector<AnalogInputEvent*> inputEvents, MinMaxDefault NewAnalogInput = {-1, 1, 1})
 	{
 		// Find inputKey
 		auto it = joystickToAnalogInput.find(joystick);
@@ -901,7 +938,7 @@ namespace input
 		else
 		{
 			// Construct a new AnalogControllerInput to bind
-			bindAnalogControllerInput(new AnalogInput(joystick), axisEventDatas, inputEvents);
+			bindAnalogControllerInput(new AnalogInput(joystick, NewAnalogInput.Min, NewAnalogInput.Max, NewAnalogInput.Default), axisEventDatas, inputEvents);
 		}
 	}
 	static void bindAnalogControllerInput(int joystick, std::vector<InputEventData> axisEventDatas, std::vector<std::string> analogInputEventNames)
@@ -943,8 +980,6 @@ namespace input
 
 	static void gamePadAxisTest(int joystick)
 	{
-		int count;
-
 		// Find joystick
 		auto it = joystickToAnalogInput.find(joystick);
 		if (it == joystickToAnalogInput.end())
@@ -1160,6 +1195,7 @@ namespace input
 				{
 					totalValue += axisToValue.second;
 				}
+
 				return totalValue;
 			}
 		}
