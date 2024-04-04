@@ -39,7 +39,7 @@ static void UpdateCam(GLFWwindow* window, engine::Camera& cam, Tilemap *map)
 	if (playerBounds[0] < camBounds[0] - zoomOutThreshold ||
 		playerBounds[1] > camBounds[1] + zoomOutThreshold ||
 		playerBounds[2] > camBounds[2] + zoomOutThreshold ||
-		playerBounds[3] < camBounds[3] - zoomOutThreshold)
+		playerBounds[3] < camBounds[3] - zoomOutThreshold || true)
 	{
 
 		float zoomOutFactor = 10.0f;

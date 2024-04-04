@@ -43,7 +43,6 @@ namespace engine
 				for (auto& sound : soundComponent.Sounds)
 				{
 					sound.second->setAbsoluteDirection(ListeningPosition - soundTransform.position);
-					std::cout << "pos: " << (ListeningPosition - soundTransform.position).x << ", " << (ListeningPosition - soundTransform.position).y << "\n";
 				}
 			}
 		}

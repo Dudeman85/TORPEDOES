@@ -76,6 +76,23 @@ void LoadLevel1(engine::Camera* cam)
 	PlayCountdown();
 }
 
+// Create everything for level 3
+void LoadLevel3(engine::Camera* cam)
+{
+	engine::collisionSystem->cam = cam;
+
+	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(1, Vector2(1434.0f, -1370.0f), ships);
+
+	//set this level's tilemap
+	engine::spriteRenderSystem->SetTilemap(resources::level3Map);
+	engine::collisionSystem->SetTilemap(resources::level3Map);
+	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{true});
+
+	// Make all the checkpoints manually
+	CreateCheckpoint(Vector3(2635.000000, -1355.000000, 0.000000), Vector3(77.500000, -40.000000, -7.500000), Vector3(20), resources::models["Prop_Buoy_Checkpoint.obj"], 45.0f);
+}
+
 //Bind all input events here
 void SetupInput()
 {
@@ -107,7 +124,7 @@ void SetupInput()
 	}
 
 	// Keyboard input
-	int KeyboardPlayer = 2;
+	int KeyboardPlayer = 0;
 
 	input::bindAnalogInput(GLFW_KEY_RIGHT, input::digitalPositiveInput, { "Turn" + std::to_string(KeyboardPlayer) }, 0);
 	input::bindAnalogInput(GLFW_KEY_LEFT, input::digitalNegativeInput, { "Turn" + std::to_string(KeyboardPlayer) }, 0);
@@ -157,13 +174,16 @@ int main()
 	SetupInput();
 
 	//Load the first level
-	LoadLevel1(&cam);
+	//LoadLevel1(&cam);
+
+	// Load the third level
+	LoadLevel3(&cam);
 
 
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 0), .scale = 20 });
-	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Checkpoint.obj"] });
+	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Buoy_Checkpoint.obj"] });
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -231,7 +251,7 @@ int main()
 
 		hedgehogSystem->Update();
 
-		UpdateCam(window, cam, resources::level1Map);
+		UpdateCam(window, cam, resources::level3Map);
 		engine::Update(&cam);
 
 
