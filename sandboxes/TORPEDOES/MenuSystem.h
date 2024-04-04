@@ -28,7 +28,7 @@ class PlayerSelectSystem : public engine::ecs::System
 	bool isPlayersReady = false;
 
 	const float throttleMoveWaitTime = 0.8f;
-	float throttleCurrentWaitedTimeUP =0;
+	float throttleCurrentWaitedTimeUP = 0;
 	float throttleCurrentWaitedTimeDown = 0;
 	engine::ecs::Entity selectionWindow;
 
@@ -99,10 +99,10 @@ public:
 			engine::ecs::AddComponent(arrowDown, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"] , .enabled = false, .uiElement = true });
 
 			engine::ecs::AddComponent(shipModel, engine::Transform{ .position = Vector3(0,0,-0.1f) , .scale = 0 });
-			engine::ecs::AddComponent(shipModel, engine::ModelRenderer{ .model = shipModels[torpedoBoat] });
+			engine::ecs::AddComponent(shipModel, engine::ModelRenderer{ .model = shipModels[torpedoBoat]});
 
 			engine::ecs::AddComponent(readyText, engine::Transform{ .position = Vector3(0,-0.2f,-0.1f) , .scale = 0 });
-			engine::ecs::AddComponent(readyText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "unready" });
+			engine::ecs::AddComponent(readyText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "unready" ,.uiElement = true});
 
 
 			engine::ecs::AddComponent(selectionWindow, engine::Transform{ .position = Vector3(0,0,0), .scale = Vector3(1,1,-0.1f) });
@@ -122,18 +122,18 @@ public:
 	}
 	void Update()
 	{
-	
+
 		//std::cout << "\n throttleCurrentWaitedTimeUP:" << throttleCurrentWaitedTimeUP << "\n";
 		throttleCurrentWaitedTimeUP += engine::deltaTime;
 		throttleCurrentWaitedTimeDown += engine::deltaTime;
 		for (engine::ecs::Entity entity : entities)
 		{
-		/*for (auto itr = entities.begin(); itr != entities.end();)
-		{
-			engine::ecs::Entity entity = *itr++;*/
+			/*for (auto itr = entities.begin(); itr != entities.end();)
+			{
+				engine::ecs::Entity entity = *itr++;*/
 
 
-			//Player& player = ecs::GetComponent<Player>(entity);
+				//Player& player = ecs::GetComponent<Player>(entity);
 			PlayerSelection& playerSelection = engine::ecs::GetComponent<PlayerSelection>(entity);
 			if (playerSelection.playerID)
 			{
@@ -150,7 +150,7 @@ public:
 					auto select = input::GetNewPress("Shoot" + std::to_string(playerSelection.playerID));
 
 
-					if (accelerationInput>0.5f && throttleCurrentWaitedTimeUP > throttleMoveWaitTime)
+					if (accelerationInput > 0.5f && throttleCurrentWaitedTimeUP > throttleMoveWaitTime)
 					{
 						throttleCurrentWaitedTimeUP = 0;
 						std::cout << "\n--Ship Selection moveUP--\n";
@@ -191,7 +191,7 @@ public:
 
 
 					//if(input::GetNewPress("MoveDown" + std::to_string(playerSelection.playerID)))
-					if(accelerationInput < -0.5f && throttleCurrentWaitedTimeDown > throttleMoveWaitTime)
+					if (accelerationInput < -0.5f && throttleCurrentWaitedTimeDown > throttleMoveWaitTime)
 					{
 						throttleCurrentWaitedTimeDown = 0;
 
@@ -249,10 +249,10 @@ public:
 	void ToggleMenuPlayerSelection()
 	{
 		printf("in MenuPlayerSelection\n");
-		
-		for (engine::ecs::Entity entity : entities)
-		{
-		
+
+		/*for (engine::ecs::Entity entity : entities)
+		{*/
+
 
 			if (isShipSelectionMenuOn)// Show every thing
 			{
@@ -262,8 +262,9 @@ public:
 
 				//.-.-.-.-.-.-.-.-.-TODO::  SHIP MODEL NOT CHANGE OR SHOW UP and Ready text missing too .-.-.-.-.-.-.-.-.-
 				engine::ecs::GetComponent< engine::TextRenderer>(readyText).text = "UNready";
-				engine::ecs::GetComponent< engine::Transform>(readyText).scale = Vector3(0.1f, 0.1f, 0.1f);
-
+				engine::ecs::GetComponent< engine::TextRenderer>(readyText).color = Vector3(255, 0, 0);
+				engine::ecs::GetComponent< engine::Transform>(readyText).scale = 0.003f;
+				
 				std::cout << "\nisShipSelectionMenuOn: " << isShipSelectionMenuOn << "\n";
 			}
 
@@ -280,7 +281,7 @@ public:
 			}
 
 			printf("in MenuPlayerSelection for loop\n");
-		}
+		//}
 		printf("Out MenuPlayerSelection\n\n\n");
 	};
 	static void BackToUIMenu()
@@ -338,7 +339,7 @@ public:
 	void Init(GLFWwindow* mainWindow)
 	{
 
-		int KeyboardPlayer = 2;
+	/*	int KeyboardPlayer = 2;
 
 		input::bindAnalogInput(GLFW_KEY_RIGHT, input::digitalPositiveInput, { "Turn" + std::to_string(KeyboardPlayer) }, 0);
 		input::bindAnalogInput(GLFW_KEY_LEFT, input::digitalNegativeInput, { "Turn" + std::to_string(KeyboardPlayer) }, 0);
@@ -349,7 +350,7 @@ public:
 		input::bindAnalogInput(GLFW_KEY_DOWN, input::digitalNegativeInput, { "Throttle" + std::to_string(KeyboardPlayer) }, 0);
 
 		input::bindDigitalInput(GLFW_KEY_N, { "Shoot" + std::to_string(KeyboardPlayer) });
-		input::bindDigitalInput(GLFW_KEY_M, { "Boost" + std::to_string(KeyboardPlayer) });
+		input::bindDigitalInput(GLFW_KEY_M, { "Boost" + std::to_string(KeyboardPlayer) });*/
 
 
 		printf("IN side MENU SYSTEM INIT\n");
@@ -435,6 +436,7 @@ public:
 	void Update()
 	{
 
+
 		//printf("IN MENU SYSTEM UPDATE()\n");
 		if (input::GetNewPress("Pause"))
 		{
@@ -447,6 +449,8 @@ public:
 
 			for (size_t i = 0; i < 4; i++)
 			{
+				float accelerationInput = input::GetTotalInputValue("Throttle" + std::to_string(i));
+
 				//input::ConstructAnalogEvent("Throttle" + std::to_string(i));
 				//input::ConstructAnalogEvent("Turn" + std::to_string(i));
 
@@ -465,23 +469,43 @@ public:
 
 				//input::bindAnalogControllerInput(i, { { input::controllerMixedInput, GLFW_GAMEPAD_AXIS_LEFT_X }, }, { "Turn" + std::to_string(i) });
 
-
-				if (input::GetInputValue("Throttle" + std::to_string(i), GLFW_GAMEPAD_AXIS_LEFT_Y) >= 0.5f)
+				if (i != 2)
 				{
-					std::cout << "upTimer" << moveWaitedTimerUP << "\n";
-					moveWaitedTimerUP += engine::deltaTime;
 
-					if (moveWaitedTimerUP >= delay)
+					if (accelerationInput >= 0.5f)
 					{
-						printf("\n\n move up input\n\n");
-						MoveUpper();
+						std::cout << "upTimer" << moveWaitedTimerUP << "\n";
+						moveWaitedTimerUP += engine::deltaTime;
+
+						if (moveWaitedTimerUP >= delay)
+						{
+							printf("\n\n move up input\n\n");
+							MoveUpper();
+							moveWaitedTimerUP = 0;
+						}
+
+					}
+					else
+					{
 						moveWaitedTimerUP = 0;
 					}
+					if (accelerationInput <= -0.5f)
+					{
+						std::cout << "downTimer" << moveWaitedTimerUP << "\n";
+						moveWaitedTimerUP += engine::deltaTime;
 
-				}
-				else
-				{
-					moveWaitedTimerUP = 0;
+						if (moveWaitedTimerUP >= delay)
+						{
+							printf("\n\n move down input\n\n");
+							MoveLower();
+							moveWaitedTimerDown = 0;
+						}
+
+					}
+					else
+					{
+						moveWaitedTimerDown = 0;
+					}
 				}
 
 				if (i == 2)   //KEYBOARD INPUT IN OPTIONS
@@ -489,20 +513,21 @@ public:
 
 					//moveUP
 
-					if (input::GetNewPress("MoveUp"))
+					if (input::GetNewPress("Throttle2") >= 0.5f)
 					{
 						MoveUpper();
 
 					}
 
 					//moveDown
-					if (input::GetNewPress("MoveDown"))
+					if (input::GetNewPress("Throttle2") <= -0.5f)
 					{
 						MoveLower();
 
 					}
 
 				}
+
 			}
 
 			if (IsCurrentPauseComponentSlider())
@@ -664,7 +689,7 @@ public:
 		nubTransform.position = Vector3(pauseComponentNub.sliderValue, 0, 0);
 		//printf("pauseComponentNub.sliderValue ");
 		std::cout << pauseComponentNub.sliderValue;
-		
+
 		//std::cout << "Nub pos:" << "x:" << nubTransform.position.x << " y:" << nubTransform.position.y << "\n";
 
 	}
@@ -677,7 +702,7 @@ public:
 		nubTransform.position.x = clamp(nubTransform.position.x, -0.17f, 0.17f);
 		//printf("pauseComponentNub.sliderValue ");
 		std::cout << pauseComponentNub.sliderValue;
-		
+
 		//std::cout << "Nub pos:" << "x:" << nubTransform.position.x << " y:" << nubTransform.position.y << "\n";
 	}
 	void MoveSliderLeft()
@@ -686,9 +711,9 @@ public:
 		engine::Transform& nubTransform = engine::ecs::GetComponent<engine::Transform>(musicSliderNub);
 		nubTransform.position -= Vector3(0.01f, 0, 0);
 		nubTransform.position.x = clamp(nubTransform.position.x, -0.17f, 0.17f);
-		
+
 		std::cout << pauseComponentNub.sliderValue;
-		
+
 		//std::cout << "Nub pos:" << "x:" << nubTransform.position.x << " y:" << nubTransform.position.y << "\n";
 
 	}
@@ -713,7 +738,7 @@ public:
 			engine::SpriteRenderer& spriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(entity);
 			spriteRenderer.texture = pauseComponent.unselectedTexture;
 
-			//enabled = !enabled;
+			enabled = !enabled;
 		}
 
 		PauseComponent& pauseComponent = engine::ecs::GetComponent<PauseComponent>(currentSelection);

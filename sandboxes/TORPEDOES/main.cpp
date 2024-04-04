@@ -79,6 +79,7 @@ void SetupInput()
 {
 	input::ConstructDigitalEvent("Pause");
 	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
+	input::bindDigitalInput(GLFW_GAMEPAD_BUTTON_START, { "Pause" });
 	input::ConstructDigitalEvent("Menu");
 	input::bindDigitalInput(GLFW_KEY_U, { "Menu" });
 	// TODO: add controller pause key
@@ -155,7 +156,8 @@ int main()
 	SetupInput();
 
 	//Load the first level
-	LoadLevel1(&cam);
+	//LoadLevel1(&cam);
+	//ShipSelectionSystem->ToggleMenuPlayerSelection();
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -181,7 +183,7 @@ int main()
 		// if paused or Pause pressed update PauseSystem
 		if (input::GetNewPress("Pause"))
 		{
-			pauseSystem->isGamePause = !(pauseSystem->isGamePause);
+			pauseSystem->isGamePause = true;// !(pauseSystem->isGamePause);
 			isGamePaused = !isGamePaused;
 			//printf("\nGamePause pressed\n");
 			pauseSystem->ToggleShowUIOptionsMenu();
@@ -189,7 +191,7 @@ int main()
 		}
 		if (pauseSystem->isGamePause)
 		{
-			//printf("\nGamePaused \n");
+			printf("\nGamePaused \n");
 			pauseSystem->Update();
 		}
 	
