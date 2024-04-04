@@ -107,8 +107,8 @@ void SetupInput()
 
 	input::bindAnalogInput(GLFW_KEY_A, input::digitalPositiveInput, { "Throttle0" }, 0);
 	input::bindAnalogInput(GLFW_KEY_Z, input::digitalNegativeInput, { "Throttle0" }, 0, -1);
-	input::bindAnalogInput(GLFW_KEY_UP, input::digitalPositiveInput, { "Throttle0" }, 0);
-	input::bindAnalogInput(GLFW_KEY_DOWN, input::digitalNegativeInput, { "Throttle0" }, 0, -1);
+	//input::bindAnalogInput(GLFW_KEY_UP, input::digitalPositiveInput, { "Throttle0" }, 0);
+    //input::bindAnalogInput(GLFW_KEY_DOWN, input::digitalNegativeInput, { "Throttle0" }, 0, -1);
 
 	input::bindDigitalInput(GLFW_KEY_N, { "Shoot0" });
 	input::bindDigitalInput(GLFW_KEY_M, { "Boost0" });
