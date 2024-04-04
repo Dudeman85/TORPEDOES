@@ -157,13 +157,13 @@ int main()
 	SetupInput();
 
 	//Load the first level
-	//LoadLevel1(&cam);
+	LoadLevel1(&cam);
 
 
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(0, -0, -20), .scale = 20 });
-	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Checkpoint.obj"] });
+	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Checkpoint.obj"], .uiElement = true });
 	ecs::AddComponent(placementEditor, SpriteRenderer{ .texture = resources::uiTextures["UI_Arrow.png"] });
 
 	//Game Loop

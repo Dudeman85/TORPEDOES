@@ -99,7 +99,7 @@ public:
 			engine::ecs::AddComponent(arrowDown, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"] , .enabled = false, .uiElement = true });
 
 			engine::ecs::AddComponent(shipModel, engine::Transform{ .position = Vector3(0,0,-0.1f) , .scale = 0 });
-			engine::ecs::AddComponent(shipModel, engine::ModelRenderer{ .model = shipModels[torpedoBoat] });
+			engine::ecs::AddComponent(shipModel, engine::ModelRenderer{ .model = shipModels[torpedoBoat], .uiElement = true });
 
 			engine::ecs::AddComponent(readyText, engine::Transform{ .position = Vector3(0,-0.2f,-0.1f) , .scale = 0 });
 			engine::ecs::AddComponent(readyText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "unready" });
@@ -258,7 +258,7 @@ public:
 			{
 				engine::ecs::GetComponent< engine::SpriteRenderer>(arrowUp).enabled = true;
 				engine::ecs::GetComponent< engine::SpriteRenderer>(arrowDown).enabled = true;
-				engine::ecs::GetComponent< engine::Transform>(shipModel).scale = 7;
+				engine::ecs::GetComponent< engine::Transform>(shipModel).scale = 0.1;
 
 				//.-.-.-.-.-.-.-.-.-TODO::  SHIP MODEL NOT CHANGE OR SHOW UP and Ready text missing too .-.-.-.-.-.-.-.-.-
 				engine::ecs::GetComponent< engine::TextRenderer>(readyText).text = "UNready";
