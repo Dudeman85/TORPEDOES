@@ -3,8 +3,6 @@
 #include "PlayerController.h"
 #include "Resources.h"
 
-using namespace engine;
-
 enum HitStates
 {
 	None,			// Does nothing when hitting player
@@ -31,56 +29,55 @@ struct Projectile
 };
 
 ECS_REGISTER_COMPONENT(Hedgehog)
-struct  Hedgehog: public Projectile 
+struct Hedgehog: public Projectile 
 {
 	float distanceTraveled = 0.0f;
 	int ownerID = 0;
 };
 
 //Temporary functin for testing
-void SpawnProjectile(ecs::Entity p, int playerID)
+void SpawnProjectile(engine::ecs::Entity p, int playerID)
 {
-	std::cout << ecs::GetComponent<Transform>(p).position.ToString();
+	std::cout << engine::ecs::GetComponent<engine::Transform>(p).position.ToString();
 }
 
 static void CreateAnimation(Vector3 animPosition)
 {
-	ecs::Entity torpedoAnim = ecs::NewEntity();
+	engine::ecs::Entity torpedoAnim = engine::ecs::NewEntity();
 	animPosition.z += 100;
-	ecs::AddComponent(torpedoAnim, Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20) });
-	ecs::AddComponent(torpedoAnim, SpriteRenderer{ });
-	ecs::AddComponent(torpedoAnim, Animator{ .onAnimationEnd = ecs::DestroyEntity });
-	AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, "explosion");
-	AnimationSystem::PlayAnimation(torpedoAnim, "explosion", false);
-
+	engine::ecs::AddComponent(torpedoAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20) });
+	engine::ecs::AddComponent(torpedoAnim, engine::SpriteRenderer{ });
+	engine::ecs::AddComponent(torpedoAnim, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
+	engine::AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, "explosion");
+	engine::AnimationSystem::PlayAnimation(torpedoAnim, "explosion", false);
 };
 
 // check if projectil collision tilemap Trigger
-static void OnTopedoCollision(Collision collision)
+static void OnTopedoCollision(engine::Collision collision)
 {
-	Transform& torpedotransfor = ecs::GetComponent<Transform>(collision.a);
-	if (collision.type == Collision::Type::tilemapTrigger)
+	engine::Transform& torpedotransfor = engine::ecs::GetComponent<engine::Transform>(collision.a);
+	if (collision.type == engine::Collision::Type::tilemapTrigger)
 	{
 		if (collision.b != 1)
 		{   // Do animation where projectile impact 
 			CreateAnimation(torpedotransfor.position);
-			ecs::DestroyEntity(collision.a);
+			engine::ecs::DestroyEntity(collision.a);
 		}
 	}
 }
 void CreateProjectile(Vector2 direction, float projectileSpeed, Vector3 spawnPosition, Vector3 sapawnRotation, int owerID)
 {
-	ecs::Entity torpedo = ecs::NewEntity();
-	ecs::AddComponent(torpedo, Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
-	ecs::AddComponent(torpedo, Rigidbody{ .velocity = direction * projectileSpeed });
-	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models["torpedo.obj"] });
+	engine::ecs::Entity torpedo = engine::ecs::NewEntity();
+	engine::ecs::AddComponent(torpedo, engine::Transform{ .position = spawnPosition, .rotation = sapawnRotation, .scale = Vector3(10) });
+	engine::ecs::AddComponent(torpedo, engine::Rigidbody{ .velocity = direction * projectileSpeed });
+	engine::ecs::AddComponent(torpedo, engine::ModelRenderer{ .model = resources::models["torpedo.obj"] });
 	std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnTopedoCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
-	ecs::AddComponent(torpedo, Projectile{ .ownerID = owerID });
+	engine::ecs::AddComponent(torpedo, engine::PolygonCollider{ .vertices = Torpedoverts, .callback = OnTopedoCollision, .trigger = true, .visualise = false,  .rotationOverride = sapawnRotation.y });
+	engine::ecs::AddComponent(torpedo, Projectile{ .ownerID = owerID });
 }
 
-ECS_REGISTER_SYSTEM(HeggehogSynten, Rigidbody, Transform, Hedgehog)
-class HeggehogSynten : public ecs::System
+ECS_REGISTER_SYSTEM(HeggehogSynten, engine::Rigidbody, engine::Transform, Hedgehog)
+class HeggehogSynten : public engine::ecs::System
 {
 	const float hedgehogSpeedVo = 500.0f;
 	const float maxDistance = 700.0f;
@@ -94,35 +91,32 @@ public:
 		// Iterate through entities in the system
 		for (auto itr = entities.begin(); itr != entities.end();)
 		{			// Get the entity and increment the iterator
-			ecs::Entity entity = *itr++;
-			Hedgehog& hedgehogComp = ecs::GetComponent<Hedgehog>(entity);
+			engine::ecs::Entity entity = *itr++;
+			Hedgehog& hedgehogComp = engine::ecs::GetComponent<Hedgehog>(entity);
 
 			if (hedgehogComp.distanceTraveled < maxDistance)
 			{
 				// Calcula la distancia recorrida sumando la distancia del paso actual
-				hedgehogComp.distanceTraveled += hedgehogSpeedVo * deltaTime; // deltaTime es el tiempo transcurrido desde el último frame
+				hedgehogComp.distanceTraveled += hedgehogSpeedVo * engine::deltaTime; // deltaTime es el tiempo transcurrido desde el último frame
 				
 				// Calcula el coficiente entre la distacia recorida y la distacia maxima 
 				float distanceRatio = hedgehogComp.distanceTraveled / maxDistance;
 
 				//// Calcula la rotación en función de la distancia recorrida
-				TransformSystem::Rotate(entity, Vector3(0, 0,-1.5f));
+				engine::TransformSystem::Rotate(entity, Vector3(0, 0,-1.65f));
 
 				// Calcula la escala en funcion de la distancia recorrida
 				float scale = maxScale - (maxScale - minScale) * (2 * abs(0.5 - distanceRatio));
 
 				// Actualiza la escala del objeto
-				ecs::GetComponent<Transform>(entity).scale = Vector3(scale);
+				engine::ecs::GetComponent<engine::Transform>(entity).scale = Vector3(scale);
 
-				
-				
-
-				Transform& transformComp = ecs::GetComponent<Transform>(entity);
+				engine::Transform& transformComp = engine::ecs::GetComponent<engine::Transform>(entity);
 			}
 			else
 			{
 				// Si se supera la distancia máxima, detén el movimiento del objeto
-				ecs::DestroyEntity(entity);
+				engine::ecs::DestroyEntity(entity);
 				break;
 			}
 
@@ -135,22 +129,36 @@ void CreateHedgehog(Vector2 direction, Vector3 spanwPposition, Vector3 sapawnRot
 	float hedgehogSpeedVo = 500.0f;
 	float distanceTraveled = 0.0f;
 
-
-	ecs::Entity hedgehog = ecs::NewEntity();
-	ecs::AddComponent(hedgehog, Transform{ .position = spanwPposition, .rotation = sapawnRotation });
+	engine::ecs::Entity hedgehog = engine::ecs::NewEntity();
+	engine::ecs::AddComponent(hedgehog, engine::Transform{ .position = spanwPposition, .rotation = sapawnRotation });
 
 	Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * hedgehogSpeedVo;
 
+	engine::ecs::AddComponent(hedgehog, engine::Rigidbody{ .velocity = finalVelocity });
 
-	ecs::AddComponent(hedgehog, Rigidbody{ .velocity = finalVelocity });
-
-	ecs::AddComponent(hedgehog, ModelRenderer{ .model = resources::models["hedgehog.obj"] });
+	engine::ecs::AddComponent(hedgehog, engine::ModelRenderer{ .model = resources::models["hedgehog.obj"] });
 	std::vector<Vector2> Hedgehogverts{ Vector2(0.2, 0.25), Vector2(0.2, -0.25), Vector2(-0.2, -0.25), Vector2(-0.2, 0.25) };
-	ecs::AddComponent(hedgehog, PolygonCollider{ .vertices = Hedgehogverts, .callback = OnTopedoCollision, .trigger = true, .visualise = true,  .rotationOverride = sapawnRotation.y });
-	ecs::AddComponent(hedgehog, Hedgehog{ .ownerID = owerID });
+	engine::ecs::AddComponent(hedgehog, engine::PolygonCollider{ .vertices = Hedgehogverts, .callback = OnTopedoCollision, .trigger = true, .visualise = true,  .rotationOverride = sapawnRotation.y });
+	engine::ecs::AddComponent(hedgehog, Hedgehog{ .ownerID = owerID });
+}
 
+void CreateTridentHedgehogs(Vector2 direction, Vector3 spawnPosition, Vector3 spawnRotation, int ownerID)
+{
+	const float angleOffset = Radians(10.0f); // Ajuste de ángulo para las direcciones de los proyectiles
+	float playerAngle = atan2(direction.y, direction.y);
 
+	// Creamos los tres proyectiles (hedgehogs)
+	for (int i = 0; i < 3; ++i)
+	{
+		// Calculamos el ángulo para cada proyectil
+		float angle = playerAngle + i * angleOffset;
 
+		// Calculamos la dirección para cada proyectil
+		Vector2 modifiedDirection = Vector2(cos(angle ), sin(angle ));
+
+		// Creamos el hedgehog
+		CreateHedgehog(modifiedDirection, spawnPosition, spawnRotation, ownerID);
+	}
 }
 
 

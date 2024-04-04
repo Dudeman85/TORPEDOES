@@ -4,6 +4,8 @@
 
 namespace resources
 {
+	using namespace engine;
+
 	std::unordered_map<std::string, Texture*> uiTextures;
 	std::unordered_map<std::string, Texture*> menuTextures;
 

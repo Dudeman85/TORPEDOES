@@ -5,7 +5,6 @@
 
 class AudioEngine;
 
-using engine::Vector3;
 ///Class to create and store audio data
 class Audio
 {
@@ -19,28 +18,28 @@ public:
 	void pause();	
 	///Continues audio from pause
 	void unpause();			
-	///Stops the audio completely
+	///Stops and deletes the audio
 	void stop();	
-	///Gets audio playing status
+	///Returns audio playing status
 	const bool getPlaying();						
 	///Sets audio file to play
 	void setSound(const std::string& fileName);		
 	///Sets audio volume
 	void setVolume(float NewVolume);	
-	///Gets audio volume
+	///Returns audio volume
 	const float getVolume();	
 	///Adds audio volume
 	void addVolume(float AddVolume);		
 	///Sets audio looping status
 	void setLoop(bool Loop);		
-	///Gets audio looping status
+	///Returns audio looping status
 	const bool getLoop();	
-	///Gets audio completion status
+	///Returns audio completion status
 	const bool getAtEnd();	
 	///Sets the absolute direction the sound is coming from headphone's perspective, distance lowers volume
-	void setDirection(Vector3 Location);	
+	void setAbsoluteDirection(Vector3 Location);	
 	///Gets the absolute direction the sound is coming from headphone's perspective, distance lowers volume
-	const Vector3 getDirection();					
+	const Vector3 getAbsoluteDirection();					
 
 private:
 	AudioEngine* owner;								// AudioEngine which owns this audio TODO: Remove

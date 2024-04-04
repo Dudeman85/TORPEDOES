@@ -44,7 +44,6 @@ using namespace std;
 class Tilemap final
 {
 public:
-
 	// Constructor
 	Tilemap(const string mapPath, Camera* cam);
 
@@ -54,8 +53,6 @@ public:
 private:
 	// Maplayer class
 	MapLayer maplayer;
-	// TiledMap variable that has all properties stored
-	TiledMap tiledmap;
 	// Shader and camera variables.
 	Shader m_shader;
 	Camera camera;

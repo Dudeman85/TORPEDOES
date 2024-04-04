@@ -20,12 +20,12 @@
 //Macro to register a component outside main
 #define ECS_REGISTER_COMPONENT(COMPONENT) \
 struct COMPONENT; \
-inline bool COMPONENT##Registered = ( ecs::RegisterComponent<COMPONENT>(), true );
+inline bool COMPONENT##Registered = ( engine::ecs::RegisterComponent<COMPONENT>(), true );
 
 //Macro to register a system and its components outside main
 #define ECS_REGISTER_SYSTEM(SYSTEM, ...) \
 class SYSTEM; \
-inline bool SYSTEM##Registered = ( ecs::RegisterSystem<SYSTEM, __VA_ARGS__>(), true );
+inline bool SYSTEM##Registered = ( engine::ecs::RegisterSystem<SYSTEM, __VA_ARGS__>(), true );
 
 
 namespace engine::ecs
