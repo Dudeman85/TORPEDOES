@@ -4,6 +4,8 @@
 #include "GameCamera.h"
 #include "engine/SoundComponent.h"
 
+using namespace engine;
+
 int checkPointNumber = 0;
 bool isGamePaused = false;
 void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine::Model* checkPointModel, float hitboxrotation, bool finish_line = false)
@@ -159,6 +161,13 @@ int main()
 	//LoadLevel1(&cam);
 	//ShipSelectionSystem->ToggleMenuPlayerSelection();
 
+
+	//Object placement editor
+	engine::ecs::Entity placementEditor = ecs::NewEntity();
+	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(0, -0, -20), .scale = 20 });
+	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Checkpoint.obj"], .uiElement = true });
+	ecs::AddComponent(placementEditor, SpriteRenderer{ .texture = resources::uiTextures["UI_Arrow.png"] });
+
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -167,6 +176,24 @@ int main()
 		//Close window when Esc is pressed
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
+
+		//Object editor
+		//Numpad 8456 move
+		if (glfwGetKey(window, GLFW_KEY_KP_8))
+			TransformSystem::Translate(placementEditor, Vector3(0, 10, 0));
+		if (glfwGetKey(window, GLFW_KEY_KP_4))
+			TransformSystem::Translate(placementEditor, Vector3(-10, 0, 0));
+		if (glfwGetKey(window, GLFW_KEY_KP_5))
+			TransformSystem::Translate(placementEditor, Vector3(0, -10, 0));
+		if (glfwGetKey(window, GLFW_KEY_KP_6))
+			TransformSystem::Translate(placementEditor, Vector3(10, 0, 0));
+		//+- scale
+		if (glfwGetKey(window, GLFW_KEY_KP_ADD))
+			TransformSystem::Scale(placementEditor, 1);
+		if (glfwGetKey(window, GLFW_KEY_KP_SUBTRACT))
+			TransformSystem::Scale(placementEditor, -1);
+		
+
 
 		input::update();
 

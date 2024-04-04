@@ -14,6 +14,8 @@ namespace engine
 		///Stores shader data
 		Shader* shader;
 
+		bool uiElement = false;
+
 		///Alternate textures, will override default ones from model
 		std::vector<Texture*> textures;
 	};
@@ -90,95 +92,162 @@ namespace engine
 		///Call this every frame
 		void Update(Camera* cam)
 		{
-			//For each entity
+			//Sort the entities and tilemap by Z
+			std::set<float> layersToDraw;
+			std::map<float, std::vector<ecs::Entity>> sortedEntities;
+
+			//UI elements are sorted seperately
+			std::set<float> uiLayersToDraw;
+			std::map<float, std::vector<ecs::Entity>> sortedUIElements;
+
+			//Sort the entities into sprite and UI layers
 			for (ecs::Entity entity : entities)
 			{
-				//Get relevant components
 				Transform& transform = ecs::GetComponent<Transform>(entity);
-				ModelRenderer& modelRenderer = ecs::GetComponent<ModelRenderer>(entity);
+				ModelRenderer& renderer = ecs::GetComponent<ModelRenderer>(entity);
 
-				//If a shader has been specified for this sprite use it, else use the default
-				Shader* shader = defaultShader;
-				if (modelRenderer.shader)
-					shader = modelRenderer.shader;
-				shader->use();
-
-				//Create the model matrix, this is the same for each mesh so it only needs to be done once
-				glm::mat4 model = TransformSystem::GetGlobalTransformMatrix(entity);
-
-				//Model matrix
-				unsigned int modelLoc = glGetUniformLocation(shader->ID, "model");
-				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-				//View matrix
-				unsigned int viewLoc = glGetUniformLocation(shader->ID, "view");
-				glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(cam->GetViewMatrix()));
-				//Projection matrix
-				unsigned int projLoc = glGetUniformLocation(shader->ID, "projection");
-				glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(cam->GetProjectionMatrix()));
-				//Light Color
-				unsigned int colorLoc = glGetUniformLocation(shader->ID, "lightColor");
-				glUniform3f(colorLoc, lightColor.x / 255, lightColor.y / 255, lightColor.z / 255);
-				//Light Position
-				unsigned int lightPosLoc = glGetUniformLocation(shader->ID, "lightPos");
-				glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
-				//Camera Position
-				unsigned int viewPosLoc = glGetUniformLocation(shader->ID, "viewPos");
-				glUniform3fv(viewPosLoc, 1, glm::value_ptr(cam->position));
-
-				//For each mesh in the model
-				for (unsigned int i = 0; i < modelRenderer.model->meshes.size(); i++)
+				//Seperate sprites and UI elements
+				if (!renderer.uiElement)
 				{
-					unsigned int diffuseNr = 1;
-					unsigned int specularNr = 1;
-
-					Mesh mesh = modelRenderer.model->meshes[i];
-
-					//For each Texture in the mesh
-					for (unsigned int j = 0; j < mesh.textures.size(); j++)
-					{
-						//Use default texture if no specific texture is assigned
-						glActiveTexture(GL_TEXTURE0 + j);
-
-						//Retrieve texture number and type (the N in texture_{type}N)
-						std::string number;
-						std::string name;
-
-						//Check if we have an override texture for this mesh
-						if (j < modelRenderer.textures.size() && modelRenderer.textures[j])
-						{
-							name = modelRenderer.textures[j]->type;
-
-							//Bind override texture
-							glBindTexture(GL_TEXTURE_2D, modelRenderer.textures[j]->ID());
-						}
-						//Use default texture
-						else
-						{
-							name = mesh.textures[j]->type;
-
-							//Bind default texture
-							glBindTexture(GL_TEXTURE_2D, mesh.textures[j]->ID());
-						}
-
-						if (name == "texture_diffuse")
-							number = std::to_string(diffuseNr++);
-						else if (name == "texture_specular")
-							number = std::to_string(specularNr++);
-
-						//Set the uniform for the material texture
-						glUniform1i(glGetUniformLocation(shader->ID, (name + number).c_str()), j);
-					}
-
-					//Unbind texture
-					glActiveTexture(GL_TEXTURE0);
-
-					//Draw mesh
-					glBindVertexArray(mesh.VAO);
-					glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
-					glBindVertexArray(0);
+					sortedEntities[transform.position.z].push_back(entity);
+					layersToDraw.insert(transform.position.z);
+				}
+				else
+				{
+					sortedUIElements[transform.position.z].push_back(entity);
+					uiLayersToDraw.insert(transform.position.z);
 				}
 			}
+
+			//Draw all models by layer
+			for (const float& layer : layersToDraw)
+			{
+				//Draw entities for this layer
+				for (const ecs::Entity& entity : sortedEntities[layer])
+				{
+					DrawEntity(entity, cam);
+				}
+			}
+
+			//Draw all UI elements by layer
+			for (const float& layer : uiLayersToDraw)
+			{
+				//Clear the depth buffer to always draw UI elements on top
+				glDisable(GL_DEPTH_BUFFER_BIT);
+
+				//Draw entities for this layer
+				for (const ecs::Entity& entity : sortedUIElements[layer])
+				{
+					DrawEntity(entity, cam);
+				}
+			}
+			glEnable(GL_DEPTH_BUFFER_BIT);
 		}
+
+		///Draw an entity to the screen
+		void DrawEntity(ecs::Entity entity, Camera* cam)
+		{
+			//Get relevant components
+			Transform& transform = ecs::GetComponent<Transform>(entity);
+			ModelRenderer& modelRenderer = ecs::GetComponent<ModelRenderer>(entity);
+
+			//If a shader has been specified for this model use it, else use the default
+			Shader* shader = defaultShader;
+			if (modelRenderer.shader)
+				shader = modelRenderer.shader;
+			shader->use();
+
+			//Create the model matrix, this is the same for each mesh so it only needs to be done once
+			glm::mat4 model = TransformSystem::GetGlobalTransformMatrix(entity);
+
+
+			unsigned int viewLoc = glGetUniformLocation(shader->ID, "view");
+			unsigned int projLoc = glGetUniformLocation(shader->ID, "projection");
+
+			if (!modelRenderer.uiElement)
+			{
+				//Give the shader the camera's view matrix
+				glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(cam->GetViewMatrix()));
+
+				//Give the shader the camera's projection matrix
+				glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(cam->GetProjectionMatrix()));
+			}
+			else
+			{
+				//Give the shader a constant view matrix
+				glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.f)));
+
+				//Give the shader a constant projection matrix
+				glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.f)));
+			}
+
+			//Model matrix
+			unsigned int modelLoc = glGetUniformLocation(shader->ID, "model");
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+			//Light Color
+			unsigned int colorLoc = glGetUniformLocation(shader->ID, "lightColor");
+			glUniform3f(colorLoc, lightColor.x / 255, lightColor.y / 255, lightColor.z / 255);
+			//Light Position
+			unsigned int lightPosLoc = glGetUniformLocation(shader->ID, "lightPos");
+			glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
+			//Camera Position
+			unsigned int viewPosLoc = glGetUniformLocation(shader->ID, "viewPos");
+			glUniform3fv(viewPosLoc, 1, glm::value_ptr(cam->position));
+
+			//For each mesh in the model
+			for (unsigned int i = 0; i < modelRenderer.model->meshes.size(); i++)
+			{
+				unsigned int diffuseNr = 1;
+				unsigned int specularNr = 1;
+
+				Mesh mesh = modelRenderer.model->meshes[i];
+
+				//For each Texture in the mesh
+				for (unsigned int j = 0; j < mesh.textures.size(); j++)
+				{
+					//Use default texture if no specific texture is assigned
+					glActiveTexture(GL_TEXTURE0 + j);
+
+					//Retrieve texture number and type (the N in texture_{type}N)
+					std::string number;
+					std::string name;
+
+					//Check if we have an override texture for this mesh
+					if (j < modelRenderer.textures.size() && modelRenderer.textures[j])
+					{
+						name = modelRenderer.textures[j]->type;
+
+						//Bind override texture
+						glBindTexture(GL_TEXTURE_2D, modelRenderer.textures[j]->ID());
+					}
+					//Use default texture
+					else
+					{
+						name = mesh.textures[j]->type;
+
+						//Bind default texture
+						glBindTexture(GL_TEXTURE_2D, mesh.textures[j]->ID());
+					}
+
+					if (name == "texture_diffuse")
+						number = std::to_string(diffuseNr++);
+					else if (name == "texture_specular")
+						number = std::to_string(specularNr++);
+
+					//Set the uniform for the material texture
+					glUniform1i(glGetUniformLocation(shader->ID, (name + number).c_str()), j);
+				}
+
+				//Unbind texture
+				glActiveTexture(GL_TEXTURE0);
+
+				//Draw mesh
+				glBindVertexArray(mesh.VAO);
+				glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
+				glBindVertexArray(0);
+			}
+		}
+
 		///Set light position and color
 		void SetLight(Vector3 _lightPos, Vector3 _lightColor)
 		{
