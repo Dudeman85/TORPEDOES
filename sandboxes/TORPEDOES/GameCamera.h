@@ -7,11 +7,9 @@ const float aspectRatio = 16.f / 9.f;
 //Height of the camera, width is calculated automatically
 float camHeight = 1.f;
 //Maximum units a player can be from the camera's edge before zooming in
-const float zoomInThreshold = 400;
+const float zoomInThreshold = 300;
 //Minimum units a player can be from the camera's edge before zooming out
-const float zoomOutThreshold = 300;
-//How fast the camera can zoom in or out
-const float zoomSpeed = 30;
+const float zoomOutThreshold = 200;
 //Minimum height the camera can have
 const float minHeight = 300;
 
@@ -39,14 +37,16 @@ static void UpdateCam(Camera* cam, Tilemap* map)
 	float leftDiff = playerBounds[3] - camBounds[3];
 
 	//Zoom out
-	if (topDiff < zoomOutThreshold || rightDiff < zoomOutThreshold || bottomDiff < zoomOutThreshold || leftDiff < zoomOutThreshold)
+	if ((topDiff < zoomOutThreshold && playerBounds[0]) || rightDiff < zoomOutThreshold || bottomDiff < zoomOutThreshold || leftDiff < zoomOutThreshold)
 	{
-		camHeight += zoomSpeed;
+		//Zoom out just enough to keep everything in bounds
+		camHeight += std::max(topDiff, std::max(rightDiff, std::max(bottomDiff, leftDiff))) * 0.01;
 	}
 	//Zoom in
-	else if (topDiff > zoomInThreshold || rightDiff > zoomInThreshold || bottomDiff > zoomInThreshold || leftDiff > zoomInThreshold)
+	else if (topDiff > zoomInThreshold && rightDiff > zoomInThreshold && bottomDiff > zoomInThreshold && leftDiff > zoomInThreshold)
 	{
-		camHeight -= zoomSpeed;
+		//Zoom in just enough to keep everything in bounds
+		camHeight -= std::min(topDiff, std::min(rightDiff, std::min(bottomDiff, leftDiff))) * 0.01;
 	}
 
 	//Restrict camera to size of tilemap
