@@ -15,8 +15,12 @@ struct PlayerSelection
 	int selection;
 	float cooldownToMoveSelection;
 	bool ready = false;
-	vector<engine::ecs::Entity> visuals;
-
+	
+											  
+	engine::ecs::Entity arrowUp;
+	engine::ecs::Entity arrowDown;
+	engine::ecs::Entity	shipModel;
+	engine::ecs::Entity	readyText;
 };
 
 ECS_REGISTER_SYSTEM(PlayerSelectSystem, PlayerSelection)
@@ -32,14 +36,10 @@ class PlayerSelectSystem : public engine::ecs::System
 	float throttleCurrentWaitedTimeDown = 0;
 	engine::ecs::Entity selectionWindow;
 
-	engine::ecs::Entity arrowUp;
-	engine::ecs::Entity arrowDown;
-	engine::ecs::Entity	shipModel;
-	engine::ecs::Entity	readyText;
 
 public:
-	std::unordered_map<ShipType, engine::Model*> shipModels;
-
+	//std::unordered_map<ShipType, engine::Model*> shipModels;
+	vector<engine::Model*> shipModels;
 	bool isShipSelectionMenuOn = false;
 
 	vector< std::function<void()> >shipButtonFunctions
@@ -49,44 +49,22 @@ public:
 	};
 	void Init()
 	{
-		shipModels.insert({ ShipType::torpedoBoat, resources::models["Ship_PT_109_Torpedo.obj"] });
-		shipModels.insert({ ShipType::submarine, resources::models["Ship_U_99_Submarine.obj"] });
-		shipModels.insert({ ShipType::cannonBoat, resources::models["Ship_Yamato_Cannon.obj"] });
-		shipModels.insert({ ShipType::hedgehogBoat, resources::models["Ship_HMCS_Sackville_Hedgehog.obj"] });
+		shipModels.push_back({ resources::models["Ship_PT_109_Torpedo.obj"] });
+		shipModels.push_back({ resources::models["Ship_U_99_Submarine.obj"] });
+		shipModels.push_back({ resources::models["Ship_Yamato_Cannon.obj"] });
+		shipModels.push_back({ resources::models["Ship_HMCS_Sackville_Hedgehog.obj"] });
 
 		for (int i = 0; i < 4; i++)
 		{
-			input::ConstructAnalogEvent("Throttle" + std::to_string(i));
-			input::ConstructDigitalEvent("Shoot" + std::to_string(i));
-
-			// Controller input
-			input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
-
-
-
-
-			input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
-			input::bindDigitalControllerInput(i, GLFW_KEY_SPACE, { "Shoot" + std::to_string(i) });
-
-			// Keyboard input
-			input::bindAnalogInput(GLFW_KEY_UP, input::digitalPositiveInput, { "Throttle" + std::to_string(2) }, 0);
-			input::bindAnalogInput(GLFW_KEY_DOWN, input::digitalNegativeInput, { "Throttle" + std::to_string(2) }, 0);
-
-
+			
 
 			selectionWindow = engine::ecs::NewEntity();
-			arrowUp = engine::ecs::NewEntity();
-			arrowDown = engine::ecs::NewEntity();
-			shipModel = engine::ecs::NewEntity();
-			readyText = engine::ecs::NewEntity();
+			engine::ecs::Entity arrowUp = engine::ecs::NewEntity();
+			engine::ecs::Entity arrowDown = engine::ecs::NewEntity();
+			engine::ecs::Entity shipModel = engine::ecs::NewEntity();
+			engine::ecs::Entity readyText = engine::ecs::NewEntity();
 
-			vector<engine::ecs::Entity> visuals
-			{
-				arrowUp,
-					arrowDown,
-					shipModel,
-					readyText
-			};
+																																	
 			//engine::ecs::AddComponent(pausedImage, engine::Transform{ .position = Vector3(0,.8f,-0.1f), .scale = Vector3(0.35f) });
 			//engine::ecs::AddComponent(pausedImage, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Paused.png"],  .enabled = false, .uiElement = true });
 			//engine::ecs::AddComponent(pausedImage, PauseComponent{ .upper = pausedImage, .lower = optionsButton, .selectedTexture = resources::menuTextures["UI_Paused.png"], .unselectedTexture = resources::menuTextures["UI_Paused.png"], .operation = PauseSystem::OnResumePressed });
@@ -99,14 +77,14 @@ public:
 			engine::ecs::AddComponent(arrowDown, engine::SpriteRenderer{.texture = resources::menuTextures["UI_Arrow.png"], .enabled = false, .uiElement = true });
 
 			engine::ecs::AddComponent(shipModel, engine::Transform{ .position = Vector3(0,0,-0.1f) , .scale = 0 });
-			engine::ecs::AddComponent(shipModel, engine::ModelRenderer{ .model = shipModels[torpedoBoat] });
+			engine::ecs::AddComponent(shipModel, engine::ModelRenderer{ .model = shipModels[0], .uiElement = true });
 
 			engine::ecs::AddComponent(readyText, engine::Transform{ .position = Vector3(0,-0.2f,-0.1f) , .scale = 0 });
-			engine::ecs::AddComponent(readyText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "unready" });
+			engine::ecs::AddComponent(readyText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "unready", .uiElement = true });
 
 
 			engine::ecs::AddComponent(selectionWindow, engine::Transform{.position = Vector3(0, 0, 0), .scale = Vector3(1, 1, -0.1f) });
-			engine::ecs::AddComponent(selectionWindow, PlayerSelection{ .playerID = i , .visuals = visuals });
+			engine::ecs::AddComponent(selectionWindow, PlayerSelection{ .playerID = i, .arrowUp = arrowUp, .arrowDown = arrowDown, .shipModel = shipModel, .readyText = readyText});
 
 
 			engine::TransformSystem::AddParent(arrowUp, selectionWindow);
@@ -124,8 +102,7 @@ public:
 	{
 
 		//std::cout << "\n throttleCurrentWaitedTimeUP:" << throttleCurrentWaitedTimeUP << "\n";
-		throttleCurrentWaitedTimeUP += engine::deltaTime;
-		throttleCurrentWaitedTimeDown += engine::deltaTime;
+		
 		for (engine::ecs::Entity entity : entities)
 		{
 		/*for (auto itr = entities.begin(); itr != entities.end();)
@@ -135,109 +112,99 @@ public:
 
 			//Player& player = ecs::GetComponent<Player>(entity);
 			PlayerSelection& playerSelection = engine::ecs::GetComponent<PlayerSelection>(entity);
-			if (playerSelection.playerID)
+			/*if (playerSelection.playerID)*/
 			{
 
-				std::unordered_map<ShipType, engine::Model*>::iterator it;
+				
 
 
 				//Check players input	
-			//	if (playerSelection.playerID == 0)
-				{
+				//if (playerSelection.playerID == 2)
+				//{
+				//	if (input::GetTotalInputValue("Throttle2" ) && throttleCurrentWaitedTimeUP > throttleMoveWaitTime)
+				//	{
+				//		throttleCurrentWaitedTimeUP = 0;
+				//		std::cout << "\n--Ship Selection moveUP--\n";
 
+
+
+				//		playerSelection.selection++;
+				//		if (playerSelection.selection > 4)
+				//			playerSelection.selection = 0;
+
+				//		engine::ecs::GetComponent< engine::Transform>(arrowUp).scale = Vector3(0.06f);
+				//		//engine::ecs::GetComponent<ModelRenderer>(entity).model = shipModels[playerSelection.selection];
+				//		engine::ecs::GetComponent< engine::ModelRenderer>(entity).model = shipModels[playerSelection.selection];
+
+				//	}
+				//	if (input::GetTotalInputValue("Throttle" + std::to_string(playerSelection.playerID)) && throttleCurrentWaitedTimeUP > throttleMoveWaitTime) 
+				//	{
+				//		throttleCurrentWaitedTimeUP = 0;
+				//		std::cout << "\n--Ship Selection moveDown--\n";
+
+
+
+				//		playerSelection.selection--;
+				//		if (playerSelection.selection <= 0)
+				//			playerSelection.selection = shipModels.size();
+
+				//		engine::ecs::GetComponent< engine::Transform>(arrowDown).scale = Vector3(0.06f);
+				//		engine::ecs::GetComponent< engine::ModelRenderer>(entity).model = shipModels[playerSelection.selection];
+
+				//	}
+				//}
+				//else
+				{
 					float accelerationInput = input::GetTotalInputValue("Throttle" + std::to_string(playerSelection.playerID));
 
 					auto select = input::GetNewPress("Shoot" + std::to_string(playerSelection.playerID));
 
-
+					//Throttle Up 
 					if (accelerationInput > 0.5f && throttleCurrentWaitedTimeUP > throttleMoveWaitTime)
 					{
 						throttleCurrentWaitedTimeUP = 0;
 						std::cout << "\n--Ship Selection moveUP--\n";
 
 
-						engine::ecs::Entity visualShipModelEntity = playerSelection.visuals[2];
 
+						playerSelection.selection++;
+						if (playerSelection.selection >= shipModels.size())
+							playerSelection.selection = 0;
 
-						// Iterate through all ship models using the iterator
-						for (it = shipModels.begin(); it != shipModels.end(); ++it)
-						{
-							// it->first is the ShipType
-							// it->second is the engine::Model* (the model pointer)
+						
+					
 
-							// You can access the ship type and model pointer using the iterator
-							ShipType shipType = it->first;
-							engine::Model* model = it->second;
-
-							if (shipType == visualShipModelEntity)
-							{
-								if (++it == shipModels.end())
-								{
-									it = shipModels.begin();
-									model = it->second;
-								}
-								else
-								{
-									++it;
-									model = it->second;
-								}
-								engine::ecs::GetComponent<engine::ModelRenderer>(visualShipModelEntity).model = model;
-								break;
-							}
-
-						}
-
+						engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowUp).scale = Vector3(0.06f);
+						engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).model = shipModels[playerSelection.selection];
 
 					}
 
 
-					//if(input::GetNewPress("MoveDown" + std::to_string(playerSelection.playerID)))
+					//Throttle Down 
 					if (accelerationInput < -0.5f && throttleCurrentWaitedTimeDown > throttleMoveWaitTime)
 					{
 						throttleCurrentWaitedTimeDown = 0;
 
 						printf("\n\n\nShip Selection moveDown\n\n\n");
-						engine::ecs::Entity visualShipModelEntity = playerSelection.visuals[2];
-
-						playerSelection.selection++;
-						if (playerSelection.selection > 4)
-							playerSelection.selection = 0;
-
-						//engine::ecs::GetComponent<engine::ModelRenderer>(visualShipModelEntity).model = shipModels[playerSelection.selection];
+						
 
 
+						playerSelection.selection--;
+						if (playerSelection.selection < 0)
+							playerSelection.selection = shipModels.size()-1;
 
-						// Iterate through all ship models using the iterator
-						for (it = shipModels.begin(); it != shipModels.end(); ++it)
-						{
-							// it->first is the ShipType
-							// it->second is the engine::Model* (the model pointer)
+						engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowDown).scale = Vector3(0.06f);
+						//engine::ecs::GetComponent< engine::ModelRenderer>(shipModel).model = shipModels[playerSelection.selection];
+						engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).model = shipModels[playerSelection.selection];
 
-							// You can access the ship type and model pointer using the iterator
-							ShipType shipType = it->first;
-							engine::Model* model = it->second;
-
-							if (it == shipModels.begin())
-							{
-								it = shipModels.end();
-
-								model = it->second;
-							}
-							else
-							{
-								--it;
-								model = it->second;
-							}
-							engine::ecs::GetComponent<engine::ModelRenderer>(visualShipModelEntity).model = model;
-							break;
-						}
 					}
 				}
 			}
 
 
 		}
-
+		throttleCurrentWaitedTimeUP += engine::deltaTime;
+		throttleCurrentWaitedTimeDown += engine::deltaTime;
 
 
 		if (isPlayersReady)
@@ -256,37 +223,44 @@ public:
 		
 		for (engine::ecs::Entity entity : entities)
 		{
-		
+
+
+
+			PlayerSelection& playerSelection = engine::ecs::GetComponent<PlayerSelection>(entity);
 
 			if (isShipSelectionMenuOn)// Show every thing
 			{
-				engine::ecs::GetComponent< engine::SpriteRenderer>(arrowUp).enabled = true;
-				engine::ecs::GetComponent< engine::SpriteRenderer>(arrowDown).enabled = true;
-				engine::ecs::GetComponent< engine::Transform>(shipModel).scale = 0.1;
+
+
+				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowUp).enabled = true;
+				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowDown).enabled = true;
+				engine::ecs::GetComponent< engine::Transform>(playerSelection.shipModel).scale = 0.1;
 
 				//.-.-.-.-.-.-.-.-.-TODO::  SHIP MODEL NOT CHANGE OR SHOW UP and Ready text missing too .-.-.-.-.-.-.-.-.-
-				engine::ecs::GetComponent< engine::TextRenderer>(readyText).text = "UNready";
-				engine::ecs::GetComponent< engine::TextRenderer>(readyText).color = Vector3(255, 0, 0);
-				engine::ecs::GetComponent< engine::Transform>(readyText).scale = 0.003f;
-				
+				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).text = "UNready";
+				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).color = Vector3(255, 0, 0);
+				engine::ecs::GetComponent< engine::Transform>(playerSelection.readyText).scale = 0.003f;
+
 				std::cout << "\nisShipSelectionMenuOn: " << isShipSelectionMenuOn << "\n";
 			}
 
 			if (!isShipSelectionMenuOn)	//hide every thing
 			{
 
-				engine::ecs::GetComponent< engine::SpriteRenderer>(arrowUp).enabled = false;
-				engine::ecs::GetComponent< engine::SpriteRenderer>(arrowDown).enabled = false;
-				engine::ecs::GetComponent< engine::Transform>(shipModel).scale = 0;
 
-				engine::ecs::GetComponent< engine::TextRenderer>(readyText).text = "UNready";
-				engine::ecs::GetComponent< engine::TextRenderer>(readyText).scale = Vector3(1, 1, 1);
+				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowUp).enabled = false;
+				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowDown).enabled = false;
+				engine::ecs::GetComponent< engine::Transform>(playerSelection.shipModel).scale = 0;
+
+				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).text = "UNready";
+				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).scale = Vector3(1, 1, 1);
 				std::cout << "\nisShipSelectionMenuOn: " << isShipSelectionMenuOn << "\n";
 			}
 
-			printf("in MenuPlayerSelection for loop\n");
+
+
+			printf("Out MenuPlayerSelection\n\n\n");
 		}
-		printf("Out MenuPlayerSelection\n\n\n");
 	};
 	static void BackToUIMenu()
 	{
@@ -453,26 +427,10 @@ public:
 
 			for (size_t i = 0; i < 4; i++)
 			{
+				
 				float accelerationInput = input::GetTotalInputValue("Throttle" + std::to_string(i));
 
-				//input::ConstructAnalogEvent("Throttle" + std::to_string(i));
-				//input::ConstructAnalogEvent("Turn" + std::to_string(i));
-
-				//input::ConstructDigitalEvent("Shoot" + std::to_string(i));
-				//input::ConstructDigitalEvent("Boost" + std::to_string(i));
-
-				//// Controller input
-				//input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
-				//input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "Boost" + std::to_string(i) });
-
-				//input::bindAnalogControllerInput(i,
-				//	{
-				//		{ input::digitalPositiveInput, GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER },
-				//		{ input::digitalNegativeInput, GLFW_GAMEPAD_AXIS_LEFT_TRIGGER }
-				//	}, { "Throttle" + std::to_string(i) });
-
-				//input::bindAnalogControllerInput(i, { { input::controllerMixedInput, GLFW_GAMEPAD_AXIS_LEFT_X }, }, { "Turn" + std::to_string(i) });
-
+			
 				if (i != 2)
 				{
 
@@ -517,14 +475,14 @@ public:
 
 					//moveUP
 
-					if (input::GetNewPress("Throttle2") >= 0.5f)
+					if (input::GetTotalInputValue("Throttle") > 0.5f)
 					{
 						MoveUpper();
 
 					}
 
 					//moveDown
-					if (input::GetNewPress("Throttle2") <= -0.5f)
+					if (input::GetTotalInputValue("Throttle") < -0.5f)
 					{
 						MoveLower();
 

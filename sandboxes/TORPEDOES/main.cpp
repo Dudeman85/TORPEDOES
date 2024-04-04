@@ -80,8 +80,6 @@ void LoadLevel1(engine::Camera* cam)
 void SetupInput()
 {
 	input::ConstructDigitalEvent("Pause");
-	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
-	input::bindDigitalInput(GLFW_GAMEPAD_BUTTON_START, { "Pause" });
 	input::ConstructDigitalEvent("Menu");
 	input::bindDigitalInput(GLFW_KEY_U, { "Menu" });
 	// TODO: add controller pause key
@@ -97,7 +95,7 @@ void SetupInput()
 		// Controller input
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "Boost" + std::to_string(i) });
-		
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_START, { "Pause" });
 		input::bindAnalogControllerInput(i, 
 		{ 
 			{ input::digitalPositiveInput, GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER }, 
@@ -120,6 +118,7 @@ void SetupInput()
 
 	input::bindDigitalInput(GLFW_KEY_N, { "Shoot" + std::to_string(KeyboardPlayer) });																  
 	input::bindDigitalInput(GLFW_KEY_M, { "Boost" + std::to_string(KeyboardPlayer) });
+	input::bindDigitalInput(GLFW_KEY_P, { "Pause"  });
 }
 
 int main()
