@@ -215,6 +215,9 @@ namespace engine
 			//Draw all UI elements by layer
 			for (const float& layer : uiLayersToDraw)
 			{
+				//Bind the right VAO after tilemap
+				glBindVertexArray(VAO);
+
 				//Draw entities for this layer
 				for (const ecs::Entity& entity : sortedUIElements[layer])
 				{

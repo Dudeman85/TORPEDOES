@@ -14,6 +14,8 @@ namespace engine
 		///Stores shader data
 		Shader* shader;
 
+		bool uiElement = false;
+
 		///Alternate textures, will override default ones from model
 		std::vector<Texture*> textures;
 	};
@@ -106,15 +108,33 @@ namespace engine
 				//Create the model matrix, this is the same for each mesh so it only needs to be done once
 				glm::mat4 model = TransformSystem::GetGlobalTransformMatrix(entity);
 
+
+				unsigned int viewLoc = glGetUniformLocation(shader->ID, "view");
+				unsigned int projLoc = glGetUniformLocation(shader->ID, "projection");
+
+				if (!modelRenderer.uiElement)
+				{
+					//Give the shader the camera's view matrix
+					glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(cam->GetViewMatrix()));
+
+					//Give the shader the camera's projection matrix
+					glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(cam->GetProjectionMatrix()));
+				}
+				else
+				{
+					//Clear the depth buffer to always draw UI elements on top
+					glClear(GL_DEPTH_BUFFER_BIT);
+
+					//Give the shader a constant view matrix
+					glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.f)));
+
+					//Give the shader a constant projection matrix
+					glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.f)));
+				}
+
 				//Model matrix
 				unsigned int modelLoc = glGetUniformLocation(shader->ID, "model");
 				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-				//View matrix
-				unsigned int viewLoc = glGetUniformLocation(shader->ID, "view");
-				glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(cam->GetViewMatrix()));
-				//Projection matrix
-				unsigned int projLoc = glGetUniformLocation(shader->ID, "projection");
-				glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(cam->GetProjectionMatrix()));
 				//Light Color
 				unsigned int colorLoc = glGetUniformLocation(shader->ID, "lightColor");
 				glUniform3f(colorLoc, lightColor.x / 255, lightColor.y / 255, lightColor.z / 255);
