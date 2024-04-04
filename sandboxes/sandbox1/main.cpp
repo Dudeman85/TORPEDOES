@@ -68,7 +68,7 @@ void LoadLevel1(engine::Camera* cam)
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
 	std::vector<ShipType> ships{ShipType::cannonBoat, ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat};
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(1, Vector2(1434.0f, -1370.0f), ships);
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(2, Vector2(1434.0f, -1370.0f), ships);
 
 	//Make all the checkpoints manually
 	CreateCheckpoint(Vector3(586.608276, -1249.448486, 100.000000), Vector3(45.000000, 40.070156, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 90.0f);
@@ -110,11 +110,11 @@ void SetupInput()
 	}
 
 	// Keyboard input for player 0
-	input::bindAnalogInput(GLFW_KEY_PERIOD, input::digitalPositiveInput, { "Turn1" }, 0);
-	input::bindAnalogInput(GLFW_KEY_COMMA, input::digitalNegativeInput, { "Turn1" }, 0);
+	input::bindAnalogInput(GLFW_KEY_PERIOD, input::digitalPositiveInput, { "Turn0" }, 0);
+	input::bindAnalogInput(GLFW_KEY_COMMA, input::digitalNegativeInput, { "Turn0" }, 0);
 
-	input::bindAnalogInput(GLFW_KEY_A, input::digitalPositiveInput, { "Throttle1" }, 0);
-	input::bindAnalogInput(GLFW_KEY_Z, input::digitalNegativeInput, { "Throttle1" }, 0);
+	input::bindAnalogInput(GLFW_KEY_A, input::digitalPositiveInput, { "Throttle0" }, 0);
+	input::bindAnalogInput(GLFW_KEY_Z, input::digitalNegativeInput, { "Throttle0" }, 0);
 	input::bindAnalogInput(GLFW_KEY_UP, input::digitalPositiveInput, { "Throttle0" }, 0);
 	input::bindAnalogInput(GLFW_KEY_DOWN, input::digitalNegativeInput, { "Throttle0" }, 0);
 
