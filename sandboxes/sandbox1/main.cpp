@@ -68,7 +68,7 @@ void LoadLevel1(engine::Camera* cam)
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
 	std::vector<ShipType> ships{ShipType::cannonBoat, ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::hedgehogBoat, ShipType::hedgehogBoat};
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(2, Vector2(434.0f, -1370.0f), ships);
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(1, Vector2(1434.0f, -1370.0f), ships);
 
 	//Make all the checkpoints manually
 	CreateCheckpoint(Vector3(586.608276, -1249.448486, 100.000000), Vector3(45.000000, 40.070156, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 90.0f);
@@ -106,21 +106,21 @@ void SetupInput()
 				{ input::digitalNegativeInput, GLFW_GAMEPAD_AXIS_LEFT_TRIGGER }
 			}, { "Throttle" + std::to_string(i) });
 
-		//input::bindAnalogControllerInput(i, { { {-1, 1, 0}, GLFW_GAMEPAD_AXIS_LEFT_X }, }, { "Turn" + std::to_string(i) });
+		input::bindAnalogControllerInput(i, { { input::controllerMixedInput, GLFW_GAMEPAD_AXIS_LEFT_X }, }, { "Turn" + std::to_string(i) });
 	}
 
 	// Keyboard input for player 0
-	//input::bindAnalogInput(GLFW_KEY_PERIOD, input::digitalPositiveInput, { "Turn0" }, 0);
-	//input::bindAnalogInput(GLFW_KEY_COMMA, input::digitalNegativeInput, { "Turn0" }, 0);
+	int KeyboardPlayer = 2;
+	input::bindAnalogInput(GLFW_KEY_RIGHT, input::digitalPositiveInput, 0, { "Turn" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_LEFT, input::digitalNegativeInput, 1, { "Turn" + std::to_string(KeyboardPlayer) });
 
-	//input::bindAnalogInput(GLFW_KEY_A, input::digitalPositiveInput, { "Throttle0" }, 0);
-	//input::bindAnalogInput(GLFW_KEY_Z, input::digitalNegativeInput, { "Throttle0" }, 0);
-	//input::bindAnalogInput(GLFW_KEY_UP, input::digitalPositiveInput, { "Throttle0" }, 0);
-	//input::bindAnalogInput(GLFW_KEY_DOWN, input::digitalNegativeInput, { "Throttle0" }, 0);
+	input::bindAnalogInput(GLFW_KEY_A, input::digitalPositiveInput, 0, { "Throttle" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_Z, input::digitalNegativeInput, 1, { "Throttle" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_UP, input::digitalPositiveInput, 0, { "Throttle" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_DOWN, input::digitalNegativeInput, 1, { "Throttle" + std::to_string(KeyboardPlayer) });
 
-	input::bindDigitalInput(GLFW_KEY_SPACE, { "Shoot0" });
-	input::bindDigitalInput(GLFW_KEY_M, { "Boost0" });
-
+	input::bindDigitalInput(GLFW_KEY_N, { "Shoot" + std::to_string(KeyboardPlayer) });
+	input::bindDigitalInput(GLFW_KEY_M, { "Boost" + std::to_string(KeyboardPlayer) });
 	/*
 	input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft0" });
 	input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight0" });
@@ -136,7 +136,7 @@ int main()
 	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window");
 
 	engine::EngineInit();
-
+	
 	//Make the camera
 	engine::Camera cam = engine::Camera(1120, 630);
 	cam.SetPosition(Vector3(0, 0, 1500));
