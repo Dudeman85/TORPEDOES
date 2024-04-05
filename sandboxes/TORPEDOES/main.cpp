@@ -225,13 +225,7 @@ int main()
 
 		input::update();
 
-		// Retarded, but required because "camera isn't component" or some bull
-		soundSystem->SetListeningPosition((cam.position.x, cam.position.y));
-		soundSystem->Update();
-
-		hedgehogSystem->Update();
-
-		UpdateCam(window, cam, resources::level1Map);
+		UpdateCam(&cam, resources::level1Map);
 		engine::Update(&cam);
 
 
