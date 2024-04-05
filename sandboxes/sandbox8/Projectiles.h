@@ -32,7 +32,7 @@ ECS_REGISTER_COMPONENT(Hedgehog)
 struct Hedgehog: public Projectile 
 {
 	float distanceTraveled = 0.0f;
-	//int ownerID = 0;
+	int ownerID = 0;
 };
 
 //Temporary functin for testing
@@ -138,7 +138,7 @@ public:
 	}
 };
 
-//void CreateHedgehog(Vector2 direction, Vector3 spanwPposition, Vector3 sapawnRotation, int owerID)
+void CreateHedgehog(Vector2 direction, Vector3 spanwPposition, Vector3 sapawnRotation, int owerID)
 {
 	float hedgehogSpeedVo = 500.0f;
 	float distanceTraveled = 0.0f;

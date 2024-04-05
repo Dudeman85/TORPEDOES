@@ -57,6 +57,20 @@ static void CreateAnimation(engine::ecs::Entity entity)
 	engine::AnimationSystem::PlayAnimation(torpedoAnim, projectile.hitAnimation, false);
 };
 
+void CreateAniHedgehog(Vector3 animPosition)
+{
+	engine::ecs::Entity hedgehogAnim = engine::ecs::NewEntity();
+	animPosition.z += 100;
+	engine::ecs::AddComponent(hedgehogAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20) });
+	engine::ecs::AddComponent(hedgehogAnim, engine::SpriteRenderer{ });
+	engine::ecs::AddComponent(hedgehogAnim, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
+	std::vector<Vector2> explosionverts{ Vector2(0.2, 0.25), Vector2(0.2, -0.25), Vector2(-0.2, -0.25), Vector2(-0.2, 0.25) };
+	engine::ecs::AddComponent(hedgehogAnim, engine::PolygonCollider{ .vertices = explosionverts, .trigger = true, .visualise = true });
+	engine::ecs::AddComponent(hedgehogAnim, Projectile{ .ownerID = -1 , .hitAnimation = "" });
+	engine::AnimationSystem::AddAnimation(hedgehogAnim, resources::explosionAnimation, "explosion");
+	engine::AnimationSystem::PlayAnimation(hedgehogAnim, "explosion", false);
+};
+
 static void OnProjectileCollision(engine::Collision collision)
 {
 	if (collision.type == engine::Collision::Type::tilemapTrigger)
@@ -87,6 +101,7 @@ public:
 		{			// Get the entity and increment the iterator
 			engine::ecs::Entity entity = *itr++;
 			Hedgehog& hedgehogComp = engine::ecs::GetComponent<Hedgehog>(entity);
+			engine::Transform& transformComp = engine::ecs::GetComponent<engine::Transform>(entity);
 
 			if (hedgehogComp.distanceTraveled < maxDistance)
 			{
@@ -97,21 +112,26 @@ public:
 				float distanceRatio = hedgehogComp.distanceTraveled / maxDistance;
 
 				//// Calcula la rotación en función de la distancia recorrida
-				engine::TransformSystem::Rotate(entity, Vector3(0, 0, -1.5f ));
+				engine::TransformSystem::Rotate(entity, Vector3(0, 0, -1.0f));
 
 				// Calcula la escala en funcion de la distancia recorrida
 				float scale = maxScale - (maxScale - minScale) * (2 * abs(0.5 - distanceRatio));
-			
+
 				// Actualiza la escala del objeto
-				engine::ecs::GetComponent<engine::Transform>(entity).scale = Vector3(scale);
+				transformComp.scale = Vector3(scale);
+
 
 			}
 			else
 			{
+				// Create the animation when the projectile reaches the end of the trajectory."
+				CreateAniHedgehog(transformComp.position);
+
 				// Si se supera la distancia máxima, detén el movimiento del objeto
 				engine::ecs::DestroyEntity(entity);
-				continue;
+				break;
 			}
+
 		};
 	}
 };

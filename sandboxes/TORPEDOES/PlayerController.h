@@ -113,6 +113,55 @@ void CreateHedgehog(engine::ecs::Entity entity)
 	ecs::AddComponent(hedgehog, Hedgehog{});
 }
 
+void CreateHedgehog(Vector2 direction, engine::ecs::Entity entity)
+{
+	using namespace engine;
+	Player& player = ecs::GetComponent<Player>(entity);
+	Transform& transform = ecs::GetComponent<Transform>(entity);
+	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
+
+	float hedgehogSpeedVo = 500.0f;
+	float distanceTraveled = 0.0f;
+
+	engine::ecs::Entity hedgehog = engine::ecs::NewEntity();
+	engine::ecs::AddComponent(hedgehog, engine::Transform{ .position = transform.position, .rotation = modelTransform.rotation });
+
+	Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * hedgehogSpeedVo;
+
+	engine::ecs::AddComponent(hedgehog, engine::Rigidbody{ .velocity = finalVelocity });
+
+	engine::ecs::AddComponent(hedgehog, engine::ModelRenderer{ .model = resources::models["hedgehog.obj"] });
+	std::vector<Vector2> Hedgehogverts{ Vector2(0.2, 0.25), Vector2(0.2, -0.25), Vector2(-0.2, -0.25), Vector2(-0.2, 0.25) };
+	//engine::ecs::AddComponent(hedgehog, engine::PolygonCollider{ .vertices = Hedgehogverts, .callback = OnTopedoCollision, .trigger = true, .visualise = true,  .rotationOverride = sapawnRotation.y });
+	ecs::AddComponent(hedgehog, Projectile{ .ownerID = player.id });
+	ecs::AddComponent(hedgehog, Hedgehog{});
+}
+
+void CreateTridentHedgehogs(engine::ecs::Entity entity)
+{
+	using namespace engine;
+
+	Player& player = ecs::GetComponent<Player>(entity);
+	Transform& transform = ecs::GetComponent<Transform>(entity);
+	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
+
+	const float angleOffset = Radians(10.0f); // Ajuste de ángulo para las direcciones de los proyectiles
+	float playerAngle = atan2(player._forwardDirection.y, player._forwardDirection.x);
+
+	// Creamos los tres proyectiles (hedgehogs)
+	for (int i = 0; i < 3; ++i)
+	{
+		// Calculamos el ángulo para cada proyectil
+		float angle = playerAngle + i * angleOffset;
+
+		// Calculamos la dirección para cada proyectil
+		Vector2 modifiedDirection = Vector2(cos(angle), sin(angle));
+
+		// Creamos el hedgehog
+		CreateHedgehog(modifiedDirection, entity);
+	}
+}
+
 void CreateShell(engine::ecs::Entity entity)
 {
 	using namespace engine;
@@ -186,7 +235,7 @@ public:
 		shipComponents.insert({ ShipType::cannonBoat,
 			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 0.8, .mainAction = CreateShell, .specialAction = Boost } });
 		shipComponents.insert({ ShipType::hedgehogBoat,
-			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 0.8, .mainAction = CreateHedgehog, .specialAction = Boost } });
+			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 0.8, .mainAction = CreateTridentHedgehogs, .specialAction = Boost } });
 
 		//Initialize ship type models
 		shipModels.insert({ ShipType::torpedoBoat, resources::models["Ship_PT_109_Torpedo.obj"] });
@@ -569,6 +618,7 @@ public:
 		}
 	}
 };
+
 //Static member definitions
 engine::ecs::Entity PlayerController::winScreen = winScreen;
 bool PlayerController::hasWon = false;
