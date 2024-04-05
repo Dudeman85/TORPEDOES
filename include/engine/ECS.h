@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <memory>
+#include <cstring>
 #include <functional>
 
 //Allow max components to be determined outside this file
