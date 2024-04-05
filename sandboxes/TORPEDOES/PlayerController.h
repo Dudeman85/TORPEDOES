@@ -572,4 +572,4 @@ public:
 //Static member definitions
 engine::ecs::Entity PlayerController::winScreen = winScreen;
 bool PlayerController::hasWon = false;
-int PlayerController::lapCount = 1;
+int PlayerController::lapCount = lapCount;

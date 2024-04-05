@@ -2,9 +2,9 @@
 #include <engine/Tilemap.h>
 #include "PlayerController.h"
 
-const float aspectRatio = 16.f / 9.f;
 //Current height of the camera, width is calculated automatically
 float camHeight = 1.f;
+const float aspectRatio = 16.f / 9.f;
 //Maximum units a player can be from the camera's edge before zooming in
 const float zoomInThreshold = 200;
 //Minimum units a player can be from the camera's edge before zooming out
@@ -14,11 +14,12 @@ const float minHeight = 300;
 
 static void UpdateCam(engine::Camera* cam, Tilemap* map)
 {
+	using namespace engine;
+
 	#ifdef _DEBUG
 	if ((map->bounds.width / map->bounds.height) < (16.f / 9.f))
 		std::cout << "map is wrong aspect\n";
 	#endif
-
 
 	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
 
