@@ -5,7 +5,7 @@
 float camScale = 1.0;
 float camScaleMin = 600.0f;
 float camScaleMax = 1650.0f;
-const float aspectRatio = 16 / 9;
+const float aspectRatio = 16.f / 9.f;
 float camPadding = 100;
 float camDeadzone = 10;
 
