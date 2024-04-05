@@ -68,7 +68,7 @@ namespace engine
 
 		//COLLISION RESOLUTION:
 
-		///Temporary function to solve a collision does affect rotation rotation, Returns 0 on success, >0 on trigger, and <0 on failure 
+		///Temporary function to solve a collision does not affect rotation rotation, Returns 0 on success, >0 on trigger, and <0 on failure 
 		static int SimpleSolveCollision(Collision collision)
 		{
 			//One of the entities does not have a rigidbody. Return <0 on failure;
@@ -109,7 +109,7 @@ namespace engine
 			if (collisions.empty())
 				return 0;
 
-			//Nothing needs to be done. Return >0 on trigger
+			//Trigger, nothing needs to be done. Return >0 on trigger
 			if (collisions.front().type == Collision::Type::trigger || collisions.front().type == Collision::Type::tilemapTrigger)
 				return 1;
 			//Nothing needs to be done. Return 0 on success
@@ -127,6 +127,7 @@ namespace engine
 				{
 					if (collision.mtv.Length() > maxIntersect.mtv.Length())
 					{
+						//If the tile is set to be a trigger
 						if (tileProperties.count(collision.b) != 0)
 						{
 							if (!tileProperties[collision.b].trigger)

@@ -56,7 +56,7 @@ void LoadLevel1(engine::Camera* cam)
 	engine::collisionSystem->SetTilemap(resources::level1Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
-	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
+	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::submarine, ShipType::cannonBoat};
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(4, Vector2(1434.0f, -1370.0f), ships);
 
 	//Make all the checkpoints manually
