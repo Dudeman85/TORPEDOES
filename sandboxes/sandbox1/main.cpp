@@ -86,7 +86,15 @@ void SetupInput()
 {
 	input::ConstructDigitalEvent("Pause");
 	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
+	input::ConstructDigitalEvent("Menu");
+	input::bindDigitalInput(GLFW_KEY_U, { "Menu" });
 	// TODO: add controller pause key
+
+	float AnalogPositiveMinDeadZone = 0;
+	float AnalogPositiveMaxDeadZone = 0.2;
+
+	float AnalogNegativeMinDeadZone = -0.2;
+	float AnalogNegativeMaxDeadZone = 0;
 
 	for (size_t i = 0; i < 4; i++)
 	{
@@ -97,39 +105,39 @@ void SetupInput()
 		input::ConstructDigitalEvent("Boost" + std::to_string(i));
 
 		// Controller input
+
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "Boost" + std::to_string(i) });
 
 		input::bindAnalogControllerInput(i,
 			{
-				{ input::digitalPositiveInput, GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER },
-				{ input::digitalNegativeInput, GLFW_GAMEPAD_AXIS_LEFT_TRIGGER }
-			}, { "Throttle" + std::to_string(i) });
+				{ { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER },
+				{ { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_TRIGGER }
+			},
+			{ "Throttle" + std::to_string(i) });
 
-		input::bindAnalogControllerInput(i, { { input::controllerMixedInput, GLFW_GAMEPAD_AXIS_LEFT_X }, }, { "Turn" + std::to_string(i) });
+		input::bindAnalogControllerInput(i,
+			{
+				{ { input::controllerMixedInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_X }
+			},
+			{ "Turn" + std::to_string(i) });
 	}
 
-	// Keyboard input for player 0
-	int KeyboardPlayer = 2;
-	input::bindAnalogInput(GLFW_KEY_RIGHT, input::digitalPositiveInput, 0, { "Turn" + std::to_string(KeyboardPlayer) });
-	input::bindAnalogInput(GLFW_KEY_LEFT, input::digitalNegativeInput, 1, { "Turn" + std::to_string(KeyboardPlayer) });
+	// Keyboard input
+	int KeyboardPlayer = 0;
 
-	input::bindAnalogInput(GLFW_KEY_A, input::digitalPositiveInput, 0, { "Throttle" + std::to_string(KeyboardPlayer) });
-	input::bindAnalogInput(GLFW_KEY_Z, input::digitalNegativeInput, 1, { "Throttle" + std::to_string(KeyboardPlayer) });
-	input::bindAnalogInput(GLFW_KEY_UP, input::digitalPositiveInput, 0, { "Throttle" + std::to_string(KeyboardPlayer) });
-	input::bindAnalogInput(GLFW_KEY_DOWN, input::digitalNegativeInput, 1, { "Throttle" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_RIGHT, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_LEFT, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
+
+	input::bindAnalogInput(GLFW_KEY_A, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_Z, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_UP, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_DOWN, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
 
 	input::bindDigitalInput(GLFW_KEY_N, { "Shoot" + std::to_string(KeyboardPlayer) });
 	input::bindDigitalInput(GLFW_KEY_M, { "Boost" + std::to_string(KeyboardPlayer) });
-	/*
-	input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft0" });
-	input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight0" });
-	input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp0" });
-	input::bindDigitalInput(GLFW_KEY_DOWN, { "MoveDown0" });
-	input::bindDigitalInput(GLFW_KEY_ENTER, { "Select0" });
-	*/
-
 }
+
 
 int main()
 {

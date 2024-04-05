@@ -10,7 +10,7 @@ const float zoomInThreshold = 200;
 //Minimum units a player can be from the camera's edge before zooming out
 const float zoomOutThreshold = 150;
 //Minimum height the camera can have
-const float minHeight = 300;
+const float minHeight = 600;
 
 static void UpdateCam(engine::Camera* cam, Tilemap* map)
 {
