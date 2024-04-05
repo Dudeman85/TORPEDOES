@@ -53,6 +53,8 @@ static void CreateAnimation(engine::ecs::Entity entity)
 	engine::ecs::AddComponent(torpedoAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20) });
 	engine::ecs::AddComponent(torpedoAnim, engine::SpriteRenderer{ });
 	engine::ecs::AddComponent(torpedoAnim, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
+
+	// MIKA ME MUUTATIN COSNT STRING MISSÄ LUKKE "HIT" ÄLÄ MUOKATA SIKSI C++ EI OSA LUUKE OIKEA JOS IE CONST STRING
 	engine::AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, "hit");
 	engine::AnimationSystem::PlayAnimation(torpedoAnim, "hit", false);
 };
@@ -67,6 +69,8 @@ void CreateAniHedgehog(Vector3 animPosition)
 	std::vector<Vector2> explosionverts{ Vector2(0.5, 0.55), Vector2(0.5, -0.55), Vector2(-0.5, -0.55), Vector2(-0.5, 0.55) };
 	engine::ecs::AddComponent(hedgehogAnim, engine::PolygonCollider{ .vertices = explosionverts, .trigger = true, .visualise = true });
 	engine::ecs::AddComponent(hedgehogAnim, Projectile{ .ownerID = -1 , .hitAnimation = "" });
+
+	//   MIKA SAMA TÄLTÄ 
 	engine::AnimationSystem::AddAnimation(hedgehogAnim, resources::explosionAnimation, "explosion");
 	engine::AnimationSystem::PlayAnimation(hedgehogAnim, "explosion", false);
 };
@@ -97,9 +101,9 @@ public:
 	void Update()
 	{
 		// Iterate through entities in the system
-		for (auto itr = entities.begin(); itr != entities.end();)
+		for (engine::ecs::Entity entity: entities)
 		{			// Get the entity and increment the iterator
-			engine::ecs::Entity entity = *itr++;
+			
 			Hedgehog& hedgehogComp = engine::ecs::GetComponent<Hedgehog>(entity);
 			engine::Transform& transformComp = engine::ecs::GetComponent<engine::Transform>(entity);
 
