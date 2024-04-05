@@ -274,15 +274,13 @@ namespace input
 	{
 		if (from_value >= from_mindeadzone && from_value <= from_maxdeadzone)
 		{
-			//std::cout << "pre:" << from_value << " : " << from_mindeadzone << " : " << from_maxdeadzone << " : " << from_default << "\n";
-			//from_value = from_default;
+			from_value = from_default;
 		}
 
 		float temp = map_value(from_value, from_min, from_max, to_min, to_max);
 
 		if (temp >= to_mindeadzone && temp <= to_maxdeadzone)
 		{
-			//std::cout << "pre:" << temp << " : " << to_mindeadzone << " : " << to_maxdeadzone << " : " << to_default << "\n";
 			temp = to_default;
 		}
 
@@ -368,20 +366,9 @@ namespace input
 					it->second.second.MinDeadzone, it->second.second.MaxDeadzone, it->second.second.Default,
 					it->first.minMax.Min, it->first.minMax.Max, 
 					it->first.minMax.MinDeadzone, it->first.minMax.MaxDeadzone, it->first.minMax.Default);
-
-					std::cout << "value " << output[it->first.axis] << " deadzones" << it->second.second.MinDeadzone << " " << it->second.second.MaxDeadzone << " " << it->first.minMax.MinDeadzone << " " << it->first.minMax.MaxDeadzone << "\n";
-
-					//output[it->first.axis] += input::map_value(*it->second.first, it->second.second.Min, it->second.second.Max, it->first.minMax.Min, it->first.minMax.Max);
-					/*
-					if (output[it->first.axis] < it->first.minMax.Deadzone)
-					{
-						std::cout << "hello: " << output[it->first.axis] << " : " << it->second.second.Max << " : " << it->first.minMax.Deadzone << "\n";
-						output[it->first.axis] = it->first.minMax.Min;
-					}*/
 				}
 				// Update total value as output
 				totalValues = output;
-				std::cout << "\n";
 				
 				totalValuesUpdated = true;
 			}
@@ -480,7 +467,6 @@ namespace input
 			}
 		}
 	 
-
 	protected:
 		eventStates pressed = eventStates::Not;		// Whether key is pressed the update before this poll
 		eventStates released = eventStates::Not;	// Whether key is released the update before this poll
@@ -946,8 +932,6 @@ namespace input
 			for (auto& axisEventData : axisEventDatas)
 			{
 				inputEvent->InputEventDataToOutputValues.insert({ {axisEventData.minMax, axisEventData.axis}, {&inputButton->axisToValue[axisEventData.axis], {controllerMixedInput, axisEventData.minMax.MinDeadzone, axisEventData.minMax.MaxDeadzone }} });
-				std::cout << " deadzones" << axisEventData.minMax.MinDeadzone << " " << axisEventData.minMax.MaxDeadzone << "\n";
-
 			}
 		}
 	}
