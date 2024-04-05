@@ -41,8 +41,11 @@ namespace engine
 	{
 	public:
 		///Update the physics system, call this every frame
-		void Update(float deltaTime)
+		void Update()
 		{
+			//Physics dt is capped at 20 fps, less than that will slow down physics to stop impercision
+			float cappedDt = std::min(engine::deltaTime, 1.0 / 20.0);
+
 			//For each entity
 			for (ecs::Entity entity : entities)
 			{
@@ -54,21 +57,21 @@ namespace engine
 				if (!rigidbody.kinematic)
 				{
 					//Add gravity
-					rigidbody.velocity += gravity * rigidbody.mass * rigidbody.gravityScale * engine::deltaTime;
+					rigidbody.velocity += gravity * rigidbody.mass * rigidbody.gravityScale * cappedDt;
 					//Apply drag
-					rigidbody.velocity -= rigidbody.velocity * rigidbody.drag * engine::deltaTime;
+					rigidbody.velocity -= rigidbody.velocity * rigidbody.drag * cappedDt;
 				}
-				if ((rigidbody.velocity * deltaTime).Length() != 0)
+				if ((rigidbody.velocity * cappedDt).Length() != 0)
 				{
 					//Integrate position
-					Move(entity, rigidbody.velocity * deltaTime, step);
+					Move(entity, rigidbody.velocity * cappedDt, step);
 				}
 			}
 		}
 
 		//COLLISION RESOLUTION:
 
-		///Temporary function to solve a collision does affect rotation rotation, Returns 0 on success, >0 on trigger, and <0 on failure 
+		///Temporary function to solve a collision does not affect rotation rotation, Returns 0 on success, >0 on trigger, and <0 on failure 
 		static int SimpleSolveCollision(Collision collision)
 		{
 			//One of the entities does not have a rigidbody. Return <0 on failure;
@@ -109,7 +112,7 @@ namespace engine
 			if (collisions.empty())
 				return 0;
 
-			//Nothing needs to be done. Return >0 on trigger
+			//Trigger, nothing needs to be done. Return >0 on trigger
 			if (collisions.front().type == Collision::Type::trigger || collisions.front().type == Collision::Type::tilemapTrigger)
 				return 1;
 			//Nothing needs to be done. Return 0 on success
@@ -127,6 +130,7 @@ namespace engine
 				{
 					if (collision.mtv.Length() > maxIntersect.mtv.Length())
 					{
+						//If the tile is set to be a trigger
 						if (tileProperties.count(collision.b) != 0)
 						{
 							if (!tileProperties[collision.b].trigger)
@@ -198,11 +202,21 @@ namespace engine
 			}
 		}
 
-		///Add velocity to entity, does not include deltaTime
-		static void Impulse(ecs::Entity entity, Vector3 velocity)
+		///Add an impulse to entity, does not include deltaTime
+		static inline void Impulse(ecs::Entity entity, Vector3 velocity)
 		{
 			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(entity);
 			rigidbody.velocity += velocity * rigidbody.mass;
+		}
+		
+		///Add force to entity
+		static inline void AddForce(ecs::Entity entity, Vector3 velocity)
+		{
+			//Physics dt is capped at 20 fps, less than that will slow down physics to stop impercision
+			float cappedDt = std::min(engine::deltaTime, 1.0 / 20.0);
+
+			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(entity);
+			rigidbody.velocity += velocity * cappedDt * rigidbody.mass;
 		}
 
 		///Sets the rigidbody properties of a tile type
