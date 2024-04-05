@@ -53,8 +53,8 @@ static void CreateAnimation(engine::ecs::Entity entity)
 	engine::ecs::AddComponent(torpedoAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20) });
 	engine::ecs::AddComponent(torpedoAnim, engine::SpriteRenderer{ });
 	engine::ecs::AddComponent(torpedoAnim, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
-	engine::AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, projectile.hitAnimation);
-	engine::AnimationSystem::PlayAnimation(torpedoAnim, projectile.hitAnimation, false);
+	engine::AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, "hit");
+	engine::AnimationSystem::PlayAnimation(torpedoAnim, "hit", false);
 };
 
 void CreateAniHedgehog(Vector3 animPosition)
@@ -64,7 +64,7 @@ void CreateAniHedgehog(Vector3 animPosition)
 	engine::ecs::AddComponent(hedgehogAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20) });
 	engine::ecs::AddComponent(hedgehogAnim, engine::SpriteRenderer{ });
 	engine::ecs::AddComponent(hedgehogAnim, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
-	std::vector<Vector2> explosionverts{ Vector2(0.2, 0.25), Vector2(0.2, -0.25), Vector2(-0.2, -0.25), Vector2(-0.2, 0.25) };
+	std::vector<Vector2> explosionverts{ Vector2(0.5, 0.55), Vector2(0.5, -0.55), Vector2(-0.5, -0.55), Vector2(-0.5, 0.55) };
 	engine::ecs::AddComponent(hedgehogAnim, engine::PolygonCollider{ .vertices = explosionverts, .trigger = true, .visualise = true });
 	engine::ecs::AddComponent(hedgehogAnim, Projectile{ .ownerID = -1 , .hitAnimation = "" });
 	engine::AnimationSystem::AddAnimation(hedgehogAnim, resources::explosionAnimation, "explosion");
@@ -112,7 +112,7 @@ public:
 				float distanceRatio = hedgehogComp.distanceTraveled / maxDistance;
 
 				//// Calcula la rotación en función de la distancia recorrida
-				engine::TransformSystem::Rotate(entity, Vector3(0, 0, -1.0f));
+				engine::TransformSystem::Rotate(entity, Vector3(0, 0, -130.5f * engine::deltaTime));
 
 				// Calcula la escala en funcion de la distancia recorrida
 				float scale = maxScale - (maxScale - minScale) * (2 * abs(0.5 - distanceRatio));
@@ -129,7 +129,7 @@ public:
 
 				// Si se supera la distancia máxima, detén el movimiento del objeto
 				engine::ecs::DestroyEntity(entity);
-				break;
+				continue;
 			}
 
 		};

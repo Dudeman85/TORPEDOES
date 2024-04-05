@@ -124,15 +124,14 @@ void CreateHedgehog(Vector2 direction, engine::ecs::Entity entity)
 	float distanceTraveled = 0.0f;
 
 	engine::ecs::Entity hedgehog = engine::ecs::NewEntity();
-	engine::ecs::AddComponent(hedgehog, engine::Transform{ .position = transform.position, .rotation = modelTransform.rotation });
+	engine::ecs::AddComponent(hedgehog, Transform{ .position = transform.position, .rotation = modelTransform.rotation });
 
 	Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * hedgehogSpeedVo;
 
 	engine::ecs::AddComponent(hedgehog, engine::Rigidbody{ .velocity = finalVelocity });
 
-	engine::ecs::AddComponent(hedgehog, engine::ModelRenderer{ .model = resources::models["hedgehog.obj"] });
+	engine::ecs::AddComponent(hedgehog, ModelRenderer{ .model = resources::models["hedgehog.obj"] });
 	std::vector<Vector2> Hedgehogverts{ Vector2(0.2, 0.25), Vector2(0.2, -0.25), Vector2(-0.2, -0.25), Vector2(-0.2, 0.25) };
-	//engine::ecs::AddComponent(hedgehog, engine::PolygonCollider{ .vertices = Hedgehogverts, .callback = OnTopedoCollision, .trigger = true, .visualise = true,  .rotationOverride = sapawnRotation.y });
 	ecs::AddComponent(hedgehog, Projectile{ .ownerID = player.id });
 	ecs::AddComponent(hedgehog, Hedgehog{});
 }

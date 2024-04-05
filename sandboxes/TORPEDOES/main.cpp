@@ -237,7 +237,7 @@ int main()
 		}
 
 		input::update();
-
+		hedgehogSystem->Update();
 		UpdateCam(&cam, resources::level1Map);
 		engine::Update(&cam);
 
