@@ -6,36 +6,12 @@
    <property name="Z" type="float" value="0"/>
   </properties>
   <data encoding="base64" compression="zlib">
-   eJztmEFOwzAQRXPNZt0IuioCViDoVXKUHI1BkaVq1MTYOP4ez1+MXhNFtT3/Ka19HYbhRepKVuGH1CdZjei8vRGdtzei8/ZGdN7eiM7bG9F5eyM6b29E5+2N6Ly9EZ23N6Lz9kZ03t6Iztsb0Xl7Izpvb0TnbYEnqXGH9Lssz1LTDuk3/bZM+k2/eyb9pt+5fJJ6zqxLpXn25Per1FtmvVeaZ09+/7ff9Jt+02/6Tb8x/JL6zqxbpXn25LcF9uS3BdLv/v0+rVkueqwxMV+LRPh9Xnu76LGmxHwtEuX3o7Ho93F+PxqLftNv+m2bLfkd2IKHHvwObMHD3v3W99AelmZYVyt+63s5ebdMva7a5yfaaT3uX+eXQvnOWTjHnpvWvdhyz/BZX8e4ta7a5yfa6S2/Y/NL5G+v59hz49qn5Z7hs76OcWtdqPPBrXHpd1m/9XuNftc9//bi9x5T+3bE73dvfu8xtW8l918lvabf+e91636X/F9/5L7Mut9H7FtL+k1i/Cbpdyv8ATxrdTQ=
+   eJztmLFOwzAQhr3BXFihE8xkhqdgS+ZEwFQETEXAq+RR8mgciixZxnFqx/bZvht+fW3VYvv+T6XJQQjxCjkwk/AI+WQmI3bf1IjdNzVi902N2H1TI3bf1IjdNzVi902N2H1TI3bf1IjdNzVi902N2H1TI3bf1IjdNzVi902N2H2XwBbSWch+h2UPGSxkv9nvksl+s981k/1mv335BHn2zEuifdbk9xvk3TMfifZZk99b581+s9/sN/vNfuPwC/LtmZ9E+6zJ7xJYk98lkP0W4tGSGvxu5y4nfa3Osd+ttM15KSX63c+znfS1Bsd+Y3ody3csv01rsd/x/DatxX6z3+x3WKbyOke/JXP4nRyLOfktmdJvyTPIeeDsIBeQS5Gf3/prqb2TswkZdd7yXLn4rb/m0/cWXkGuA0edt36u1PdPdKf1dU/dnwvhb47Ace19w3wtNqmUj/XnNubi91H8d3rJ77X9OfJv1uPa+7r5XsOkUj7Wn9uYk9+q56Z12e+wfquem9atwW/5P2Hv4E9sv5c8r8Hv3nAP1EbXuW35fbA035L9bg33QG10nVvI66+QXqf0u4HP32rJ0e9Tv9dtvFHOuOa3aS4h0yhR9xHyuiHGdZ+Lv3cJ5uiTLsJcQvvtwybTxDov9v23e8hDhol1Xmy/qfEXASUENA==
   </data>
  </layer>
  <layer id="3" name="collider" width="92" height="56">
   <data encoding="base64" compression="zlib">
-   eJzt26ENADEMBEEr/RedBh48SFYBM9I1sMDMa2aWpaOhd0vvlt4tvVt6t/Ru6d3Su6V3S++W3i29W3q39G7p3dK7pXdL75beLb1berf0bund0ruld0vvlt4tvVt6t/Ru6d3Su6V3S++W3i29W3q39G7p3dK7pXdL7zP+/mzrfYbeLb1berf0bund0ruld0vvN+nd0rv1dXfs7jZEWAKj
-  </data>
- </layer>
- <layer id="4" name="Tile Layer 3" width="92" height="56">
-  <properties>
-   <property name="Z" type="float" value="3"/>
-  </properties>
-  <data encoding="base64" compression="zlib">
-   eJzt1LENgDAMAMGsQ0MNNQtQ0cKojEYaBiASOMJ3krsUL8tKKQAAAAAAAAAAAAAAAAAAAEx15jpjKWdwSgpLdEAyLXe9vdABPRiiAxI5ogOS8W9/b48O+IHx4Xt33ube8xpakYc9A727ALakBXc=
-  </data>
- </layer>
- <layer id="5" name="Tile Layer 5" width="92" height="56">
-  <properties>
-   <property name="Z" type="float" value="-0.5"/>
-  </properties>
-  <data encoding="base64" compression="zlib">
-   eJzt0iESwkAQRcG9JuigQcPlcjRShYuKShd5K6baz/uvMcZzu9f0FD/bvaenqXvX1L1r6t41de+aundN3bum7l1T966pe9fUvWvq3jV175q6d03du6buXVP3rql719S9a+reNXXvmrp3Td27pu5dU/euqXvX1L1r6t41de+aundN3bum7l1T9655tMtjjHXZbu/tpF1cxaNd7r/frnsXvJd/c+577vvKzn3PfV9Z3bum7l1T966pe9fUvWvq3jV175q6d03du6buXVP3rql719S9a+reNXXvmrp3zS/+F0qG
-  </data>
- </layer>
- <layer id="2" name="Tile Layer 2" width="92" height="56">
-  <properties>
-   <property name="Z" type="float" value="1"/>
-  </properties>
-  <data encoding="base64" compression="zlib">
-   eJzt1ssKglAARdH7Rc0bR4+ZVtPqW/u0FBIcZA/Ik+FacEaCXrYOLAUAAAAAAICxrZ5cW8dOMR96Z+mdpXeW3ll6Z+mdpXeW3ll6Z+mdpXeW3ll6Z+mdpXfWlHrP4f3qnaV3lt5ZemfpnTWl3r96ZpLeWVPrPWd6Z7W9N822ve3CZ1iGV5VyHeO+72h775sdeju+G4qP6Z2ld86iWV30Tun+TfTO0Hsc1cDq+3W9v6Pr+sqp2bm3y5iHemDoe/i3AUzZDTZyPmo=
+   eJzt3DENAEAMw8Cq/EE/go7v6U4KAQPIzsxaOhp6t/Ru6d3Su6V3S++W3i29W3q39G7p3dK7pXdL75beLb1berf0bund0ruld0vvlt4tvVt6t/Ru6d3Su6V3S++W3i29W3q39G7p3dK7pXdL75beLb1berf0bund0ruld0vvlt4tvVt6t/Ru6d3Su6V369ffm917LHQCSQ==
   </data>
  </layer>
 </map>

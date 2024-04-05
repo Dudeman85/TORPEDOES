@@ -15,8 +15,8 @@ void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine:
 {
 	engine::ecs::Entity checkpoint = engine::ecs::NewEntity();
 
-	engine::ecs::AddComponent(checkpoint, engine::Transform{ .position = position , .rotation = rotation , .scale = scale });
-	engine::ecs::AddComponent(checkpoint, engine::ModelRenderer{ .model = checkPointModel });
+	engine::ecs::AddComponent(checkpoint, engine::Transform{.position = position, .rotation = rotation, .scale = scale });
+	engine::ecs::AddComponent(checkpoint, engine::ModelRenderer{.model = checkPointModel });
 	engine::ecs::AddComponent(checkpoint, CheckPoint{ .checkPointID = checkPointNumber , .Finish_line = finish_line });
 	std::vector<Vector2> CheckpointcolliderVerts{ Vector2(4, 8), Vector2(4, -8), Vector2(-4, -8), Vector2(-4, 8) };
 	engine::ecs::AddComponent(checkpoint, engine::PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = false, .rotationOverride = hitboxrotation }));
@@ -27,7 +27,7 @@ void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine:
 void CreateCrowd(Vector3 pos, engine::Animation& anim)
 {
 	engine::ecs::Entity crowd = engine::ecs::NewEntity();
-	engine::ecs::AddComponent(crowd, engine::Transform{ .position = pos, .scale = Vector3(100, 30, 0) });
+	engine::ecs::AddComponent(crowd, engine::Transform{.position = pos, .scale = Vector3(100, 30, 0) });
 	engine::ecs::AddComponent(crowd, engine::SpriteRenderer{});
 	engine::ecs::AddComponent(crowd, engine::Animator{});
 	engine::AnimationSystem::AddAnimation(crowd, anim, "CrowdCheer");
@@ -38,9 +38,9 @@ void CreateCrowd(Vector3 pos, engine::Animation& anim)
 void PlayCountdown()
 {
 	engine::ecs::Entity countdown = engine::ecs::NewEntity();
-	engine::ecs::AddComponent(countdown, engine::Transform{ .position = Vector3(1475, -1270, 10), .scale = Vector3(60, 100, 0) });
+	engine::ecs::AddComponent(countdown, engine::Transform{.position = Vector3(1475, -1270, 10), .scale = Vector3(60, 100, 0) });
 	engine::ecs::AddComponent(countdown, engine::SpriteRenderer{});
-	engine::ecs::AddComponent(countdown, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
+	engine::ecs::AddComponent(countdown, engine::Animator{.onAnimationEnd = engine::ecs::DestroyEntity });
 	engine::AnimationSystem::AddAnimation(countdown, resources::countdownAnim, "CountDown");
 	engine::AnimationSystem::PlayAnimation(countdown, "CountDown", false);
 	engine::ecs::GetSystem<PlayerController>()->countdownTimer = 5;
@@ -78,12 +78,7 @@ void LoadLevel1(engine::Camera* cam)
 
 	PlayCountdown();
 }
-template <class LoadLevel1>
-void DoSomething(LoadLevel1 func)
-{
-	engine::Camera* cam;
-	return func(cam);
-}
+
 //Bind all input events here
 void SetupInput()
 {
@@ -91,6 +86,12 @@ void SetupInput()
 	input::ConstructDigitalEvent("Menu");
 	input::bindDigitalInput(GLFW_KEY_U, { "Menu" });
 	// TODO: add controller pause key
+
+	float AnalogPositiveMinDeadZone = 0;
+	float AnalogPositiveMaxDeadZone = 0.2;
+
+	float AnalogNegativeMinDeadZone = -0.2;
+	float AnalogNegativeMaxDeadZone = 0;
 
 	for (size_t i = 0; i < 4; i++)
 	{
@@ -101,30 +102,37 @@ void SetupInput()
 		input::ConstructDigitalEvent("Boost" + std::to_string(i));
 
 		// Controller input
+
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "Boost" + std::to_string(i) });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_START, { "Pause" });
-		input::bindAnalogControllerInput(i, 
-		{ 
-			{ input::digitalPositiveInput, GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER }, 
-			{ input::digitalNegativeInput, GLFW_GAMEPAD_AXIS_LEFT_TRIGGER }
-		}, { "Throttle" + std::to_string(i) });
 
-		input::bindAnalogControllerInput(i, { { input::controllerMixedInput, GLFW_GAMEPAD_AXIS_LEFT_X }, }, { "Turn" + std::to_string(i) });
+		input::bindAnalogControllerInput(i,
+										 {
+											 { { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER },
+											 { { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_TRIGGER }
+										 },
+										 { "Throttle" + std::to_string(i) });
+
+		input::bindAnalogControllerInput(i,
+										 {
+											 { { input::controllerMixedInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_X }
+										 },
+										 { "Turn" + std::to_string(i) });
 	}
 
 	// Keyboard input
-	int KeyboardPlayer = 2;
+	int KeyboardPlayer = 1;
 
-	input::bindAnalogInput(GLFW_KEY_RIGHT,	input::digitalPositiveInput, { "Turn" + std::to_string(KeyboardPlayer) }, 0);
-	input::bindAnalogInput(GLFW_KEY_LEFT,	input::digitalNegativeInput, { "Turn" + std::to_string(KeyboardPlayer) }, 0);
+	input::bindAnalogInput(GLFW_KEY_RIGHT, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_LEFT, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
 
-	input::bindAnalogInput(GLFW_KEY_A,		input::digitalPositiveInput, { "Throttle" + std::to_string(KeyboardPlayer) }, 0);
-	input::bindAnalogInput(GLFW_KEY_Z,		input::digitalNegativeInput, { "Throttle" + std::to_string(KeyboardPlayer) }, 0);
-	input::bindAnalogInput(GLFW_KEY_UP,		input::digitalPositiveInput, { "Throttle" + std::to_string(KeyboardPlayer) }, 0);
-	input::bindAnalogInput(GLFW_KEY_DOWN,	input::digitalNegativeInput, { "Throttle" + std::to_string(KeyboardPlayer) }, 0);
+	input::bindAnalogInput(GLFW_KEY_A, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_Z, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_UP, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_DOWN, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
 
-	input::bindDigitalInput(GLFW_KEY_N, { "Shoot" + std::to_string(KeyboardPlayer) });																  
+	input::bindDigitalInput(GLFW_KEY_N, { "Shoot" + std::to_string(KeyboardPlayer) });
 	input::bindDigitalInput(GLFW_KEY_M, { "Boost" + std::to_string(KeyboardPlayer) });
 	input::bindDigitalInput(GLFW_KEY_P, { "Pause"  });
 }
@@ -172,9 +180,9 @@ int main()
 
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
-	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(0, -0, -20), .scale = 20 });
-	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Checkpoint.obj"], .uiElement = true });
-	ecs::AddComponent(placementEditor, SpriteRenderer{ .texture = resources::uiTextures["UI_Arrow.png"] });
+	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 0), .scale = 20 });
+	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Checkpoint.obj"] });
+
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -186,35 +194,63 @@ int main()
 			glfwSetWindowShouldClose(window, true);
 
 		//Object editor
-		//Numpad 8456 move
-		if (glfwGetKey(window, GLFW_KEY_KP_8))
-			TransformSystem::Translate(placementEditor, Vector3(0, 10, 0));
-		if (glfwGetKey(window, GLFW_KEY_KP_4))
-			TransformSystem::Translate(placementEditor, Vector3(-10, 0, 0));
-		if (glfwGetKey(window, GLFW_KEY_KP_5))
-			TransformSystem::Translate(placementEditor, Vector3(0, -10, 0));
-		if (glfwGetKey(window, GLFW_KEY_KP_6))
-			TransformSystem::Translate(placementEditor, Vector3(10, 0, 0));
-		//+- scale
-		if (glfwGetKey(window, GLFW_KEY_KP_ADD))
-			TransformSystem::Scale(placementEditor, 1);
-		if (glfwGetKey(window, GLFW_KEY_KP_SUBTRACT))
-			TransformSystem::Scale(placementEditor, -1);
-		
+		{
+			const float editorSpeed = 0.5;
+			//Hold numpad 0 to toggle rotate
+			if (glfwGetKey(window, GLFW_KEY_KP_0))
+			{
+				//Numpad 8456 move
+				if (glfwGetKey(window, GLFW_KEY_KP_4))
+					TransformSystem::Rotate(placementEditor, Vector3(0, 0, 5) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_6))
+					TransformSystem::Rotate(placementEditor, Vector3(0, 0, -5) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_8))
+					TransformSystem::Rotate(placementEditor, Vector3(-5, 0, 0) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_5))
+					TransformSystem::Rotate(placementEditor, Vector3(5, 0, 0) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_7))
+					TransformSystem::Rotate(placementEditor, Vector3(0, 5, 0) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_9))
+					TransformSystem::Rotate(placementEditor, Vector3(0, -5, 0) * editorSpeed);
+			}
+			else
+			{
+				//Numpad 8456 move
+				if (glfwGetKey(window, GLFW_KEY_KP_8))
+					TransformSystem::Translate(placementEditor, Vector3(0, 10, 0) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_4))
+					TransformSystem::Translate(placementEditor, Vector3(-10, 0, 0) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_5))
+					TransformSystem::Translate(placementEditor, Vector3(0, -10, 0) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_6))
+					TransformSystem::Translate(placementEditor, Vector3(10, 0, 0) * editorSpeed);
+			}
+			//+- scale
+			if (glfwGetKey(window, GLFW_KEY_KP_ADD))
+				TransformSystem::Scale(placementEditor, 1 * editorSpeed);
+			if (glfwGetKey(window, GLFW_KEY_KP_SUBTRACT))
+				TransformSystem::Scale(placementEditor, -1 * editorSpeed);
+			//Print spawn Function
+			if (glfwGetKey(window, GLFW_KEY_KP_ENTER))
+			{
+				auto& et = ecs::GetComponent<Transform>(placementEditor);
+				std::cout << et.position.ToString() << ", " << et.rotation.ToString() << ", " << et.scale.ToString() << std::endl;
+			}
+			//Reset Transforms
+			if (glfwGetKey(window, GLFW_KEY_KP_DECIMAL))
+			{
+				TransformSystem::SetRotation(placementEditor, 0);
+				TransformSystem::SetScale(placementEditor, 20);
+			}
+		}
 
 
 		input::update();
-
-		// Retarded, but required because "camera isn't component" or some bull
-		soundSystem->SetListeningPosition((cam.position.x, cam.position.y));
-		soundSystem->Update();
-
 		hedgehogSystem->Update();
-
-		UpdateCam(window, cam, resources::level1Map);	
+		UpdateCam(&cam, resources::level1Map);
 		engine::Update(&cam);
 
-		
+
 		// if paused or Pause pressed update PauseSystem
 		if (input::GetNewPress("Pause"))
 		{
@@ -222,23 +258,23 @@ int main()
 			//isGamePaused = !isGamePaused;
 			//printf("\nGamePause pressed\n");
 			pauseSystem->ToggleShowUIOptionsMenu();
-																							
+
 		}
 		if (pauseSystem->isGamePause)
 		{
 			printf("\nGamePaused \n");
 			pauseSystem->Update();
 		}
-	
+
 		if (input::GetNewPress("Menu"))
 		{
 			ShipSelectionSystem->isShipSelectionMenuOn = !ShipSelectionSystem->isShipSelectionMenuOn;
 			isGamePaused = !isGamePaused;
-			
 
-				ShipSelectionSystem->ToggleMenuPlayerSelection();
-		
-			
+
+			ShipSelectionSystem->ToggleMenuPlayerSelection();
+
+
 			std::cout << "is Ship selection open:" << ShipSelectionSystem->isShipSelectionMenuOn;
 		}
 		if (ShipSelectionSystem->isShipSelectionMenuOn)
@@ -251,12 +287,13 @@ int main()
 		// playerControl Update for frame if not paused
 		//                           XOR gate true when only if out puts are different
 		/*if ((pauseSystem->isGamePause ^ ShipSelectionSystem->isShipSelectionMenuOn))*/
-		if(isGamePaused)
+		if (isGamePaused)
 		{
 			//printf("\nNOT UPDATING playerController \n");
-			
+
 		}
-		else {
+		else
+		{
 			playerController->Update(window);
 		}
 

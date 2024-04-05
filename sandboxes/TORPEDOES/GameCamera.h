@@ -2,83 +2,77 @@
 #include <engine/Tilemap.h>
 #include "PlayerController.h"
 
-	float camScale = 1.0;
-	float camScaleMin = 600.0f;
-	float camScaleMax = 1650.0f;
-	const float aspectRatio = 16.f / 9.f;
-	float camPadding = 100;
-	float camDeadzone = 10;
-	const float zoomThreshold = 5.0f;
+//Current height of the camera, width is calculated automatically
+float camHeight = 1.f;
+const float aspectRatio = 16.f / 9.f;
+//Maximum units a player can be from the camera's edge before zooming in
+const float zoomInThreshold = 200;
+//Minimum units a player can be from the camera's edge before zooming out
+const float zoomOutThreshold = 150;
+//Minimum height the camera can have
+const float minHeight = 600;
 
-static void UpdateCam(GLFWwindow* window, engine::Camera& cam, Tilemap *map) 
+static void UpdateCam(engine::Camera* cam, Tilemap* map)
 {
-	std::shared_ptr<PlayerController> playerController = engine::ecs::GetSystem<PlayerController>();
-	
-	// Calculate the Bounding Box
-	std::array<float, 4> camBounds
-	{
-		cam.position.y * 2 + cam.height / 2,	//top
-		cam.position.x * 2 + cam.width / 2,		//right
-		cam.position.y * 2 - cam.height / 2,	//bottom
-		cam.position.x * 2 - cam.width / 2 		//left
+	using namespace engine;
+
+	#ifdef _DEBUG
+	if ((map->bounds.width / map->bounds.height) < (16.f / 9.f))
+		std::cout << "map is wrong aspect\n";
+	#endif
+
+	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
+
+	// Calculate the camera's bounds
+	std::array<float, 4> camBounds{
+		cam->position.y * 2 + cam->height / 2, //top
+			cam->position.x * 2 + cam->width / 2, //right
+			cam->position.y * 2 - cam->height / 2, //bottom
+			cam->position.x * 2 - cam->width / 2 //left
 	};
 
-	float zoomOutThreshold = -camPadding * 2.5f;
-	float zoomInThreshold = camPadding * 2.0f;
-
-	// Calculate the difference between the player and camera bounds
-	// array values: Top, right, bottom, left
+	//Calculate the difference between the player and camera bounds
+	//Top, right, bottom, left
 	std::array<float, 4> playerBounds = playerController->GetPlayerBounds();
 
-	float topDiff = camBounds[0] - playerBounds[0];
-	float rightDiff = camBounds[1] - playerBounds[1];
-	float bottomDiff = playerBounds[2] - camBounds[2];
-	float leftDiff = playerBounds[3] - camBounds[3];
+	float topDiff = abs(camBounds[0] - playerBounds[0]);
+	float rightDiff = abs(camBounds[1] - playerBounds[1]);
+	float bottomDiff = abs(camBounds[2] - playerBounds[2]);
+	float leftDiff = abs(camBounds[3] - playerBounds[3]);
 
-	// Zoom out
-	if (playerBounds[0] < camBounds[0] - zoomOutThreshold ||
-		playerBounds[1] > camBounds[1] + zoomOutThreshold ||
-		playerBounds[2] > camBounds[2] + zoomOutThreshold ||
-		playerBounds[3] < camBounds[3] - zoomOutThreshold)
+	//Find which edge is the closest to the camera's edge, but still inside the zoom out threshold and not too close to the tilemap's edge
+	float minDiff = std::min(topDiff, std::min(rightDiff, std::min(bottomDiff, leftDiff)));
+
+	//Zoom out when any player is close enough to the edge of the camera, but not too close to edge of tilemap
+	if (minDiff < zoomOutThreshold)
 	{
-
-		float zoomOutFactor = 10.0f;
-		float zoomOutValue = zoomOutFactor - min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 10.0 + zoomThreshold; 
-		camScale = max(camScale + zoomOutValue, camScaleMin);
+		//Zoom out just enough to keep everything in bounds
+		camHeight += zoomOutThreshold - minDiff;
 	}
-	// Zoom in
-	else if (topDiff > zoomInThreshold && rightDiff > zoomInThreshold && bottomDiff > zoomInThreshold && leftDiff > zoomInThreshold) 
+	//Zoom in when all players are far enough from the camera's edge
+	else if (minDiff > zoomInThreshold)
 	{
-
-		float zoomInValue = min(topDiff, min(bottomDiff, min(rightDiff, leftDiff))) / 100.0f;
-		camScale = max(camScale - zoomInValue, camScaleMin);
+		//Zoom in just enough to keep everything in bounds
+		camHeight -= minDiff - zoomInThreshold;
 	}
 
-	// Clamp the camera zoom between min and max and set it's dimensions
-	camScale = std::clamp(camScale, camScaleMin, camScaleMax);
-	cam.height = camScale;
-	cam.width = cam.height * aspectRatio;
-	
-	// Calculate the center point of the bounding box
-	float boundingBoxWidth = playerBounds[1] - playerBounds[3];
-	float boundingBoxHeight = playerBounds[0] - playerBounds[2];
-	Vector2 boundingBoxCenter = Vector2(playerBounds[3] + boundingBoxWidth * 0.5f, playerBounds[2] + boundingBoxHeight * 0.5f);
+	//Restrict camera to size of tilemap
+	camHeight = std::clamp(camHeight, minHeight, map->bounds.height);
 
-	// Adjust the camera position based on the center of the bounding box
-	Vector3 camPos;
-	camPos.x = std::clamp(boundingBoxCenter.x, map->position.x + cam.width / 2, map->position.x + map->bounds.width - cam.width / 2);
-	camPos.y = std::clamp(boundingBoxCenter.y, map->position.y - map->bounds.height + cam.height / 2, map->position.y - cam.height / 2);
-	camPos.z = 1500;
-	cam.SetPosition(camPos);
+	//Calculate the camera's position
+	Vector2 playersCenter(playerBounds[3] + (playerBounds[1] - playerBounds[3]) / 2, playerBounds[2] + (playerBounds[0] - playerBounds[2]) / 2);
+	const float positionXMax = map->position.x + map->bounds.width - (camHeight * aspectRatio) / 2;
+	const float positionXMin = map->position.x + (camHeight * aspectRatio) / 2;
+	const float positionYMax = map->position.y - camHeight / 2;
+	const float positionYMin = map->position.y - map->bounds.height + camHeight / 2;
 
-	// Calculate the desired zoom level and adjust the camera zoom.
-	float desiredZoom = max(boundingBoxWidth / (cam.width * aspectRatio), boundingBoxHeight / cam.height);
+	//Set the camera to the center of the player box
+	Vector3 position;
+	position.x = std::clamp(playersCenter.x, positionXMin, positionXMax);
+	position.y = std::clamp(playersCenter.y, positionYMin, positionYMax);
+	position.z = 1500;
 
-	// Adjust the camera zoom only if the desired zoom exceeds the established limits
-	if (desiredZoom > camScaleMin && desiredZoom < camScaleMax)
-	{
-		camScale = desiredZoom;
-	}
-
-	engine::modelRenderSystem->SetLight(Vector3(cam.position.x, cam.position.y, 1500), Vector3(255));
+	//Apply camera position and scale
+	cam->SetPosition(position);
+	cam->SetDimensions(std::floor(camHeight * aspectRatio), camHeight);
 }
