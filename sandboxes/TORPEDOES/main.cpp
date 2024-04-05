@@ -8,6 +8,9 @@ using namespace engine;
 
 int checkPointNumber = 0;
 bool isGamePaused = false;
+std::vector<ShipType> playerShips;
+std::function<void(engine::Camera*)>	startLevel;
+
 void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine::Model* checkPointModel, float hitboxrotation, bool finish_line = false)
 {
 	engine::ecs::Entity checkpoint = engine::ecs::NewEntity();
@@ -56,8 +59,8 @@ void LoadLevel1(engine::Camera* cam)
 	engine::collisionSystem->SetTilemap(resources::level1Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
-	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(4, Vector2(1434.0f, -1370.0f), ships);
+	//std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips.size(), Vector2(1434.0f, -1370.0f), playerShips);
 
 	//Make all the checkpoints manually
 	CreateCheckpoint(Vector3(2100.226807, -963.837402, 100.000000), Vector3(30.000000, 159.245773, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 45.0f);
@@ -75,7 +78,12 @@ void LoadLevel1(engine::Camera* cam)
 
 	PlayCountdown();
 }
-
+template <class LoadLevel1>
+void DoSomething(LoadLevel1 func)
+{
+	engine::Camera* cam;
+	return func(cam);
+}
 //Bind all input events here
 void SetupInput()
 {
@@ -150,6 +158,7 @@ int main()
 	soundSystem->AddSoundEngine("Background");
 	soundSystem->AddSoundEngine("Music");
 
+	//startLevel = LoadLevel1(&cam);
 	std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem = engine::ecs::GetSystem<PlayerSelectSystem>();
 	ShipSelectionSystem->Init();
 
@@ -202,7 +211,7 @@ int main()
 
 		hedgehogSystem->Update();
 
-		UpdateCam(window, cam, resources::level1Map);
+		UpdateCam(window, cam, resources::level1Map);	
 		engine::Update(&cam);
 
 		
@@ -210,7 +219,7 @@ int main()
 		if (input::GetNewPress("Pause"))
 		{
 			pauseSystem->isGamePause = true;// !(pauseSystem->isGamePause);
-			isGamePaused = !isGamePaused;
+			//isGamePaused = !isGamePaused;
 			//printf("\nGamePause pressed\n");
 			pauseSystem->ToggleShowUIOptionsMenu();
 																							
@@ -234,6 +243,7 @@ int main()
 		}
 		if (ShipSelectionSystem->isShipSelectionMenuOn)
 		{
+		engine::modelRenderSystem->SetLight(Vector3(0,0,-200), 255);
 			//printf("\nShipSelectionSystem->Update()\n");
 			ShipSelectionSystem->Update();
 		}
@@ -249,6 +259,8 @@ int main()
 		else {
 			playerController->Update(window);
 		}
+
+
 
 		glfwSwapBuffers(window);
 	}
