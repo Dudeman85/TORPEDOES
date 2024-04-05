@@ -29,7 +29,7 @@ namespace resources
 		niagaraFont = new engine::Font("Niagara Solid.ttf", 0, 0, 48);
 
 		level1Map = new Tilemap(cam);
-		level1Map->loadMap("/levels/level1.tmx");
+		level1Map->loadMap("/levels/level2.tmx");
 
 		explosionAnimation = engine::AnimationsFromSpritesheet("/spritesheets/explosion.png", 6, 1, std::vector<int>(6, 150))[0];
 		crowdAnims = engine::AnimationsFromSpritesheet("/spritesheets/CrowdCheer14.png", 3, 1, std::vector<int>(3, 150))[0];
