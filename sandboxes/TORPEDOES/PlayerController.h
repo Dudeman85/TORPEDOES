@@ -489,7 +489,7 @@ public:
 			}
 
 			// Apply the final impulse to the object
-			engine::PhysicsSystem::Impulse(entity, (forwardImpulse * player._speedScale * finalBoostScale) * engine::deltaTime);
+			engine::PhysicsSystem::AddForce(entity, (forwardImpulse * player._speedScale * finalBoostScale));
 
 			// Reset offroad status for this frame
 			player._offroadThisFrame = false;

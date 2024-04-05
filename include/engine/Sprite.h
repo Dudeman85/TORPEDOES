@@ -18,7 +18,7 @@
 #include <engine/GL/Texture.h>
 #include <engine/GL/Camera.h>
 #include <engine/Tilemap.h>
-
+#include <engine/Timing.h>
 
 namespace engine
 {
@@ -316,11 +316,8 @@ namespace engine
 	{
 	public:
 		//Update every entity with relevant components
-		void Update(float deltaTime)
+		void Update()
 		{
-			//Delta time in milliseconds
-			deltaTime *= 1000;
-
 			//For each entity that has the required components
 			for (ecs::Entity entity : entities)
 			{
@@ -330,7 +327,7 @@ namespace engine
 				//If the entity is currently playing an animation
 				if (animator.playingAnimation)
 				{
-					animator.animationTimer += deltaTime;
+					animator.animationTimer += engine::deltaTime * 1000;
 
 					//If enough time (defined by animation) has passed advance the animation frame
 					if (animator.animationTimer >= animator.animations[animator.currentAnimation].delays[animator.animationFrame])
