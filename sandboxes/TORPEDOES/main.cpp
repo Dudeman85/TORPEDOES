@@ -6,9 +6,11 @@
 
 using namespace engine;
 
+//bool canStartLoadingMap ;
+//std::vector<ShipType> playerShips; 
+
 int checkPointNumber = 0;
 bool isGamePaused = false;
-std::vector<ShipType> playerShips;
 std::function<void(engine::Camera*)>	startLevel;
 
 void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine::Model* checkPointModel, float hitboxrotation, bool finish_line = false)
@@ -59,8 +61,12 @@ void LoadLevel1(engine::Camera* cam)
 	engine::collisionSystem->SetTilemap(resources::level1Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
-	//std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips.size(), Vector2(1434.0f, -1370.0f), playerShips);
+
+	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(ships.size(), Vector2(1434.0f, -1370.0f), ships);
+
+	//std::vector<ShipType> playerShips = PlayerSelectSystem::GetPlayerShips();
+	//engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips.size(), Vector2(1434.0f, -1370.0f), playerShips);
 
 	//Make all the checkpoints manually
 	CreateCheckpoint(Vector3(2100.226807, -963.837402, 100.000000), Vector3(30.000000, 159.245773, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 45.0f);
@@ -137,6 +143,18 @@ void SetupInput()
 	input::bindDigitalInput(GLFW_KEY_P, { "Pause"  });
 }
 
+void PlayersMenu(std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem)
+{
+	ShipSelectionSystem->isShipSelectionMenuOn = !ShipSelectionSystem->isShipSelectionMenuOn;
+	isGamePaused = !isGamePaused;
+
+
+	ShipSelectionSystem->ToggleMenuPlayerSelection();
+
+
+	std::cout << "is Ship selection open:" << ShipSelectionSystem->isShipSelectionMenuOn;
+}
+
 int main()
 {
 	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window");
@@ -182,11 +200,19 @@ int main()
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 0), .scale = 20 });
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Checkpoint.obj"] });
-
-
+	
+	PlayersMenu(ShipSelectionSystem);
+	bool mapLoaded = false;
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
+	/*	if (PlayerSelectSystem::GetCanStartLoadingMap() && mapLoaded)
+		{						  5
+			mapLoaded = true;
+			LoadLevel1(&cam);
+		}*/
+
+
 		glfwPollEvents();
 
 		//Close window when Esc is pressed
