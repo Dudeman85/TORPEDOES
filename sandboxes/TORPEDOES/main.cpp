@@ -6,8 +6,7 @@
 
 using namespace engine;
 
-//bool canStartLoadingMap ;
-//std::vector<ShipType> playerShips; 
+
 
 int checkPointNumber = 0;
 bool isGamePaused = false;
@@ -62,11 +61,11 @@ void LoadLevel1(engine::Camera* cam)
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
 
-	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(ships.size(), Vector2(1434.0f, -1370.0f), ships);
+	//std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
+	//engine::ecs::GetSystem<PlayerController>()->CreatePlayers(ships.size(), Vector2(1434.0f, -1370.0f), ships);
 
-	//std::vector<ShipType> playerShips = PlayerSelectSystem::GetPlayerShips();
-	//engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips.size(), Vector2(1434.0f, -1370.0f), playerShips);
+	std::vector<ShipType>& playerShips = playerShips;
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips.size(), Vector2(1434.0f, -1370.0f), playerShips);
 
 	//Make all the checkpoints manually
 	CreateCheckpoint(Vector3(2100.226807, -963.837402, 100.000000), Vector3(30.000000, 159.245773, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 45.0f);
@@ -276,6 +275,12 @@ int main()
 		UpdateCam(&cam, resources::level1Map);
 		engine::Update(&cam);
 
+		if(canStartLoadingMap) 
+		{
+			canStartLoadingMap = false;
+			ShipSelectionSystem->isShipSelectionMenuOn = false;
+			LoadLevel1(&cam);
+		}
 
 		// if paused or Pause pressed update PauseSystem
 		if (input::GetNewPress("Pause"))

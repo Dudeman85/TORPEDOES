@@ -10,6 +10,9 @@
 enum GameStates { PauseMenuMainState, pauseMenuOptionsState, SelectShipState, GameState };
 enum ShipPlayDifficulty { easy, normal, hard };
 
+static bool canStartLoadingMap;
+static bool isSceneloaded;
+std::vector<ShipType> playerShips;
 
 //PlayerShipSelection
 ECS_REGISTER_COMPONENT(PlayerSelection)
@@ -63,22 +66,23 @@ class PlayerSelectSystem : public engine::ecs::System
 
 	map<int, ShipType>selectedShipsAtTheFrame;
 
-	std::vector<ShipType> SetSelectedPlayerShips(map<int, ShipType> selectedShipsAtTheFrame)
+	void SetSelectedPlayerShips(map<int, ShipType> selectedShipsAtTheFrame)
 	{
-		std::vector<ShipType>playerShips;
+		
 
 		for (const auto& pair : selectedShipsAtTheFrame)
 		{
 			playerShips.push_back(ShipType(pair.second));
 			std::cout << " " << pair.second << "  ";
 		}
-		return playerShips;
+		
 
 	};
 public:
-
+	
+	//std::vector<ShipType> playerShips;
 	//static bool canStartLoadingMap;
-	//static std::vector<ShipType> PlayerShips;
+	
 
 	////static bool canStartLoadingMap;
 	////static std::vector<ShipType>playerShips;
@@ -115,7 +119,7 @@ public:
 
 		std::vector<std::string>shipInfoToText;
 
-		ShipType shipType = ShipType(playerSelection.playerID);
+		ShipType shipType = ShipType(playerSelection.selection);
 
 		//TODO: GET REFERENCE ABOUT STATS AND PUT THEM HERE	
 		switch (shipType)
@@ -123,7 +127,7 @@ public:
 
 		case ShipType::torpedoBoat:
 		{
-			shipName = "torpedoBoat";
+			shipName = "Torpedo boat";
 			baseSpeed = 0;
 			boost = 0;
 			special = 0;
@@ -131,7 +135,7 @@ public:
 		}
 		case ShipType::submarine:
 		{
-			shipName = "submarine";
+			shipName = "Submarine";
 			baseSpeed = 0;
 			boost = 0;
 			special = 0;
@@ -139,7 +143,7 @@ public:
 		}
 		case ShipType::cannonBoat:
 		{
-			shipName = "cannonBoat";
+			shipName = "Cannon boat";
 			baseSpeed = 0;
 			boost = 0;
 			special = 0;
@@ -147,7 +151,7 @@ public:
 		}
 		case ShipType::hedgehogBoat:
 		{
-			shipName = "hedgehogBoat";
+			shipName = "Hedgehog boat";
 			baseSpeed = 0;
 			boost = 0;
 			special = 0;
@@ -155,7 +159,7 @@ public:
 		}
 		case ShipType::pirateShip:
 		{
-			shipName = "pirateShip";
+			shipName = "PirateShip";
 			baseSpeed = 0;
 			boost = 0;
 			special = 0;
@@ -512,12 +516,16 @@ public:
 
 
 					playerSelection.selection--;
-					if (playerSelection.selection < 0)
+					if (playerSelection.selection < 0) 
+					{
 						playerSelection.selection = shipModels.size() - 1;
+					}
 
 					engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowDown).scale = Vector3(0.08f);
 					engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).model = shipModels[playerSelection.selection];
 					playerSelection.isArrowBig = true;
+
+						
 				}
 
 				//Set arrow indicator scale to normal
@@ -574,6 +582,7 @@ public:
 				if (startGameCurrentTime < 0) 
 				{
 					engine::ecs::GetComponent<engine::TextRenderer>(startGameTimerEntity).text = "Loading...";
+
 				}
 				else 
 				{
@@ -588,10 +597,6 @@ public:
 
 					engine::ecs::GetComponent<engine::TextRenderer>(startGameTimerEntity).text = result;
 				}
-
-				
-
-				
 
 				engine::ecs::GetComponent<engine::TextRenderer>(startGameTimerEntity).color = Vector3(255, 0, 0);
 				isReseted = false;
@@ -611,9 +616,16 @@ public:
 		}
 		if ((startGameCurrentTime <= 0 || isPlayersReady)) //TODO:: CANT LAOD new map	canStartLoadingMap
 		{	//START GAME
-			//canStartLoadingMap = false;
+			canStartLoadingMap = true;
 
+			
 			printf("============= GAME STARTING ==========\n");
+			SetSelectedPlayerShips(selectedShipsAtTheFrame);
+			
+			
+			/*engine::Camera* cam;
+
+			LoadLevel1(cam);*/
 
 			//SetSelectedPlayerShips(selectedShipsAtTheFrame);
 
