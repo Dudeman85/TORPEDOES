@@ -111,6 +111,7 @@ public:
 		//SHIP STATS
 
 		string shipName;
+		Vector3 nameColor;
 		float baseSpeed;
 		float boost;
 		float special;
@@ -170,7 +171,7 @@ public:
 		}
 
 
-		string shipInfo =
+		string shipInfo 
 		{
 			"SHIP INFO\n\n"
 
@@ -181,8 +182,36 @@ public:
 			"special: " + to_string(special)
 
 		};
-		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipInfo).text = "STATS";
-		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipInfo).color = Vector3(232, 235, 52);
+		switch (playerSelection.playerID)
+		{
+		case 0:
+		{
+			nameColor = nameColor = Vector3(109,0, 255);		
+			break;
+		}
+		case 1:
+		{
+			
+			nameColor = nameColor = Vector3(0, 255, 0);
+			break;
+		}
+		case 2:
+		{
+			nameColor = Vector3(0,230, 255);
+			break;
+		}
+		case 3:
+		{
+			nameColor = Vector3(255, 248, 0);
+
+			break;
+		}
+		default:
+			break;
+		}
+		std::string playerNumStats ="Player: "+ to_string(playerSelection.playerID+1);
+		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipInfo).text = playerNumStats;
+		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipInfo).color = Vector3(nameColor.x, nameColor.y, nameColor.z);
 		
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipNameEntity).text = "shipName: " + shipName;
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.specialEntity).text = "special: " + to_string(special);
@@ -192,88 +221,7 @@ public:
 		return  shipInfo;
 
 	}
-	std::string PrintShipInfo(ShipType shipType)
-	{
-		//SHIP STATS
-
-		ShipPlayDifficulty PlayDifficulty;
-		string shipName;
-		float baseSpeed;
-		float boost;
-		float special;
-		
-
 	
-		
-
-		
-
-		std::vector<std::string>shipInfoToText;
-
-		//TODO: GET REFERENCE ABOUT STATS AND PUT THEM HERE	
-		switch (shipType)
-		{
-
-		case ShipType::torpedoBoat:
-		{
-			shipName = "torpedoBoat";
-			baseSpeed =0;
-			boost =0;
-			special =0;
-			break;
-		}
-		case ShipType::submarine:
-		{
-			shipName = "submarine";
-			baseSpeed =0;
-			boost =0;
-			special =0;
-			break;
-		}
-		case ShipType::cannonBoat:
-		{
-			shipName = "cannonBoat";
-			baseSpeed =0;
-			boost =0;
-			special =0;
-			break;
-		}
-		case ShipType::hedgehogBoat:
-		{
-			shipName = "hedgehogBoat";
-			baseSpeed  =0;
-			boost  =0;
-			special  =0;
-			break;
-		}
-		case ShipType::pirateShip:
-		{
-			shipName = "pirateShip";
-			baseSpeed  =0;
-			boost  =0;
-			special  =0;
-			break;
-		}
-		default:
-			break;
-		}
-		
-	
-		string shipInfo =
-		{ 
-			"SHIP INFO\n\n"	
-
-
-			"shipName: "+shipName+"\n" +
-			"BaseSpeed: " +to_string(baseSpeed) + "\n" +
-			"Boost: "+to_string(boost )+ "\n" +
-			"special: "+ to_string(special)
-
-		};
-
-		return  shipInfo;
-
-	}
 
 	void Init()
 	{
@@ -346,21 +294,21 @@ public:
 
 			//shipInfo Entity
 			engine::ecs::AddComponent(shipInfo, engine::Transform{ .position = Vector3(-1,.7f,-0.1f) , .scale = statsParentScale });
-			engine::ecs::AddComponent(shipInfo, engine::TextRenderer{ .font = resources::niagaraFont, .text = "Stats Info Here",.color = Vector3(57, 150, 54),.uiElement = true });
+			engine::ecs::AddComponent(shipInfo, engine::TextRenderer{ .font = resources::niagaraFont, .text = "PRESS { SHOOT } BUTTON TO JOIN!",.color = Vector3(57, 150, 54),.uiElement = true });
 
 			//shipNameEntity
 			engine::ecs::AddComponent(shipNameEntity, engine::Transform{ .position = Vector3(-statsOffset,0*statsOffsetEatch - statsOffsetY,-0.1f) , .scale = scaleForStatsChilds });
-			engine::ecs::AddComponent(shipNameEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "shipName Entity",.color = Vector3(57, 150, 54),.uiElement = true });
+			engine::ecs::AddComponent(shipNameEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "",.color = Vector3(57, 150, 54),.uiElement = true });
 
 			//baseSpeedEntity
 			engine::ecs::AddComponent(baseSpeedEntity, engine::Transform{ .position = Vector3(-statsOffset, 1 * statsOffsetEatch - statsOffsetY,-0.1f) , .scale = scaleForStatsChilds });
-			engine::ecs::AddComponent(baseSpeedEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "baseSpeed Entity",.color = Vector3(57, 150, 54),.uiElement = true });
+			engine::ecs::AddComponent(baseSpeedEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "",.color = Vector3(57, 150, 54),.uiElement = true });
 			//boostEntity
 			engine::ecs::AddComponent(boostEntity, engine::Transform{ .position = Vector3(-statsOffset,2 * statsOffsetEatch - statsOffsetY,-0.1f) , .scale = scaleForStatsChilds });
-			engine::ecs::AddComponent(boostEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "boost Entity",.color = Vector3(57, 150, 54),.uiElement = true });
+			engine::ecs::AddComponent(boostEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "",.color = Vector3(57, 150, 54),.uiElement = true });
 			//specialEntity
 			engine::ecs::AddComponent(specialEntity, engine::Transform{ .position = Vector3(-statsOffset, 3 * statsOffsetEatch - statsOffsetY,-0.1f) , .scale = scaleForStatsChilds });
-			engine::ecs::AddComponent(specialEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "special Entity",.color = Vector3(57, 150, 54),.uiElement = true });
+			engine::ecs::AddComponent(specialEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "",.color = Vector3(57, 150, 54),.uiElement = true });
 
 
 
@@ -394,7 +342,7 @@ public:
 			engine::ecs::AddComponent(selectionWindow, engine::Transform{ .position = offsetPlayerWindows, .scale = Vector3(0.5, 0.5, -0.1f) });
 			engine::ecs::AddComponent(selectionWindow, PlayerSelection{ .playerID = i, .arrowUp = arrowUp, .arrowDown = arrowDown, .shipModel = shipModel, .readyText = readyText, .playerWindow = selectionWindow, .shipInfo = shipInfo,.shipNameEntity= shipNameEntity,.baseSpeedEntity= baseSpeedEntity,.boostEntity= boostEntity ,.specialEntity = specialEntity, });
 
-			engine::ecs::AddComponent(selectionWindow, engine::TextRenderer{ .font = resources::niagaraFont, .text = "PRESS { SHOOT } BUTTON TO JOIN!",.offset=Vector3(0,0.15f,0),.uiElement = true});
+			engine::ecs::AddComponent(selectionWindow, engine::TextRenderer{ .font = resources::niagaraFont, .text = "",.offset=Vector3(0,0.15f,0),.uiElement = true});
 
 			auto& selectWin = engine::ecs::GetComponent<engine::TextRenderer>(selectionWindow);
 			selectWin.scale = 0.001f;
@@ -454,7 +402,7 @@ public:
 					playerSelection.isActivePlayer = true;
 					engine::ecs::GetComponent< engine::Transform>(playerSelection.shipModel).scale = 0.2;
 					//engine::ecs::GetComponent< engine::Transform>(playerSelection.shipModel).position = (0.9f, 0.2f, -0.1f);
-					engine::ecs::GetComponent<engine::TextRenderer>(playerSelection.playerWindow).text = "P" + to_string(playerSelection.playerID);
+					//engine::ecs::GetComponent<engine::TextRenderer>(playerSelection.playerWindow).text = "P" + to_string(playerSelection.playerID);
 				}
 				else
 				{
