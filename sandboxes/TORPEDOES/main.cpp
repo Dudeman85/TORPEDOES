@@ -333,6 +333,7 @@ int main()
 			playerController->Update(window);
 		}
 
+		ecs::Update();
 		glfwSwapBuffers(window);
 	}
 
@@ -341,7 +342,7 @@ int main()
 	engine::UninitializeTimers();
 	input::uninitialize();
 
-	engine::ecs::DestroyAllEntities(true);
+	ecs::DestroyAllEntities(true);
 	glfwTerminate();
 	return 0;
 }
