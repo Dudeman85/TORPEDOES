@@ -38,7 +38,7 @@ struct u_99Component
 	float cooldown;
 };
 
-ECS_REGISTER_SYSTEM(u_99System, engine::Transform)
+ECS_REGISTER_SYSTEM(u_99System)
 class u_99System : public engine::ecs::System
 {
 	void Update() 
@@ -46,7 +46,7 @@ class u_99System : public engine::ecs::System
 	}
 };
 
-ECS_REGISTER_COMPONENT(pt_10Component, engine::Texture)
+ECS_REGISTER_COMPONENT(pt_10Component)
 struct pt_10Component
 {
 	engine::ecs::Entity upper, lower;
@@ -60,7 +60,7 @@ class pt_10System : public engine::ecs::System
 
 };
 
-ECS_REGISTER_COMPONENT(LaMuerteComponent, engine::Texture)
+ECS_REGISTER_COMPONENT(LaMuerteComponent)
 struct LaMuerteComponent
 {
 	engine::ecs::Entity upper, lower;
