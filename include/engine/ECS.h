@@ -382,7 +382,7 @@ namespace engine::ecs
 		return signature;
 	}
 
-	//Get a component array of type T
+	//Implementation internal function. Get a component array of type T
 	template<typename T>
 	inline ComponentArray<T>* _GetComponentArray()
 	{

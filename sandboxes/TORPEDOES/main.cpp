@@ -192,7 +192,6 @@ int main()
 	//LoadLevel1(&cam);
 	//ShipSelectionSystem->ToggleMenuPlayerSelection();
 
-
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 0), .scale = 20 });
