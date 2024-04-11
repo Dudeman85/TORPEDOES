@@ -45,6 +45,16 @@ namespace engine
 		bool repeat = false;
 		CallbackWrapper* function;
 		double timePassed;
+
+		bool operator == (const ScheduledFunction comp) const
+		{
+			return 
+			type == comp.type
+			&& duration == comp.duration
+			&& repeat == comp.repeat
+			&& function == comp.function
+			&& timePassed == comp.timePassed;
+		}
 	};
 
 	//Timer Component
@@ -68,7 +78,7 @@ namespace engine
 	class TimerSystem : public ecs::System
 	{
 	private:
-		static std::vector<ScheduledFunction> schedule;
+		static std::vector<ScheduledFunction*> schedule;
 
 	public:
 		void Init()
@@ -83,38 +93,38 @@ namespace engine
 			for (auto itr = schedule.begin(); itr != schedule.end();)
 			{
 				// Get the entity and increment the iterator
-				ScheduledFunction& future = *itr;
+				ScheduledFunction* future = *itr;
 
-				if (future.type == ScheduledFunction::Type::seconds)
+				if (future->type == ScheduledFunction::Type::seconds)
 				{
 					// Timer is realtime, add deltaTime
-					future.timePassed += deltaTime;
+					future->timePassed += deltaTime;
 				}
 				else
 				{
 					// Timer is in frames, add one frame
-					future.timePassed++;
+					future->timePassed++;
 				}
 
 				// Whether timer is done
-				while (future.timePassed >= future.duration)
+				while (future->timePassed >= future->duration)
 				{
-					future.timePassed -= future.duration;
+					future->timePassed -= future->duration;
 
-					future.function->Call();
+					future->function->Call();
 
 					// If not repeating, delete the event
-					if (!future.repeat)
+					if (!future->repeat)
 					{
 						// Remove function from _CallbackWrappers
-						auto it = std::find(_CallbackWrappers.begin(), _CallbackWrappers.end(), future.function);
+						auto it = std::find(_CallbackWrappers.begin(), _CallbackWrappers.end(), future->function);
 						if (it != _CallbackWrappers.end()) 
 						{
 							_CallbackWrappers.erase(it);
 						}
 
-						delete future.function;
-						future.function = nullptr;
+						delete future->function;
+						future->function = nullptr;
 
 						itr = schedule.erase(itr);
 						break;
@@ -174,18 +184,32 @@ namespace engine
 			timer.running = true;
 		}
 
+		// TODO: make correctly
+		void DeleteTimer(ScheduledFunction* deleteFunction)
+		{
+			auto it = std::find(schedule.begin(), schedule.end(), deleteFunction);
+
+			// If the pointer is found, erase it from the vector
+			if (it != schedule.end())
+			{
+				schedule.erase(it);
+				delete deleteFunction;
+			}
+		}
+
 		// Schedule a function to be executed in n seconds or frames, returns a handle to that event
 		template<typename Function, typename... Args>
-		static inline ScheduledFunction& ScheduleFunction(Function&& CallbackFunction, double time, bool repeat = false, ScheduledFunction::Type durationType = ScheduledFunction::Type::seconds, Args&&... Arguments)
+		static inline ScheduledFunction* ScheduleFunction(Function&& CallbackFunction, double time, bool repeat = false, ScheduledFunction::Type durationType = ScheduledFunction::Type::seconds, Args&&... Arguments)
 		{
+			// Deleted when ending engine TODO: delete at ScheduleFunction deconstructor
 			CallbackWrapper* wrapper = new CallbackWrapper(std::bind(std::forward<Function>(CallbackFunction), std::forward<Args>(Arguments)...));
 			_CallbackWrappers.push_back(wrapper);
 
-			ScheduledFunction future = ScheduledFunction{ .type = durationType, .duration = time, .repeat = repeat, .function = wrapper };
+			// Deleted at DeleteTimer or when hits timer and isnt repeating TODO: This is currently a memory leak
+			ScheduledFunction* future = new ScheduledFunction{ .type = durationType, .duration = time, .repeat = repeat, .function = wrapper };
 			schedule.push_back(future);
 
-			// Why not return future? This is not thread-safe, and for no reason
-			return schedule.back();
+			return future;
 		}
 	};
 
@@ -200,4 +224,4 @@ namespace engine
 
 }
 
-std::vector<engine::ScheduledFunction> engine::TimerSystem::schedule = schedule;
+std::vector<engine::ScheduledFunction*> engine::TimerSystem::schedule = schedule;
