@@ -53,8 +53,26 @@ static void CreateAnimation(engine::ecs::Entity entity)
 	engine::ecs::AddComponent(torpedoAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20) });
 	engine::ecs::AddComponent(torpedoAnim, engine::SpriteRenderer{ });
 	engine::ecs::AddComponent(torpedoAnim, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
-	engine::AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, projectile.hitAnimation);
-	engine::AnimationSystem::PlayAnimation(torpedoAnim, projectile.hitAnimation, false);
+
+	// MIKA ME MUUTATIN COSNT STRING MISSÄ LUKKE "HIT" ÄLÄ MUOKATA SIKSI C++ EI OSA LUUKE OIKEA JOS IE CONST STRING
+	engine::AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, "hit");
+	engine::AnimationSystem::PlayAnimation(torpedoAnim, "hit", false);
+};
+
+void CreateAniHedgehog(Vector3 animPosition)
+{
+	engine::ecs::Entity hedgehogAnim = engine::ecs::NewEntity();
+	animPosition.z += 100;
+	engine::ecs::AddComponent(hedgehogAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20) });
+	engine::ecs::AddComponent(hedgehogAnim, engine::SpriteRenderer{ });
+	engine::ecs::AddComponent(hedgehogAnim, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
+	std::vector<Vector2> explosionverts{ Vector2(0.5, 0.55), Vector2(0.5, -0.55), Vector2(-0.5, -0.55), Vector2(-0.5, 0.55) };
+	engine::ecs::AddComponent(hedgehogAnim, engine::PolygonCollider{ .vertices = explosionverts, .trigger = true, .visualise = true });
+	engine::ecs::AddComponent(hedgehogAnim, Projectile{ .ownerID = -1 , .hitAnimation = "" });
+
+	//   MIKA SAMA TÄLTÄ 
+	engine::AnimationSystem::AddAnimation(hedgehogAnim, resources::explosionAnimation, "explosion");
+	engine::AnimationSystem::PlayAnimation(hedgehogAnim, "explosion", false);
 };
 
 static void OnProjectileCollision(engine::Collision collision)
@@ -83,10 +101,11 @@ public:
 	void Update()
 	{
 		// Iterate through entities in the system
-		for (auto itr = entities.begin(); itr != entities.end();)
+		for (engine::ecs::Entity entity: entities)
 		{			// Get the entity and increment the iterator
-			engine::ecs::Entity entity = *itr++;
+			
 			Hedgehog& hedgehogComp = engine::ecs::GetComponent<Hedgehog>(entity);
+			engine::Transform& transformComp = engine::ecs::GetComponent<engine::Transform>(entity);
 
 			if (hedgehogComp.distanceTraveled < maxDistance)
 			{
@@ -97,21 +116,26 @@ public:
 				float distanceRatio = hedgehogComp.distanceTraveled / maxDistance;
 
 				//// Calcula la rotación en función de la distancia recorrida
-				engine::TransformSystem::Rotate(entity, Vector3(0, 0, -1.5f ));
+				engine::TransformSystem::Rotate(entity, Vector3(0, 0, -130.5f * engine::deltaTime));
 
 				// Calcula la escala en funcion de la distancia recorrida
 				float scale = maxScale - (maxScale - minScale) * (2 * abs(0.5 - distanceRatio));
-			
+
 				// Actualiza la escala del objeto
-				engine::ecs::GetComponent<engine::Transform>(entity).scale = Vector3(scale);
+				transformComp.scale = Vector3(scale);
+
 
 			}
 			else
 			{
+				// Create the animation when the projectile reaches the end of the trajectory."
+				CreateAniHedgehog(transformComp.position);
+
 				// Si se supera la distancia máxima, detén el movimiento del objeto
 				engine::ecs::DestroyEntity(entity);
 				continue;
 			}
+
 		};
 	}
 };

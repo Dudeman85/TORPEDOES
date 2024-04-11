@@ -58,9 +58,9 @@ public:
 	///Sets the ambient volume
 	void setAmbientVolume(float newVolume);
 	///Gets the ambient volume
-	const float getAmbientVolume();					
+	const float getAmbientVolume();
 	///miniaudio engine
-	ma_engine soundEngine;							
+	ma_engine soundEngine;
 
 private:
 	float ambientVolume;							// Engine's volume, decrease to affect all audios played from it

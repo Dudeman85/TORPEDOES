@@ -69,9 +69,10 @@ public:
 			input::bindDigitalControllerInput(i, GLFW_KEY_SPACE, { "Shoot" + std::to_string(i) });
 
 			// Keyboard input
+			/*
 			input::bindAnalogInput(GLFW_KEY_UP, input::digitalPositiveInput, { "Throttle" + std::to_string(2) }, 0);
 			input::bindAnalogInput(GLFW_KEY_DOWN, input::digitalNegativeInput, { "Throttle" + std::to_string(2) }, 0);
-
+			*/
 
 
 			selectionWindow = engine::ecs::NewEntity();
@@ -338,7 +339,7 @@ public:
 	{
 
 		int KeyboardPlayer = 2;
-
+		/*
 		input::bindAnalogInput(GLFW_KEY_RIGHT, input::digitalPositiveInput, { "Turn" + std::to_string(KeyboardPlayer) }, 0);
 		input::bindAnalogInput(GLFW_KEY_LEFT, input::digitalNegativeInput, { "Turn" + std::to_string(KeyboardPlayer) }, 0);
 
@@ -346,6 +347,7 @@ public:
 		input::bindAnalogInput(GLFW_KEY_Z, input::digitalNegativeInput, { "Throttle" + std::to_string(KeyboardPlayer) }, 0);
 		input::bindAnalogInput(GLFW_KEY_UP, input::digitalPositiveInput, { "Throttle" + std::to_string(KeyboardPlayer) }, 0);
 		input::bindAnalogInput(GLFW_KEY_DOWN, input::digitalNegativeInput, { "Throttle" + std::to_string(KeyboardPlayer) }, 0);
+		*/
 
 		input::bindDigitalInput(GLFW_KEY_N, { "Shoot" + std::to_string(KeyboardPlayer) });
 		input::bindDigitalInput(GLFW_KEY_M, { "Boost" + std::to_string(KeyboardPlayer) });

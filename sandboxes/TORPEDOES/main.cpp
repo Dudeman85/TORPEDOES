@@ -102,6 +102,12 @@ void SetupInput()
 	input::bindDigitalInput(GLFW_KEY_U, { "Menu" });
 	// TODO: add controller pause key
 
+	float AnalogPositiveMinDeadZone = 0;
+	float AnalogPositiveMaxDeadZone = 0.2;
+
+	float AnalogNegativeMinDeadZone = -0.2;
+	float AnalogNegativeMaxDeadZone = 0;
+
 	for (size_t i = 0; i < 4; i++)
 	{
 		input::ConstructAnalogEvent("Throttle" + std::to_string(i));
@@ -111,28 +117,34 @@ void SetupInput()
 		input::ConstructDigitalEvent("Boost" + std::to_string(i));
 
 		// Controller input
+
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "Boost" + std::to_string(i) });
 
 		input::bindAnalogControllerInput(i,
 										 {
-											 { input::digitalPositiveInput, GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER },
-											 { input::digitalNegativeInput, GLFW_GAMEPAD_AXIS_LEFT_TRIGGER }
-										 }, { "Throttle" + std::to_string(i) });
+											 { { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER },
+											 { { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_TRIGGER }
+										 },
+										 { "Throttle" + std::to_string(i) });
 
-		input::bindAnalogControllerInput(i, { { input::controllerMixedInput, GLFW_GAMEPAD_AXIS_LEFT_X }, }, { "Turn" + std::to_string(i) });
+		input::bindAnalogControllerInput(i,
+										 {
+											 { { input::controllerMixedInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_X }
+										 },
+										 { "Turn" + std::to_string(i) });
 	}
 
 	// Keyboard input
-	int KeyboardPlayer = 0;
+	int KeyboardPlayer = 1;
 
-	input::bindAnalogInput(GLFW_KEY_RIGHT, input::digitalPositiveInput, { "Turn" + std::to_string(KeyboardPlayer) }, 0);
-	input::bindAnalogInput(GLFW_KEY_LEFT, input::digitalNegativeInput, { "Turn" + std::to_string(KeyboardPlayer) }, 0);
+	input::bindAnalogInput(GLFW_KEY_RIGHT, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_LEFT, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
 
-	input::bindAnalogInput(GLFW_KEY_A, input::digitalPositiveInput, { "Throttle" + std::to_string(KeyboardPlayer) }, 0);
-	input::bindAnalogInput(GLFW_KEY_Z, input::digitalNegativeInput, { "Throttle" + std::to_string(KeyboardPlayer) }, 0);
-	input::bindAnalogInput(GLFW_KEY_UP, input::digitalPositiveInput, { "Throttle" + std::to_string(KeyboardPlayer) }, 0);
-	input::bindAnalogInput(GLFW_KEY_DOWN, input::digitalNegativeInput, { "Throttle" + std::to_string(KeyboardPlayer) }, 0);
+	input::bindAnalogInput(GLFW_KEY_A, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_Z, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_UP, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_DOWN, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
 
 	input::bindDigitalInput(GLFW_KEY_N, { "Shoot" + std::to_string(KeyboardPlayer) });
 	input::bindDigitalInput(GLFW_KEY_M, { "Boost" + std::to_string(KeyboardPlayer) });
@@ -185,6 +197,7 @@ int main()
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 0), .scale = 20 });
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Buoy_Checkpoint.obj"] });
 
+
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -195,63 +208,60 @@ int main()
 			glfwSetWindowShouldClose(window, true);
 
 		//Object editor
-		const float editorSpeed = 0.5;
-		//Hold numpad 0 to toggle rotate
-		if (glfwGetKey(window, GLFW_KEY_KP_0))
 		{
-			//Numpad 8456 move
-			if (glfwGetKey(window, GLFW_KEY_KP_4))
-				TransformSystem::Rotate(placementEditor, Vector3(0, 0, 5) * editorSpeed);
-			if (glfwGetKey(window, GLFW_KEY_KP_6))
-				TransformSystem::Rotate(placementEditor, Vector3(0, 0, -5) * editorSpeed);
-			if (glfwGetKey(window, GLFW_KEY_KP_8))
-				TransformSystem::Rotate(placementEditor, Vector3(-5, 0, 0) * editorSpeed);
-			if (glfwGetKey(window, GLFW_KEY_KP_5))
-				TransformSystem::Rotate(placementEditor, Vector3(5, 0, 0) * editorSpeed);
-			if (glfwGetKey(window, GLFW_KEY_KP_7))
-				TransformSystem::Rotate(placementEditor, Vector3(0, 5, 0) * editorSpeed);
-			if (glfwGetKey(window, GLFW_KEY_KP_9))
-				TransformSystem::Rotate(placementEditor, Vector3(0, -5, 0) * editorSpeed);
+			const float editorSpeed = 0.5;
+			//Hold numpad 0 to toggle rotate
+			if (glfwGetKey(window, GLFW_KEY_KP_0))
+			{
+				//Numpad 8456 move
+				if (glfwGetKey(window, GLFW_KEY_KP_4))
+					TransformSystem::Rotate(placementEditor, Vector3(0, 0, 5) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_6))
+					TransformSystem::Rotate(placementEditor, Vector3(0, 0, -5) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_8))
+					TransformSystem::Rotate(placementEditor, Vector3(-5, 0, 0) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_5))
+					TransformSystem::Rotate(placementEditor, Vector3(5, 0, 0) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_7))
+					TransformSystem::Rotate(placementEditor, Vector3(0, 5, 0) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_9))
+					TransformSystem::Rotate(placementEditor, Vector3(0, -5, 0) * editorSpeed);
+			}
+			else
+			{
+				//Numpad 8456 move
+				if (glfwGetKey(window, GLFW_KEY_KP_8))
+					TransformSystem::Translate(placementEditor, Vector3(0, 10, 0) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_4))
+					TransformSystem::Translate(placementEditor, Vector3(-10, 0, 0) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_5))
+					TransformSystem::Translate(placementEditor, Vector3(0, -10, 0) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_6))
+					TransformSystem::Translate(placementEditor, Vector3(10, 0, 0) * editorSpeed);
+			}
+			//+- scale
+			if (glfwGetKey(window, GLFW_KEY_KP_ADD))
+				TransformSystem::Scale(placementEditor, 1 * editorSpeed);
+			if (glfwGetKey(window, GLFW_KEY_KP_SUBTRACT))
+				TransformSystem::Scale(placementEditor, -1 * editorSpeed);
+			//Print spawn Function
+			if (glfwGetKey(window, GLFW_KEY_KP_ENTER))
+			{
+				auto& et = ecs::GetComponent<Transform>(placementEditor);
+				std::cout << et.position.ToString() << ", " << et.rotation.ToString() << ", " << et.scale.ToString() << std::endl;
+			}
+			//Reset Transforms
+			if (glfwGetKey(window, GLFW_KEY_KP_DECIMAL))
+			{
+				TransformSystem::SetRotation(placementEditor, 0);
+				TransformSystem::SetScale(placementEditor, 20);
+			}
 		}
-		else
-		{
-			//Numpad 8456 move
-			if (glfwGetKey(window, GLFW_KEY_KP_8))
-				TransformSystem::Translate(placementEditor, Vector3(0, 10, 0) * editorSpeed);
-			if (glfwGetKey(window, GLFW_KEY_KP_4))
-				TransformSystem::Translate(placementEditor, Vector3(-10, 0, 0) * editorSpeed);
-			if (glfwGetKey(window, GLFW_KEY_KP_5))
-				TransformSystem::Translate(placementEditor, Vector3(0, -10, 0) * editorSpeed);
-			if (glfwGetKey(window, GLFW_KEY_KP_6))
-				TransformSystem::Translate(placementEditor, Vector3(10, 0, 0) * editorSpeed);
-		}
-		//+- scale
-		if (glfwGetKey(window, GLFW_KEY_KP_ADD))
-			TransformSystem::Scale(placementEditor, 1 * editorSpeed);
-		if (glfwGetKey(window, GLFW_KEY_KP_SUBTRACT))
-			TransformSystem::Scale(placementEditor, -1 * editorSpeed);
-		//Print spawn Function
-		if (glfwGetKey(window, GLFW_KEY_KP_ENTER))
-		{
-			auto& et = ecs::GetComponent<Transform>(placementEditor);
-			std::cout << et.position.ToString() << ", " << et.rotation.ToString() << ", " << et.scale.ToString() << std::endl;
-		}
-		//Reset Transforms
-		if (glfwGetKey(window, GLFW_KEY_KP_DECIMAL))
-		{
-			TransformSystem::SetRotation(placementEditor, 0);
-			TransformSystem::SetScale(placementEditor, 20);
-		}
+
 
 		input::update();
-
-		// Retarded, but required because "camera isn't component" or some bull
-		soundSystem->SetListeningPosition((cam.position.x, cam.position.y));
-		soundSystem->Update();
-
 		hedgehogSystem->Update();
-
-		UpdateCam(window, cam, resources::level3Map);
+		UpdateCam(&cam, resources::level1Map);
 		engine::Update(&cam);
 
 

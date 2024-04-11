@@ -70,10 +70,10 @@ namespace engine
 		//Update engine systems
 		//Physics must be before collision
 		if (enablePhysics)
-			physicsSystem->Update(deltaTime);
+			physicsSystem->Update();
 		//Animation must be before sprite rendering
 		if (enableAnimation)
-			animationSystem->Update(deltaTime);
+			animationSystem->Update();
 		if (enableRendering)
 		{
 			//ModelRenderer must be before SpriteRenderer

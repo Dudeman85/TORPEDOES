@@ -74,7 +74,7 @@ namespace engine
 		void Init()
 		{
 			// Start Time
-			_lastFrame = chrono::high_resolution_clock::now();
+			_lastFrame = std::chrono::high_resolution_clock::now();
 		}
 
 		void Update()

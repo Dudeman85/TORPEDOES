@@ -67,7 +67,7 @@ void LoadLevel1(engine::Camera* cam)
 	engine::collisionSystem->SetTilemap(resources::level1Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
-	std::vector<ShipType> ships{ShipType::cannonBoat, ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat};
+	std::vector<ShipType> ships{ShipType::cannonBoat, ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::hedgehogBoat, ShipType::hedgehogBoat};
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(1, Vector2(1434.0f, -1370.0f), ships);
 
 	//Make all the checkpoints manually
@@ -86,7 +86,15 @@ void SetupInput()
 {
 	input::ConstructDigitalEvent("Pause");
 	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
+	input::ConstructDigitalEvent("Menu");
+	input::bindDigitalInput(GLFW_KEY_U, { "Menu" });
 	// TODO: add controller pause key
+
+	float AnalogPositiveMinDeadZone = 0;
+	float AnalogPositiveMaxDeadZone = 0.2;
+
+	float AnalogNegativeMinDeadZone = -0.2;
+	float AnalogNegativeMaxDeadZone = 0;
 
 	for (size_t i = 0; i < 4; i++)
 	{
@@ -97,46 +105,46 @@ void SetupInput()
 		input::ConstructDigitalEvent("Boost" + std::to_string(i));
 
 		// Controller input
+
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "Boost" + std::to_string(i) });
 
 		input::bindAnalogControllerInput(i,
 			{
-				{ input::digitalPositiveInput, GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER },
-				{ input::digitalNegativeInput, GLFW_GAMEPAD_AXIS_LEFT_TRIGGER }
-			}, { "Throttle" + std::to_string(i) });
+				{ { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER },
+				{ { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_TRIGGER }
+			},
+			{ "Throttle" + std::to_string(i) });
 
-		input::bindAnalogControllerInput(i, { { {-1, 1, 0}, GLFW_GAMEPAD_AXIS_LEFT_X }, }, { "Turn" + std::to_string(i) });
+		input::bindAnalogControllerInput(i,
+			{
+				{ { input::controllerMixedInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_X }
+			},
+			{ "Turn" + std::to_string(i) });
 	}
 
-	// Keyboard input for player 0
-	input::bindAnalogInput(GLFW_KEY_PERIOD, input::digitalPositiveInput, { "Turn1" }, 0);
-	input::bindAnalogInput(GLFW_KEY_COMMA, input::digitalNegativeInput, { "Turn1" }, 0);
+	// Keyboard input
+	int KeyboardPlayer = 0;
 
-	input::bindAnalogInput(GLFW_KEY_A, input::digitalPositiveInput, { "Throttle1" }, 0);
-	input::bindAnalogInput(GLFW_KEY_Z, input::digitalNegativeInput, { "Throttle1" }, 0);
-	input::bindAnalogInput(GLFW_KEY_UP, input::digitalPositiveInput, { "Throttle0" }, 0);
-	input::bindAnalogInput(GLFW_KEY_DOWN, input::digitalNegativeInput, { "Throttle0" }, 0);
+	input::bindAnalogInput(GLFW_KEY_RIGHT, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_LEFT, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
 
-	input::bindDigitalInput(GLFW_KEY_SPACE, { "Shoot0" });
-	input::bindDigitalInput(GLFW_KEY_M, { "Boost0" });
+	input::bindAnalogInput(GLFW_KEY_A, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_Z, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_UP, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_DOWN, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
 
-	/*
-	input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft0" });
-	input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight0" });
-	input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp0" });
-	input::bindDigitalInput(GLFW_KEY_DOWN, { "MoveDown0" });
-	input::bindDigitalInput(GLFW_KEY_ENTER, { "Select0" });
-	*/
-
+	input::bindDigitalInput(GLFW_KEY_N, { "Shoot" + std::to_string(KeyboardPlayer) });
+	input::bindDigitalInput(GLFW_KEY_M, { "Boost" + std::to_string(KeyboardPlayer) });
 }
+
 
 int main()
 {
 	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window");
 
 	engine::EngineInit();
-
+	
 	//Make the camera
 	engine::Camera cam = engine::Camera(1120, 630);
 	cam.SetPosition(Vector3(0, 0, 1500));
