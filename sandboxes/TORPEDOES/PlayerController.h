@@ -91,27 +91,6 @@ void CreateTorpedo(engine::ecs::Entity entity)
 	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models[torpedoProjectile.model] });
 }
 
-void CreateHedgehog(engine::ecs::Entity entity)
-{
-	Player& player = ecs::GetComponent<Player>(entity);
-	Transform& transform = ecs::GetComponent<Transform>(entity);
-	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
-
-	float speed = 500.0f;
-
-	ecs::Entity hedgehog = ecs::NewEntity();
-	ecs::AddComponent(hedgehog, Transform{ .position = transform.position, .rotation = modelTransform.rotation });
-
-	Vector3 finalVelocity = Vector3(player._forwardDirection.x, player._forwardDirection.y, 0.0f) * speed;
-
-	ecs::AddComponent(hedgehog, Rigidbody{ .velocity = finalVelocity });
-
-	ecs::AddComponent(hedgehog, ModelRenderer{ .model = resources::models["hedgehog.obj"] });
-	std::vector<Vector2> Hedgehogverts{ Vector2(0.2, 0.25), Vector2(0.2, -0.25), Vector2(-0.2, -0.25), Vector2(-0.2, 0.25) };
-	ecs::AddComponent(hedgehog, PolygonCollider{ .vertices = Hedgehogverts, .callback = OnProjectileCollision, .trigger = true, .visualise = true,  .rotationOverride = transform.position.y });
-	ecs::AddComponent(hedgehog, Projectile{ .ownerID = player.id });
-	ecs::AddComponent(hedgehog, Hedgehog{});
-}
 
 void CreateHedgehog(Vector2 direction, engine::ecs::Entity entity)
 {
@@ -120,13 +99,10 @@ void CreateHedgehog(Vector2 direction, engine::ecs::Entity entity)
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-	float hedgehogSpeedVo = 500.0f;
-	float distanceTraveled = 0.0f;
-
 	engine::ecs::Entity hedgehog = engine::ecs::NewEntity();
 	engine::ecs::AddComponent(hedgehog, Transform{ .position = transform.position, .rotation = modelTransform.rotation });
 
-	Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * hedgehogSpeedVo;
+	Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * ecs::GetSystem<HedgehogSystem>()->hedgehogSpeedVo;
 
 	engine::ecs::AddComponent(hedgehog, engine::Rigidbody{ .velocity = finalVelocity });
 
@@ -144,8 +120,8 @@ void CreateTridentHedgehogs(engine::ecs::Entity entity)
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-	const float angleOffset = Radians(10.0f); // Ajuste de ángulo para las direcciones de los proyectiles
-	float playerAngle = atan2(player._forwardDirection.y, player._forwardDirection.x) - angleOffset;
+	const float angleOffset = Radians(5.0f); // Ajuste de ángulo para las direcciones de los proyectiles
+	float playerAngle = atan2(player._forwardDirection.y, player._forwardDirection.x) - angleOffset*1.5;
 
 	// Creamos los tres proyectiles (hedgehogs)
 	for (int i = 0; i < 3; ++i)

@@ -91,13 +91,15 @@ static void OnProjectileCollision(engine::Collision collision)
 ECS_REGISTER_SYSTEM(HedgehogSystem, engine::Rigidbody, engine::Transform, Hedgehog)
 class HedgehogSystem : public engine::ecs::System
 {
+public:
 	const float hedgehogSpeedVo = 500.0f;
 	const float maxDistance = 700.0f;
-	const float maxScale = 200.0f;
-	const float minScale = 100.0f;
+	const float maxScale = 100.0f;
+	const float minScale = 50.0f;
 	const float minRotation = -50.0f;
 	const float maxRotation = +50.0f;
-public:
+
+
 	void Update()
 	{
 		// Iterate through entities in the system
