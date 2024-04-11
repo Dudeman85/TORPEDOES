@@ -66,7 +66,7 @@ void LoadLevel1(engine::Camera* cam)
 	CreateCheckpoint(Vector3(1043.635132, -875.206543, 100.000000), Vector3(45.000000, 179.241272, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 45.0f);
 	CreateCheckpoint(Vector3(943.931152, -293.566711, 100.000000), Vector3(45.000000, 107.476852, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 45.0f);
 	CreateCheckpoint(Vector3(586.608276, -1249.448486, 100.000000), Vector3(45.000000, 40.070156, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 90.0f);
-	CreateCheckpoint(Vector3(1513.692383, -1462.996187, 50.000000), Vector3(90.000000, 90.901711, 0.000000), Vector3(14), resources::models["Finish_line.obj"], -1, true); // 10
+	CreateCheckpoint(Vector3(1513.692383, -1462.996187, 50.000000), Vector3(45.000000, .901711, 0.000000), Vector3(14), resources::models["Finish_line.obj"], -1, true); // 10
 
 	//Make the crowds manually
 	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims);
@@ -74,6 +74,26 @@ void LoadLevel1(engine::Camera* cam)
 	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims);
 
 	PlayCountdown();
+}
+
+// Create everything for level 2
+void LoadLevel2(engine::Camera* cam)
+{
+	engine::collisionSystem->cam = cam;
+
+	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(1, Vector2(1200.0f, -1700.0f), ships);
+
+	// Set this level's tilemap
+	engine::spriteRenderSystem->SetTilemap(resources::level2Map);
+	engine::collisionSystem->SetTilemap(resources::level2Map);
+	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty { true });
+
+	// Make all the checkpoint's manually
+	CreateCheckpoint(Vector3(1470.000000, -980.000000, 0.000000), Vector3(42.500000, -37.500000, -32.500000), Vector3(14), resources::models["Prop_Buoy.obj"], 45.0f);
+	CreateCheckpoint(Vector3(2145.000000, -1470.000000, 0.000000), Vector3(32.500000, 0.000000, 0.000000), Vector3(14), resources::models["Prop_Buoy.obj"], 45.0f);
+	CreateCheckpoint(Vector3(2390.000000, -1640.000000, 0.000000), Vector3(0.000000, -57.500000, -90.000000), Vector3(14), resources::models["Prop_Buoy.obj"], 45.0f);
+	CreateCheckpoint(Vector3(1230.000000, -1700.000000, 0.000000), Vector3(0.000000, -50.000000, -90.000000), Vector3(11), resources::models["Finish_line.obj"], 45.0f);
 }
 
 // Create everything for level 3
@@ -136,7 +156,7 @@ void SetupInput()
 	}
 
 	// Keyboard input
-	int KeyboardPlayer = 1;
+	int KeyboardPlayer = 0;
 
 	input::bindAnalogInput(GLFW_KEY_RIGHT, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
 	input::bindAnalogInput(GLFW_KEY_LEFT, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
@@ -188,14 +208,17 @@ int main()
 	//Load the first level
 	//LoadLevel1(&cam);
 
+	// Load the second level
+	LoadLevel2(&cam);
+
 	// Load the third level
-	LoadLevel3(&cam);
+	//LoadLevel3(&cam);
 
 
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 0), .scale = 20 });
-	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Buoy_Checkpoint.obj"] });
+	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Buoy.obj"] });
 
 
 	//Game Loop
@@ -261,7 +284,7 @@ int main()
 
 		input::update();
 		hedgehogSystem->Update();
-		UpdateCam(&cam, resources::level1Map);
+		UpdateCam(&cam, resources::level2Map);
 		engine::Update(&cam);
 
 
