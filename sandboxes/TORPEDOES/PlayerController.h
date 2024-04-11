@@ -145,7 +145,7 @@ void CreateTridentHedgehogs(engine::ecs::Entity entity)
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
 	const float angleOffset = Radians(10.0f); // Ajuste de ángulo para las direcciones de los proyectiles
-	float playerAngle = atan2(player._forwardDirection.y, player._forwardDirection.x);
+	float playerAngle = atan2(player._forwardDirection.y, player._forwardDirection.x) - angleOffset;
 
 	// Creamos los tres proyectiles (hedgehogs)
 	for (int i = 0; i < 3; ++i)
@@ -668,11 +668,7 @@ public:
 			Audio* audio = engine::AddAudio("Gameplay", "audio/dink.wav", false, 100000);
 			audio->pause();
 
-			engine::ecs::AddComponent(player, engine::SoundComponent{.Sounds =
-									  {
-										  {"Dink", audio}
-									  }}
-			);
+			engine::ecs::AddComponent(player, engine::SoundComponent{.Sounds = { {"Dink", audio} }});
 		}
 	}
 };
