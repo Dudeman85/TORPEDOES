@@ -6,11 +6,9 @@
 
 using namespace engine;
 
-
-
 int checkPointNumber = 0;
 bool isGamePaused = false;
-std::function<void(engine::Camera*)>	startLevel;
+
 
 void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine::Model* checkPointModel, float hitboxrotation, bool finish_line = false)
 {
@@ -64,7 +62,7 @@ void LoadLevel1(engine::Camera* cam)
 	//std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
 	//engine::ecs::GetSystem<PlayerController>()->CreatePlayers(ships.size(), Vector2(1434.0f, -1370.0f), ships);
 
-	std::vector<ShipType>& playerShips = playerShips;
+	
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips.size(), Vector2(1434.0f, -1370.0f), playerShips);
 
 	//Make all the checkpoints manually
@@ -127,7 +125,7 @@ void SetupInput()
 	}
 
 	// Keyboard input
-	int KeyboardPlayer = 1;
+	int KeyboardPlayer = 3;
 
 	input::bindAnalogInput(GLFW_KEY_RIGHT, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
 	input::bindAnalogInput(GLFW_KEY_LEFT, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
@@ -277,6 +275,7 @@ int main()
 
 		if(canStartLoadingMap) 
 		{
+			isGamePaused = false;
 			canStartLoadingMap = false;
 			ShipSelectionSystem->isShipSelectionMenuOn = false;
 			LoadLevel1(&cam);
