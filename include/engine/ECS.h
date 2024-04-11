@@ -125,8 +125,6 @@ namespace engine::ecs
 
 		Iterator begin()
 		{
-			if (!packed)
-				Pack();
 			return Iterator(&entities[0], this);
 		}
 		Iterator end()
@@ -393,6 +391,15 @@ namespace engine::ecs
 
 
 	//PUBLIC FUNCTIONS
+
+	//Updates entity arrays and maybe some other things, call this at the very end of a frame
+	void Update()
+	{
+		for (auto& system : systems)
+		{
+			system.second->entities.Pack();
+		}
+	}
 
 	//Checks if an entity exists
 	inline bool EntityExists(Entity entity)

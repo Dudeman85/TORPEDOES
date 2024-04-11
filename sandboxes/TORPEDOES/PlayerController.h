@@ -93,6 +93,7 @@ void CreateTorpedo(engine::ecs::Entity entity)
 	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models[torpedoProjectile.model] });
 }
 
+
 /* SHELL */
 
 void CreateShell(engine::ecs::Entity entity)
@@ -103,10 +104,13 @@ void CreateShell(engine::ecs::Entity entity)
 
 	float speed = 500;
 
+
 	ecs::Entity shell = ecs::NewEntity();
 	ecs::AddComponent(shell, Projectile{ .ownerID = player.id, .speed = 500, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
 
+
 	Projectile& shellProjectile = ecs::GetComponent<Projectile>(shell);
+
 
 	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(10) });
 	ecs::AddComponent(shell, Rigidbody{ .velocity = player._forwardDirection * shellProjectile.speed });
@@ -114,6 +118,7 @@ void CreateShell(engine::ecs::Entity entity)
 	std::vector<Vector2> Shellverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
 	ecs::AddComponent(shell, PolygonCollider{ .vertices = Shellverts, .callback = OnProjectileCollision, .trigger = true, .visualise = false,  .rotationOverride = transform.position.y });
 }
+
 
 /* HEDGEHOG */
 
@@ -124,10 +129,12 @@ void CreateHedgehog(Vector2 direction, engine::ecs::Entity entity, float timeHel
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
+
 	float hedgehogSpeed = 500.0f;
 
 	engine::ecs::Entity hedgehog = engine::ecs::NewEntity();
 	engine::ecs::AddComponent(hedgehog, Transform{ .position = transform.position, .rotation = modelTransform.rotation });
+
 
 	Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * hedgehogSpeed;
 
@@ -162,6 +169,7 @@ void CreateHedgehog(engine::ecs::Entity entity)
 	ecs::AddComponent(hedgehog, Hedgehog{});
 }
 
+
 void CreateTridentHedgehogs(engine::ecs::Entity entity, float timeHeld)
 {
 	using namespace engine;
@@ -172,17 +180,23 @@ void CreateTridentHedgehogs(engine::ecs::Entity entity, float timeHeld)
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-	float playerAngle = atan2(player._forwardDirection.y, player._forwardDirection.x);
+
+	float playerAngle = atan2(player._forwardDirection.y, player._forwardDirection.x) - angleOffset;
+
 
 	for (int i = -1; i < 2; ++i)
 	{
+
 		float angle = playerAngle + (i * angleOffset);
 
+
 		Vector2 modifiedDirection = Vector2(cos(angle), sin(angle));
+
 
 		CreateHedgehog(modifiedDirection, entity, timeHeld);
 	}
 }
+
 
 struct aimingGuide
 {
@@ -229,13 +243,17 @@ void AimHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuides)
 void CreateAimingGuides(engine::ecs::Entity entity)
 {
 	Transform& transform = ecs::GetComponent<Transform>(entity);
+
 	Player& player = ecs::GetComponent<Player>(entity);
+
 
 	// Create aiming guides
 	engine::ecs::Entity aimingGuides = engine::ecs::NewEntity();
 
+
 	engine::ecs::AddComponent(aimingGuides, engine::Transform{ .position = transform.position, .rotation = transform.rotation, .scale = transform.scale });
 	engine::ecs::AddComponent(aimingGuides, engine::ModelRenderer{ .model = resources::models["Weapon_HedgehogAmmo.obj"] });
+
 
 	// Deleted when AimHedgehog finishes
 	playerIdToAimGuides[player.id] = 
@@ -245,6 +263,7 @@ void CreateAimingGuides(engine::ecs::Entity entity)
 		engine::timerSystem->ScheduleFunction(&AimHedgehog, 1, true, ScheduledFunction::Type::frames, entity, aimingGuides) 
 	};
 }
+
 
 void ShootHedgehog(engine::ecs::Entity entity)
 {
@@ -385,6 +404,7 @@ public:
 		shipComponents.insert({ ShipType::cannonBoat,
 			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 0.8, .mainAction = CreateShell, .specialAction = Boost } });
 		shipComponents.insert({ ShipType::hedgehogBoat,
+	
 			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 0.8, .mainAction = ShootHedgehog, .specialAction = Boost } });
 
 		//Initialize ship type models
@@ -760,11 +780,7 @@ public:
 			Audio* audio = engine::AddAudio("Gameplay", "audio/dink.wav", false, 100000);
 			audio->pause();
 
-			engine::ecs::AddComponent(player, engine::SoundComponent{.Sounds =
-									  {
-										  {"Dink", audio}
-									  }}
-			);
+
 		}
 	}
 };
