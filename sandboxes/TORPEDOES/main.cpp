@@ -92,7 +92,7 @@ void LoadLevel2(engine::Camera* cam)
 	// Make all the checkpoint's manually
 	CreateCheckpoint(Vector3(1470.000000, -980.000000, 0.000000), Vector3(42.500000, -37.500000, -32.500000), Vector3(14), resources::models["Prop_Buoy.obj"], 45.0f);
 	CreateCheckpoint(Vector3(2145.000000, -1470.000000, 0.000000), Vector3(32.500000, 0.000000, 0.000000), Vector3(14), resources::models["Prop_Buoy.obj"], 45.0f);
-	CreateCheckpoint(Vector3(2390.000000, -1640.000000, 0.000000), Vector3(0.000000, -57.500000, -90.000000), Vector3(14), resources::models["Prop_Buoy.obj"], 45.0f);
+	CreateCheckpoint(Vector3(2390.000000, -1640.000000, 0.000000), Vector3(-2.500000, -85.000000, -92.500000), Vector3(14), resources::models["Prop_Buoy_Vertical_Ver2.obj"], 45.0f);
 	CreateCheckpoint(Vector3(1230.000000, -1700.000000, 0.000000), Vector3(0.000000, -50.000000, -90.000000), Vector3(11), resources::models["Finish_line.obj"], 45.0f);
 }
 
@@ -218,7 +218,7 @@ int main()
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 0), .scale = 20 });
-	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Buoy.obj"] });
+	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Buoy_Vertical_Ver2.obj"] });
 
 
 	//Game Loop
