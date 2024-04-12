@@ -789,10 +789,10 @@ public:
 	}
 
 	//Spawn 1-4 players, all in a line from top to bottom
-	void CreatePlayers(int count, Vector2 startPos, std::vector<ShipType> shipTypes)
+	void CreatePlayers(std::unordered_map<int, ShipType> players, Vector2 startPos)
 	{
 		Vector2 offset(0, 60);
-		for (int i = 0; i < count; i++)
+		for (const auto& p : players)
 		{
 			//Make all the necessary entities
 			engine::ecs::Entity player = engine::ecs::NewEntity();
@@ -803,25 +803,25 @@ public:
 
 			//Create the player entity which contains everything but rendering
 			//Player component is a bit special
-			engine::ecs::AddComponent(player, shipComponents[shipTypes[i]]);
+			engine::ecs::AddComponent(player, shipComponents[p.second]);
 			Player& playerComponent = engine::ecs::GetComponent<Player>(player);
-			playerComponent.id = i;
+			playerComponent.id = p.first;
 			playerComponent.renderedEntity = playerRender;
 			playerComponent.nameText = playerNameText;
 
-			engine::ecs::AddComponent(player, engine::Transform{.position = Vector3(startPos - offset * i, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
+			engine::ecs::AddComponent(player, engine::Transform{.position = Vector3(startPos - offset * p.first, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			engine::ecs::AddComponent(player, engine::Rigidbody{.drag = 1.5 });
 			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
 			engine::ecs::AddComponent(player, engine::PolygonCollider{.vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
 
 			//Create the player's name tag
-			engine::ecs::AddComponent(playerNameText, engine::TextRenderer{.font = resources::niagaraFont, .text = "P" + to_string(i + 1), .color = Vector3(0.5, 0.8, 0.2) });
+			engine::ecs::AddComponent(playerNameText, engine::TextRenderer{.font = resources::niagaraFont, .text = "P" + to_string(p.first + 1), .color = Vector3(0.5, 0.8, 0.2) });
 			engine::ecs::AddComponent(playerNameText, engine::Transform{.position = Vector3(-2, 2, 20), .scale = Vector3(0.1) });
 			engine::TransformSystem::AddParent(playerNameText, player);
 
 			//Create the player's rendered entity
 			engine::ecs::AddComponent(playerRender, engine::Transform{.rotation = Vector3(45, 0, 0), .scale = Vector3(1.5) });
-			engine::ecs::AddComponent(playerRender, engine::ModelRenderer{.model = shipModels[shipTypes[i]] });
+			engine::ecs::AddComponent(playerRender, engine::ModelRenderer{.model = shipModels[p.second] });
 			engine::TransformSystem::AddParent(playerRender, player);
 
 			//Create the players's torpedo indicators

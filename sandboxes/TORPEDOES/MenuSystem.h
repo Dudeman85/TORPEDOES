@@ -2,7 +2,6 @@
 //Author: Sauli Hanell month.day.year 2.9.2024
 
 #include <engine/Application.h>
-#include <functional>
 #include "engine/Input.h"  
 #include "engine/Timing.h"
 
@@ -12,7 +11,7 @@ enum ShipPlayDifficulty { easy, normal, hard };
 
 static bool canStartLoadingMap;
 static bool isSceneloaded;
-std::vector<ShipType> playerShips;
+std::unordered_map<int, ShipType> playerShips;
 
 //PlayerShipSelection
 ECS_REGISTER_COMPONENT(PlayerSelection)
@@ -64,22 +63,10 @@ class PlayerSelectSystem : public engine::ecs::System
 	float throttleCurrentWaitedTimeDown = 0;
 	engine::ecs::Entity selectionWindow;
 
-	map<int, ShipType>selectedShipsAtTheFrame;
+	std::unordered_map<int, ShipType>selectedShipsAtTheFrame;
 
 	int playersThatAreReadyAmount = 0;
 
-	void SetSelectedPlayerShips(map<int, ShipType> selectedShipsAtTheFrame)
-	{
-		
-
-		for (const auto& pair : selectedShipsAtTheFrame)
-		{
-			playerShips.push_back(ShipType(pair.second));
-			std::cout << " " << pair.second << "  ";
-		}
-		
-
-	};
 public:
 	
 	//std::vector<ShipType> playerShips;
@@ -572,7 +559,7 @@ public:
 
 			
 			printf("============= GAME STARTING ==========\n");
-			SetSelectedPlayerShips(selectedShipsAtTheFrame);
+			playerShips = selectedShipsAtTheFrame;
 			isShipSelectionMenuOn = false;
 			ToggleMenuPlayerSelection();
 			
