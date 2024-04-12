@@ -96,10 +96,15 @@ void LoadLevel2(engine::Camera* cam)
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty { true });
 
 	// Make all the checkpoint's manually
-	CreateCheckpoint(Vector3(1470.000000, -980.000000, 0.000000), Vector3(42.500000, -37.500000, -32.500000), Vector3(14), resources::models["Prop_Buoy.obj"], 45.0f);
-	CreateCheckpoint(Vector3(2145.000000, -1470.000000, 0.000000), Vector3(32.500000, 0.000000, 0.000000), Vector3(14), resources::models["Prop_Buoy.obj"], 45.0f);
-	CreateCheckpoint(Vector3(2390.000000, -1640.000000, 0.000000), Vector3(-2.500000, -85.000000, -92.500000), Vector3(14), resources::models["Prop_Buoy_Vertical_Ver2.obj"], 45.0f);
-	CreateCheckpoint(Vector3(1230.000000, -1700.000000, 0.000000), Vector3(0.000000, -50.000000, -90.000000), Vector3(11), resources::models["Finish_line.obj"], 45.0f);
+	CreateCheckpoint(Vector3(1455.000000, -995.000000, 100.000000), Vector3(35.000000, -15.000000, -20.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 45.0f);				// First checkpoint
+	CreateCheckpoint(Vector3(2405.000000, -1640.000000, 100.000000), Vector3(22.500000, 0.000000, 50.000000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 45.0f);			// Second checkpoint
+	CreateCheckpoint(Vector3(3595.000000, -1095.000000, 100.000000), Vector3(40.000000, 0.000000, 47.500000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 45.0f);			// Third checkpoint
+	CreateCheckpoint(Vector3(2715.000000, -1145.000000, 0.000000), Vector3(45.000000, 0.000000, 0.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 45.0f);						// Fourth checkpoint
+	CreateCheckpoint(Vector3(2415.000000, -500.000000, 100.000000), Vector3(25.000000, -17.500000, -30.000000), Vector3(16), resources::models["Prop_Buoy.obj"], 45.0f);				// Fifth checkpoint
+	CreateCheckpoint(Vector3(1505.000000, -335.000000, 100.000000), Vector3(52.500000, -32.500000, -5.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 45.0f);					// Sixth checkpoint
+	CreateCheckpoint(Vector3(600.000000, -665.000000, 100.000000), Vector3(40.000000, -25.000000, -17.500000), Vector3(20), resources::models["Prop_Buoy.obj"], 45.0f);					// Seventh checkpoint
+	CreateCheckpoint(Vector3(530.000000, -1675.000000, 100.000000), Vector3(45.000000, 32.500000, 47.500000), Vector3(20), resources::models["Prop_Buoy_Vertical.obj"], 45.0f);			// Eight checkpoint
+	CreateCheckpoint(Vector3(1230.000000, -1700.000000, 0.000000), Vector3(0.000000, -50.000000, -90.000000), Vector3(11), resources::models["Finish_line.obj"], 45.0f);				// Finish line
 }
 
 // Create everything for level 3
@@ -238,8 +243,8 @@ int main()
 
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
-	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 0), .scale = 20 });
-	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Buoy_Vertical_Ver2.obj"] });
+	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 100), .scale = 20 });
+	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Buoy_Vertical.obj"] });
 	
 	PlayersMenu(ShipSelectionSystem);
 	bool mapLoaded = false;
