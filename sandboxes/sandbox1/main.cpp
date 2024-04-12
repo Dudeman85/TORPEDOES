@@ -58,15 +58,16 @@ void LoadLevel1(engine::Camera* cam)
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
 	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(2, Vector2(2000.0f, -1670.0f), ships);
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(1, Vector2(2000.0f, -1650.0f), ships);
 
 	//Make all the checkpoints manually
 	CreateCheckpoint(Vector3(3015.000000, -760.000000, 100.000000), Vector3(27.500000, 47.500000, 7.500000), Vector3(19), resources::models["Prop_Buoy.obj"], 37.5f+90.f);
 	CreateCheckpoint(Vector3(2645.000000, -975.000000, 100.000000), Vector3(27.500000, -40.000000, -7.500000), Vector3(19), resources::models["Prop_Buoy.obj"], -20.0f+90.f);
 	CreateCheckpoint(Vector3(2140.000000, -635.000000, 100.000000), Vector3(27.500000, 0.000000, 12.500000), Vector3(15.f), resources::models["Prop_Buoy.obj"], -2.5f + 90.f);
-	CreateCheckpoint(Vector3(890.000000, -425.000000, 100.000000), Vector3(57.500000, 302.500000, 22.500000), Vector3(18.5f), resources::models["Prop_Buoy.obj"], 15.0f + 45.f);
-	CreateCheckpoint(Vector3(1165.000000, -1360.000000, 100.000000), Vector3(45.000000, -175.000000, 5.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 13.0f + 90.f);
-	CreateCheckpoint(Vector3(2390.000000, -1625.000000, 100.000000), Vector3(-7.500000, -65.000000, -92.500000), Vector3(17), resources::models["Finish_line.obj"], 180.f, true); // 10
+	CreateCheckpoint(Vector3(885.000000, -780.000000, 100.000000), Vector3(15.000000, 25.000000, 7.500000), Vector3(14.5f), resources::models["Prop_Buoy.obj"], 15.0f + 90.f);
+	CreateCheckpoint(Vector3(1185.000000, -480.000000, 100.000000), Vector3(25.000000, 7.500000, 7.500000), Vector3(14.5f), resources::models["Prop_Buoy.obj"], 15.0f + 90.f);
+	CreateCheckpoint(Vector3(1170.000000, -1250.000000, 100.000000), Vector3(37.500000, 0.000000, 0.000000), Vector3(13), resources::models["Prop_Buoy.obj"], 13.0f+80.f);
+	CreateCheckpoint(Vector3(2555.000000, -1555.000000, 100.000000), Vector3(-17.500000, -87.500000, -90.000000), Vector3(20.5f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true); // 10
 
 	//Make the crowds manually
 	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims);

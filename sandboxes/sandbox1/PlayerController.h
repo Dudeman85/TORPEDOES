@@ -641,7 +641,7 @@ public:
 			playerComponent.renderedEntity = playerRender;
 			playerComponent.nameText = playerNameText;
 
-			engine::ecs::AddComponent(player, engine::Transform{.position = Vector3(startPos - offset * i, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
+			engine::ecs::AddComponent(player, engine::Transform{.position = Vector3(startPos - offset * i, 150), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			engine::ecs::AddComponent(player, engine::Rigidbody{.drag = 1.5 });
 			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
 			engine::ecs::AddComponent(player, engine::PolygonCollider{.vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
