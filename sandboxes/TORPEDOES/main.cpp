@@ -263,10 +263,12 @@ int main()
 			}
 		}
 
-
 		input::update();
+
+		if(!isGamePaused)
+			UpdateCam(&cam, resources::level1Map);
+
 		hedgehogSystem->Update();
-		UpdateCam(&cam, resources::level1Map);
 		engine::Update(&cam);
 
 		if(canStartLoadingMap) 
