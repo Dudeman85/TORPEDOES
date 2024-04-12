@@ -143,6 +143,7 @@ void Multishot(ShootFunc callfunc, engine::ecs::Entity entity, std::vector<engin
 		--amount;
 		++positive_i;
 		extra = 1;
+	    //Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * ecs::GetSystem<HedgehogSystem>()->hedgehogSpeedVo;
 
 		callfunc(entity, entities[0], modifiedDirection, timeHeld);
 	}
@@ -204,6 +205,7 @@ struct aimingGuideStruct
 	engine::ScheduledFunction* timerFunction;
 };
 
+	const float angleOffset = Radians(5.0f); // Ajuste de ángulo para las direcciones de los proyectiles
 static std::map<int, aimingGuideStruct> playerIdToAimGuides;
 
 void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> aimingGuides, float guideSpeed, float shootAngle, int shootAmount)
@@ -215,6 +217,9 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 	if (input::GetPressed("Shoot" + std::to_string(player.id)))
 	{
 		// When button is pressed, move aim guide forward
+	Transform& transform = ecs::GetComponent<Transform>(entity);
+	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
+	
 
 		Player& player = ecs::GetComponent<Player>(entity);
 		Transform& playerTransform = ecs::GetComponent<Transform>(entity);
