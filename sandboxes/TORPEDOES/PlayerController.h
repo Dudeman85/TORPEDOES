@@ -298,11 +298,10 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 
 		playerIdToAimGuides.erase(player.id);
 
-		/*
-		for (auto& destroyGuide : aimingGuides)
+		for (auto& aimingGuide : aimingGuides)
 		{
-			engine::ecs::DestroyEntity(destroyGuide);
-		}*/
+			// TODO: Change guide animation
+		}
 	}
 }
 
