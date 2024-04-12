@@ -607,6 +607,8 @@ public:
 
 			float rotateInput = input::GetTotalInputValue("Turn" + std::to_string(player.id));
 
+			bool newShotInput = input::GetNewPress("Shoot" + std::to_string(player.id));
+
 			accelerationInput = std::clamp(accelerationInput, -1.0f, 1.0f);
 			rotateInput = std::clamp(rotateInput, -1.0f, 1.0f);
 
@@ -633,6 +635,9 @@ public:
 				case HitStates::Stop:
 					// Rotate player
 					engine::TransformSystem::Rotate(player.renderedEntity, 0, 360.0f * engine::deltaTime, 0);
+					accelerationInput = 0;
+					rotateInput = 0;
+					newShotInput = false;
 					break;
 				case HitStates::Additive:
 					player._speedScale += std::max(hitProjectile.first.hitSpeedFactor, 0.f);
@@ -761,7 +766,7 @@ public:
 			// If the projectile cooldown has passed
 			while (player._shootTimer >= player.shootCooldown)
 			{
-				if (!input::GetNewPress("Shoot" + std::to_string(player.id)))
+				if (!newShotInput)
 				{
 					// We haven't pressed the shoot button, keep shootTimer at max value
 					player._shootTimer = player.shootCooldown;
