@@ -8,6 +8,8 @@ using namespace engine;
 
 int checkPointNumber = 0;
 bool isGamePaused = false;
+
+
 void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine::Model* checkPointModel, float hitboxrotation, bool finish_line = false)
 {
 	engine::ecs::Entity checkpoint = engine::ecs::NewEntity();
@@ -56,8 +58,12 @@ void LoadLevel1(engine::Camera* cam)
 	engine::collisionSystem->SetTilemap(resources::level1Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
-	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(4, Vector2(1434.0f, -1370.0f), ships);
+
+	//std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
+	//engine::ecs::GetSystem<PlayerController>()->CreatePlayers(ships.size(), Vector2(1434.0f, -1370.0f), ships);
+
+	
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips.size(), Vector2(1434.0f, -1370.0f), playerShips);
 
 	//Make all the checkpoints manually
 	CreateCheckpoint(Vector3(2100.226807, -963.837402, 100.000000), Vector3(30.000000, 159.245773, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 45.0f);
@@ -80,7 +86,6 @@ void LoadLevel1(engine::Camera* cam)
 void SetupInput()
 {
 	input::ConstructDigitalEvent("Pause");
-	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
 	input::ConstructDigitalEvent("Menu");
 	input::bindDigitalInput(GLFW_KEY_U, { "Menu" });
 	// TODO: add controller pause key
@@ -103,6 +108,7 @@ void SetupInput()
 
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "Boost" + std::to_string(i) });
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_START, { "Pause" });
 
 		input::bindAnalogControllerInput(i,
 										 {
@@ -119,7 +125,7 @@ void SetupInput()
 	}
 
 	// Keyboard input
-	int KeyboardPlayer = 2;
+	int KeyboardPlayer = 0;
 
 	input::bindAnalogInput(GLFW_KEY_RIGHT, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
 	input::bindAnalogInput(GLFW_KEY_LEFT, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
@@ -131,6 +137,19 @@ void SetupInput()
 
 	input::bindDigitalInput(GLFW_KEY_N, { "Shoot" + std::to_string(KeyboardPlayer) });
 	input::bindDigitalInput(GLFW_KEY_M, { "Boost" + std::to_string(KeyboardPlayer) });
+	input::bindDigitalInput(GLFW_KEY_P, { "Pause"  });
+}
+
+void PlayersMenu(std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem)
+{
+	ShipSelectionSystem->isShipSelectionMenuOn = !ShipSelectionSystem->isShipSelectionMenuOn;
+	isGamePaused = !isGamePaused;
+
+
+	ShipSelectionSystem->ToggleMenuPlayerSelection();
+
+
+	std::cout << "is Ship selection open:" << ShipSelectionSystem->isShipSelectionMenuOn;
 }
 
 int main()
@@ -162,6 +181,7 @@ int main()
 	soundSystem->AddSoundEngine("Background");
 	soundSystem->AddSoundEngine("Music");
 
+	//startLevel = LoadLevel1(&cam);
 	std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem = engine::ecs::GetSystem<PlayerSelectSystem>();
 	ShipSelectionSystem->Init();
 
@@ -169,18 +189,26 @@ int main()
 	SetupInput();
 
 	//Load the first level
-	LoadLevel1(&cam);
-
+	//LoadLevel1(&cam);
+	//ShipSelectionSystem->ToggleMenuPlayerSelection();
 
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 0), .scale = 20 });
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Checkpoint.obj"] });
-
-
+	
+	PlayersMenu(ShipSelectionSystem);
+	bool mapLoaded = false;
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
+	/*	if (PlayerSelectSystem::GetCanStartLoadingMap() && mapLoaded)
+		{						  5
+			mapLoaded = true;
+			LoadLevel1(&cam);
+		}*/
+
+
 		glfwPollEvents();
 
 		//Close window when Esc is pressed
@@ -244,19 +272,26 @@ int main()
 		UpdateCam(&cam, resources::level1Map);
 		engine::Update(&cam);
 
+		if(canStartLoadingMap) 
+		{
+			isGamePaused = false;
+			canStartLoadingMap = false;
+			ShipSelectionSystem->isShipSelectionMenuOn = false;
+			LoadLevel1(&cam);
+		}
 
 		// if paused or Pause pressed update PauseSystem
 		if (input::GetNewPress("Pause"))
 		{
-			pauseSystem->isGamePause = !(pauseSystem->isGamePause);
-			isGamePaused = !isGamePaused;
+			pauseSystem->isGamePause = true;// !(pauseSystem->isGamePause);
+			//isGamePaused = !isGamePaused;
 			//printf("\nGamePause pressed\n");
 			pauseSystem->ToggleShowUIOptionsMenu();
 
 		}
 		if (pauseSystem->isGamePause)
 		{
-			//printf("\nGamePaused \n");
+			printf("\nGamePaused \n");
 			pauseSystem->Update();
 		}
 
@@ -273,6 +308,7 @@ int main()
 		}
 		if (ShipSelectionSystem->isShipSelectionMenuOn)
 		{
+		engine::modelRenderSystem->SetLight(Vector3(0,0,-200), 255);
 			//printf("\nShipSelectionSystem->Update()\n");
 			ShipSelectionSystem->Update();
 		}

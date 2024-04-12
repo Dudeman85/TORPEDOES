@@ -32,8 +32,8 @@ struct Projectile
 ECS_REGISTER_COMPONENT(Hedgehog)
 struct  Hedgehog : public Projectile
 {
-	float distanceTraveled = 0.0f;
-
+	float distanceTraveled = 0;	// Distance travelled
+	float targetDistance = 0;	// Distance until explosion
 };
 
 //Temporary function for testing
@@ -88,6 +88,10 @@ static void OnProjectileCollision(engine::Collision collision)
 	}
 }
 
+static const float _HedgehogMaxDistance = 900.0f;	// Full charge distance
+static const float _HedgehogMinDistance = 200.0f;	// No charge distance
+static const float _HedgehogChargeTime = 1.0f;		// Time until full charge
+
 ECS_REGISTER_SYSTEM(HedgehogSystem, engine::Rigidbody, engine::Transform, Hedgehog)
 class HedgehogSystem : public engine::ecs::System
 {
@@ -109,13 +113,13 @@ public:
 			Hedgehog& hedgehogComp = engine::ecs::GetComponent<Hedgehog>(entity);
 			engine::Transform& transformComp = engine::ecs::GetComponent<engine::Transform>(entity);
 
-			if (hedgehogComp.distanceTraveled < maxDistance)
+			if (hedgehogComp.distanceTraveled < hedgehogComp.targetDistance)
 			{
 				// Calcula la distancia recorrida sumando la distancia del paso actual
 				hedgehogComp.distanceTraveled += hedgehogSpeedVo * engine::deltaTime; // deltaTime es el tiempo transcurrido desde el último frame
 
 				// Calcula el coficiente entre la distacia recorida y la distacia maxima 
-				float distanceRatio = hedgehogComp.distanceTraveled / maxDistance;
+				float distanceRatio = hedgehogComp.distanceTraveled / hedgehogComp.targetDistance;
 
 				//// Calcula la rotación en función de la distancia recorrida
 				engine::TransformSystem::Rotate(entity, Vector3(0, 0, -130.5f * engine::deltaTime));
@@ -125,8 +129,6 @@ public:
 
 				// Actualiza la escala del objeto
 				transformComp.scale = Vector3(scale);
-
-
 			}
 			else
 			{
@@ -135,9 +137,7 @@ public:
 
 				// Si se supera la distancia máxima, detén el movimiento del objeto
 				engine::ecs::DestroyEntity(entity);
-				continue;
 			}
-
 		};
 	}
 };
