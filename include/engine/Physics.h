@@ -122,38 +122,31 @@ namespace engine
 			ecs::Entity a = collisions.front().a;
 			Collision maxIntersect = Collision{ .mtv = Vector2(0) };
 
-			int i = 0;
-			do
+			//Find the largest collision
+			for (Collision& collision : collisions)
 			{
-				//Find the largest collision
-				for (Collision& collision : collisions)
+				if (collision.mtv.Length() > maxIntersect.mtv.Length())
 				{
-					if (collision.mtv.Length() > maxIntersect.mtv.Length())
+					//If the tile is set to be a trigger
+					if (tileProperties.count(collision.b) != 0)
 					{
-						//If the tile is set to be a trigger
-						if (tileProperties.count(collision.b) != 0)
-						{
-							if (!tileProperties[collision.b].trigger)
-								maxIntersect = collision;
-						}
-						else
-						{
+						if (!tileProperties[collision.b].trigger)
 							maxIntersect = collision;
-						}
+					}
+					else
+					{
+						maxIntersect = collision;
 					}
 				}
+			}
+			//Solve the largest collision
+			if (maxIntersect.type == Collision::Type::tilemapCollision)
+			{
+				TransformSystem::Translate(a, maxIntersect.mtv);
+			}
 
-				//Solve the largest collision
-				if (maxIntersect.type == Collision::Type::tilemapCollision)
-				{
-					TransformSystem::Translate(a, maxIntersect.mtv);
-				}
-
-				//Check collision again
-				collisions = ecs::GetSystem<CollisionSystem>()->CheckTilemapCollision(a);
-
-				i++;
-			} while (collisions.size() > 0 && i < tilemapIterationLimit);
+			//Check collision again
+			collisions = ecs::GetSystem<CollisionSystem>()->CheckTilemapCollision(a);
 
 			//Calculate new velocities
 			Rigidbody& rba = ecs::GetComponent<Rigidbody>(a);
@@ -208,7 +201,7 @@ namespace engine
 			Rigidbody& rigidbody = ecs::GetComponent<Rigidbody>(entity);
 			rigidbody.velocity += velocity * rigidbody.mass;
 		}
-		
+
 		///Add force to entity
 		static inline void AddForce(ecs::Entity entity, Vector3 velocity)
 		{
@@ -229,7 +222,6 @@ namespace engine
 		int step = 1;
 		///gravity yay
 		Vector3 gravity;
-		static const int tilemapIterationLimit = 10;
 	private:
 		//Currently a bad system to assign different physics properties to tile IDs
 		//TODO: Probably move this to tilemap or make better in some other way

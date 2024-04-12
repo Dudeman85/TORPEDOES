@@ -694,7 +694,10 @@ public:
 				}
 			}
 
-			collider.rotationOverride = modelTransform.rotation.y + 1080;
+			//Set the collider's rotation
+			collider.rotationOverride = (int)std::round(modelTransform.rotation.y) % 360;
+			if (modelTransform.rotation.y < 0)
+				collider.rotationOverride = 360 - std::abs(collider.rotationOverride);
 
 			// Increase the special timer
 			player._specialTimer += engine::deltaTime;
@@ -834,7 +837,7 @@ public:
 			engine::ecs::AddComponent(player, engine::Transform{.position = Vector3(startPos - offset * p.first, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			engine::ecs::AddComponent(player, engine::Rigidbody{.drag = 1.5 });
 			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
-			engine::ecs::AddComponent(player, engine::PolygonCollider{.vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
+			engine::ecs::AddComponent(player, engine::PolygonCollider{.vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = true });
 
 			//Create the player's name tag
 			engine::ecs::AddComponent(playerNameText, engine::TextRenderer{.font = resources::niagaraFont, .text = "P" + to_string(p.first + 1), .color = Vector3(0.5, 0.8, 0.2) });

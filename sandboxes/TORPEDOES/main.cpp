@@ -42,7 +42,7 @@ static void PlayCountdown()
 	engine::ecs::AddComponent(countdown, engine::Animator{.onAnimationEnd = engine::ecs::DestroyEntity });
 	engine::AnimationSystem::AddAnimation(countdown, resources::countdownAnim, "CountDown");
 	engine::AnimationSystem::PlayAnimation(countdown, "CountDown", false);
-	engine::ecs::GetSystem<PlayerController>()->countdownTimer = 5;
+	engine::ecs::GetSystem<PlayerController>()->countdownTimer = 3;
 }
 
 //Create everything for level 1
