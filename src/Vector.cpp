@@ -56,11 +56,11 @@ float& Vector2::operator[](int i)
 }
 
 //Add
-Vector2 Vector2::operator+(const float& add)
+Vector2 Vector2::operator+(const float& add) const
 {
 	return Vector2(x + add, y + add);
 }
-Vector2 Vector2::operator+(const Vector2& add)
+Vector2 Vector2::operator+(const Vector2& add) const
 {
 	return Vector2(x + add.x, y + add.y);
 }
@@ -72,11 +72,11 @@ Vector2& Vector2::operator+=(const Vector2& add)
 }
 
 //Subtract
-Vector2 Vector2::operator-(const float& sub)
+Vector2 Vector2::operator-(const float& sub) const
 {
 	return Vector2(x - sub, y - sub);
 }
-Vector2 Vector2::operator-(const Vector2& sub)
+Vector2 Vector2::operator-(const Vector2& sub) const
 {
 	return Vector2(x - sub.x, y - sub.y);
 }
@@ -88,11 +88,11 @@ Vector2& Vector2::operator-=(const Vector2& sub)
 }
 
 //Multiply
-Vector2 Vector2::operator*(const float& mult)
+Vector2 Vector2::operator*(const float& mult) const
 {
 	return Vector2(x * mult, y * mult);
 }
-Vector2 Vector2::operator*(const Vector2& mult)
+Vector2 Vector2::operator*(const Vector2& mult) const
 {
 	return Vector2(x * mult.x, y * mult.y);
 }
@@ -110,11 +110,11 @@ Vector2& Vector2::operator*=(const Vector2& mult)
 }
 
 //Divide
-Vector2 Vector2::operator/(const float& div)
+Vector2 Vector2::operator/(const float& div) const
 {
 	return Vector2(x / div, y / div);
 }
-Vector2 Vector2::operator/(const Vector2& div)
+Vector2 Vector2::operator/(const Vector2& div) const
 {
 	return Vector2(x / div.x, y / div.y);
 }
@@ -125,7 +125,7 @@ Vector2& Vector2::operator/=(const float& div)
 	return *this;
 }
 
-float Vector2::Length()
+float Vector2::Length() const
 {
 	return sqrt(x * x + y * y);
 }
@@ -134,20 +134,20 @@ Vector2 Vector2::Normalize()
 	float length = sqrt(x * x + y * y);
 	return Vector2(x / length, y / length);
 }
-float Vector2::Dot(const Vector2& b)
+float Vector2::Dot(const Vector2& b) const
 {
 	return (x * b.x) + (y * b.y);
 }
-Vector2 Vector2::LeftNormal()
+Vector2 Vector2::LeftNormal() const
 {
 	return Vector2(-y, x).Normalize();
 }
-Vector2 Vector2::RightNormal()
+Vector2 Vector2::RightNormal() const
 {
 	return Vector2(y, -x).Normalize();
 }
 
-std::string Vector2::ToString()
+std::string Vector2::ToString() const
 {
 	char buff[255];
 	std::snprintf(buff, sizeof(buff) - 1, "(%f, %f)", x, y);
@@ -230,11 +230,11 @@ const float& Vector3::operator[](int i) const
 }
 
 //Addition
-Vector3 Vector3::operator+(const float& add)
+Vector3 Vector3::operator+(const float& add) const
 {
 	return Vector3(x + add, y + add, z + add);
 }
-Vector3 Vector3::operator+(const Vector3& add)
+Vector3 Vector3::operator+(const Vector3& add) const
 {
 	return Vector3(x + add.x, y + add.y, z + add.z);
 }
@@ -247,11 +247,11 @@ Vector3& Vector3::operator+=(const Vector3& add)
 }
 
 //Subtraction
-Vector3 Vector3::operator-(const float& sub)
+Vector3 Vector3::operator-(const float& sub) const
 {
 	return Vector3(x - sub, y - sub, z - sub);
 }
-Vector3 Vector3::operator-(const Vector3& sub)
+Vector3 Vector3::operator-(const Vector3& sub) const
 {
 	return Vector3(x - sub.x, y - sub.y, z - sub.z);
 }
@@ -264,11 +264,11 @@ Vector3& Vector3::operator-=(const Vector3& sub)
 }
 
 //Multiplication
-Vector3 Vector3::operator*(const float& mult)
+Vector3 Vector3::operator*(const float& mult) const
 {
 	return Vector3(x * mult, y * mult, z * mult);
 }
-Vector3 Vector3::operator*(const Vector3& mult)
+Vector3 Vector3::operator*(const Vector3& mult) const
 {
 	return Vector3(x * mult.x, y * mult.y, z * mult.z);
 }
@@ -281,11 +281,11 @@ Vector3& Vector3::operator*=(const float& mult)
 }
 
 //Division
-Vector3 Vector3::operator/(const float& div)
+Vector3 Vector3::operator/(const float& div) const
 {
 	return Vector3(x / div, y / div, z / div);
 }
-Vector3 Vector3::operator/(const Vector3& div)
+Vector3 Vector3::operator/(const Vector3& div) const
 {
 	return Vector3(x / div.x, y / div.y, z / div.z);
 }
@@ -297,7 +297,7 @@ Vector3& Vector3::operator/=(const float& div)
 	return *this;
 }
 
-float Vector3::Length()
+float Vector3::Length() const
 {
 	return sqrt(x * x + y * y + z * z);
 }
@@ -310,21 +310,21 @@ Vector3 Vector3::Normalize()
 	float length = sqrt(x * x + y * y + z * z);
 	return Vector3(x / length, y / length, z / length);
 }
-float Vector3::Dot(Vector3 b)
+float Vector3::Dot(Vector3 b) const
 {
 	return (x * b.x) + (y * b.y) + (z * b.z);
 }
-Vector3 Vector3::Cross(Vector3 b)
+Vector3 Vector3::Cross(Vector3 b) const
 {
 	return Vector3((y * b.z) - (z * b.y), (z * b.x) - (x * b.z), (x * b.y) - (y * b.x));
 }
 
-glm::vec3 Vector3::ToGlm()
+glm::vec3 Vector3::ToGlm() const
 {
 	return glm::vec3(x, y, z);
 }
 
-std::string Vector3::ToString()
+std::string Vector3::ToString() const
 {
 	char buff[255];
 	std::snprintf(buff, sizeof(buff) - 1, "(%f, %f, %f)", x, y, z);

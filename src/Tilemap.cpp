@@ -43,7 +43,7 @@ Tilemap::Tilemap(engine::Camera* cam)
 {
 	m_shader = new engine::Shader(
 	R"(
-	#version 330 core
+	#version 460 core
 	in vec3 a_position;
 	in vec2 a_texCoord;
 
@@ -60,7 +60,7 @@ Tilemap::Tilemap(engine::Camera* cam)
 	v_texCoord = a_texCoord;
 	}
 	)", R"(
-	#version 330 core
+	#version 460 core
 	#define FLIP_HORIZONTAL 8u
 	#define FLIP_VERTICAL 4u
 	#define FLIP_DIAGONAL 2u

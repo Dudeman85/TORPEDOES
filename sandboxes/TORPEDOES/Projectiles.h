@@ -88,7 +88,7 @@ static void OnProjectileCollision(engine::Collision collision)
 	}
 }
 
-static const float _HedgehogMaxDistance = 900.0f;	// Full charge distance
+static const float _HedgehogMaxDistance = 700.0f;	// Full charge distance
 static const float _HedgehogMinDistance = 200.0f;	// No charge distance
 static const float _HedgehogChargeTime = 1.0f;		// Time until full charge
 

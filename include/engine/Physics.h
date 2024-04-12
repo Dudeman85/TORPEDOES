@@ -71,7 +71,7 @@ namespace engine
 
 		//COLLISION RESOLUTION:
 
-		///Temporary function to solve a collision does not affect rotation rotation, Returns 0 on success, >0 on trigger, and <0 on failure 
+		///Temporary (permanent) function to solve a collision does not affect rotation, Returns 0 on success, >0 on trigger, and <0 on failure 
 		static int SimpleSolveCollision(Collision collision)
 		{
 			//One of the entities does not have a rigidbody. Return <0 on failure;
