@@ -17,7 +17,7 @@ void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine:
 	engine::ecs::AddComponent(checkpoint, engine::ModelRenderer{.model = checkPointModel });
 	engine::ecs::AddComponent(checkpoint, CheckPoint{ .checkPointID = checkPointNumber , .Finish_line = finish_line });
 	std::vector<Vector2> CheckpointcolliderVerts{ Vector2(4, 8), Vector2(4, -8), Vector2(-4, -8), Vector2(-4, 8) };
-	engine::ecs::AddComponent(checkpoint, engine::PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = false, .rotationOverride = hitboxrotation }));
+	engine::ecs::AddComponent(checkpoint, engine::PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = true, .rotationOverride = hitboxrotation }));
 
 	checkPointNumber++;
 };
@@ -58,16 +58,15 @@ void LoadLevel1(engine::Camera* cam)
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
 	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(1, Vector2(1434.0f, -1370.0f), ships);
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(2, Vector2(2000.0f, -1670.0f), ships);
 
 	//Make all the checkpoints manually
-	CreateCheckpoint(Vector3(2100.226807, -963.837402, 100.000000), Vector3(30.000000, 159.245773, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 45.0f);
-	CreateCheckpoint(Vector3(2597.463135, -684.973389, 100.000000), Vector3(45.000000, 180.022018, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 45.0f);
-	CreateCheckpoint(Vector3(1668.260010, -990.794373, 100.000000), Vector3(45.000000, 147.891968, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 45.0f);
-	CreateCheckpoint(Vector3(1043.635132, -875.206543, 100.000000), Vector3(45.000000, 179.241272, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 45.0f);
-	CreateCheckpoint(Vector3(943.931152, -293.566711, 100.000000), Vector3(45.000000, 107.476852, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 45.0f);
-	CreateCheckpoint(Vector3(586.608276, -1249.448486, 100.000000), Vector3(45.000000, 40.070156, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 90.0f);
-	CreateCheckpoint(Vector3(1513.692383, -1462.996187, 50.000000), Vector3(90.000000, 90.901711, 0.000000), Vector3(14), resources::models["Finish_line.obj"], -1, true); // 10
+	CreateCheckpoint(Vector3(3015.000000, -760.000000, 100.000000), Vector3(27.500000, 47.500000, 7.500000), Vector3(19), resources::models["Prop_Buoy.obj"], 37.5f+90.f);
+	CreateCheckpoint(Vector3(2645.000000, -975.000000, 100.000000), Vector3(27.500000, -40.000000, -7.500000), Vector3(19), resources::models["Prop_Buoy.obj"], -20.0f+90.f);
+	CreateCheckpoint(Vector3(2140.000000, -635.000000, 100.000000), Vector3(27.500000, 0.000000, 12.500000), Vector3(15.f), resources::models["Prop_Buoy.obj"], -2.5f + 90.f);
+	CreateCheckpoint(Vector3(890.000000, -425.000000, 100.000000), Vector3(57.500000, 302.500000, 22.500000), Vector3(18.5f), resources::models["Prop_Buoy.obj"], 15.0f + 45.f);
+	CreateCheckpoint(Vector3(1165.000000, -1360.000000, 100.000000), Vector3(45.000000, -175.000000, 5.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 13.0f + 90.f);
+	CreateCheckpoint(Vector3(2390.000000, -1625.000000, 100.000000), Vector3(-7.500000, -65.000000, -92.500000), Vector3(17), resources::models["Finish_line.obj"], 180.f, true); // 10
 
 	//Make the crowds manually
 	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims);
@@ -75,6 +74,7 @@ void LoadLevel1(engine::Camera* cam)
 	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims);
 
 	PlayCountdown();
+	PlayerController::lapCount = 1;
 }
 
 //Bind all input events here
@@ -175,8 +175,8 @@ int main()
 
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
-	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 0), .scale = 20 });
-	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Checkpoint.obj"] });
+	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 100), .scale = 20 });
+	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Buoy.obj"] });
 
 
 	//Game Loop
@@ -238,7 +238,7 @@ int main()
 				TransformSystem::SetScale(placementEditor, 20);
 			}
 		}
-
+		
 
 		input::update();
 		hedgehogSystem->Update();

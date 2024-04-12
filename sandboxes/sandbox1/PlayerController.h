@@ -53,7 +53,7 @@ struct Player
 
 	// Checkpoint
 	int previousCheckpoint = -1;
-	int lap = 1;
+	int lap = 0;
 
 	// Hit
 	std::vector<std::pair<Projectile, float>> hitProjectiles;
@@ -267,7 +267,7 @@ class PlayerController : public engine::ecs::System
 {
 	static engine::ecs::Entity winScreen;
 	static bool hasWon;
-	static int lapCount; // How many laps to race through
+	
 
 	//A map from a ship type to a pre-initialized Player component with the proper stats
 	std::unordered_map<ShipType, Player> shipComponents;
@@ -276,7 +276,7 @@ class PlayerController : public engine::ecs::System
 
 public:
 	float countdownTimer = 0;
-
+	static int lapCount; // How many laps to race through
 	void Init()
 	{
 		//Create the entity to be shown at a win
