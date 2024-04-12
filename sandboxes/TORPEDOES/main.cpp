@@ -10,7 +10,7 @@ int checkPointNumber = 0;
 bool isGamePaused = false;
 
 
-void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine::Model* checkPointModel, float hitboxrotation, bool finish_line = false)
+static void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine::Model* checkPointModel, float hitboxrotation, bool finish_line = false)
 {
 	engine::ecs::Entity checkpoint = engine::ecs::NewEntity();
 
@@ -23,7 +23,7 @@ void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine:
 	checkPointNumber++;
 };
 
-void CreateCrowd(Vector3 pos, engine::Animation& anim)
+static void CreateCrowd(Vector3 pos, engine::Animation& anim)
 {
 	engine::ecs::Entity crowd = engine::ecs::NewEntity();
 	engine::ecs::AddComponent(crowd, engine::Transform{.position = pos, .scale = Vector3(100, 30, 0) });
@@ -34,7 +34,7 @@ void CreateCrowd(Vector3 pos, engine::Animation& anim)
 }
 
 //Play the countdown timer and freeze players untill it is done
-void PlayCountdown()
+static void PlayCountdown()
 {
 	engine::ecs::Entity countdown = engine::ecs::NewEntity();
 	engine::ecs::AddComponent(countdown, engine::Transform{.position = Vector3(1475, -1270, 10), .scale = Vector3(60, 100, 0) });
@@ -42,11 +42,11 @@ void PlayCountdown()
 	engine::ecs::AddComponent(countdown, engine::Animator{.onAnimationEnd = engine::ecs::DestroyEntity });
 	engine::AnimationSystem::AddAnimation(countdown, resources::countdownAnim, "CountDown");
 	engine::AnimationSystem::PlayAnimation(countdown, "CountDown", false);
-	engine::ecs::GetSystem<PlayerController>()->countdownTimer = 5;
+	engine::ecs::GetSystem<PlayerController>()->countdownTimer = 3;
 }
 
 //Create everything for level 1
-void LoadLevel1(engine::Camera* cam)
+static void LoadLevel1(engine::Camera* cam)
 {
 	engine::collisionSystem->cam = cam;
 
@@ -58,12 +58,7 @@ void LoadLevel1(engine::Camera* cam)
 	engine::collisionSystem->SetTilemap(resources::level1Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
-
-	//std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
-	//engine::ecs::GetSystem<PlayerController>()->CreatePlayers(ships.size(), Vector2(1434.0f, -1370.0f), ships);
-
-	
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips.size(), Vector2(1434.0f, -1370.0f), playerShips);
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1434.0f, -1370.0f));
 
 	//Make all the checkpoints manually
 	CreateCheckpoint(Vector3(2100.226807, -963.837402, 100.000000), Vector3(30.000000, 159.245773, 0.000000), Vector3(17), resources::models["Checkpoint.obj"], 45.0f);
@@ -125,7 +120,7 @@ void LoadLevel3(engine::Camera* cam)
 }
 
 //Bind all input events here
-void SetupInput()
+static void SetupInput()
 {
 	input::ConstructDigitalEvent("Pause");
 	input::ConstructDigitalEvent("Menu");
@@ -182,7 +177,7 @@ void SetupInput()
 	input::bindDigitalInput(GLFW_KEY_P, { "Pause"  });
 }
 
-void PlayersMenu(std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem)
+static void PlayersMenu(std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem)
 {
 	ShipSelectionSystem->isShipSelectionMenuOn = !ShipSelectionSystem->isShipSelectionMenuOn;
 	isGamePaused = !isGamePaused;
@@ -196,6 +191,7 @@ void PlayersMenu(std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem)
 
 int main()
 {
+
 	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window");
 
 	engine::EngineInit();
@@ -248,6 +244,7 @@ int main()
 	
 	PlayersMenu(ShipSelectionSystem);
 	bool mapLoaded = false;
+
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -315,10 +312,11 @@ int main()
 			}
 		}
 
-
 		input::update();
+
+		if(!isGamePaused)
+			UpdateCam(&cam, resources::level2Map);
 		hedgehogSystem->Update();
-		UpdateCam(&cam, resources::level2Map);
 		engine::Update(&cam);
 
 		if(canStartLoadingMap) 

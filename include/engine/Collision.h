@@ -57,6 +57,8 @@ namespace engine
 		///Called every frame
 		void Update(Camera* camera)
 		{
+			glClear(GL_DEPTH_BUFFER_BIT);
+
 			//This needs to be a member for tilemap rendering convenience
 			cam = camera;
 

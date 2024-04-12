@@ -117,9 +117,9 @@ void CreateShell(engine::ecs::Entity entity)
 
 /* MULTISHOT */
 
-using ShootFunc = std::function<void(engine::ecs::Entity, Vector2, float)>;
+using ShootFunc = std::function<void(engine::ecs::Entity, engine::ecs::Entity, Vector2, float)>;
 
-void Multishot(ShootFunc callfunc, engine::ecs::Entity entity, float angleOffset, int amount, float timeHeld)
+void Multishot(ShootFunc callfunc, engine::ecs::Entity entity, std::vector<engine::ecs::Entity> entities, float angleOffset, int amount, float timeHeld)
 {
 	using namespace engine;
 
@@ -143,8 +143,9 @@ void Multishot(ShootFunc callfunc, engine::ecs::Entity entity, float angleOffset
 		--amount;
 		++positive_i;
 		extra = 1;
+	    //Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * ecs::GetSystem<HedgehogSystem>()->hedgehogSpeedVo;
 
-		callfunc(entity, modifiedDirection, timeHeld);
+		callfunc(entity, entities[0], modifiedDirection, timeHeld);
 	}
 	else
 	{
@@ -159,7 +160,7 @@ void Multishot(ShootFunc callfunc, engine::ecs::Entity entity, float angleOffset
 
 		modifiedDirection = Vector2(cos(angle), sin(angle));
 
-		callfunc(entity, modifiedDirection, timeHeld);
+		callfunc(entity, entities[positive_i], modifiedDirection, timeHeld);
 	}
 
 	// Shoot negative:
@@ -169,13 +170,13 @@ void Multishot(ShootFunc callfunc, engine::ecs::Entity entity, float angleOffset
 
 		modifiedDirection = Vector2(cos(angle), sin(angle));
 
-		callfunc(entity, modifiedDirection, timeHeld);
+		callfunc(entity, entities[positive_i + negative_i - 1], modifiedDirection, timeHeld);
 	}
 }
 
 /* HEDGEHOG */
 
-void CreateHedgehog(engine::ecs::Entity entity, Vector2 direction, float timeHeld)
+void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide, Vector2 direction, float timeHeld)
 {
 	using namespace engine;
 	Player& player = ecs::GetComponent<Player>(entity);
@@ -194,7 +195,7 @@ void CreateHedgehog(engine::ecs::Entity entity, Vector2 direction, float timeHel
 	engine::ecs::AddComponent(hedgehog, ModelRenderer{ .model = resources::models["hedgehog.obj"] });
 	std::vector<Vector2> Hedgehogverts{ Vector2(0.2, 0.25), Vector2(0.2, -0.25), Vector2(-0.2, -0.25), Vector2(-0.2, 0.25) };
 	ecs::AddComponent(hedgehog, Projectile{ .ownerID = player.id });
-	ecs::AddComponent(hedgehog, Hedgehog{ .targetDistance = std::clamp(input::map_value(timeHeld, 0, _HedgehogChargeTime, _HedgehogMinDistance, _HedgehogMaxDistance), _HedgehogMinDistance, _HedgehogMaxDistance) });
+	ecs::AddComponent(hedgehog, Hedgehog{ .targetDistance = std::clamp(input::map_value(timeHeld, 0, _HedgehogChargeTime, _HedgehogMinDistance, _HedgehogMaxDistance), _HedgehogMinDistance, _HedgehogMaxDistance), .aimingGuide = aimingGuide });
 }
 
 struct aimingGuideStruct
@@ -204,6 +205,7 @@ struct aimingGuideStruct
 	engine::ScheduledFunction* timerFunction;
 };
 
+	const float angleOffset = Radians(5.0f); // Ajuste de ángulo para las direcciones de los proyectiles
 static std::map<int, aimingGuideStruct> playerIdToAimGuides;
 
 void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> aimingGuides, float guideSpeed, float shootAngle, int shootAmount)
@@ -215,6 +217,9 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 	if (input::GetPressed("Shoot" + std::to_string(player.id)))
 	{
 		// When button is pressed, move aim guide forward
+	Transform& transform = ecs::GetComponent<Transform>(entity);
+	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
+	
 
 		Player& player = ecs::GetComponent<Player>(entity);
 		Transform& playerTransform = ecs::GetComponent<Transform>(entity);
@@ -280,7 +285,7 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 	else
 	{
 		// When button is released, shoot
-		Multishot(CreateHedgehog, entity, shootAngle, shootAmount, *playerIdToAimGuides[player.id].totalTime);
+		Multishot(CreateHedgehog, entity, aimingGuides, shootAngle, shootAmount, *playerIdToAimGuides[player.id].totalTime);
 		player.ammo -= aimingGuides.size();
 		player.ammo = std::clamp(player.ammo, 0, player.maxAmmo);
 
@@ -293,9 +298,9 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 
 		playerIdToAimGuides.erase(player.id);
 
-		for (auto& destroyGuide : aimingGuides)
+		for (auto& aimingGuide : aimingGuides)
 		{
-			engine::ecs::DestroyEntity(destroyGuide);
+			// TODO: Change guide animation
 		}
 	}
 }
@@ -345,6 +350,7 @@ void ShootHedgehog(engine::ecs::Entity entity)
 	float guideSpeed = 500;
 	float shootAngle = Radians(10.0f);
 	float shootAmount = player.ammo;
+	player.ammo++; // We don't use up ammo until we shoot
 
 	CreateAimingGuides(entity, 500, Radians(10.0f), shootAmount);
 }
@@ -539,6 +545,12 @@ public:
 		{
 			Projectile& projectile = engine::ecs::GetComponent<Projectile>(collision.b); // projectile is collision.b 
 
+			if (player.submerged && !projectile.canHitSubmerged)
+			{
+				// Submerged hit: Ignore
+				return;
+			}
+
 			if (player.id != projectile.ownerID)
 			{
 				for (auto& hitProjectile : player.hitProjectiles)
@@ -564,7 +576,7 @@ public:
 				//engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(collision.a);
 				//soundComponent.Sounds["Dink"]->play();
 
-				//Destroy torpedo at end of frame
+				//Destroy projectile at end of frame
 				engine::ecs::DestroyEntity(collision.b);
 			}
 		}
@@ -592,8 +604,10 @@ public:
 
 			// Initialize inputs
 			float accelerationInput = input::GetTotalInputValue("Throttle" + std::to_string(player.id));
-
 			float rotateInput = input::GetTotalInputValue("Turn" + std::to_string(player.id));
+
+			bool newShotInput = input::GetNewPress("Shoot" + std::to_string(player.id));
+			bool newSpecialInput = input::GetPressed("Boost" + std::to_string(player.id));
 
 			accelerationInput = std::clamp(accelerationInput, -1.0f, 1.0f);
 			rotateInput = std::clamp(rotateInput, -1.0f, 1.0f);
@@ -620,7 +634,13 @@ public:
 				{
 				case HitStates::Stop:
 					// Rotate player
-					engine::TransformSystem::Rotate(player.renderedEntity, 0, 360.0f * engine::deltaTime, 0);
+					engine::TransformSystem::Rotate(player.renderedEntity, 0, (360.0f / hitProjectile.first.hitTime) * engine::deltaTime, 0);
+
+					// Ignore all input
+					accelerationInput = 0;
+					rotateInput = 0;
+					newShotInput = false;
+					newSpecialInput = false;
 					break;
 				case HitStates::Additive:
 					player._speedScale += std::max(hitProjectile.first.hitSpeedFactor, 0.f);
@@ -674,7 +694,10 @@ public:
 				}
 			}
 
-			collider.rotationOverride = modelTransform.rotation.y + 1080;
+			//Set the collider's rotation
+			collider.rotationOverride = (int)std::round(modelTransform.rotation.y) % 360;
+			if (modelTransform.rotation.y < 0)
+				collider.rotationOverride = 360 - std::abs(collider.rotationOverride);
 
 			// Increase the special timer
 			player._specialTimer += engine::deltaTime;
@@ -682,7 +705,7 @@ public:
 			// If the special cooldown has passed
 			while (player._specialTimer >= player.specialCooldown)
 			{
-				if (!input::GetPressed("Boost" + std::to_string(player.id)))
+				if (!newSpecialInput)
 				{
 					// We haven't pressed the special button, keep _specialTimer at max value
 					player._specialTimer = player.specialCooldown;
@@ -749,7 +772,7 @@ public:
 			// If the projectile cooldown has passed
 			while (player._shootTimer >= player.shootCooldown)
 			{
-				if (!input::GetNewPress("Shoot" + std::to_string(player.id)))
+				if (!newShotInput)
 				{
 					// We haven't pressed the shoot button, keep shootTimer at max value
 					player._shootTimer = player.shootCooldown;
@@ -791,10 +814,10 @@ public:
 	}
 
 	//Spawn 1-4 players, all in a line from top to bottom
-	void CreatePlayers(int count, Vector2 startPos, std::vector<ShipType> shipTypes)
+	void CreatePlayers(std::unordered_map<int, ShipType> players, Vector2 startPos)
 	{
 		Vector2 offset(0, 60);
-		for (int i = 0; i < count; i++)
+		for (const auto& p : players)
 		{
 			//Make all the necessary entities
 			engine::ecs::Entity player = engine::ecs::NewEntity();
@@ -805,25 +828,25 @@ public:
 
 			//Create the player entity which contains everything but rendering
 			//Player component is a bit special
-			engine::ecs::AddComponent(player, shipComponents[shipTypes[i]]);
+			engine::ecs::AddComponent(player, shipComponents[p.second]);
 			Player& playerComponent = engine::ecs::GetComponent<Player>(player);
-			playerComponent.id = i;
+			playerComponent.id = p.first;
 			playerComponent.renderedEntity = playerRender;
 			playerComponent.nameText = playerNameText;
 
-			engine::ecs::AddComponent(player, engine::Transform{.position = Vector3(startPos - offset * i, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
+			engine::ecs::AddComponent(player, engine::Transform{.position = Vector3(startPos - offset * p.first, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			engine::ecs::AddComponent(player, engine::Rigidbody{.drag = 1.5 });
 			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
-			engine::ecs::AddComponent(player, engine::PolygonCollider{.vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
+			engine::ecs::AddComponent(player, engine::PolygonCollider{.vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = true });
 
 			//Create the player's name tag
-			engine::ecs::AddComponent(playerNameText, engine::TextRenderer{.font = resources::niagaraFont, .text = "P" + to_string(i + 1), .color = Vector3(0.5, 0.8, 0.2) });
+			engine::ecs::AddComponent(playerNameText, engine::TextRenderer{.font = resources::niagaraFont, .text = "P" + to_string(p.first + 1), .color = Vector3(0.5, 0.8, 0.2) });
 			engine::ecs::AddComponent(playerNameText, engine::Transform{.position = Vector3(-2, 2, 20), .scale = Vector3(0.1) });
 			engine::TransformSystem::AddParent(playerNameText, player);
 
 			//Create the player's rendered entity
 			engine::ecs::AddComponent(playerRender, engine::Transform{.rotation = Vector3(45, 0, 0), .scale = Vector3(1.5) });
-			engine::ecs::AddComponent(playerRender, engine::ModelRenderer{.model = shipModels[shipTypes[i]] });
+			engine::ecs::AddComponent(playerRender, engine::ModelRenderer{.model = shipModels[p.second] });
 			engine::TransformSystem::AddParent(playerRender, player);
 
 			//Create the players's torpedo indicators

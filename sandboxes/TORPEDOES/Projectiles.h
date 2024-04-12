@@ -22,6 +22,7 @@ struct Projectile
 	HitStates hitType = HitStates::Stop;
 	float hitSpeedFactor = -0.05f;		// If hitType is not Stop, scale of speed change when hit
 	float hitTime = 2.0f;				// Time the hit lasts
+	bool canHitSubmerged = false;
 
 	/* Files */
 
@@ -34,6 +35,8 @@ struct  Hedgehog : public Projectile
 {
 	float distanceTraveled = 0;	// Distance travelled
 	float targetDistance = 0;	// Distance until explosion
+
+	engine::ecs::Entity aimingGuide;
 };
 
 //Temporary function for testing
@@ -59,20 +62,23 @@ static void CreateAnimation(engine::ecs::Entity entity)
 	engine::AnimationSystem::PlayAnimation(torpedoAnim, "hit", false);
 };
 
-void CreateAniHedgehog(Vector3 animPosition)
+void CreateHedgehogExplosion(engine::ecs::Entity entity)
 {
-	engine::ecs::Entity hedgehogAnim = engine::ecs::NewEntity();
-	animPosition.z += 100;
-	engine::ecs::AddComponent(hedgehogAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20) });
-	engine::ecs::AddComponent(hedgehogAnim, engine::SpriteRenderer{ });
-	engine::ecs::AddComponent(hedgehogAnim, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
-	std::vector<Vector2> explosionverts{ Vector2(0.5, 0.55), Vector2(0.5, -0.55), Vector2(-0.5, -0.55), Vector2(-0.5, 0.55) };
-	engine::ecs::AddComponent(hedgehogAnim, engine::PolygonCollider{ .vertices = explosionverts, .trigger = true, .visualise = true });
-	engine::ecs::AddComponent(hedgehogAnim, Projectile{ .ownerID = -1 , .hitAnimation = "" });
+	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(entity);
+	Hedgehog& hedgehog = engine::ecs::GetComponent<Hedgehog>(entity);
 
-	//   MIKA SAMA TÄLTÄ 
-	engine::AnimationSystem::AddAnimation(hedgehogAnim, resources::explosionAnimation, "explosion");
-	engine::AnimationSystem::PlayAnimation(hedgehogAnim, "explosion", false);
+	engine::ecs::DestroyEntity(hedgehog.aimingGuide);
+
+	engine::ecs::Entity hedgehogExplosion = engine::ecs::NewEntity();
+	engine::ecs::AddComponent(hedgehogExplosion, engine::Transform{ .position = transform.position + Vector3(0, 0, 100 +(double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20) });
+	engine::ecs::AddComponent(hedgehogExplosion, engine::SpriteRenderer{ });
+	engine::ecs::AddComponent(hedgehogExplosion, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
+	std::vector<Vector2> explosionverts{ Vector2(0.5, 0.55), Vector2(0.5, -0.55), Vector2(-0.5, -0.55), Vector2(-0.5, 0.55) };
+	engine::ecs::AddComponent(hedgehogExplosion, engine::PolygonCollider{ .vertices = explosionverts, .trigger = true, .visualise = true });
+	engine::ecs::AddComponent(hedgehogExplosion, Projectile{ .ownerID = -1, .hitType = HitStates::Stop, .hitSpeedFactor = 0.5, .hitTime = 3, .canHitSubmerged = true, .hitAnimation = "" });
+
+	engine::AnimationSystem::AddAnimation(hedgehogExplosion, resources::explosionAnimation, "explosion");
+	engine::AnimationSystem::PlayAnimation(hedgehogExplosion, "explosion", false);
 };
 
 static void OnProjectileCollision(engine::Collision collision)
@@ -95,47 +101,47 @@ static const float _HedgehogChargeTime = 1.0f;		// Time until full charge
 ECS_REGISTER_SYSTEM(HedgehogSystem, engine::Rigidbody, engine::Transform, Hedgehog)
 class HedgehogSystem : public engine::ecs::System
 {
+public:
 	const float hedgehogSpeedVo = 500.0f;
-	const float maxScale = 200.0f;
-	const float minScale = 100.0f;
-
-	// TODO: these must be calculated
+	const float maxDistance = 700.0f;
+	const float maxScale = 100.0f;
+	const float minScale = 50.0f;
 	const float minRotation = -50.0f;
 	const float maxRotation = +50.0f;
 
-public:
+
 	void Update()
 	{
 		// Iterate through entities in the system
 		for (engine::ecs::Entity entity: entities)
-		{			// Get the entity and increment the iterator
-			
+		{			
+			// Get the entity and increment the iterator
 			Hedgehog& hedgehogComp = engine::ecs::GetComponent<Hedgehog>(entity);
 			engine::Transform& transformComp = engine::ecs::GetComponent<engine::Transform>(entity);
 
 			if (hedgehogComp.distanceTraveled < hedgehogComp.targetDistance)
 			{
-				// Calcula la distancia recorrida sumando la distancia del paso actual
-				hedgehogComp.distanceTraveled += hedgehogSpeedVo * engine::deltaTime; // deltaTime es el tiempo transcurrido desde el último frame
+				// Projectile is still travelling to it's target distance
 
-				// Calcula el coficiente entre la distacia recorida y la distacia maxima 
+				// Increment distance travelled
+				hedgehogComp.distanceTraveled += hedgehogSpeedVo * engine::deltaTime;
+
+				// Ratio of distance travelled to the target distance
 				float distanceRatio = hedgehogComp.distanceTraveled / hedgehogComp.targetDistance;
 
-				//// Calcula la rotación en función de la distancia recorrida
+				// TODO: Calculate based on distance travelled
 				engine::TransformSystem::Rotate(entity, Vector3(0, 0, -130.5f * engine::deltaTime));
 
-				// Calcula la escala en funcion de la distancia recorrida
+				// Map scale to distance ratio
 				float scale = maxScale - (maxScale - minScale) * (2 * abs(0.5 - distanceRatio));
 
-				// Actualiza la escala del objeto
 				transformComp.scale = Vector3(scale);
 			}
 			else
 			{
-				// Create the animation when the projectile reaches the end of the trajectory."
-				CreateAniHedgehog(transformComp.position);
+				// Projectile has reached the end of it's trajectory
+				CreateHedgehogExplosion(entity);
 
-				// Si se supera la distancia máxima, detén el movimiento del objeto
 				engine::ecs::DestroyEntity(entity);
 			}
 		};
