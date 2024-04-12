@@ -26,11 +26,11 @@ struct Player
 	float minSpeedWhileTurning = 60;
 
 	float offtrackSpeedScale = 0.6;
+	Vector2 forwardDirection;
 
 	float _speedScale = 1;
 	float _boostScale = 1;
 	bool _offroadThisFrame = false;
-	Vector2 _forwardDirection;
 
 	bool submerged = false;
 
@@ -86,13 +86,12 @@ void CreateTorpedo(engine::ecs::Entity entity)
 	Projectile& torpedoProjectile = ecs::GetComponent<Projectile>(torpedo);
 
 	ecs::AddComponent(torpedo, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(10) });
-	ecs::AddComponent(torpedo, Rigidbody{ .velocity = player._forwardDirection * torpedoProjectile.speed });
+	ecs::AddComponent(torpedo, Rigidbody{ .velocity = player.forwardDirection * torpedoProjectile.speed });
 	std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
 	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .visualise = false,  .rotationOverride = transform.position.y });
 
 	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models[torpedoProjectile.model] });
 }
-
 
 /* SHELL */
 
@@ -104,128 +103,194 @@ void CreateShell(engine::ecs::Entity entity)
 
 	float speed = 500;
 
-
 	ecs::Entity shell = ecs::NewEntity();
 	ecs::AddComponent(shell, Projectile{ .ownerID = player.id, .speed = 500, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
 
-
 	Projectile& shellProjectile = ecs::GetComponent<Projectile>(shell);
 
-
 	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(10) });
-	ecs::AddComponent(shell, Rigidbody{ .velocity = player._forwardDirection * shellProjectile.speed });
+	ecs::AddComponent(shell, Rigidbody{ .velocity = player.forwardDirection * shellProjectile.speed });
 	ecs::AddComponent(shell, ModelRenderer{ .model = resources::models[shellProjectile.model = "Weapon_HedgehogAmmo.obj"] });
 	std::vector<Vector2> Shellverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
 	ecs::AddComponent(shell, PolygonCollider{ .vertices = Shellverts, .callback = OnProjectileCollision, .trigger = true, .visualise = false,  .rotationOverride = transform.position.y });
 }
 
+/* MULTISHOT */
+
+using ShootFunc = std::function<void(engine::ecs::Entity, Vector2, float)>;
+
+void Multishot(ShootFunc callfunc, engine::ecs::Entity entity, float angleOffset, int amount, float timeHeld)
+{
+	using namespace engine;
+
+	Player& player = ecs::GetComponent<Player>(entity);
+
+	const float playerAngle = atan2(player.forwardDirection.y, player.forwardDirection.x);
+
+	// If amount is even, we offset by this amount at the start
+	float evenOffset = 0;
+
+	int positive_i = 0;
+	int negative_i = 1;
+	int extra = 0;
+
+	Vector2 modifiedDirection;
+
+	if (amount % 2)
+	{
+		// Amount is odd: Shoot to the center with 0 angle offset
+		modifiedDirection = Vector2(cos(playerAngle), sin(playerAngle));
+		--amount;
+		++positive_i;
+		extra = 1;
+	Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * ecs::GetSystem<HedgehogSystem>()->hedgehogSpeedVo;
+
+		callfunc(entity, modifiedDirection, timeHeld);
+	}
+	else
+	{
+		// Amount is even: Add half the offset
+		evenOffset = angleOffset / 2;
+	}
+
+	// Shoot positive:
+	for (; positive_i < (amount / 2) + extra; ++positive_i)
+	{
+		float angle = playerAngle + evenOffset + (positive_i * angleOffset);
+
+		modifiedDirection = Vector2(cos(angle), sin(angle));
+
+		callfunc(entity, modifiedDirection, timeHeld);
+	}
+
+	// Shoot negative:
+	for (int negative_i = 1; negative_i < (amount / 2) + 1; ++negative_i)
+	{
+		float angle = playerAngle + evenOffset + (negative_i * -angleOffset);
+
+		modifiedDirection = Vector2(cos(angle), sin(angle));
+
+		callfunc(entity, modifiedDirection, timeHeld);
+	}
+}
 
 /* HEDGEHOG */
 
-void CreateHedgehog(Vector2 direction, engine::ecs::Entity entity, float timeHeld)
+void CreateHedgehog(engine::ecs::Entity entity, Vector2 direction, float timeHeld)
 {
 	using namespace engine;
 	Player& player = ecs::GetComponent<Player>(entity);
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-	float hedgehogSpeedVo = 500.0f;
-	float distanceTraveled = 0.0f;
+	float hedgehogSpeed = 500.0f;
 
 	engine::ecs::Entity hedgehog = engine::ecs::NewEntity();
 	engine::ecs::AddComponent(hedgehog, Transform{ .position = transform.position, .rotation = modelTransform.rotation });
 
-	Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * ecs::GetSystem<HedgehogSystem>()->hedgehogSpeedVo;
+	Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * hedgehogSpeed;
 
 	engine::ecs::AddComponent(hedgehog, engine::Rigidbody{ .velocity = finalVelocity });
 
 	engine::ecs::AddComponent(hedgehog, ModelRenderer{ .model = resources::models["hedgehog.obj"] });
 	std::vector<Vector2> Hedgehogverts{ Vector2(0.2, 0.25), Vector2(0.2, -0.25), Vector2(-0.2, -0.25), Vector2(-0.2, 0.25) };
 	ecs::AddComponent(hedgehog, Projectile{ .ownerID = player.id });
-	ecs::AddComponent(hedgehog, Hedgehog{ .targetDistance = input::map_value(timeHeld, 0, _HedgehogChargeTime, _HedgehogMinDistance, _HedgehogMaxDistance)});
+	ecs::AddComponent(hedgehog, Hedgehog{ .targetDistance = std::clamp(input::map_value(timeHeld, 0, _HedgehogChargeTime, _HedgehogMinDistance, _HedgehogMaxDistance), _HedgehogMinDistance, _HedgehogMaxDistance) });
 }
 
-
-void CreateHedgehog(engine::ecs::Entity entity)
+struct aimingGuideStruct
 {
-	Player& player = ecs::GetComponent<Player>(entity);
-	Transform& transform = ecs::GetComponent<Transform>(entity);
-	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
-
-	float speed = 500.0f;
-
-	ecs::Entity hedgehog = ecs::NewEntity();
-	ecs::AddComponent(hedgehog, Transform{ .position = transform.position, .rotation = modelTransform.rotation });
-
-	Vector3 finalVelocity = Vector3(player._forwardDirection.x, player._forwardDirection.y, 0.0f) * speed;
-
-	ecs::AddComponent(hedgehog, Rigidbody{ .velocity = finalVelocity });
-
-	ecs::AddComponent(hedgehog, ModelRenderer{ .model = resources::models["hedgehog.obj"] });
-	std::vector<Vector2> Hedgehogverts{ Vector2(0.2, 0.25), Vector2(0.2, -0.25), Vector2(-0.2, -0.25), Vector2(-0.2, 0.25) };
-	ecs::AddComponent(hedgehog, PolygonCollider{ .vertices = Hedgehogverts, .callback = OnProjectileCollision, .trigger = true, .visualise = true,  .rotationOverride = transform.position.y });
-	ecs::AddComponent(hedgehog, Projectile{ .ownerID = player.id });
-	ecs::AddComponent(hedgehog, Hedgehog{});
-}
-
-
-void CreateTridentHedgehogs(engine::ecs::Entity entity, float timeHeld)
-{
-	using namespace engine;
+	std::vector<engine::ecs::Entity> entities;
+	float* totalTime;
+	engine::ScheduledFunction* timerFunction;
+};
 
 	const float angleOffset = Radians(5.0f); // Ajuste de ángulo para las direcciones de los proyectiles
+static std::map<int, aimingGuideStruct> playerIdToAimGuides;
 
+void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> aimingGuides, float guideSpeed, float shootAngle, int shootAmount)
+{
 	Player& player = ecs::GetComponent<Player>(entity);
+
+	*playerIdToAimGuides[player.id].totalTime += engine::deltaTime;
+
+	if (input::GetPressed("Shoot" + std::to_string(player.id)))
+	{
+		// When button is pressed, move aim guide forward
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 	
 	float playerAngle = atan2(player._forwardDirection.y, player._forwardDirection.x) - angleOffset*1.5;
 
-
-	for (int i = -1; i < 2; ++i)
-	{
-
-		float angle = playerAngle + (i * angleOffset);
-
-
-		Vector2 modifiedDirection = Vector2(cos(angle), sin(angle));
-
-
-		CreateHedgehog(modifiedDirection, entity, timeHeld);
-	}
-}
-
-
-struct aimingGuide
-{
-	engine::ecs::Entity entity;
-	float* totalTime;
-	engine::ScheduledFunction* timerFunction;
-};
-
-static std::map<int, aimingGuide> playerIdToAimGuides;
-
-void AimHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuides)
-{
-	Player& player = ecs::GetComponent<Player>(entity);
-
-	if (input::GetPressed("Shoot" + std::to_string(player.id)))
-	{
-		// When button is pressed, move aim guides forward
-		float speed = 0.5;
-
-		Transform& aimingTransform = ecs::GetComponent<Transform>(aimingGuides);
+		Player& player = ecs::GetComponent<Player>(entity);
 		Transform& playerTransform = ecs::GetComponent<Transform>(entity);
 
-		//float playerAngle = atan2(player._forwardDirection.y, player._forwardDirection.x);
-		aimingTransform.position += (player._forwardDirection * 0.5 * (*playerIdToAimGuides[player.id].totalTime));
+		const float playerAngle = atan2(player.forwardDirection.y, player.forwardDirection.x);
+
+		// If amount is even, we offset by this amount at the start
+		float evenOffset = 0;
+
+		int positive_i = 0;
+		int negative_i = 1;
+		int extra = 0;
+
+		Vector2 modifiedDirection;
+
+		if (shootAmount % 2)
+		{
+			// Amount is odd: Move guide to the center with 0 angle offset
+			modifiedDirection = Vector2(cos(playerAngle), sin(playerAngle));
+			--shootAmount;
+			++positive_i;
+			extra = 1;
+
+			Transform& guideTransform = ecs::GetComponent<Transform>(aimingGuides[0]);
+			guideTransform.position = playerTransform.position
+				+ (modifiedDirection * _HedgehogMinDistance)
+				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, _HedgehogChargeTime)));
+			guideTransform.scale = 100;
+		}
+		else
+		{
+			// Amount is even: Add half the offset
+			evenOffset = shootAngle / 2;
+		}
+
+		// Guide positive:
+		for (; positive_i < (shootAmount / 2) + extra; ++positive_i)
+		{
+			float angle = playerAngle + evenOffset + (positive_i * shootAngle);
+
+			modifiedDirection = Vector2(cos(angle), sin(angle));
+
+			Transform& guideTransform = ecs::GetComponent<Transform>(aimingGuides[positive_i]);
+			guideTransform.position = playerTransform.position
+			+ (modifiedDirection * _HedgehogMinDistance)
+			+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, _HedgehogChargeTime)));
+			guideTransform.scale = 100;
+		}
+		// Guide negative:
+		for (int negative_i = 1; negative_i < (shootAmount / 2) + 1; ++negative_i)
+		{
+			float angle = playerAngle + evenOffset + (negative_i * -shootAngle);
+
+			modifiedDirection = Vector2(cos(angle), sin(angle));
+
+			Transform& guideTransform = ecs::GetComponent<Transform>(aimingGuides[(negative_i)+(positive_i - 1)]);
+			guideTransform.position = playerTransform.position
+				+ (modifiedDirection * _HedgehogMinDistance)
+				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, _HedgehogChargeTime)));
+			guideTransform.scale = 100;
+		}
 	}
 	else
 	{
 		// When button is released, shoot
-		CreateTridentHedgehogs(entity, *playerIdToAimGuides[player.id].totalTime);
+		Multishot(CreateHedgehog, entity, shootAngle, shootAmount, *playerIdToAimGuides[player.id].totalTime);
+		player.ammo -= aimingGuides.size();
+		player.ammo = std::clamp(player.ammo, 0, player.maxAmmo);
 
-		playerIdToAimGuides[player.id].entity = 0;
+		playerIdToAimGuides[player.id].entities.clear();
 
 		delete playerIdToAimGuides[player.id].totalTime;
 		playerIdToAimGuides[player.id].totalTime = nullptr;
@@ -234,34 +299,40 @@ void AimHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuides)
 
 		playerIdToAimGuides.erase(player.id);
 
-		engine::ecs::DestroyEntity(aimingGuides);
+		for (auto& destroyGuide : aimingGuides)
+		{
+			engine::ecs::DestroyEntity(destroyGuide);
+		}
 	}
 }
 
-void CreateAimingGuides(engine::ecs::Entity entity)
+void CreateAimingGuides(engine::ecs::Entity entity, float guideSpeed, float shootAngle, int shootAmount)
 {
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 
 	Player& player = ecs::GetComponent<Player>(entity);
 
-
 	// Create aiming guides
-	engine::ecs::Entity aimingGuides = engine::ecs::NewEntity();
+	std::vector<engine::ecs::Entity> aimingGuides;
+	for (int i = 0; i < shootAmount; ++i)
+	{
+		engine::ecs::Entity newGuide = engine::ecs::NewEntity();
 
+		engine::ecs::AddComponent(newGuide, engine::Transform{ .position = transform.position, .rotation = transform.rotation, .scale = transform.scale });
+		engine::ecs::AddComponent(newGuide, engine::ModelRenderer{ .model = resources::models["Weapon_HedgehogAmmo.obj"] });
 
-	engine::ecs::AddComponent(aimingGuides, engine::Transform{ .position = transform.position, .rotation = transform.rotation, .scale = transform.scale });
-	engine::ecs::AddComponent(aimingGuides, engine::ModelRenderer{ .model = resources::models["Weapon_HedgehogAmmo.obj"] });
-
+		aimingGuides.push_back(newGuide);
+	}
 
 	// Deleted when AimHedgehog finishes
+	float* time = new float(0);
 	playerIdToAimGuides[player.id] = 
 	{ 
-		aimingGuides, new float,  
+		aimingGuides, time,
 		// Start 1-frame looping timer to check button press
-		engine::timerSystem->ScheduleFunction(&AimHedgehog, 1, true, ScheduledFunction::Type::frames, entity, aimingGuides) 
+		engine::timerSystem->ScheduleFunction(&AimHedgehog, 1, true, ScheduledFunction::Type::frames, entity, aimingGuides, guideSpeed, shootAngle, shootAmount)
 	};
 }
-
 
 void ShootHedgehog(engine::ecs::Entity entity)
 {
@@ -270,22 +341,19 @@ void ShootHedgehog(engine::ecs::Entity entity)
 	// Whether this player id has shot once before
 	if (playerIdToAimGuides.find(player.id) != playerIdToAimGuides.end())
 	{
-		// Whether this player has aim guides
-		if (!playerIdToAimGuides[player.id].entity == 0)
+		if (!playerIdToAimGuides[player.id].entities.empty())
 		{
-			CreateAimingGuides(entity);
+			// Do not add aiming guides if this player already has them
+			return;
 		}
-
-		// Increment total time
-		*playerIdToAimGuides[player.id].totalTime += engine::deltaTime;
 	}
-	else
-	{
-		CreateAimingGuides(entity);
 
-		// Increment total time
-		*playerIdToAimGuides[player.id].totalTime += engine::deltaTime;
-	}
+	float guideSpeed = 500;
+	float shootAngle = Radians(10.0f);
+	float shootAmount = player.ammo;
+	player.ammo++; // We don't use up ammo until we shoot
+
+	CreateAimingGuides(entity, 500, Radians(10.0f), shootAmount);
 }
 
 /* BOOST */
@@ -403,7 +471,7 @@ public:
 			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 0.8, .mainAction = CreateShell, .specialAction = Boost } });
 		shipComponents.insert({ ShipType::hedgehogBoat,
 	
-			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 0.8, .mainAction = ShootHedgehog, .specialAction = Boost } });
+			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.4, .specialCooldown = 0.8, .ammoRechargeCooldown = 0.8, .maxAmmo = 8, .mainAction = ShootHedgehog, .specialAction = Boost } });
 
 		//Initialize ship type models
 		shipModels.insert({ ShipType::torpedoBoat, resources::models["Ship_PT_109_Torpedo.obj"] });
@@ -478,6 +546,12 @@ public:
 		{
 			Projectile& projectile = engine::ecs::GetComponent<Projectile>(collision.b); // projectile is collision.b 
 
+			if (player.submerged && !projectile.canHitSubmerged)
+			{
+				// Submerged hit: Ignore
+				return;
+			}
+
 			if (player.id != projectile.ownerID)
 			{
 				for (auto& hitProjectile : player.hitProjectiles)
@@ -500,10 +574,10 @@ public:
 
 				CreateAnimation(collision.b);
 
-				engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(collision.a);
-				soundComponent.Sounds["Dink"]->play();
+				//engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(collision.a);
+				//soundComponent.Sounds["Dink"]->play();
 
-				//Destroy torpedo at end of frame
+				//Destroy projectile at end of frame
 				engine::ecs::DestroyEntity(collision.b);
 			}
 		}
@@ -576,8 +650,8 @@ public:
 
 			// CALCULATE POSITION AND ROTATION
 			// Calculate the forward direction
-			Vector2 forwardDirection = Vector2(cos(glm::radians(modelTransform.rotation.y)), sin(glm::radians(modelTransform.rotation.y)));
-			forwardDirection.Normalize();
+			player.forwardDirection = Vector2(cos(glm::radians(modelTransform.rotation.y)), sin(glm::radians(modelTransform.rotation.y)));
+			player.forwardDirection.Normalize();
 
 			// Initialize the impulse as zero
 			Vector2 forwardImpulse(0.0f, 0.0f);
@@ -585,12 +659,12 @@ public:
 			// Apply acceleration impulse if positive input is received
 			if (accelerationInput > 0.0f)
 			{
-				forwardImpulse = forwardDirection * accelerationInput * player.forwardSpeed;
+				forwardImpulse = player.forwardDirection * accelerationInput * player.forwardSpeed;
 			}
 			// Apply deceleration impulse if negative input is received
 			if (accelerationInput < 0.0f)
 			{
-				forwardImpulse = forwardDirection * accelerationInput * player.reverseSpeed;
+				forwardImpulse = player.forwardDirection * accelerationInput * player.reverseSpeed;
 			}
 			if (rotateInput != 0.0f)
 			{
@@ -605,7 +679,7 @@ public:
 
 				// Set min speed while turning
 
-				Vector2 minRotateImpulse = forwardDirection * std::abs(trueRotateInput) * player.minSpeedWhileTurning * engine::deltaTime;
+				Vector2 minRotateImpulse = player.forwardDirection * std::abs(trueRotateInput) * player.minSpeedWhileTurning * engine::deltaTime;
 
 				if (minRotateImpulse.Length() > forwardImpulse.Length())
 				{
@@ -704,7 +778,6 @@ public:
 				}
 
 				// Create a projectile using the parameters of the player object.
-				player._forwardDirection = forwardDirection;
 				player.mainAction(entity);
 
 				player.ammo--;
