@@ -345,6 +345,7 @@ void ShootHedgehog(engine::ecs::Entity entity)
 	float guideSpeed = 500;
 	float shootAngle = Radians(10.0f);
 	float shootAmount = player.ammo;
+	player.ammo++; // We don't use up ammo until we shoot
 
 	CreateAimingGuides(entity, 500, Radians(10.0f), shootAmount);
 }
@@ -539,6 +540,12 @@ public:
 		{
 			Projectile& projectile = engine::ecs::GetComponent<Projectile>(collision.b); // projectile is collision.b 
 
+			if (player.submerged && !projectile.canHitSubmerged)
+			{
+				// Submerged hit: Ignore
+				return;
+			}
+
 			if (player.id != projectile.ownerID)
 			{
 				for (auto& hitProjectile : player.hitProjectiles)
@@ -564,7 +571,7 @@ public:
 				//engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(collision.a);
 				//soundComponent.Sounds["Dink"]->play();
 
-				//Destroy torpedo at end of frame
+				//Destroy projectile at end of frame
 				engine::ecs::DestroyEntity(collision.b);
 			}
 		}
