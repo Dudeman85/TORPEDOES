@@ -70,7 +70,7 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 	engine::ecs::DestroyEntity(hedgehog.aimingGuide);
 
 	engine::ecs::Entity hedgehogExplosion = engine::ecs::NewEntity();
-	engine::ecs::AddComponent(hedgehogExplosion, engine::Transform{ .position = transform.position + Vector3(0, 0, 100 +(double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20) });
+	engine::ecs::AddComponent(hedgehogExplosion, engine::Transform{ .position = transform.position + Vector3(0, 0, 100 +(double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(40) });
 	engine::ecs::AddComponent(hedgehogExplosion, engine::SpriteRenderer{ });
 	engine::ecs::AddComponent(hedgehogExplosion, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
 	std::vector<Vector2> explosionverts{ Vector2(0.5, 0.55), Vector2(0.5, -0.55), Vector2(-0.5, -0.55), Vector2(-0.5, 0.55) };

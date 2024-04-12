@@ -75,4 +75,5 @@ static void UpdateCam(engine::Camera* cam, Tilemap* map)
 	//Apply camera position and scale
 	cam->SetPosition(position);
 	cam->SetDimensions(std::floor(camHeight * aspectRatio), camHeight);
+	engine::modelRenderSystem->SetLight(cam->position, Vector3(255));
 }
