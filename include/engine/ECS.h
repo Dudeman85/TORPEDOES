@@ -44,7 +44,7 @@ namespace engine::ecs
 
 	//ENTITY MANAGEMENT DATA
 
-	//Custom container class for storing a system's entities, not suitable for anythin else
+	//Custom container class for storing a system's entities, not suitable for anything else
 	class EntityList
 	{
 	private:

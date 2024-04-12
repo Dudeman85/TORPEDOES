@@ -71,9 +71,11 @@ Systems are esentially collections of functions that operate upon data in compon
 Every system must be a class that inherits from the System class. This class contains the list of all entities, called entities, the system can operate on.
 
 Systems should have an Update and an Init function, although these are not strictly required. The update function should have a loop which iterates through each entity in the entities set. The loop should be done exactly like below. Avoid using constructors and instead do setup in an Init function.
+
+Every system must also be registered with the ECS_REGISTER_SYSTEM macro before it can be used. This macro takes the system class type and every required component as parameters. **Note: Any components which are used by the system should be set as required!**
 ```cpp
 //Example Gravity System
-//Requires Position component
+//Requires GravitySystem system
 ECS_REGISTER_SYSTEM(GravitySystem, Position)
 class GravitySystem : public ecs::System
 {
@@ -116,7 +118,7 @@ TranformSystem::SetPosition(entity, Vector3(100, 100, 100));
 engine::tranformSystem->SetPosition(entity, Vector3(100, 100, 100));
 ```
 
-All you need to do now is get a reference to the system and call Update in your game loop:
+All you need to do now is get a reference to the system and call Update and Init in your game loop:
 
 ```cpp
 //Get the gravity system
@@ -136,7 +138,7 @@ while(true)
 
 ## Other Features
 
-There is a tagging system where you can add string tags to specific entities. The only predefined tag is "persistent", which prevents the entity from being deleted by DestroyAllEntities.
+There is a tagging system where you can add string tags to specific entities. The only tag with predefined functionality is "persistent", which prevents the entity from being deleted by DestroyAllEntities.
 ```cpp
 //Set the tags of an entity, overrites any previous tags
 ecs::SetTags(entity, { "a", "b" });
