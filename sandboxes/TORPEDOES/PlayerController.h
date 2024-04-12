@@ -281,6 +281,8 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 	{
 		// When button is released, shoot
 		Multishot(CreateHedgehog, entity, shootAngle, shootAmount, *playerIdToAimGuides[player.id].totalTime);
+		player.ammo -= aimingGuides.size();
+		player.ammo = std::clamp(player.ammo, 0, player.maxAmmo);
 
 		playerIdToAimGuides[player.id].entities.clear();
 
@@ -342,7 +344,7 @@ void ShootHedgehog(engine::ecs::Entity entity)
 
 	float guideSpeed = 500;
 	float shootAngle = Radians(10.0f);
-	float shootAmount = 3;
+	float shootAmount = player.ammo;
 
 	CreateAimingGuides(entity, 500, Radians(10.0f), shootAmount);
 }
@@ -462,7 +464,7 @@ public:
 			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 0.8, .mainAction = CreateShell, .specialAction = Boost } });
 		shipComponents.insert({ ShipType::hedgehogBoat,
 	
-			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 0.8, .mainAction = ShootHedgehog, .specialAction = Boost } });
+			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.4, .specialCooldown = 0.8, .ammoRechargeCooldown = 0.8, .maxAmmo = 8, .mainAction = ShootHedgehog, .specialAction = Boost } });
 
 		//Initialize ship type models
 		shipModels.insert({ ShipType::torpedoBoat, resources::models["Ship_PT_109_Torpedo.obj"] });
