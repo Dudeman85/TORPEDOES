@@ -35,6 +35,8 @@ struct  Hedgehog : public Projectile
 {
 	float distanceTraveled = 0;	// Distance travelled
 	float targetDistance = 0;	// Distance until explosion
+
+	engine::ecs::Entity aimingGuide;
 };
 
 //Temporary function for testing
@@ -63,6 +65,9 @@ static void CreateAnimation(engine::ecs::Entity entity)
 void CreateHedgehogExplosion(engine::ecs::Entity entity)
 {
 	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(entity);
+	Hedgehog& hedgehog = engine::ecs::GetComponent<Hedgehog>(entity);
+
+	engine::ecs::DestroyEntity(hedgehog.aimingGuide);
 
 	engine::ecs::Entity hedgehogExplosion = engine::ecs::NewEntity();
 	engine::ecs::AddComponent(hedgehogExplosion, engine::Transform{ .position = transform.position + Vector3(0, 0, 100 +(double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20) });
@@ -70,7 +75,7 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 	engine::ecs::AddComponent(hedgehogExplosion, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
 	std::vector<Vector2> explosionverts{ Vector2(0.5, 0.55), Vector2(0.5, -0.55), Vector2(-0.5, -0.55), Vector2(-0.5, 0.55) };
 	engine::ecs::AddComponent(hedgehogExplosion, engine::PolygonCollider{ .vertices = explosionverts, .trigger = true, .visualise = true });
-	engine::ecs::AddComponent(hedgehogExplosion, Projectile{ .ownerID = -1, .hitType = HitStates::Stop, .hitSpeedFactor = 0.5, .hitTime = 1, .canHitSubmerged = true, .hitAnimation = "" });
+	engine::ecs::AddComponent(hedgehogExplosion, Projectile{ .ownerID = -1, .hitType = HitStates::Stop, .hitSpeedFactor = 0.5, .hitTime = 3, .canHitSubmerged = true, .hitAnimation = "" });
 
 	engine::AnimationSystem::AddAnimation(hedgehogExplosion, resources::explosionAnimation, "explosion");
 	engine::AnimationSystem::PlayAnimation(hedgehogExplosion, "explosion", false);

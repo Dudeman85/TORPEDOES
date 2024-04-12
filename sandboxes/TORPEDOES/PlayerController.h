@@ -117,9 +117,9 @@ void CreateShell(engine::ecs::Entity entity)
 
 /* MULTISHOT */
 
-using ShootFunc = std::function<void(engine::ecs::Entity, Vector2, float)>;
+using ShootFunc = std::function<void(engine::ecs::Entity, engine::ecs::Entity, Vector2, float)>;
 
-void Multishot(ShootFunc callfunc, engine::ecs::Entity entity, float angleOffset, int amount, float timeHeld)
+void Multishot(ShootFunc callfunc, engine::ecs::Entity entity, std::vector<engine::ecs::Entity> entities, float angleOffset, int amount, float timeHeld)
 {
 	using namespace engine;
 
@@ -144,7 +144,7 @@ void Multishot(ShootFunc callfunc, engine::ecs::Entity entity, float angleOffset
 		++positive_i;
 		extra = 1;
 
-		callfunc(entity, modifiedDirection, timeHeld);
+		callfunc(entity, entities[0], modifiedDirection, timeHeld);
 	}
 	else
 	{
@@ -159,7 +159,7 @@ void Multishot(ShootFunc callfunc, engine::ecs::Entity entity, float angleOffset
 
 		modifiedDirection = Vector2(cos(angle), sin(angle));
 
-		callfunc(entity, modifiedDirection, timeHeld);
+		callfunc(entity, entities[positive_i], modifiedDirection, timeHeld);
 	}
 
 	// Shoot negative:
@@ -169,13 +169,13 @@ void Multishot(ShootFunc callfunc, engine::ecs::Entity entity, float angleOffset
 
 		modifiedDirection = Vector2(cos(angle), sin(angle));
 
-		callfunc(entity, modifiedDirection, timeHeld);
+		callfunc(entity, entities[positive_i + negative_i - 1], modifiedDirection, timeHeld);
 	}
 }
 
 /* HEDGEHOG */
 
-void CreateHedgehog(engine::ecs::Entity entity, Vector2 direction, float timeHeld)
+void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide, Vector2 direction, float timeHeld)
 {
 	using namespace engine;
 	Player& player = ecs::GetComponent<Player>(entity);
@@ -194,7 +194,7 @@ void CreateHedgehog(engine::ecs::Entity entity, Vector2 direction, float timeHel
 	engine::ecs::AddComponent(hedgehog, ModelRenderer{ .model = resources::models["hedgehog.obj"] });
 	std::vector<Vector2> Hedgehogverts{ Vector2(0.2, 0.25), Vector2(0.2, -0.25), Vector2(-0.2, -0.25), Vector2(-0.2, 0.25) };
 	ecs::AddComponent(hedgehog, Projectile{ .ownerID = player.id });
-	ecs::AddComponent(hedgehog, Hedgehog{ .targetDistance = std::clamp(input::map_value(timeHeld, 0, _HedgehogChargeTime, _HedgehogMinDistance, _HedgehogMaxDistance), _HedgehogMinDistance, _HedgehogMaxDistance) });
+	ecs::AddComponent(hedgehog, Hedgehog{ .targetDistance = std::clamp(input::map_value(timeHeld, 0, _HedgehogChargeTime, _HedgehogMinDistance, _HedgehogMaxDistance), _HedgehogMinDistance, _HedgehogMaxDistance), .aimingGuide = aimingGuide });
 }
 
 struct aimingGuideStruct
@@ -280,7 +280,7 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 	else
 	{
 		// When button is released, shoot
-		Multishot(CreateHedgehog, entity, shootAngle, shootAmount, *playerIdToAimGuides[player.id].totalTime);
+		Multishot(CreateHedgehog, entity, aimingGuides, shootAngle, shootAmount, *playerIdToAimGuides[player.id].totalTime);
 		player.ammo -= aimingGuides.size();
 		player.ammo = std::clamp(player.ammo, 0, player.maxAmmo);
 
@@ -293,10 +293,11 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 
 		playerIdToAimGuides.erase(player.id);
 
+		/*
 		for (auto& destroyGuide : aimingGuides)
 		{
 			engine::ecs::DestroyEntity(destroyGuide);
-		}
+		}*/
 	}
 }
 
@@ -599,10 +600,10 @@ public:
 
 			// Initialize inputs
 			float accelerationInput = input::GetTotalInputValue("Throttle" + std::to_string(player.id));
-
 			float rotateInput = input::GetTotalInputValue("Turn" + std::to_string(player.id));
 
 			bool newShotInput = input::GetNewPress("Shoot" + std::to_string(player.id));
+			bool newSpecialInput = input::GetPressed("Boost" + std::to_string(player.id));
 
 			accelerationInput = std::clamp(accelerationInput, -1.0f, 1.0f);
 			rotateInput = std::clamp(rotateInput, -1.0f, 1.0f);
@@ -629,10 +630,13 @@ public:
 				{
 				case HitStates::Stop:
 					// Rotate player
-					engine::TransformSystem::Rotate(player.renderedEntity, 0, 360.0f * engine::deltaTime, 0);
+					engine::TransformSystem::Rotate(player.renderedEntity, 0, (360.0f / hitProjectile.first.hitTime) * engine::deltaTime, 0);
+
+					// Ignore all input
 					accelerationInput = 0;
 					rotateInput = 0;
 					newShotInput = false;
+					newSpecialInput = false;
 					break;
 				case HitStates::Additive:
 					player._speedScale += std::max(hitProjectile.first.hitSpeedFactor, 0.f);
@@ -694,7 +698,7 @@ public:
 			// If the special cooldown has passed
 			while (player._specialTimer >= player.specialCooldown)
 			{
-				if (!input::GetPressed("Boost" + std::to_string(player.id)))
+				if (!newSpecialInput)
 				{
 					// We haven't pressed the special button, keep _specialTimer at max value
 					player._specialTimer = player.specialCooldown;
