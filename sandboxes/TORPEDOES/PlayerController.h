@@ -143,7 +143,6 @@ void Multishot(ShootFunc callfunc, engine::ecs::Entity entity, std::vector<engin
 		--amount;
 		++positive_i;
 		extra = 1;
-	    //Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * ecs::GetSystem<HedgehogSystem>()->hedgehogSpeedVo;
 
 		callfunc(entity, entities[0], modifiedDirection, timeHeld);
 	}
@@ -183,12 +182,11 @@ void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide,
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-	float hedgehogSpeed = 500.0f;
 
 	engine::ecs::Entity hedgehog = engine::ecs::NewEntity();
 	engine::ecs::AddComponent(hedgehog, Transform{ .position = transform.position, .rotation = modelTransform.rotation });
 
-	Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * hedgehogSpeed;
+	Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * ecs::GetSystem<HedgehogSystem>()->hedgehogSpeedVo;
 
 	engine::ecs::AddComponent(hedgehog, engine::Rigidbody{ .velocity = finalVelocity });
 
@@ -347,12 +345,12 @@ void ShootHedgehog(engine::ecs::Entity entity)
 		}
 	}
 
-	float guideSpeed = 500;
-	float shootAngle = Radians(10.0f);
+	float guideSpeed = 500; // tältä voi muokkata indikatori nopeus 
+	float shootAngle = Radians(5.0f);
 	float shootAmount = player.ammo;
 	player.ammo++; // We don't use up ammo until we shoot
 
-	CreateAimingGuides(entity, 500, Radians(10.0f), shootAmount);
+	CreateAimingGuides(entity, 500, Radians(5.0f), 4);
 }
 
 /* BOOST */

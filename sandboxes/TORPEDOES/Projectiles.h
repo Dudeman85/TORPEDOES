@@ -95,7 +95,7 @@ static void OnProjectileCollision(engine::Collision collision)
 }
 
 static const float _HedgehogMaxDistance = 700.0f;	// Full charge distance
-static const float _HedgehogMinDistance = 200.0f;	// No charge distance
+static const float _HedgehogMinDistance = 100.0f;	// No charge distance   ( can guied go close if charge to value)
 static const float _HedgehogChargeTime = 1.0f;		// Time until full charge
 
 ECS_REGISTER_SYSTEM(HedgehogSystem, engine::Rigidbody, engine::Transform, Hedgehog)
@@ -130,7 +130,7 @@ public:
 				float distanceRatio = hedgehogComp.distanceTraveled / hedgehogComp.targetDistance;
 
 				// TODO: Calculate based on distance travelled
-				engine::TransformSystem::Rotate(entity, Vector3(0, 0, -130.5f * engine::deltaTime));
+				engine::TransformSystem::Rotate(entity, Vector3(0, 0, -105.5f * engine::deltaTime));
 
 				// Map scale to distance ratio
 				float scale = maxScale - (maxScale - minScale) * (2 * abs(0.5 - distanceRatio));
