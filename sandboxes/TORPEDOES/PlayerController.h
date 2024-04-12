@@ -22,7 +22,7 @@ struct Player
 	float forwardSpeed = 400;
 	float reverseSpeed = 133;
 
-	float rotationSpeed = 100;
+	float rotationSpeed = 120;
 	float minSpeedWhileTurning = 60;
 
 	float offtrackSpeedScale = 0.6;
@@ -108,7 +108,7 @@ void CreateShell(engine::ecs::Entity entity)
 
 	Projectile& shellProjectile = ecs::GetComponent<Projectile>(shell);
 
-	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(10) });
+	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(20) });
 	ecs::AddComponent(shell, Rigidbody{ .velocity = player.forwardDirection * shellProjectile.speed });
 	ecs::AddComponent(shell, ModelRenderer{ .model = resources::models[shellProjectile.model = "Weapon_HedgehogAmmo.obj"] });
 	std::vector<Vector2> Shellverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
@@ -193,7 +193,7 @@ void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide,
 	engine::ecs::AddComponent(hedgehog, engine::Rigidbody{ .velocity = finalVelocity });
 
 	engine::ecs::AddComponent(hedgehog, ModelRenderer{ .model = resources::models["hedgehog.obj"] });
-	std::vector<Vector2> Hedgehogverts{ Vector2(0.2, 0.25), Vector2(0.2, -0.25), Vector2(-0.2, -0.25), Vector2(-0.2, 0.25) };
+	std::vector<Vector2> Hedgehogverts{ Vector2(0.4, 0.5), Vector2(0.4, -0.5), Vector2(-0.4, -0.5), Vector2(-0.4, 0.5) };
 	ecs::AddComponent(hedgehog, Projectile{ .ownerID = player.id });
 	ecs::AddComponent(hedgehog, Hedgehog{ .targetDistance = std::clamp(input::map_value(timeHeld, 0, _HedgehogChargeTime, _HedgehogMinDistance, _HedgehogMaxDistance), _HedgehogMinDistance, _HedgehogMaxDistance), .aimingGuide = aimingGuide });
 }
@@ -443,7 +443,7 @@ class PlayerController : public engine::ecs::System
 {
 	static engine::ecs::Entity winScreen;
 	static bool hasWon;
-	static int lapCount; // How many laps to race through
+	
 
 	//A map from a ship type to a pre-initialized Player component with the proper stats
 	std::unordered_map<ShipType, Player> shipComponents;
@@ -452,7 +452,7 @@ class PlayerController : public engine::ecs::System
 
 public:
 	float countdownTimer = 0;
-
+	static int lapCount; // How many laps to race through
 	void Init()
 	{
 		//Create the entity to be shown at a win
@@ -634,7 +634,7 @@ public:
 				{
 				case HitStates::Stop:
 					// Rotate player
-					engine::TransformSystem::Rotate(player.renderedEntity, 0, (360.0f / hitProjectile.first.hitTime) * engine::deltaTime, 0);
+					engine::TransformSystem::Rotate(player.renderedEntity, 0, (720.0f / hitProjectile.first.hitTime) * engine::deltaTime, 0);
 
 					// Ignore all input
 					accelerationInput = 0;

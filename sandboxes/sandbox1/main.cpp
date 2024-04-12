@@ -17,7 +17,7 @@ void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine:
 	engine::ecs::AddComponent(checkpoint, engine::ModelRenderer{.model = checkPointModel });
 	engine::ecs::AddComponent(checkpoint, CheckPoint{ .checkPointID = checkPointNumber , .Finish_line = finish_line });
 	std::vector<Vector2> CheckpointcolliderVerts{ Vector2(4, 8), Vector2(4, -8), Vector2(-4, -8), Vector2(-4, 8) };
-	engine::ecs::AddComponent(checkpoint, engine::PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = true, .rotationOverride = hitboxrotation }));
+	engine::ecs::AddComponent(checkpoint, engine::PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = false, .rotationOverride = hitboxrotation }));
 
 	checkPointNumber++;
 };
@@ -36,7 +36,7 @@ void CreateCrowd(Vector3 pos, engine::Animation& anim)
 void PlayCountdown()
 {
 	engine::ecs::Entity countdown = engine::ecs::NewEntity();
-	engine::ecs::AddComponent(countdown, engine::Transform{.position = Vector3(1475, -1270, 10), .scale = Vector3(60, 100, 0) });
+	engine::ecs::AddComponent(countdown, engine::Transform{.position = Vector3(2480, -1400, 10), .scale = Vector3(60, 100, 0) });
 	engine::ecs::AddComponent(countdown, engine::SpriteRenderer{});
 	engine::ecs::AddComponent(countdown, engine::Animator{.onAnimationEnd = engine::ecs::DestroyEntity });
 	engine::AnimationSystem::AddAnimation(countdown, resources::countdownAnim, "CountDown");
@@ -57,8 +57,8 @@ void LoadLevel1(engine::Camera* cam)
 	engine::collisionSystem->SetTilemap(resources::level1Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
-	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(1, Vector2(2000.0f, -1650.0f), ships);
+	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::torpedoBoat, ShipType::torpedoBoat, ShipType::torpedoBoat};
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(4, Vector2(2480.0f, -1520.0f), ships);
 
 	//Make all the checkpoints manually
 	CreateCheckpoint(Vector3(3015.000000, -760.000000, 100.000000), Vector3(27.500000, 47.500000, 7.500000), Vector3(19), resources::models["Prop_Buoy.obj"], 37.5f+90.f);
@@ -67,7 +67,7 @@ void LoadLevel1(engine::Camera* cam)
 	CreateCheckpoint(Vector3(885.000000, -780.000000, 100.000000), Vector3(15.000000, 25.000000, 7.500000), Vector3(14.5f), resources::models["Prop_Buoy.obj"], 15.0f + 90.f);
 	CreateCheckpoint(Vector3(1185.000000, -480.000000, 100.000000), Vector3(25.000000, 7.500000, 7.500000), Vector3(14.5f), resources::models["Prop_Buoy.obj"], 15.0f + 90.f);
 	CreateCheckpoint(Vector3(1170.000000, -1250.000000, 100.000000), Vector3(37.500000, 0.000000, 0.000000), Vector3(13), resources::models["Prop_Buoy.obj"], 13.0f+80.f);
-	CreateCheckpoint(Vector3(2555.000000, -1555.000000, 100.000000), Vector3(-17.500000, -87.500000, -90.000000), Vector3(20.5f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true); // 10
+	CreateCheckpoint(Vector3(2555.000000, -1600.000000, 100.000000), Vector3(-17.500000, -87.500000, -90.000000), Vector3(20.5f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true); // 10
 
 	//Make the crowds manually
 	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims);
