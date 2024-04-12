@@ -96,19 +96,11 @@ static const float _HedgehogChargeTime = 1.0f;		// Time until full charge
 ECS_REGISTER_SYSTEM(HedgehogSystem, engine::Rigidbody, engine::Transform, Hedgehog)
 class HedgehogSystem : public engine::ecs::System
 {
-<<<<<<< HEAD
 public:
 	const float hedgehogSpeedVo = 500.0f;
 	const float maxDistance = 700.0f;
 	const float maxScale = 100.0f;
 	const float minScale = 50.0f;
-=======
-	const float hedgehogSpeed = 500.0f;
-	const float maxScale = 200.0f;
-	const float minScale = 100.0f;
-
-	// TODO: these must be calculated
->>>>>>> 7113c2bf635a2f4bb98de53d0164638701922af7
 	const float minRotation = -50.0f;
 	const float maxRotation = +50.0f;
 
@@ -127,7 +119,7 @@ public:
 				// Projectile is still travelling to it's target distance
 
 				// Increment distance travelled
-				hedgehogComp.distanceTraveled += hedgehogSpeed * engine::deltaTime;
+				hedgehogComp.distanceTraveled += hedgehogSpeedVo * engine::deltaTime;
 
 				// Ratio of distance travelled to the target distance
 				float distanceRatio = hedgehogComp.distanceTraveled / hedgehogComp.targetDistance;

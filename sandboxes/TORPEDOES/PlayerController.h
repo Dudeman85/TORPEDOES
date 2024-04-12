@@ -143,7 +143,7 @@ void Multishot(ShootFunc callfunc, engine::ecs::Entity entity, float angleOffset
 		--amount;
 		++positive_i;
 		extra = 1;
-	Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * ecs::GetSystem<HedgehogSystem>()->hedgehogSpeedVo;
+	    //Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * ecs::GetSystem<HedgehogSystem>()->hedgehogSpeedVo;
 
 		callfunc(entity, modifiedDirection, timeHeld);
 	}
@@ -220,7 +220,6 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 	
-	float playerAngle = atan2(player._forwardDirection.y, player._forwardDirection.x) - angleOffset*1.5;
 
 		Player& player = ecs::GetComponent<Player>(entity);
 		Transform& playerTransform = ecs::GetComponent<Transform>(entity);
