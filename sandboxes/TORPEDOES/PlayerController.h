@@ -13,6 +13,18 @@ using namespace engine;
 
 enum ShipType { torpedoBoat, submarine, cannonBoat, hedgehogBoat, pirateShip };
 
+struct indicatorStruct
+{
+	engine::ecs::Entity entity;
+	engine::Texture* texture1;
+	engine::Texture* texture2;
+
+	indicatorStruct(engine::ecs::Entity e, engine::Texture* t1, engine::Texture* t2) : entity(e), texture1(t1), texture2(t2)
+	{
+
+	}
+};
+
 ECS_REGISTER_COMPONENT(Player)
 struct Player
 {
@@ -62,6 +74,9 @@ struct Player
 	std::vector<std::pair<Projectile, float>> hitProjectiles;
 
 	// Rendered child entities
+	std::vector<indicatorStruct> shootIndicators;
+	std::vector<indicatorStruct> specialIndicators;
+
 	engine::ecs::Entity renderedEntity;
 	engine::ecs::Entity nameText;
 	engine::ecs::Entity animationEntity;
@@ -888,55 +903,123 @@ public:
 				}
 			}
 
-			if (player.animationEntity != 0) {
+			// Shoot indicators
+
+			std::cout << player.shootIndicators.size() << " " << player.maxAmmo;
+
+			if (player.shootIndicators.size() >= player.maxAmmo)
+			{
+				for (int i = 0; i < player.maxAmmo; i++)
+				{
+					indicatorStruct& it = player.shootIndicators[i];
+					
+					engine::SpriteRenderer model = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
+					if (player.ammo > i)
+					{
+						model.texture = it.texture1;
+						std::cout << "yes!";
+					}
+					else
+					{
+						model.texture = it.texture2;
+						std::cout << "no!";
+					}
+				}
+				std::cout << "hello!!! \n";
+			}
+
+			if (player.animationEntity != 0) 
+			{
 				TransformSystem::SetRotation(player.animationEntity, {0, 0, modelTransform.rotation.y});
 			}
 		}
 	}
 
 	//Spawn 1-4 players, all in a line from top to bottom
-	void CreatePlayers(std::unordered_map<int, ShipType> players, Vector2 startPos)
+	void CreatePlayers(std::unordered_map<int, ShipType> playerShips, Vector2 startPos)
 	{
 		Vector2 offset(0, 60);
-		for (const auto& p : players)
+		for (const auto& playerShip : playerShips)
 		{
 			//Make all the necessary entities
-			engine::ecs::Entity player = engine::ecs::NewEntity();
+			engine::ecs::Entity playerEntity = engine::ecs::NewEntity();
 			engine::ecs::Entity playerNameText = engine::ecs::NewEntity();
 			engine::ecs::Entity playerRender = engine::ecs::NewEntity();
-			engine::ecs::Entity torpIndicator1 = engine::ecs::NewEntity();
-			engine::ecs::Entity torpIndicator2 = engine::ecs::NewEntity();
 
 			//Create the player entity which contains everything but rendering
 			//Player component is a bit special
-			engine::ecs::AddComponent(player, shipComponents[p.second]);
-			Player& playerComponent = engine::ecs::GetComponent<Player>(player);
-			playerComponent.id = p.first;
+			engine::ecs::AddComponent(playerEntity, shipComponents[playerShip.second]);
+			Player& playerComponent = engine::ecs::GetComponent<Player>(playerEntity);
+			playerComponent.id = playerShip.first;
 			playerComponent.renderedEntity = playerRender;
 			playerComponent.nameText = playerNameText;
 
-			engine::ecs::AddComponent(player, engine::Transform{ .position = Vector3(startPos - offset * p.first, 150), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
-			engine::ecs::AddComponent(player, engine::Rigidbody{ .drag = 1.5 });
+			engine::ecs::AddComponent(playerEntity, engine::Transform{ .position = Vector3(startPos - offset * playerShip.first, 150), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
+			engine::ecs::AddComponent(playerEntity, engine::Rigidbody{ .drag = 1.5 });
 			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
-			engine::ecs::AddComponent(player, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = true });
+			engine::ecs::AddComponent(playerEntity, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = true });
 
 			//Create the player's name tag
-			engine::ecs::AddComponent(playerNameText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "P" + to_string(p.first + 1), .color = Vector3(0.5, 0.8, 0.2) });
+			engine::ecs::AddComponent(playerNameText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "P" + to_string(playerShip.first + 1), .color = Vector3(0.5, 0.8, 0.2) });
 			engine::ecs::AddComponent(playerNameText, engine::Transform{ .position = Vector3(-2, 2, 20), .scale = Vector3(0.1) });
-			engine::TransformSystem::AddParent(playerNameText, player);
+			engine::TransformSystem::AddParent(playerNameText, playerEntity);
 
 			//Create the player's rendered entity
 			engine::ecs::AddComponent(playerRender, engine::Transform{ .rotation = Vector3(45, 0, 0), .scale = Vector3(1.5) });
-			engine::ecs::AddComponent(playerRender, engine::ModelRenderer{ .model = shipModels[p.second] });
-			engine::TransformSystem::AddParent(playerRender, player);
+			engine::ecs::AddComponent(playerRender, engine::ModelRenderer{ .model = shipModels[playerShip.second] });
+			engine::TransformSystem::AddParent(playerRender, playerEntity);
 
-			//Create the players's torpedo indicators
-			engine::ecs::AddComponent(torpIndicator1, engine::SpriteRenderer{ .texture = resources::uiTextures["UI_Green_Torpedo_Icon.png"] });
-			engine::ecs::AddComponent(torpIndicator1, engine::Transform{ .position = Vector3(-2, -2, 10), .scale = Vector3(2, .5, 1) });
-			engine::TransformSystem::AddParent(torpIndicator1, player);
+			Player player = engine::ecs::GetComponent<Player>(playerEntity);
+
+			//Create the players's shoot indicators
+			float totalWidth = 0;
+			float indicatorDistance = 0;
+
+			switch (playerShip.second)
+			{ 
+				case ShipType::torpedoBoat:
+				case ShipType::submarine:
+					totalWidth = -2;
+					indicatorDistance = 2;
+
+					for (int i = 0; i < player.maxAmmo; i++)
+					{
+						engine::ecs::Entity shootIndicator = engine::ecs::NewEntity();
+
+						engine::ecs::AddComponent(shootIndicator, engine::SpriteRenderer{ .texture = resources::uiTextures["UI_Green_Torpedo_Icon.png"] });
+						engine::ecs::AddComponent(shootIndicator, engine::Transform{ .position = Vector3( totalWidth + (i * indicatorDistance), -2, 10), .scale = Vector3(2, .5, 1) });
+						engine::TransformSystem::AddParent(shootIndicator, playerEntity);
+
+						player.shootIndicators.push_back(indicatorStruct(shootIndicator, resources::uiTextures["UI_Green_Torpedo_Icon.png"], resources::uiTextures["UI_Red_Torpedo_Icon.png"]));
+					}
+					break;
+				case ShipType::hedgehogBoat:
+					break;
+				case ShipType::cannonBoat:
+				case ShipType::pirateShip:
+						break;
+				default:
+					break;
+			}
+			//Create the players's special indicators
+			switch (playerShip.second)
+			{
+				case ShipType::torpedoBoat:
+				case ShipType::submarine:
+					break;
+				case ShipType::hedgehogBoat:
+					break;
+				case ShipType::cannonBoat:
+				case ShipType::pirateShip:
+					break;
+				default:
+					break;
+			}
+
+			/*
 			engine::ecs::AddComponent(torpIndicator2, engine::SpriteRenderer{ .texture = resources::uiTextures["UI_Green_Torpedo_Icon.png"] });
 			engine::ecs::AddComponent(torpIndicator2, engine::Transform{ .position = Vector3(2, -2, 10), .scale = Vector3(2, .5, 1) });
-			engine::TransformSystem::AddParent(torpIndicator2, player);
+			engine::TransformSystem::AddParent(torpIndicator2, player);*/
 
 			// Works
 			Audio* audio = engine::AddAudio("Gameplay", "audio/dink.wav", false, 100000);
