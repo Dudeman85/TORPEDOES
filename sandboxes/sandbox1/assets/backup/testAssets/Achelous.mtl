@@ -1,0 +1,32 @@
+# Blender 3.6.1 MTL File: 'Achelous.blend'
+# www.blender.org
+
+newmtl Autocannon
+Ns 87.293396
+Ka 0.400000 0.400000 0.400000
+Ks 0.427273 0.427273 0.427273
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd Autocannon.png
+
+newmtl Ship
+Ns 250.000000
+Ka 0.612069 0.612069 0.612069
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd AchelousTexture.png
+
+newmtl Windshield
+Ns 857.220581
+Ka 0.163793 0.163793 0.163793
+Kd 0.014698 0.057027 0.080012
+Ks 0.801724 0.801724 0.801724
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3

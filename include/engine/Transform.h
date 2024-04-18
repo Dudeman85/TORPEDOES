@@ -268,6 +268,28 @@ namespace engine
 			return glm::degrees(atan2(bTransform.position.y - aTransform.position.y, bTransform.position.x - aTransform.position.x));
 		}
 
+		//Calculate the global transform of an entity, this is not a reference and does not affect the original transform
+		static Transform GetGlobalTransform(ecs::Entity entity) 
+		{
+			Transform& transform = ecs::GetComponent<Transform>(entity);
+
+			Transform globalTransform = transform;
+			ecs::Entity currentParent = transform.parent;
+			//Iterate through each parent adding their transform
+			while (currentParent != 0)
+			{
+				Transform& parentTransform = ecs::GetComponent<Transform>(currentParent);
+
+				globalTransform.position += parentTransform.position;
+				globalTransform.rotation += parentTransform.rotation;
+				globalTransform.scale += parentTransform.scale;
+
+				currentParent = parentTransform.parent;
+			}
+
+			return globalTransform;
+		}
+
 		static glm::mat4 GetLocalTranformMatrix(ecs::Entity entity)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);

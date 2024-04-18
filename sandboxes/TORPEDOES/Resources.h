@@ -22,6 +22,7 @@ namespace resources
 	Animation crowdAnims;
 	Animation countdownAnim;	
 	Animation divingAnim;	
+	Animation continuousDivingAnim;	
 
 	
 	//Load all the global resources here
@@ -49,6 +50,7 @@ namespace resources
 		crowdAnims = AnimationsFromSpritesheet("/spritesheets/CrowdCheer14.png", 3, 1, vector<int>(3, 150))[0];
 		countdownAnim = AnimationsFromSpritesheet("/spritesheets/UI_Countdown_Ver2.png", 5, 1, vector<int>(5, 1000))[0];
 		divingAnim = AnimationsFromSpritesheet("/spritesheets/Diving_Sheet_Ver2.png", 8, 1, vector<int>(8, 100))[0];
+		continuousDivingAnim = AnimationsFromSpritesheet("/spritesheets/Underwater_Sheet_Ver2.png", 4, 1, vector<int>(4, 50))[0];
 	}
 
 	void UnloadResources()
