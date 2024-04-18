@@ -33,7 +33,7 @@ struct Player
 	bool _offroadThisFrame = false;
 
 	bool submerged = false;
-	bool reloading = true;
+	bool reloading = false;
 	int secondaryAmmo = 0;
 
 	// Action cooldowns
@@ -127,7 +127,7 @@ void ShootShell(engine::ecs::Entity entity)
 {
 	Player& player = ecs::GetComponent<Player>(entity);
 
-	if (!player.reloading)
+	if (player.reloading)
 	{
 		// Reloading
 		if (player.ammo < player.maxAmmo)
@@ -137,14 +137,14 @@ void ShootShell(engine::ecs::Entity entity)
 			return;
 		}
 		// Fully reloaded
-		player.reloading = true;
+		player.reloading = false;
 		player.secondaryAmmo = player.maxAmmo;
 	}
 
 	if (player.secondaryAmmo <= 1)
 	{
 		// Last ammo, start reload
-		player.reloading = false;
+		player.reloading = true;
 	}
 
 	player.secondaryAmmo--;
@@ -525,7 +525,7 @@ public:
 		{ 
 			ShipType::cannonBoat, Player
 			{
-				.forwardSpeed = 400, .rotationSpeed = 75, .canShoot = false,
+				.forwardSpeed = 400, .rotationSpeed = 75, .reloading = true,
 				.shootCooldown = 0.1, .specialCooldown = 0.8, .ammoRechargeCooldown = 0.16,
 				.holdShoot = true, .maxAmmo = 10,
 				.mainAction = ShootShell, .specialAction = Boost 
