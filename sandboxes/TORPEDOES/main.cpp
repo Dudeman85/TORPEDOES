@@ -18,7 +18,7 @@ static void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, 
 	engine::ecs::AddComponent(checkpoint, engine::ModelRenderer{.model = checkPointModel });
 	engine::ecs::AddComponent(checkpoint, CheckPoint{ .checkPointID = checkPointNumber , .Finish_line = finish_line });
 	std::vector<Vector2> CheckpointcolliderVerts{ Vector2(4, 8), Vector2(4, -8), Vector2(-4, -8), Vector2(-4, 8) };
-	engine::ecs::AddComponent(checkpoint, engine::PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = false, .rotationOverride = hitboxrotation }));
+	engine::ecs::AddComponent(checkpoint, engine::PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = true, .rotationOverride = hitboxrotation }));
 
 	checkPointNumber++;
 };
@@ -34,10 +34,10 @@ static void CreateCrowd(Vector3 pos, engine::Animation& anim)
 }
 
 //Play the countdown timer and freeze players untill it is done
-static void PlayCountdown()
+static void PlayCountdown(Vector3 pos)
 {
 	engine::ecs::Entity countdown = engine::ecs::NewEntity();
-	engine::ecs::AddComponent(countdown, engine::Transform{.position = Vector3(2480, -1400, 10), .scale = Vector3(60, 100, 0) });
+	engine::ecs::AddComponent(countdown, engine::Transform{.position = pos, .scale = Vector3(60, 100, 0) });
 	engine::ecs::AddComponent(countdown, engine::SpriteRenderer{});
 	engine::ecs::AddComponent(countdown, engine::Animator{.onAnimationEnd = engine::ecs::DestroyEntity });
 	engine::AnimationSystem::AddAnimation(countdown, resources::countdownAnim, "CountDown");
@@ -76,7 +76,7 @@ static void LoadLevel1(engine::Camera* cam)
 	CreateCrowd({ 1545, -1715, 11 }, resources::crowdAnims);
 	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims);
 
-	PlayCountdown();
+	PlayCountdown(Vector3(2480.0f, -1520.0f, 0.0f));
 	PlayerController::lapCount = 1;
 }
 
@@ -86,7 +86,7 @@ void LoadLevel2(engine::Camera* cam)
 	engine::collisionSystem->cam = cam;
 
 	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1200.0f, -1700.0f));
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1160.0f, -1600.0f));
 
 	// Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level2Map);
@@ -94,15 +94,18 @@ void LoadLevel2(engine::Camera* cam)
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty { true });
 
 	// Make all the checkpoint's manually
-	CreateCheckpoint(Vector3(1455.000000, -995.000000, 100.000000), Vector3(35.000000, -15.000000, -20.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 45.0f);				// First checkpoint
-	CreateCheckpoint(Vector3(2430.000000, -1630.000000, 100.000000), Vector3(7.500000, 92.500000, 90.000000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 45.0f);			// Second checkpoint
-	CreateCheckpoint(Vector3(3595.000000, -1095.000000, 100.000000), Vector3(40.000000, 0.000000, 47.500000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 45.0f);			// Third checkpoint
-	CreateCheckpoint(Vector3(2715.000000, -1145.000000, 100.000000), Vector3(45.000000, 0.000000, 0.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 45.0f);					// Fourth checkpoint
-	CreateCheckpoint(Vector3(2415.000000, -500.000000, 100.000000), Vector3(25.000000, -17.500000, -30.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 45.0f);				// Fifth checkpoint
-	CreateCheckpoint(Vector3(1505.000000, -335.000000, 100.000000), Vector3(52.500000, -32.500000, -5.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 45.0f);					// Sixth checkpoint
-	CreateCheckpoint(Vector3(600.000000, -665.000000, 100.000000), Vector3(40.000000, -25.000000, -17.500000), Vector3(17), resources::models["Prop_Buoy.obj"], 45.0f);					// Seventh checkpoint
-	CreateCheckpoint(Vector3(530.000000, -1675.000000, 100.000000), Vector3(45.000000, 32.500000, 47.500000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 45.0f);			// Eight checkpoint
-	CreateCheckpoint(Vector3(1230.000000, -1700.000000, 100.000000), Vector3(0.000000, -50.000000, -90.000000), Vector3(11), resources::models["Finish_line.obj"], 45.0f, true);		// Finish line
+	CreateCheckpoint(Vector3(1455.000000, -995.000000, 100.000000), Vector3(35.000000, -15.000000, -20.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 65.0f);				// First checkpoint
+	CreateCheckpoint(Vector3(2430.000000, -1630.000000, 100.000000), Vector3(7.500000, 92.500000, 90.000000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 0.0f);			// Second checkpoint
+	CreateCheckpoint(Vector3(3595.000000, -1095.000000, 100.000000), Vector3(40.000000, 0.000000, 47.500000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 130.0f);		// Third checkpoint
+	CreateCheckpoint(Vector3(2715.000000, -1130.000000, 100.000000), Vector3(45.000000, 0.000000, 0.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 90.0f);					// Fourth checkpoint
+	CreateCheckpoint(Vector3(2415.000000, -500.000000, 100.000000), Vector3(25.000000, -17.500000, -30.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 55.0f);				// Fifth checkpoint
+	CreateCheckpoint(Vector3(1505.000000, -335.000000, 100.000000), Vector3(52.500000, -32.500000, -5.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 60.0f);					// Sixth checkpoint
+	CreateCheckpoint(Vector3(600.000000, -665.000000, 100.000000), Vector3(40.000000, -25.000000, -17.500000), Vector3(17), resources::models["Prop_Buoy.obj"], 60.0f);					// Seventh checkpoint
+	CreateCheckpoint(Vector3(530.000000, -1675.000000, 100.000000), Vector3(45.000000, 32.500000, 47.500000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 145.0f);		// Eight checkpoint
+	CreateCheckpoint(Vector3(1230.000000, -1695.000000, 100.000000), Vector3(-52.500000, -87.500000, -90.000000), Vector3(20), resources::models["Prop_Goal_Ver2.obj"], 0.0f, true);			// Finish line
+
+	PlayCountdown(Vector3(1260.0f, -1500.0f, 0.0f));
+	PlayerController::lapCount = 0;
 }
 
 // Create everything for level 3
@@ -243,7 +246,7 @@ int main()
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 100), .scale = 20 });
-	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Buoy_Vertical.obj"] });
+	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Goal_Ver2.obj"] });
 	
 	PlayersMenu(ShipSelectionSystem);
 	bool mapLoaded = false;
