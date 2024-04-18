@@ -61,6 +61,7 @@ struct Player
 	// Rendered child entities
 	engine::ecs::Entity renderedEntity;
 	engine::ecs::Entity nameText;
+	engine::ecs::Entity animationEntity;
 };
 
 ECS_REGISTER_COMPONENT(CheckPoint)
@@ -383,7 +384,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 
 	//Make the diving bubbles animation
 	ecs::Entity divingEntity = ecs::NewEntity();
-	ecs::AddComponent(divingEntity, Transform{ .position = {0, 0, 10}, .scale = {5, 5, 1} });
+	ecs::AddComponent(divingEntity, Transform{ .position = {0, 0, 10}, .scale = {5, 2, 1} });
 	ecs::AddComponent(divingEntity, SpriteRenderer{});
 	ecs::AddComponent(divingEntity, Animator{ .onAnimationEnd = ecs::DestroyEntity });
 	TransformSystem::SetRotation(divingEntity, { 0, 0, modelTransform.rotation.y });
@@ -391,31 +392,28 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 	AnimationSystem::PlayAnimation(divingEntity, "dive");
 	TransformSystem::AddParent(divingEntity, playerEntity);
 
-	//Make the continuous diving animation
-	ecs::Entity continuousDivingEntity = ecs::NewEntity();
-	ecs::AddComponent(continuousDivingEntity, Transform{ .position = {0, 0, 10}, .scale = {5, 5, 1} });
-	ecs::AddComponent(continuousDivingEntity, SpriteRenderer{});
-	ecs::AddComponent(continuousDivingEntity, Animator{ .onAnimationEnd = ecs::DestroyEntity });
-	TransformSystem::SetRotation(continuousDivingEntity, { 0, 0, modelTransform.rotation.y });
-	AnimationSystem::AddAnimation(continuousDivingEntity, resources::divingAnim, "dive");
-	AnimationSystem::PlayAnimation(continuousDivingEntity, "dive");
-	TransformSystem::AddParent(continuousDivingEntity, playerEntity);
-
 	//Submerge if surfaced
 	if (!playerComponent.submerged)
 	{
+		//Make the continuous diving animation
+		playerComponent.animationEntity = ecs::NewEntity();
+		ecs::AddComponent(playerComponent.animationEntity, Transform{ .position = {0, 0, -1}, .scale = {5, 2, 1} });
+		ecs::AddComponent(playerComponent.animationEntity, SpriteRenderer{});
+		ecs::AddComponent(playerComponent.animationEntity, Animator{ });
+		TransformSystem::SetRotation(playerComponent.animationEntity, { 0, 0, modelTransform.rotation.y });
+		AnimationSystem::AddAnimation(playerComponent.animationEntity, resources::continuousDivingAnim, "diving");
+		AnimationSystem::PlayAnimation(playerComponent.animationEntity, "diving", true);
+		TransformSystem::AddParent(playerComponent.animationEntity, playerEntity);
+
 		//Start submerging and slow down
 		playerComponent.forwardSpeed /= 1.5f;
-		PhysicsSystem::Impulse(playerEntity, Vector3(0, 0, -10));
 
-		ecs::GetComponent<Transform>(playerComponent.renderedEntity).position.z -= 1;
 		//Cannot surface for 5 seconds
 
 		//Finished submerging after 1 second
 		TimerSystem::ScheduleFunction(
 			[playerEntity]()
 			{
-				ecs::GetComponent<Rigidbody>(playerEntity).velocity.z = 0;
 				Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
 				playerComponent.submerged = true;
 				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures.push_back(resources::modelTextures["Player_Black.png"]);
@@ -426,17 +424,16 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 	//Surface if submerged
 	else
 	{
+		ecs::DestroyEntity(playerComponent.animationEntity);
+		playerComponent.animationEntity = 0;
+
 		//Start surfacing and speed up
 		playerComponent.forwardSpeed *= 1.5f;
-		PhysicsSystem::Impulse(playerEntity, Vector3(0, 0, 10));
-
-		ecs::GetComponent<Transform>(playerComponent.renderedEntity).position.z += 1;
 
 		//Finished surfacing after 1 second
 		TimerSystem::ScheduleFunction(
 			[playerEntity]()
 			{
-				ecs::GetComponent<Rigidbody>(playerEntity).velocity.z = 0;
 				Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
 				playerComponent.submerged = false;
 				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures.clear();
@@ -819,6 +816,10 @@ public:
 					player._ammoRechargeTimer = 0;
 				}
 			}
+
+			if (player.animationEntity != 0) {
+				TransformSystem::SetRotation(player.animationEntity, {0, 0, modelTransform.rotation.y});
+			}
 		}
 	}
 
@@ -869,8 +870,6 @@ public:
 			// Works
 			Audio* audio = engine::AddAudio("Gameplay", "audio/dink.wav", false, 100000);
 			audio->pause();
-
-
 		}
 	}
 };
