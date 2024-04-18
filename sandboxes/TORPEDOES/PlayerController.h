@@ -203,7 +203,7 @@ struct aimingGuideStruct
 	engine::ScheduledFunction* timerFunction;
 };
 
-const float angleOffset = Radians(5.0f); // Ajuste de ángulo para las direcciones de los proyectiles
+//const float HedgehogAngleOffset = Radians(5.0f); // Ajuste de ángulo para las direcciones de los proyectiles
 static std::map<int, aimingGuideStruct> playerIdToAimGuides;
 
 void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> aimingGuides, float guideSpeed, float shootAngle, int shootAmount)
@@ -345,12 +345,13 @@ void ShootHedgehog(engine::ecs::Entity entity)
 		}
 	}
 
-	float guideSpeed = 500; // tältä voi muokkata indikatori nopeus 
+	float guideSpeed = 500;
 	float shootAngle = Radians(5.0f);
-	float shootAmount = player.ammo;
-	player.ammo++; // We don't use up ammo until we shoot
+	//float shootAmount = player.ammo;
+	float shootAmount = 4;
+	//player.ammo++; // We don't use up ammo until we shoot
 
-	CreateAimingGuides(entity, 500, Radians(5.0f), 4);
+	CreateAimingGuides(entity, 500, shootAngle, shootAmount);
 }
 
 /* BOOST */
@@ -496,7 +497,7 @@ public:
 			ShipType::cannonBoat, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 75, 
-				.shootCooldown = 0.1, .specialCooldown = 0.8, .ammoRechargeCooldown = 0.0,
+				.shootCooldown = 0.3, .specialCooldown = 0.8, .ammoRechargeCooldown = 0.0,
 				.holdShoot = true, .maxAmmo = 1, 
 				.mainAction = CreateShell, .specialAction = Boost 
 			} 
@@ -608,7 +609,6 @@ public:
 				}
 				// Add the new hit
 				player.hitProjectiles.push_back({ projectile, 0.f });
-
 			SkipAddingHit:
 
 				CreateAnimation(collision.b);
@@ -691,15 +691,17 @@ public:
 					newSpecialInput = false;
 					break;
 				case HitStates::Additive:
-					player._speedScale += std::max(hitProjectile.first.hitSpeedFactor, 0.f);
+					player._speedScale = std::max(player._speedScale += hitProjectile.first.hitSpeedFactor, 0.f);
+					std::cout << player._speedScale << ", ";
 					break;
 				case HitStates::Multiplicative:
-					player._speedScale += std::max(player._speedScale *= hitProjectile.first.hitSpeedFactor, 0.f);
+					player._speedScale = std::max(player._speedScale *= hitProjectile.first.hitSpeedFactor, 0.f);
 					break;
 				default:
 					break;
 				}
 			}
+			std::cout << player._speedScale << " \n";
 
 			/* Movement */
 
