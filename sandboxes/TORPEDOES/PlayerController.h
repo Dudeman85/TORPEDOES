@@ -522,7 +522,7 @@ public:
 			{
 				.forwardSpeed = 400, .rotationSpeed = 75, 
 				.shootCooldown = 0.2, .specialCooldown = 0.8, 
-				// .holdShoot = true, .maxAmmo = 8, 
+				.holdShoot = false, .maxAmmo = 2, 
 				.mainAction = CreateTorpedo, .specialAction = Boost 
 			} 
 		});
@@ -532,7 +532,7 @@ public:
 			{
 				.forwardSpeed = 400, .rotationSpeed = 75, 
 				.shootCooldown = 0.2, .specialCooldown = 4, 
-				//.holdShoot = true, .maxAmmo = 8, 
+				.holdShoot = false, .maxAmmo = 2, 
 				.mainAction = CreateTorpedo, .specialAction = ToggleSubmerge 
 			} 
 		});
@@ -905,23 +905,23 @@ public:
 
 			// Shoot indicators
 
-			std::cout << player.shootIndicators.size() << " " << player.maxAmmo;
+			std::cout << player.shootIndicators.size() << " " << player.maxAmmo << "\n";
 
 			if (player.shootIndicators.size() >= player.maxAmmo)
 			{
 				for (int i = 0; i < player.maxAmmo; i++)
 				{
-					indicatorStruct& it = player.shootIndicators[i];
+					indicatorStruct it = player.shootIndicators[i];
 					
-					engine::SpriteRenderer model = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
+					engine::SpriteRenderer& sprite = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
 					if (player.ammo > i)
 					{
-						model.texture = it.texture1;
+						sprite.texture = it.texture1;
 						std::cout << "yes!";
 					}
 					else
 					{
-						model.texture = it.texture2;
+						sprite.texture = it.texture2;
 						std::cout << "no!";
 					}
 				}
@@ -969,7 +969,7 @@ public:
 			engine::ecs::AddComponent(playerRender, engine::ModelRenderer{ .model = shipModels[playerShip.second] });
 			engine::TransformSystem::AddParent(playerRender, playerEntity);
 
-			Player player = engine::ecs::GetComponent<Player>(playerEntity);
+			Player& player = engine::ecs::GetComponent<Player>(playerEntity);
 
 			//Create the players's shoot indicators
 			float totalWidth = 0;
@@ -986,11 +986,13 @@ public:
 					{
 						engine::ecs::Entity shootIndicator = engine::ecs::NewEntity();
 
-						engine::ecs::AddComponent(shootIndicator, engine::SpriteRenderer{ .texture = resources::uiTextures["UI_Green_Torpedo_Icon.png"] });
+						engine::ecs::AddComponent(shootIndicator, engine::SpriteRenderer{  });
 						engine::ecs::AddComponent(shootIndicator, engine::Transform{ .position = Vector3( totalWidth + (i * indicatorDistance), -2, 10), .scale = Vector3(2, .5, 1) });
 						engine::TransformSystem::AddParent(shootIndicator, playerEntity);
 
-						player.shootIndicators.push_back(indicatorStruct(shootIndicator, resources::uiTextures["UI_Green_Torpedo_Icon.png"], resources::uiTextures["UI_Red_Torpedo_Icon.png"]));
+						auto a = indicatorStruct(shootIndicator, resources::uiTextures["UI_Green_Torpedo_Icon.png"], resources::uiTextures["UI_Red_Torpedo_Icon.png"]);
+
+						player.shootIndicators.push_back(a);
 					}
 					break;
 				case ShipType::hedgehogBoat:
