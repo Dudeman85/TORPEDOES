@@ -144,7 +144,7 @@ void ShootShell(engine::ecs::Entity entity)
 	if (player.secondaryAmmo <= 1)
 	{
 		// Last ammo, start reload
-		player.canShoot = false;
+		player.reloading = false;
 	}
 
 	player.secondaryAmmo--;
