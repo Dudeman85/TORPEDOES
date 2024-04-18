@@ -27,7 +27,7 @@ struct Projectile
 	/* Files */
 
 	std::string hitAnimation = "explosion";
-	std::string model = "torpedo.obj";
+	std::string model = "Weapon_Torpedo.obj";
 };
 
 ECS_REGISTER_COMPONENT(Hedgehog)
