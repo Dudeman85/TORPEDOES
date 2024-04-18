@@ -446,7 +446,7 @@ public:
 
 				//Throttle Down 
 				else if (accelerationInput < -0.5f && throttleCurrentWaitedTimeDown > throttleMoveWaitTime)
-				{
+				{	  //TODO:: KORJAA alusken vaihtoa aika jokaiselle
 					throttleCurrentWaitedTimeDown = 0;
 
 					printf("\nShip Selection moveDown\n");
