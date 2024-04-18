@@ -62,6 +62,7 @@ struct Player
 	// Rendered child entities
 	engine::ecs::Entity renderedEntity;
 	engine::ecs::Entity nameText;
+	engine::ecs::Entity animationEntity;
 };
 
 ECS_REGISTER_COMPONENT(CheckPoint)
@@ -79,6 +80,8 @@ void CreateTorpedo(engine::ecs::Entity entity)
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
+	std::cout << modelTransform.rotation.ToString() << "\n";
+
 	float speed = 500;
 
 	ecs::Entity torpedo = ecs::NewEntity();
@@ -89,7 +92,7 @@ void CreateTorpedo(engine::ecs::Entity entity)
 	ecs::AddComponent(torpedo, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(10) });
 	ecs::AddComponent(torpedo, Rigidbody{ .velocity = player.forwardDirection * torpedoProjectile.speed });
 	std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .visualise = false,  .rotationOverride = transform.position.y });
+	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .visualise = true,  .rotationOverride = std::abs(modelTransform.rotation.y) });
 
 	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models[torpedoProjectile.model] });
 }
@@ -112,8 +115,10 @@ void CreateShell(engine::ecs::Entity entity)
 	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(40) });
 	ecs::AddComponent(shell, Rigidbody{ .velocity = player.forwardDirection * shellProjectile.speed });
 	ecs::AddComponent(shell, ModelRenderer{ .model = resources::models[shellProjectile.model = "Weapon_HedgehogAmmo.obj"] });
-	std::vector<Vector2> Shellverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-	ecs::AddComponent(shell, PolygonCollider{ .vertices = Shellverts, .callback = OnProjectileCollision, .trigger = true, .visualise = false,  .rotationOverride = transform.position.y });
+	float shellSize = 0.1;
+
+	std::vector<Vector2> shellverts{ Vector2(shellSize, shellSize), Vector2(shellSize, -shellSize), Vector2(-shellSize, -shellSize), Vector2(-shellSize, shellSize) };
+	ecs::AddComponent(shell, PolygonCollider{ .vertices = shellverts, .callback = OnProjectileCollision, .trigger = true, .visualise = true,  .rotationOverride = std::abs(modelTransform.rotation.y) });
 }
 
 /* MULTISHOT */
@@ -203,7 +208,7 @@ struct aimingGuideStruct
 	engine::ScheduledFunction* timerFunction;
 };
 
-const float angleOffset = Radians(5.0f); // Ajuste de ángulo para las direcciones de los proyectiles
+//const float HedgehogAngleOffset = Radians(5.0f); // Ajuste de ángulo para las direcciones de los proyectiles
 static std::map<int, aimingGuideStruct> playerIdToAimGuides;
 
 void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> aimingGuides, float guideSpeed, float shootAngle, int shootAmount)
@@ -345,12 +350,13 @@ void ShootHedgehog(engine::ecs::Entity entity)
 		}
 	}
 
-	float guideSpeed = 500; // tältä voi muokkata indikatori nopeus 
+	float guideSpeed = 500;
 	float shootAngle = Radians(5.0f);
-	float shootAmount = player.ammo;
-	player.ammo++; // We don't use up ammo until we shoot
+	//float shootAmount = player.ammo;
+	float shootAmount = 4;
+	//player.ammo++; // We don't use up ammo until we shoot
 
-	CreateAimingGuides(entity, 500, Radians(5.0f), 4);
+	CreateAimingGuides(entity, 500, shootAngle, shootAmount);
 }
 
 /* BOOST */
@@ -383,7 +389,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 
 	//Make the diving bubbles animation
 	ecs::Entity divingEntity = ecs::NewEntity();
-	ecs::AddComponent(divingEntity, Transform{ .position = {0, 0, 10}, .scale = {5, 5, 1} });
+	ecs::AddComponent(divingEntity, Transform{ .position = {0, 0, 10}, .scale = {5, 2, 1} });
 	ecs::AddComponent(divingEntity, SpriteRenderer{});
 	ecs::AddComponent(divingEntity, Animator{ .onAnimationEnd = ecs::DestroyEntity });
 	TransformSystem::SetRotation(divingEntity, { 0, 0, modelTransform.rotation.y });
@@ -391,58 +397,50 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 	AnimationSystem::PlayAnimation(divingEntity, "dive");
 	TransformSystem::AddParent(divingEntity, playerEntity);
 
-	//Make the continuous diving animation
-	ecs::Entity continuousDivingEntity = ecs::NewEntity();
-	ecs::AddComponent(continuousDivingEntity, Transform{ .position = {0, 0, 10}, .scale = {5, 5, 1} });
-	ecs::AddComponent(continuousDivingEntity, SpriteRenderer{});
-	ecs::AddComponent(continuousDivingEntity, Animator{ .onAnimationEnd = ecs::DestroyEntity });
-	TransformSystem::SetRotation(continuousDivingEntity, { 0, 0, modelTransform.rotation.y });
-	AnimationSystem::AddAnimation(continuousDivingEntity, resources::divingAnim, "dive");
-	AnimationSystem::PlayAnimation(continuousDivingEntity, "dive");
-	TransformSystem::AddParent(continuousDivingEntity, playerEntity);
-
 	//Submerge if surfaced
 	if (!playerComponent.submerged)
 	{
+		//Make the continuous diving animation
+		playerComponent.animationEntity = ecs::NewEntity();
+		ecs::AddComponent(playerComponent.animationEntity, Transform{ .position = {0, 0, 5}, .scale = {5, 2, 1} });
+		ecs::AddComponent(playerComponent.animationEntity, SpriteRenderer{});
+		ecs::AddComponent(playerComponent.animationEntity, Animator{ });
+		TransformSystem::SetRotation(playerComponent.animationEntity, { 0, 0, modelTransform.rotation.y });
+		AnimationSystem::AddAnimation(playerComponent.animationEntity, resources::continuousDivingAnim, "diving");
+		AnimationSystem::PlayAnimation(playerComponent.animationEntity, "diving", true);
+		TransformSystem::AddParent(playerComponent.animationEntity, playerEntity);
+
 		//Start submerging and slow down
 		playerComponent.forwardSpeed /= 1.5f;
-		PhysicsSystem::Impulse(playerEntity, Vector3(0, 0, -10));
 
-		ecs::GetComponent<Transform>(playerComponent.renderedEntity).position.z -= 1;
 		//Cannot surface for 5 seconds
 
 		//Finished submerging after 1 second
 		TimerSystem::ScheduleFunction(
 			[playerEntity]()
 			{
-				ecs::GetComponent<Rigidbody>(playerEntity).velocity.z = 0;
 				Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
 				playerComponent.submerged = true;
 				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures.push_back(resources::modelTextures["Player_Black.png"]);
 			}, 0.3);
-
-		std::cout << "submerge\n";
 	}
 	//Surface if submerged
 	else
 	{
+		ecs::DestroyEntity(playerComponent.animationEntity);
+		playerComponent.animationEntity = 0;
+
 		//Start surfacing and speed up
 		playerComponent.forwardSpeed *= 1.5f;
-		PhysicsSystem::Impulse(playerEntity, Vector3(0, 0, 10));
-
-		ecs::GetComponent<Transform>(playerComponent.renderedEntity).position.z += 1;
 
 		//Finished surfacing after 1 second
 		TimerSystem::ScheduleFunction(
 			[playerEntity]()
 			{
-				ecs::GetComponent<Rigidbody>(playerEntity).velocity.z = 0;
 				Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
 				playerComponent.submerged = false;
 				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures.clear();
 			}, 0.3);
-
-		std::cout << "surface\n";
 	}
 }
 
@@ -496,7 +494,7 @@ public:
 			ShipType::cannonBoat, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 75, 
-				.shootCooldown = 0.1, .specialCooldown = 0.8, .ammoRechargeCooldown = 0.0,
+				.shootCooldown = 0.3, .specialCooldown = 0.8, .ammoRechargeCooldown = 0.0,
 				.holdShoot = true, .maxAmmo = 1, 
 				.mainAction = CreateShell, .specialAction = Boost 
 			} 
@@ -608,7 +606,6 @@ public:
 				}
 				// Add the new hit
 				player.hitProjectiles.push_back({ projectile, 0.f });
-
 			SkipAddingHit:
 
 				CreateAnimation(collision.b);
@@ -691,10 +688,10 @@ public:
 					newSpecialInput = false;
 					break;
 				case HitStates::Additive:
-					player._speedScale += std::max(hitProjectile.first.hitSpeedFactor, 0.f);
+					player._speedScale = std::max(player._speedScale += hitProjectile.first.hitSpeedFactor, 0.f);
 					break;
 				case HitStates::Multiplicative:
-					player._speedScale += std::max(player._speedScale *= hitProjectile.first.hitSpeedFactor, 0.f);
+					player._speedScale = std::max(player._speedScale *= hitProjectile.first.hitSpeedFactor, 0.f);
 					break;
 				default:
 					break;
@@ -858,6 +855,10 @@ public:
 					player._ammoRechargeTimer = 0;
 				}
 			}
+
+			if (player.animationEntity != 0) {
+				TransformSystem::SetRotation(player.animationEntity, {0, 0, modelTransform.rotation.y});
+			}
 		}
 	}
 
@@ -882,7 +883,7 @@ public:
 			playerComponent.renderedEntity = playerRender;
 			playerComponent.nameText = playerNameText;
 
-			engine::ecs::AddComponent(player, engine::Transform{ .position = Vector3(startPos - offset * p.first, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
+			engine::ecs::AddComponent(player, engine::Transform{ .position = Vector3(startPos - offset * p.first, 150), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			engine::ecs::AddComponent(player, engine::Rigidbody{ .drag = 1.5 });
 			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
 			engine::ecs::AddComponent(player, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = true });
@@ -908,8 +909,6 @@ public:
 			// Works
 			Audio* audio = engine::AddAudio("Gameplay", "audio/dink.wav", false, 100000);
 			audio->pause();
-
-
 		}
 	}
 };

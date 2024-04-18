@@ -180,7 +180,7 @@ namespace engine
 			//Sort the entities into sprite and UI layers
 			for (ecs::Entity entity : entities)
 			{
-				Transform& transform = ecs::GetComponent<Transform>(entity);
+				Transform transform = TransformSystem::GetGlobalTransform(entity);
 				SpriteRenderer& renderer = ecs::GetComponent<SpriteRenderer>(entity);
 
 				//Seperate sprites and UI elements
