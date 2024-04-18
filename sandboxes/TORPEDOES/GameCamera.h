@@ -16,10 +16,10 @@ static void UpdateCam(engine::Camera* cam, Tilemap* map)
 {
 	using namespace engine;
 
-	#ifdef _DEBUG
+#ifdef _DEBUG
 	if ((map->bounds.width / map->bounds.height) < (16.f / 9.f))
 		std::cout << "map is wrong aspect\n";
-	#endif
+#endif
 
 	std::shared_ptr<PlayerController> playerController = ecs::GetSystem<PlayerController>();
 
@@ -31,27 +31,47 @@ static void UpdateCam(engine::Camera* cam, Tilemap* map)
 			cam->position.x * 2 - cam->width / 2 //left
 	};
 
-	//Calculate the difference between the player and camera bounds
+	//Get the bounds of all players
 	//Top, right, bottom, left
 	std::array<float, 4> playerBounds = playerController->GetPlayerBounds();
+	//Bounds need to clamped to prevent infinite zoom
+	playerBounds[0] = std::min(playerBounds[0], map->position.y - zoomInThreshold);
+	playerBounds[1] = std::min(playerBounds[1], map->position.x + map->bounds.width - zoomInThreshold);
+	playerBounds[2] = std::max(playerBounds[2], map->position.y - map->bounds.height + zoomInThreshold);
+	playerBounds[3] = std::max(playerBounds[3], map->position.x + zoomInThreshold);
 
+	//Calculate the difference between the player and camera bounds
 	float topDiff = abs(camBounds[0] - playerBounds[0]);
 	float rightDiff = abs(camBounds[1] - playerBounds[1]);
 	float bottomDiff = abs(camBounds[2] - playerBounds[2]);
 	float leftDiff = abs(camBounds[3] - playerBounds[3]);
 
-	//Find which edge is the closest to the camera's edge, but still inside the zoom out threshold and not too close to the tilemap's edge
+	//Find which edge is the closest to the camera's edge
 	float minDiff = std::min(topDiff, std::min(rightDiff, std::min(bottomDiff, leftDiff)));
 
-	//Zoom out when any player is close enough to the edge of the camera, but not too close to edge of tilemap
+	//Zoom out when any player is close enough to the edge of the camera
 	if (minDiff < zoomOutThreshold)
 	{
 		//Zoom out just enough to keep everything in bounds
 		camHeight += zoomOutThreshold - minDiff;
 	}
 	//Zoom in when all players are far enough from the camera's edge
-	else if (minDiff > zoomInThreshold)
+	else if (minDiff >= zoomInThreshold)
 	{
+		//Special case for when one player is too close to the tilemap's edge
+		if (minDiff == zoomInThreshold) 
+		{
+			//Find a player which is not at the tilemap's edge
+			if (topDiff > zoomInThreshold)
+				minDiff = topDiff;
+			if (rightDiff > zoomInThreshold && rightDiff < minDiff)
+				minDiff = rightDiff;
+			if (bottomDiff > zoomInThreshold && bottomDiff < minDiff)
+				minDiff = bottomDiff;
+			if (leftDiff > zoomInThreshold && leftDiff < minDiff)
+				minDiff = leftDiff;
+		}
+
 		//Zoom in just enough to keep everything in bounds
 		camHeight -= minDiff - zoomInThreshold;
 	}
