@@ -39,6 +39,7 @@ struct Player
 	float specialCooldown = 0.8f;		// Time between special uses
 	float ammoRechargeCooldown = 1.f;	// Time between gaining ammo
 
+	bool holdShoot = false;				// Whether we can hold to shoot
 	int ammo = 0;
 	int maxAmmo = 2;
 
@@ -101,14 +102,14 @@ void CreateShell(engine::ecs::Entity entity)
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-	float speed = 500;
+	float speed = 400;
 
 	ecs::Entity shell = ecs::NewEntity();
 	ecs::AddComponent(shell, Projectile{ .ownerID = player.id, .speed = 500, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
 
 	Projectile& shellProjectile = ecs::GetComponent<Projectile>(shell);
 
-	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(20) });
+	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(40) });
 	ecs::AddComponent(shell, Rigidbody{ .velocity = player.forwardDirection * shellProjectile.speed });
 	ecs::AddComponent(shell, ModelRenderer{ .model = resources::models[shellProjectile.model = "Weapon_HedgehogAmmo.obj"] });
 	std::vector<Vector2> Shellverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
@@ -182,7 +183,6 @@ void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide,
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-
 	engine::ecs::Entity hedgehog = engine::ecs::NewEntity();
 	engine::ecs::AddComponent(hedgehog, Transform{ .position = transform.position, .rotation = modelTransform.rotation });
 
@@ -203,7 +203,7 @@ struct aimingGuideStruct
 	engine::ScheduledFunction* timerFunction;
 };
 
-	const float angleOffset = Radians(5.0f); // Ajuste de ángulo para las direcciones de los proyectiles
+const float angleOffset = Radians(5.0f); // Ajuste de ángulo para las direcciones de los proyectiles
 static std::map<int, aimingGuideStruct> playerIdToAimGuides;
 
 void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> aimingGuides, float guideSpeed, float shootAngle, int shootAmount)
@@ -460,15 +460,46 @@ public:
 		engine::ecs::AddComponent(winScreen, engine::Transform{.position = Vector3(0, 0, 0.5f), .scale = Vector3(0.3f) });
 
 		//Initialize each ship type's stats
-		shipComponents.insert({ ShipType::torpedoBoat,
-			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 0.8, .mainAction = CreateTorpedo, .specialAction = Boost } });
-		shipComponents.insert({ ShipType::submarine,
-			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 4, .mainAction = CreateTorpedo, .specialAction = ToggleSubmerge } });
-		shipComponents.insert({ ShipType::cannonBoat,
-			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.2, .specialCooldown = 0.8, .mainAction = CreateShell, .specialAction = Boost } });
-		shipComponents.insert({ ShipType::hedgehogBoat,
-	
-			Player{.forwardSpeed = 400, .rotationSpeed = 75, .shootCooldown = 0.4, .specialCooldown = 0.8, .ammoRechargeCooldown = 0.8, .maxAmmo = 8, .mainAction = ShootHedgehog, .specialAction = Boost } });
+		shipComponents.insert(
+		{ 
+			ShipType::torpedoBoat, Player
+			{
+				.forwardSpeed = 400, .rotationSpeed = 75, 
+				.shootCooldown = 0.2, .specialCooldown = 0.8, 
+				// .holdShoot = true, .maxAmmo = 8, 
+				.mainAction = CreateTorpedo, .specialAction = Boost 
+			} 
+		});
+		shipComponents.insert(
+		{ 
+			ShipType::submarine, Player
+			{
+				.forwardSpeed = 400, .rotationSpeed = 75, 
+				.shootCooldown = 0.2, .specialCooldown = 4, 
+				//.holdShoot = true, .maxAmmo = 8, 
+				.mainAction = CreateTorpedo, .specialAction = ToggleSubmerge 
+			} 
+		});
+		shipComponents.insert(
+		{ 
+			ShipType::cannonBoat, Player
+			{
+				.forwardSpeed = 400, .rotationSpeed = 75, 
+				.shootCooldown = 0.1, .specialCooldown = 0.8, .ammoRechargeCooldown = 0.0,
+				.holdShoot = true, .maxAmmo = 1, 
+				.mainAction = CreateShell, .specialAction = Boost 
+			} 
+		});
+		shipComponents.insert(
+		{	
+			ShipType::hedgehogBoat, Player
+			{
+				.forwardSpeed = 400, .rotationSpeed = 75, 
+				.shootCooldown = 0.4, .specialCooldown = 0.8, .ammoRechargeCooldown = 0.8, 
+				.holdShoot = false, .maxAmmo = 8, 
+				.mainAction = ShootHedgehog, .specialAction = Boost 
+			} 
+		});
 
 		//Initialize ship type models
 		shipModels.insert({ ShipType::torpedoBoat, resources::models["Ship_PT_109_Torpedo.obj"] });
@@ -604,7 +635,15 @@ public:
 			float accelerationInput = input::GetTotalInputValue("Throttle" + std::to_string(player.id));
 			float rotateInput = input::GetTotalInputValue("Turn" + std::to_string(player.id));
 
-			bool newShotInput = input::GetNewPress("Shoot" + std::to_string(player.id));
+			bool newShotInput = 0;
+			if (player.holdShoot)
+			{
+				newShotInput = input::GetPressed("Shoot" + std::to_string(player.id));
+			}
+			else
+			{
+				newShotInput = input::GetNewPress("Shoot" + std::to_string(player.id));
+			}
 			bool newSpecialInput = input::GetPressed("Boost" + std::to_string(player.id));
 
 			accelerationInput = std::clamp(accelerationInput, -1.0f, 1.0f);
