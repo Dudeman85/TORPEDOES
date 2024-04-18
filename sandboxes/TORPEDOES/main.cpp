@@ -86,7 +86,7 @@ void LoadLevel2(engine::Camera* cam)
 	engine::collisionSystem->cam = cam;
 
 	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(1, Vector2(1200.0f, -1700.0f), ships);
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1200.0f, -1700.0f));
 
 	// Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level2Map);
@@ -95,14 +95,14 @@ void LoadLevel2(engine::Camera* cam)
 
 	// Make all the checkpoint's manually
 	CreateCheckpoint(Vector3(1455.000000, -995.000000, 100.000000), Vector3(35.000000, -15.000000, -20.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 45.0f);				// First checkpoint
-	CreateCheckpoint(Vector3(2405.000000, -1640.000000, 100.000000), Vector3(22.500000, 0.000000, 50.000000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 45.0f);			// Second checkpoint
+	CreateCheckpoint(Vector3(2430.000000, -1630.000000, 100.000000), Vector3(7.500000, 92.500000, 90.000000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 45.0f);			// Second checkpoint
 	CreateCheckpoint(Vector3(3595.000000, -1095.000000, 100.000000), Vector3(40.000000, 0.000000, 47.500000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 45.0f);			// Third checkpoint
-	CreateCheckpoint(Vector3(2715.000000, -1145.000000, 0.000000), Vector3(45.000000, 0.000000, 0.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 45.0f);						// Fourth checkpoint
-	CreateCheckpoint(Vector3(2415.000000, -500.000000, 100.000000), Vector3(25.000000, -17.500000, -30.000000), Vector3(16), resources::models["Prop_Buoy.obj"], 45.0f);				// Fifth checkpoint
+	CreateCheckpoint(Vector3(2715.000000, -1145.000000, 100.000000), Vector3(45.000000, 0.000000, 0.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 45.0f);					// Fourth checkpoint
+	CreateCheckpoint(Vector3(2415.000000, -500.000000, 100.000000), Vector3(25.000000, -17.500000, -30.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 45.0f);				// Fifth checkpoint
 	CreateCheckpoint(Vector3(1505.000000, -335.000000, 100.000000), Vector3(52.500000, -32.500000, -5.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 45.0f);					// Sixth checkpoint
-	CreateCheckpoint(Vector3(600.000000, -665.000000, 100.000000), Vector3(40.000000, -25.000000, -17.500000), Vector3(20), resources::models["Prop_Buoy.obj"], 45.0f);					// Seventh checkpoint
-	CreateCheckpoint(Vector3(530.000000, -1675.000000, 100.000000), Vector3(45.000000, 32.500000, 47.500000), Vector3(20), resources::models["Prop_Buoy_Vertical.obj"], 45.0f);			// Eight checkpoint
-	CreateCheckpoint(Vector3(1230.000000, -1700.000000, 0.000000), Vector3(0.000000, -50.000000, -90.000000), Vector3(11), resources::models["Finish_line.obj"], 45.0f);				// Finish line
+	CreateCheckpoint(Vector3(600.000000, -665.000000, 100.000000), Vector3(40.000000, -25.000000, -17.500000), Vector3(17), resources::models["Prop_Buoy.obj"], 45.0f);					// Seventh checkpoint
+	CreateCheckpoint(Vector3(530.000000, -1675.000000, 100.000000), Vector3(45.000000, 32.500000, 47.500000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 45.0f);			// Eight checkpoint
+	CreateCheckpoint(Vector3(1230.000000, -1700.000000, 100.000000), Vector3(0.000000, -50.000000, -90.000000), Vector3(11), resources::models["Finish_line.obj"], 45.0f, true);		// Finish line
 }
 
 // Create everything for level 3
@@ -111,7 +111,7 @@ void LoadLevel3(engine::Camera* cam)
 	engine::collisionSystem->cam = cam;
 
 	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(1, Vector2(1434.0f, -1370.0f), ships);
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1434.0f, -1370.0f));
 
 	//set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level3Map);
@@ -233,7 +233,7 @@ int main()
 	//LoadLevel1(&cam);
 
 	// Load the second level
-	LoadLevel2(&cam);
+	//LoadLevel2(&cam);
 
 	// Load the third level
 	//LoadLevel3(&cam);
@@ -327,7 +327,7 @@ int main()
 			isGamePaused = false;
 			canStartLoadingMap = false;
 			ShipSelectionSystem->isShipSelectionMenuOn = false;
-			LoadLevel1(&cam);
+			LoadLevel2(&cam);
 		}
 
 		// if paused or Pause pressed update PauseSystem
