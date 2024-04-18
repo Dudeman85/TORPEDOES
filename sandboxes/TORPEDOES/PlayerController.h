@@ -397,7 +397,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 	{
 		//Make the continuous diving animation
 		playerComponent.animationEntity = ecs::NewEntity();
-		ecs::AddComponent(playerComponent.animationEntity, Transform{ .position = {0, 0, -1}, .scale = {5, 2, 1} });
+		ecs::AddComponent(playerComponent.animationEntity, Transform{ .position = {0, 0, 5}, .scale = {5, 2, 1} });
 		ecs::AddComponent(playerComponent.animationEntity, SpriteRenderer{});
 		ecs::AddComponent(playerComponent.animationEntity, Animator{ });
 		TransformSystem::SetRotation(playerComponent.animationEntity, { 0, 0, modelTransform.rotation.y });
@@ -418,8 +418,6 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 				playerComponent.submerged = true;
 				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures.push_back(resources::modelTextures["Player_Black.png"]);
 			}, 0.3);
-
-		std::cout << "submerge\n";
 	}
 	//Surface if submerged
 	else
@@ -438,8 +436,6 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 				playerComponent.submerged = false;
 				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures.clear();
 			}, 0.3);
-
-		std::cout << "surface\n";
 	}
 }
 
@@ -844,7 +840,7 @@ public:
 			playerComponent.renderedEntity = playerRender;
 			playerComponent.nameText = playerNameText;
 
-			engine::ecs::AddComponent(player, engine::Transform{ .position = Vector3(startPos - offset * p.first, 100), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
+			engine::ecs::AddComponent(player, engine::Transform{ .position = Vector3(startPos - offset * p.first, 150), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			engine::ecs::AddComponent(player, engine::Rigidbody{ .drag = 1.5 });
 			vector<Vector2> colliderVerts{ Vector2(2, 2), Vector2(2, -1), Vector2(-5, -1), Vector2(-5, 2) };
 			engine::ecs::AddComponent(player, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = true });
