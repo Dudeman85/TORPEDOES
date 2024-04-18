@@ -31,32 +31,31 @@ public:
 	bool operator==(const Vector2& rhs);
 
 	//Add
-	Vector2 operator+(const float& add);
-	Vector2 operator+(const Vector2& add);
+	Vector2 operator+(const float& add) const;
+	Vector2 operator+(const Vector2& add) const;
 	Vector2& operator+=(const Vector2& add);
 	//Subtract
-	Vector2 operator-(const float& sub);
-	Vector2 operator-(const Vector2& sub);
+	Vector2 operator-(const float& sub) const;
+	Vector2 operator-(const Vector2& sub) const;
 	Vector2& operator-=(const Vector2& sub);
 	//Multiply
 	// TODO: Replace use of "float" as templated type
-	Vector2 operator*(const float& mult);
-	Vector2 operator*(const Vector2& mult);
+	Vector2 operator*(const float& mult) const;
+	Vector2 operator*(const Vector2& mult) const;
 	Vector2& operator*=(const float& mult);
 	Vector2& operator*=(const Vector2& mult);
 	//Divide
-	Vector2 operator/(const float& div);
-	Vector2 operator/(const Vector2& div);
+	Vector2 operator/(const float& div) const;
+	Vector2 operator/(const Vector2& div) const;
 	Vector2& operator/=(const float& div);
 
-	// TODO: Add templated return type
-	float Length();
+	float Length() const; // TODO: Add templated return type
 	Vector2 Normalize();
-	Vector2 LeftNormal();
-	Vector2 RightNormal();
-	float Dot(const Vector2& b);
+	Vector2 LeftNormal() const;
+	Vector2 RightNormal() const;
+	float Dot(const Vector2& b) const;
 
-	std::string ToString();
+	std::string ToString() const;
 
 	// TODO: Replace "float" as "double"
 	float x, y;
@@ -82,32 +81,32 @@ public:
 	bool operator!=(const Vector3& rhs);
 
 	//Add
-	Vector3 operator+(const float& add);
-	Vector3 operator+(const Vector3& add);
+	Vector3 operator+(const float& add) const;
+	Vector3 operator+(const Vector3& add) const;
 	Vector3& operator+=(const Vector3& add);
 	//Subtract
-	Vector3 operator-(const float& sub);
-	Vector3 operator-(const Vector3& sub);
+	Vector3 operator-(const float& sub) const;
+	Vector3 operator-(const Vector3& sub) const;
 	Vector3& operator-=(const Vector3& sub);
 	//Multiply
-	Vector3 operator*(const float& mult);
-	Vector3 operator*(const Vector3& mult);
+	Vector3 operator*(const float& mult) const;
+	Vector3 operator*(const Vector3& mult) const;
 	Vector3& operator*=(const float& mult);
 	//Divide
-	Vector3 operator/(const float& div);
-	Vector3 operator/(const Vector3& div);
+	Vector3 operator/(const float& div) const;
+	Vector3 operator/(const Vector3& div) const;
 	Vector3& operator/=(const float& div);
 
-	float Length();
+	float Length() const;
 	Vector3 Normalize();
 	Vector3 Pow(float power);
-	float Dot(Vector3 b);
-	Vector3 Cross(Vector3 b);
+	float Dot(Vector3 b) const;
+	Vector3 Cross(Vector3 b) const;
 
 	//Comvert to a glm vec3
-	glm::vec3 ToGlm();
+	glm::vec3 ToGlm() const;
 
-	std::string ToString();
+	std::string ToString() const;
 
 	float x, y, z;
 };

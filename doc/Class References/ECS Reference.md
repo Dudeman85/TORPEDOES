@@ -4,22 +4,15 @@ This reference is meant to explain how to use the ECS architecture on a surface 
 
 ## ECS Basics
 The ECS architectures consists of entities, components, and systems.<br>
-**Entities are IDs and can be though of similarly to game objects.**<br>
-**Components store data attached to entities.**<br>
-**Systems operate upon the data in components.** Each system has required components it needs to operate; if an entity has every required component it will be operated upon by the system.
+- **Entities are IDs and can be though of similarly to game objects.** They don't contain any data themselves.<br>
+- **Components store data attached to entities.** Each entity can have one instance of a component type attached to it.<br>
+- **Systems operate upon the data in components.** Each system has required components it needs to operate; if an entity has every required component it will be operated upon by the system.
 
 All of the ECS functionality is in **engine/ECS.h** and under the namespace **engine::ecs**
-```cpp
-//The ECS implementation, this is unnecessary if you include engine/Application.h
-#include <engine/ECS.h>	
-
-//Probably want to use this
-using namespace engine;
-```
 
 ---
 ## Entity
-Entities are IDs. They have no data or methods themselves and can be though of as gaining the attributes of the components attached to them. **0 will never be a valid entity.**
+Entities are IDs. They have no data or methods themselves and can be though of as gaining the attributes of the components attached to them. **Note: 0 will never be a valid entity.**
 ```cpp
 //Example entity
 //This is just an id with no actual data
@@ -31,9 +24,9 @@ ecs::DestroyEntity(player);
 
 ---
 ## Component
-Components are aggregate structs or classes, meaning no user defined constructors, and no private or virtual members! They are initialized with a designated initializer {}, just like arrays. Since components should not have any methods, it is good to keep them as structs.
+Components are aggregate structs or classes, meaning no user defined constructors, and no private or virtual members (among other things)! They are initialized with a designated initializer {}, just like arrays. Since components should not have any methods, it is good practice to keep them as structs.
 
-Every component type also must be registered before it can be used.
+Every component type also must be registered with the ECS_REGISTER_COMPONENT macro before it can be used. This macro takes the component type as a parameter.
 ```cpp
 //Example custom component
 ECS_REGISTER_COMPONENT(Position)
@@ -43,7 +36,7 @@ struct Position
 };
 ```
 
-Adding and getting components to entities can be done as such:
+Adding and getting components to and from entities can be done as such:
 ```cpp
 //Add the component to an entity
 ecs::AddComponent(player, Position{ .x = 10.0f, .y = 25.25f, .z = 0.0f});
@@ -73,15 +66,16 @@ ecs::SetComponentDestructor<Position>(OnPositionRemoved);
 
 ---
 ## System
-Systems are esentially collections of functions that operate upon data in components. Each system has a list of required components it needs to operate which needs to be given manually, as well as a list of entities with those required components which is automaticaly set by the ECS implementation.
-For example, a render system could require Sprite and Transform components. It would then automatically operate upon every entity with at least those components.
+Systems are esentially collections of functions that operate upon data in components. Each system has a list of required components it needs to operate, known as a signature, which needs to be given manually when registering the system. The ECS implementation then gives the system a list of entities with those required components. For example, a render system could require Sprite and Transform components. It would then automatically operate upon every entity with at least those components.
 
-Every system must be a class that inherits from the System class which contains the list of all entities with the required components.
+Every system must be a class that inherits from the System class. This class contains the list of all entities, called entities, the system can operate on.
 
-Systems should have an Update and an Init function, although these are not strictly required. The update function should have a loop which iterates through each entity in the entities set. The loop should be done exactly like below. Avoid using constructors and instead do setup in Init.
+Systems should have an Update and an Init function, although these are not strictly required. The update function should have a loop which iterates through each entity in the entities set. The loop should be done exactly like below. Avoid using constructors and instead do setup in an Init function.
+
+Every system must also be registered with the ECS_REGISTER_SYSTEM macro before it can be used. This macro takes the system class type and every required component as parameters. **Note: Any components which are used by the system should be set as required!**
 ```cpp
 //Example Gravity System
-//Requires Position component
+//Requires GravitySystem system
 ECS_REGISTER_SYSTEM(GravitySystem, Position)
 class GravitySystem : public ecs::System
 {
@@ -124,7 +118,7 @@ TranformSystem::SetPosition(entity, Vector3(100, 100, 100));
 engine::tranformSystem->SetPosition(entity, Vector3(100, 100, 100));
 ```
 
-All you need to do now is get a reference to the system and call Update in your game loop:
+All you need to do now is get a reference to the system and call Update and Init in your game loop:
 
 ```cpp
 //Get the gravity system
@@ -144,7 +138,7 @@ while(true)
 
 ## Other Features
 
-There is a tagging system where you can add string tags to specific entities. The only predefined tag is "persistent", which prevents the entity from being deleted by DestroyAllEntities.
+There is a tagging system where you can add string tags to specific entities. The only tag with predefined functionality is "persistent", which prevents the entity from being deleted by DestroyAllEntities.
 ```cpp
 //Set the tags of an entity, overrites any previous tags
 ecs::SetTags(entity, { "a", "b" });

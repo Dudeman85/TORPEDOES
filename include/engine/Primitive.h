@@ -65,7 +65,7 @@ namespace engine
 		void Draw(Camera* cam, Vector3 color = Vector3(100.0f), Transform transform = Transform())
 		{
 			//Primitives should be drawn above everything
-			glClear(GL_DEPTH_BUFFER_BIT);
+			glDisable(GL_DEPTH_BUFFER_BIT);
 
 			defaultShader->use();
 
@@ -102,6 +102,7 @@ namespace engine
 
 			glDrawElements(GL_LINE_LOOP, numVertices, GL_UNSIGNED_INT, 0);
 
+			glEnable(GL_DEPTH_BUFFER_BIT);
 			glBindVertexArray(0);
 		}
 

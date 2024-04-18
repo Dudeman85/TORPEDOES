@@ -15,6 +15,9 @@ namespace engine
     {
         std::unordered_map<std::string, Texture*> textures;
     
+        if (!std::filesystem::exists(path))
+            std::cout << "Invalid path: " << path << std::endl;
+
         //For each item in the directory
         for (const auto& directoryEntry : std::filesystem::directory_iterator(path))
         {
