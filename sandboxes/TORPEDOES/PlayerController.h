@@ -33,6 +33,8 @@ struct Player
 	bool _offroadThisFrame = false;
 
 	bool submerged = false;
+	bool reloading = false;
+	int secondaryAmmo = 0;
 
 	// Action cooldowns
 	float shootCooldown = 0.2f;			// Time between shots
@@ -119,6 +121,36 @@ void CreateShell(engine::ecs::Entity entity)
 
 	std::vector<Vector2> shellverts{ Vector2(shellSize, shellSize), Vector2(shellSize, -shellSize), Vector2(-shellSize, -shellSize), Vector2(-shellSize, shellSize) };
 	ecs::AddComponent(shell, PolygonCollider{ .vertices = shellverts, .callback = OnProjectileCollision, .trigger = true, .visualise = true,  .rotationOverride = std::abs(modelTransform.rotation.y) });
+}
+
+void ShootShell(engine::ecs::Entity entity)
+{
+	Player& player = ecs::GetComponent<Player>(entity);
+
+	if (player.reloading)
+	{
+		// Reloading
+		if (player.ammo < player.maxAmmo)
+		{
+			// Not reloaded
+			player.ammo++; // We didn't shoot
+			return;
+		}
+		// Fully reloaded
+		player.reloading = false;
+		player.secondaryAmmo = player.maxAmmo;
+	}
+
+	if (player.secondaryAmmo <= 1)
+	{
+		// Last ammo, start reload
+		player.reloading = true;
+	}
+
+	player.secondaryAmmo--;
+	player.ammo = 0;
+
+	CreateShell(entity);
 }
 
 /* MULTISHOT */
@@ -493,10 +525,10 @@ public:
 		{ 
 			ShipType::cannonBoat, Player
 			{
-				.forwardSpeed = 400, .rotationSpeed = 75, 
-				.shootCooldown = 0.3, .specialCooldown = 0.8, .ammoRechargeCooldown = 0.0,
-				.holdShoot = true, .maxAmmo = 1, 
-				.mainAction = CreateShell, .specialAction = Boost 
+				.forwardSpeed = 400, .rotationSpeed = 75, .reloading = true,
+				.shootCooldown = 0.1, .specialCooldown = 0.8, .ammoRechargeCooldown = 0.16,
+				.holdShoot = true, .maxAmmo = 10,
+				.mainAction = ShootShell, .specialAction = Boost 
 			} 
 		});
 		shipComponents.insert(
