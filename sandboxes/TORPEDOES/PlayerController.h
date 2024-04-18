@@ -79,6 +79,8 @@ void CreateTorpedo(engine::ecs::Entity entity)
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
+	std::cout << modelTransform.rotation.ToString() << "\n";
+
 	float speed = 500;
 
 	ecs::Entity torpedo = ecs::NewEntity();
@@ -89,7 +91,7 @@ void CreateTorpedo(engine::ecs::Entity entity)
 	ecs::AddComponent(torpedo, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(10) });
 	ecs::AddComponent(torpedo, Rigidbody{ .velocity = player.forwardDirection * torpedoProjectile.speed });
 	std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .visualise = false,  .rotationOverride = transform.position.y });
+	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .visualise = true,  .rotationOverride = std::abs(modelTransform.rotation.x) });
 
 	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models[torpedoProjectile.model] });
 }
@@ -112,8 +114,10 @@ void CreateShell(engine::ecs::Entity entity)
 	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(40) });
 	ecs::AddComponent(shell, Rigidbody{ .velocity = player.forwardDirection * shellProjectile.speed });
 	ecs::AddComponent(shell, ModelRenderer{ .model = resources::models[shellProjectile.model = "Weapon_HedgehogAmmo.obj"] });
-	std::vector<Vector2> Shellverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-	ecs::AddComponent(shell, PolygonCollider{ .vertices = Shellverts, .callback = OnProjectileCollision, .trigger = true, .visualise = false,  .rotationOverride = transform.position.y });
+	float shellSize = 0.1;
+
+	std::vector<Vector2> shellverts{ Vector2(shellSize, shellSize), Vector2(shellSize, -shellSize), Vector2(-shellSize, -shellSize), Vector2(-shellSize, shellSize) };
+	ecs::AddComponent(shell, PolygonCollider{ .vertices = shellverts, .callback = OnProjectileCollision, .trigger = true, .visualise = true,  .rotationOverride = modelTransform.rotation.y });
 }
 
 /* MULTISHOT */
@@ -692,7 +696,6 @@ public:
 					break;
 				case HitStates::Additive:
 					player._speedScale = std::max(player._speedScale += hitProjectile.first.hitSpeedFactor, 0.f);
-					std::cout << player._speedScale << ", ";
 					break;
 				case HitStates::Multiplicative:
 					player._speedScale = std::max(player._speedScale *= hitProjectile.first.hitSpeedFactor, 0.f);
@@ -701,7 +704,6 @@ public:
 					break;
 				}
 			}
-			std::cout << player._speedScale << " \n";
 
 			/* Movement */
 
