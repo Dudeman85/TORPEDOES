@@ -26,6 +26,7 @@ struct PlayerSelection
 	float timeArrowBigTime;
 	bool isArrowBig;
 
+
 	engine::ecs::Entity arrowUp;
 	engine::ecs::Entity arrowDown;
 	engine::ecs::Entity	shipModel;
@@ -38,6 +39,7 @@ struct PlayerSelection
 	engine::ecs::Entity boostEntity;
 	engine::ecs::Entity specialEntity;
 
+	engine::ecs::Entity backgroundImage;
 
 };
 
@@ -251,6 +253,7 @@ public:
 			engine::ecs::Entity boostEntity = engine::ecs::NewEntity();
 			engine::ecs::Entity specialEntity = engine::ecs::NewEntity();
 
+			engine::ecs::Entity backgroundImage = engine::ecs::NewEntity();
 
 			//engine::ecs::AddComponent(pausedImage, engine::Transform{ .position = Vector3(0,.8f,-0.1f), .scale = Vector3(0.35f) });
 			//engine::ecs::AddComponent(pausedImage, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Paused.png"],  .enabled = false, .uiElement = true });
@@ -263,8 +266,11 @@ public:
 			engine::ecs::AddComponent(arrowDown, engine::Transform{ .position = Vector3(arrowsPosX, arrowDownposY, -0.1f), .rotation = Vector3(0, 0, 90), .scale = Vector3(0.04f) });
 			engine::ecs::AddComponent(arrowDown, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"], .enabled = false, .uiElement = true });
 
-			engine::ecs::AddComponent(shipModel, engine::Transform{ .position = Vector3(0.7f, -0.2f, -0.1f) , .scale = 0 });
+			engine::ecs::AddComponent(shipModel, engine::Transform{ .position = Vector3(0.7f, -0.2f, -0.1f) , .scale = 0});
 			engine::ecs::AddComponent(shipModel, engine::ModelRenderer{ .model = shipModels[0], .uiElement = true });
+
+			engine::ecs::AddComponent(backgroundImage, engine::Transform{ .position = Vector3(0,0,-0.9f), .rotation = Vector3(0,0,0), .scale = Vector3(1) });
+			engine::ecs::AddComponent(backgroundImage, engine::SpriteRenderer{ .texture = resources::menuTextures["Selection_BG_Var3.png"], .enabled = false, .uiElement = true });
 
 			engine::ecs::AddComponent(readyText, engine::Transform{ .position = Vector3(arrowsPosX-0.4f,arrowDownposY,-0.1f) , .scale = 0 });
 			engine::ecs::AddComponent(readyText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "unready", .uiElement = true });
@@ -317,7 +323,7 @@ public:
 			}
 
 			engine::ecs::AddComponent(selectionWindow, engine::Transform{ .position = offsetPlayerWindows, .scale = Vector3(0.5, 0.5, -0.1f) });
-			engine::ecs::AddComponent(selectionWindow, PlayerSelection{ .playerID = i, .arrowUp = arrowUp, .arrowDown = arrowDown, .shipModel = shipModel, .readyText = readyText, .playerWindow = selectionWindow, .shipInfo = shipInfo,.shipNameEntity= shipNameEntity,.baseSpeedEntity= baseSpeedEntity,.boostEntity= boostEntity ,.specialEntity = specialEntity, });
+			engine::ecs::AddComponent(selectionWindow, PlayerSelection{ .playerID = i, .arrowUp = arrowUp, .arrowDown = arrowDown, .shipModel = shipModel, .readyText = readyText, .playerWindow = selectionWindow, .shipInfo = shipInfo,.shipNameEntity= shipNameEntity,.baseSpeedEntity= baseSpeedEntity,.boostEntity= boostEntity ,.specialEntity = specialEntity, .backgroundImage = backgroundImage });
 
 			engine::ecs::AddComponent(selectionWindow, engine::TextRenderer{ .font = resources::niagaraFont, .text = "",.offset=Vector3(0,0.15f,0),.uiElement = true});
 
@@ -331,6 +337,8 @@ public:
 			engine::TransformSystem::AddParent(shipModel, selectionWindow);
 			engine::TransformSystem::AddParent(readyText, selectionWindow);
 			engine::TransformSystem::AddParent(shipInfo, selectionWindow);
+
+			engine::TransformSystem::AddParent(backgroundImage, selectionWindow);
 
 			engine::TransformSystem::AddParent(shipNameEntity, shipInfo);
 			engine::TransformSystem::AddParent(specialEntity, shipInfo);
@@ -372,6 +380,9 @@ public:
 
 				if (!playerSelection.isActivePlayer)
 				{
+					engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.backgroundImage).enabled = true;
+
+
 					//add player to selectedShipsAtTheFrame if not yet have that player ID
 					if (!selectedShipsAtTheFrame.contains(playerSelection.playerID))
 						selectedShipsAtTheFrame.insert({ playerSelection.playerID, ShipType::torpedoBoat });
@@ -485,7 +496,7 @@ public:
 			else  yRotation = ShipModelTransform.rotation.y - 360 + 35 * engine::deltaTime;
 
 			ShipModelTransform.rotation = Vector3(6, yRotation, 0);
-
+		/*	ShipModelTransform.position= Vector2(ShipModelTransform.position.x,-.4f);*/
 			//std::cout << "\n" << "isArrowBig: " << playerSelection.isArrowBig << "time:" << playerSelection.timeArrowBigTime << "\n";
 
 
