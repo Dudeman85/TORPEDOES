@@ -205,10 +205,10 @@ public:
 
 		startGameCurrentTime = startGameTimerInitValue;
 
-		shipModels.push_back({ resources::models["Ship_PT_109_Torpedo.obj"] });
-		shipModels.push_back({ resources::models["Ship_U_99_Submarine.obj"] });
-		shipModels.push_back({ resources::models["Ship_Yamato_Cannon.obj"] });
-		shipModels.push_back({ resources::models["Ship_HMCS_Sackville_Hedgehog.obj"] });
+		shipModels.push_back({ resources::models["Ship_PT_109_Wireframe.obj"] });
+		shipModels.push_back({ resources::models["Ship_U_99_Wireframe.obj"] });
+		shipModels.push_back({ resources::models["Ship_Yamato_Wireframe.obj"] });
+		shipModels.push_back({ resources::models["Ship_HMCS_Sackville_Wireframe.obj"] });
 
 		sceneParent = engine::ecs::NewEntity();
 		engine::ecs::AddComponent(sceneParent, engine::Transform{ .position = Vector3(0,0,0), .rotation = Vector3(0, 0, 0), .scale = 0.7f });
