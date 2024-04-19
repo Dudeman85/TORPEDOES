@@ -75,7 +75,7 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 	engine::ecs::AddComponent(hedgehogExplosion, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
 	std::vector<Vector2> explosionverts{ Vector2(0.5, 0.55), Vector2(0.5, -0.55), Vector2(-0.5, -0.55), Vector2(-0.5, 0.55) };
 	engine::ecs::AddComponent(hedgehogExplosion, engine::PolygonCollider{ .vertices = explosionverts, .trigger = true, .visualise = true });
-	engine::ecs::AddComponent(hedgehogExplosion, Projectile{ .ownerID = -1, .hitType = HitStates::Stop, .hitSpeedFactor = 0.5, .hitTime = 3, .canHitSubmerged = true, .hitAnimation = "" });
+	engine::ecs::AddComponent(hedgehogExplosion, Projectile{ .ownerID = hedgehog.ownerID, .hitType = HitStates::Stop, .hitSpeedFactor = 0.5, .hitTime = 3, .canHitSubmerged = true, .hitAnimation = "" });
 
 	engine::AnimationSystem::AddAnimation(hedgehogExplosion, resources::explosionAnimation, "explosion");
 	engine::AnimationSystem::PlayAnimation(hedgehogExplosion, "explosion", false);
