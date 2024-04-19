@@ -63,6 +63,9 @@ MapLayer::~MapLayer()
 
 void MapLayer::draw(glm::mat4 model, unsigned int modelLoc, unsigned int tilesetCountLoc, unsigned int tileSizeLoc)
 {
+    if (m_subsets.empty())
+        return;
+
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, m_subsets[0].vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
