@@ -19,6 +19,7 @@ namespace resources
 	Tilemap* level3Map; // Tropical tilemap
 
 	Animation explosionAnimation;
+	Animation WaterexplosionAnimation;
 	Animation crowdAnims;
 	Animation countdownAnim;	
 	Animation divingAnim;	
@@ -47,6 +48,7 @@ namespace resources
 		level3Map->loadMap("levels/level3.tmx");
 
 		explosionAnimation = AnimationsFromSpritesheet("/spritesheets/explosion.png", 6, 1, vector<int>(6, 150))[0];
+		WaterexplosionAnimation = AnimationsFromSpritesheet("/spritesheets/Hedgehog_Explosion.png", 14, 1, vector<int>(14, 70))[0];
 		crowdAnims = AnimationsFromSpritesheet("/spritesheets/CrowdCheer14.png", 3, 1, vector<int>(3, 150))[0];
 		countdownAnim = AnimationsFromSpritesheet("/spritesheets/UI_Countdown_Ver2.png", 5, 1, vector<int>(5, 1000))[0];
 		divingAnim = AnimationsFromSpritesheet("/spritesheets/Diving_Sheet_Ver2.png", 8, 1, vector<int>(8, 100))[0];

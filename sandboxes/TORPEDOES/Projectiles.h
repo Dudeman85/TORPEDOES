@@ -2,8 +2,8 @@
 #include <engine/Application.h>
 #include "Resources.h"
 
-enum HitStates 
-{ 
+enum HitStates
+{
 	None,			// Does nothing when hitting player
 	Additive,		// Adds hitSpeedFactor additively:			100% + 50% + 50% = 200%		Flat increase/decrease
 	Multiplicative,	// Adds hitSpeedFactor multiplicatively:	100% + 50% + 50% = 225%		Stacked decreases become constantly weaker, stacked increases become constantly stronger 
@@ -40,10 +40,10 @@ struct  Hedgehog : public Projectile
 };
 
 //Temporary function for testing
- void SpawnProjectile(engine::ecs::Entity p, int playerID)
- {
+void SpawnProjectile(engine::ecs::Entity p, int playerID)
+{
 	std::cout << engine::ecs::GetComponent<engine::Transform>(p).position.ToString();
- }
+}
 
 static void CreateAnimation(engine::ecs::Entity entity)
 {
@@ -70,15 +70,24 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 	engine::ecs::DestroyEntity(hedgehog.aimingGuide);
 
 	engine::ecs::Entity hedgehogExplosion = engine::ecs::NewEntity();
-	engine::ecs::AddComponent(hedgehogExplosion, engine::Transform{ .position = transform.position + Vector3(0, 0, 100 +(double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(40) });
+	engine::ecs::AddComponent(hedgehogExplosion, engine::Transform{ .position = transform.position + Vector3(0, 0, 100 + (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(40) });
 	engine::ecs::AddComponent(hedgehogExplosion, engine::SpriteRenderer{ });
 	engine::ecs::AddComponent(hedgehogExplosion, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
 	std::vector<Vector2> explosionverts{ Vector2(0.5, 0.55), Vector2(0.5, -0.55), Vector2(-0.5, -0.55), Vector2(-0.5, 0.55) };
 	engine::ecs::AddComponent(hedgehogExplosion, engine::PolygonCollider{ .vertices = explosionverts, .trigger = true, .visualise = true });
 	engine::ecs::AddComponent(hedgehogExplosion, Projectile{ .ownerID = hedgehog.ownerID, .hitType = HitStates::Stop, .hitSpeedFactor = 0.5, .hitTime = 3, .canHitSubmerged = true, .hitAnimation = "" });
 
-	engine::AnimationSystem::AddAnimation(hedgehogExplosion, resources::explosionAnimation, "explosion");
-	engine::AnimationSystem::PlayAnimation(hedgehogExplosion, "explosion", false);
+	// aqui verifica si el id del tilecolare y activa la otra animacion 
+	if (engine::collisionSystem->tilemap->checkCollision(transform.position.x, transform.position.y) > 1)
+	{
+		engine::AnimationSystem::AddAnimation(hedgehogExplosion, resources::explosionAnimation, "explosion");
+		engine::AnimationSystem::PlayAnimation(hedgehogExplosion, "explosion", false);
+	}
+	else
+	{
+		engine::AnimationSystem::AddAnimation(hedgehogExplosion, resources::WaterexplosionAnimation, "Hedgehog_Explosion.png");
+		engine::AnimationSystem::PlayAnimation(hedgehogExplosion, "Hedgehog_Explosion.png", false);
+	}
 };
 
 static void OnProjectileCollision(engine::Collision collision)
@@ -86,7 +95,7 @@ static void OnProjectileCollision(engine::Collision collision)
 	if (collision.type == engine::Collision::Type::tilemapTrigger)
 	{
 		if (collision.b != 1)
-		{   
+		{
 			// Do animation projectile impact animation
 			CreateAnimation(collision.a);
 			engine::ecs::DestroyEntity(collision.a);
@@ -113,8 +122,8 @@ public:
 	void Update()
 	{
 		// Iterate through entities in the system
-		for (engine::ecs::Entity entity: entities)
-		{			
+		for (engine::ecs::Entity entity : entities)
+		{
 			// Get the entity and increment the iterator
 			Hedgehog& hedgehogComp = engine::ecs::GetComponent<Hedgehog>(entity);
 			engine::Transform& transformComp = engine::ecs::GetComponent<engine::Transform>(entity);
