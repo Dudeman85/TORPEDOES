@@ -581,7 +581,7 @@ public:
 		}
 		else startGameTimer = false;
 
-		if (startGameCurrentTime <= -3 )
+		if (startGameCurrentTime <= -1 || input::GetNewPress("StartGame"))
 		{	//START GAME
 			canStartLoadingMap = true;
 
