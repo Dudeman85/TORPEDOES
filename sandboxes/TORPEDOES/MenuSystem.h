@@ -41,6 +41,9 @@ struct PlayerSelection
 
 	engine::ecs::Entity backgroundImage;
 
+	float throttleCurrentWaitedTimeUP = 0;
+	float throttleCurrentWaitedTimeDown = 0;
+
 };
 
 
@@ -51,7 +54,7 @@ class PlayerSelectSystem : public engine::ecs::System
 
 	bool isLoadingMap = false;
 	const double startGameTimerInitValue = 30.f;
-	double startGameCurrentTime ;
+	float startGameCurrentTime ;
 
 	Vector2 gameStartTimerPosition;
 	engine::ecs::Entity startGameTimerEntity;
@@ -88,6 +91,7 @@ public:
 
 	//std::unordered_map<ShipType, engine::Model*> shipModels;
 	vector<engine::Model*> shipModels;
+	vector<engine::Model*> shipModelsReady;
 	bool isShipSelectionMenuOn = false;
 
 	vector< std::function<void()> >shipButtonFunctions
@@ -212,6 +216,12 @@ public:
 		shipModels.push_back({ resources::models["Ship_Yamato_Wireframe.obj"] });
 		shipModels.push_back({ resources::models["Ship_HMCS_Sackville_Wireframe.obj"] });
 
+		shipModelsReady.push_back({ resources::models["Ship_PT_109_Torpedo.obj"] });
+		shipModelsReady.push_back({ resources::models["Ship_U_99_Submarine.obj"] });
+		shipModelsReady.push_back({ resources::models["Ship_Yamato_Cannon.obj"] });
+		shipModelsReady.push_back({ resources::models["Ship_HMCS_Sackville_Variation.obj"] });
+
+
 		sceneParent = engine::ecs::NewEntity();
 		engine::ecs::AddComponent(sceneParent, engine::Transform{ .position = Vector3(0,0,0), .rotation = Vector3(0, 0, 0), .scale = 0.7f });
 		engine::ecs::AddComponent(sceneParent, engine::TextRenderer{ .font = resources::niagaraFont, .text = "",.scale = 0.005f,.color = Vector3(0, 0, 250), .uiElement = true });
@@ -230,7 +240,7 @@ public:
 		float statsParentScale = 0.004f;
 
 		float arrowsPosX = 0.8f;
-		float arrowUPposY = 0.28f;
+		float arrowUPposY = 0.22f;
 		float arrowDownposY = 0.18f;
 
 		Vector2 shipPos = (0.7f, -0.2f, -0.1f);
@@ -260,10 +270,10 @@ public:
 			//engine::ecs::AddComponent(pausedImage, PauseComponent{ .upper = pausedImage, .lower = optionsButton, .selectedTexture = resources::menuTextures["UI_Paused.png"], .unselectedTexture = resources::menuTextures["UI_Paused.png"], .operation = PauseSystem::OnResumePressed });
 
 
-			engine::ecs::AddComponent(arrowUp, engine::Transform{ .position = Vector3(arrowsPosX, arrowUPposY, -0.1f), .rotation = Vector3(0, 0, -90), .scale = Vector3(0.04f) });
+			engine::ecs::AddComponent(arrowUp, engine::Transform{ .position = Vector3(arrowsPosX+0.2f, arrowUPposY, -0.1f), .rotation = Vector3(0, 0, 180), .scale = Vector3(0.04f) });
 			engine::ecs::AddComponent(arrowUp, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"], .enabled = false, .uiElement = true });
 
-			engine::ecs::AddComponent(arrowDown, engine::Transform{ .position = Vector3(arrowsPosX, arrowDownposY, -0.1f), .rotation = Vector3(0, 0, 90), .scale = Vector3(0.04f) });
+			engine::ecs::AddComponent(arrowDown, engine::Transform{ .position = Vector3(arrowsPosX, arrowUPposY, -0.1f), .rotation = Vector3(0, 0, 0), .scale = Vector3(0.04f) });
 			engine::ecs::AddComponent(arrowDown, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"], .enabled = false, .uiElement = true });
 
 			engine::ecs::AddComponent(shipModel, engine::Transform{ .position = Vector3(0.7f, -0.2f, -0.1f) , .scale = 0});
@@ -363,9 +373,9 @@ public:
 
 
 			
+			float accelerationInput = input::GetTotalInputValue("Turn" + std::to_string(playerSelection.playerID));
 
-
-			float accelerationInput = input::GetTotalInputValue("Throttle" + std::to_string(playerSelection.playerID));
+			//float accelerationInput = input::GetTotalInputValue("Throttle" + std::to_string(playerSelection.playerID));
 
 			auto select = input::GetNewPress("Shoot" + std::to_string(playerSelection.playerID));
 
@@ -380,6 +390,7 @@ public:
 
 				if (!playerSelection.isActivePlayer)
 				{
+					
 					engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.backgroundImage).enabled = true;
 
 
@@ -410,14 +421,16 @@ public:
 					{
 						playersThatAreReadyAmount++;
 						printf(" TIMER s TARTED \n");
-						startGameTimer = true;
+						
+						engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).model = shipModelsReady[playerSelection.selection];
 						engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).color = Vector3(0, 255, 0);
 					}
 					else
 					{
+						engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).model = shipModels[playerSelection.selection];
 						playersThatAreReadyAmount--;
 						engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).color = Vector3(0, 0, 255);
-						startGameTimer = false;
+						
 					}
 				}
 			}
@@ -427,9 +440,9 @@ public:
 
 
 				//Throttle Up 
-				if (accelerationInput > 0.5f && throttleCurrentWaitedTimeUP > throttleMoveWaitTime)
+				if (accelerationInput > 0.5f && playerSelection.throttleCurrentWaitedTimeUP > throttleMoveWaitTime)
 				{
-					throttleCurrentWaitedTimeUP = 0;
+					playerSelection.throttleCurrentWaitedTimeUP = 0;
 					//std::cout << "\n--Ship Selection moveUP--\n";
 
 					playerSelection.selection++;
@@ -443,9 +456,9 @@ public:
 
 
 				//Throttle Down 
-				else if (accelerationInput < -0.5f && throttleCurrentWaitedTimeDown > throttleMoveWaitTime)
+				else if (accelerationInput < -0.5f && playerSelection.throttleCurrentWaitedTimeDown > throttleMoveWaitTime)
 				{	  //TODO:: KORJAA alusken vaihtoa aika jokaiselle
-					throttleCurrentWaitedTimeDown = 0;
+					playerSelection.throttleCurrentWaitedTimeDown = 0;
 
 					printf("\nShip Selection moveDown\n");
 
@@ -504,7 +517,7 @@ public:
 
 
 		//GAME TIMER 
-			if (startGameTimer && startGameCurrentTime > 0)
+			if (startGameTimer && startGameCurrentTime > -5)
 			{
 
 				//print timer in screen
@@ -555,16 +568,20 @@ public:
 				//canStartLoadingMap = false;
 			}
 
+
+		playerSelection.throttleCurrentWaitedTimeUP += engine::deltaTime;
+		playerSelection.throttleCurrentWaitedTimeDown += engine::deltaTime;
 			
 		}
 		//TODO::ERROR BRAKES THE GAME if implemented
 		if (selectedShipsAtTheFrame.size() != 0 && selectedShipsAtTheFrame.size() == playersThatAreReadyAmount)
 		{
-			isPlayersReady = true;
+			startGameTimer = true;
+			
 		}
-		else  isPlayersReady = false;
+		else startGameTimer = false;
 
-		if (startGameCurrentTime <= 0 || isPlayersReady)
+		if (startGameCurrentTime <= -1 || input::GetNewPress("StartGame"))
 		{	//START GAME
 			canStartLoadingMap = true;
 
@@ -575,9 +592,6 @@ public:
 			ToggleMenuPlayerSelection();
 			
 		}
-
-		throttleCurrentWaitedTimeUP += engine::deltaTime;
-		throttleCurrentWaitedTimeDown += engine::deltaTime;
 
 
 	}

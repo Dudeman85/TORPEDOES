@@ -16,10 +16,9 @@ enum ShipType { torpedoBoat, submarine, cannonBoat, hedgehogBoat, pirateShip };
 struct indicatorStruct
 {
 	engine::ecs::Entity entity;
-	engine::Texture* texture1;
-	engine::Texture* texture2;
+	std::vector<engine::Texture*> textures;
 
-	indicatorStruct(engine::ecs::Entity e, engine::Texture* t1, engine::Texture* t2) : entity(e), texture1(t1), texture2(t2)
+	indicatorStruct(engine::ecs::Entity e, std::vector<engine::Texture*> t) : entity(e), textures(t)
 	{
 
 	}
@@ -63,7 +62,7 @@ struct Player
 	float _specialTimer = 0.0f;
 
 	// Action functions
-	std::function<void(engine::ecs::Entity)> mainAction;
+	std::function<void(engine::ecs::Entity)> shootAction;
 	std::function<void(engine::ecs::Entity)> specialAction;
 
 	// Checkpoint
@@ -76,6 +75,9 @@ struct Player
 	// Rendered child entities
 	std::vector<indicatorStruct> shootIndicators;
 	std::vector<indicatorStruct> specialIndicators;
+
+	std::function<void(engine::ecs::Entity)> shootIndicatorUpdate;
+	std::function<void(engine::ecs::Entity)> specialIndicatorUpdate;
 
 	engine::ecs::Entity renderedEntity;
 	engine::ecs::Entity nameText;
@@ -255,7 +257,6 @@ struct aimingGuideStruct
 	engine::ScheduledFunction* timerFunction;
 };
 
-//const float HedgehogAngleOffset = Radians(5.0f); // Ajuste de ángulo para las direcciones de los proyectiles
 static std::map<int, aimingGuideStruct> playerIdToAimGuides;
 
 void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> aimingGuides, float guideSpeed, float shootAngle, int shootAmount)
@@ -458,16 +459,14 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 		TransformSystem::AddParent(playerComponent.animationEntity, playerEntity);
 
 		//Start submerging and slow down
-		playerComponent.forwardSpeed /= 1.5f;
-
-		//Cannot surface for 5 seconds
+		playerComponent._boostScale = 0.75;
+		playerComponent.submerged = true;
 
 		//Finished submerging after 1 second
 		TimerSystem::ScheduleFunction(
 			[playerEntity]()
 			{
 				Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
-				playerComponent.submerged = true;
 				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures.push_back(resources::modelTextures["Player_Black.png"]);
 			}, 0.3);
 	}
@@ -478,7 +477,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 		playerComponent.animationEntity = 0;
 
 		//Start surfacing and speed up
-		playerComponent.forwardSpeed *= 1.5f;
+		playerComponent._boostScale = 1;
 
 		//Finished surfacing after 1 second
 		TimerSystem::ScheduleFunction(
@@ -488,6 +487,132 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 				playerComponent.submerged = false;
 				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures.clear();
 			}, 0.3);
+	}
+}
+
+/* INDICATOR UPDATES */
+
+void CannonIndicatorUpdate(engine::ecs::Entity entity)
+{
+	Player& player = engine::ecs::GetComponent<Player>(entity);
+
+	if (player.shootIndicators.empty())
+	{
+		return;
+	}
+
+	indicatorStruct& it = player.shootIndicators.back();
+
+	engine::SpriteRenderer& sprite = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
+	if (!player.reloading || (player.ammo >= player.maxAmmo))
+	{
+		sprite.texture = it.textures[0];
+	}
+	else
+	{
+		sprite.texture = it.textures[1];
+	}
+}
+
+void HedgehogIndicatorUpdate(engine::ecs::Entity entity)
+{
+	Player& player = engine::ecs::GetComponent<Player>(entity);
+
+	if (player.shootIndicators.empty())
+	{
+		return;
+	}
+
+	indicatorStruct& it = player.shootIndicators.back();
+
+	engine::SpriteRenderer& sprite = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
+	if (player.ammo > 0)
+	{
+		sprite.texture = it.textures[0];
+	}
+	else
+	{
+		sprite.texture = it.textures[1];
+	}
+}
+
+void TorpedoIndicatorUpdate(engine::ecs::Entity entity)
+{
+	Player& player = engine::ecs::GetComponent<Player>(entity);
+
+	if (player.shootIndicators.size() < player.maxAmmo)
+	{
+		return;
+	}
+
+	for (int i = 0; i < player.maxAmmo; i++)
+	{
+		indicatorStruct& it = player.shootIndicators[i];
+
+		engine::SpriteRenderer& sprite = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
+		if (player.ammo > i)
+		{
+			sprite.texture = it.textures[0];
+		}
+		else
+		{
+			sprite.texture = it.textures[1];
+		}
+	}
+}
+
+void BoostIndicatorUpdate(engine::ecs::Entity entity)
+{
+	Player& player = engine::ecs::GetComponent<Player>(entity);
+
+	if (player.shootIndicators.empty())
+	{
+		return;
+	}
+
+	indicatorStruct& it = player.specialIndicators[0];
+	engine::SpriteRenderer& sprite = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
+
+	if (player.specialCooldown <= player._specialTimer)
+	{
+		sprite.texture = it.textures[0];
+	}
+	else
+	{
+		sprite.texture = it.textures[1];
+	}
+}
+
+void SubmergeIndicatorUpdate(engine::ecs::Entity entity)
+{
+	Player& player = engine::ecs::GetComponent<Player>(entity);
+
+	indicatorStruct& it = player.specialIndicators[0];
+	engine::SpriteRenderer& sprite = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
+
+	if (player.submerged)
+	{
+		if (player.specialCooldown <= player._specialTimer)
+		{
+
+			sprite.texture = it.textures[0];
+		}
+		else
+		{
+			sprite.texture = it.textures[1];
+		}
+	}
+	else
+	{
+		if (player.specialCooldown <= player._specialTimer)
+		{
+
+			sprite.texture = it.textures[2];
+		}
+		else
+		{
+			sprite.texture = it.textures[3];
+		}
 	}
 }
 
@@ -521,9 +646,10 @@ public:
 			ShipType::torpedoBoat, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 75, 
-				.shootCooldown = 0.2, .specialCooldown = 0.8, 
+				.shootCooldown = 0.2, .specialCooldown = 999999, .ammoRechargeCooldown = 2,
 				.holdShoot = false, .maxAmmo = 2, 
-				.mainAction = CreateTorpedo, .specialAction = Boost 
+				.shootAction = CreateTorpedo, .specialAction = Boost,
+				.shootIndicatorUpdate = TorpedoIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
 			} 
 		});
 		shipComponents.insert(
@@ -531,9 +657,10 @@ public:
 			ShipType::submarine, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 75, 
-				.shootCooldown = 0.2, .specialCooldown = 4, 
+				.shootCooldown = 0.2, .specialCooldown = 4, .ammoRechargeCooldown = 2,
 				.holdShoot = false, .maxAmmo = 2, 
-				.mainAction = CreateTorpedo, .specialAction = ToggleSubmerge 
+				.shootAction = CreateTorpedo, .specialAction = ToggleSubmerge,
+				.shootIndicatorUpdate = TorpedoIndicatorUpdate, .specialIndicatorUpdate = SubmergeIndicatorUpdate
 			} 
 		});
 		shipComponents.insert(
@@ -541,9 +668,10 @@ public:
 			ShipType::cannonBoat, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 75, .reloading = true,
-				.shootCooldown = 0.1, .specialCooldown = 0.8, .ammoRechargeCooldown = 0.16,
+				.shootCooldown = 0.1, .specialCooldown = 999999, .ammoRechargeCooldown = 0.16,
 				.holdShoot = true, .maxAmmo = 10,
-				.mainAction = ShootShell, .specialAction = Boost 
+				.shootAction = ShootShell, .specialAction = Boost,
+				.shootIndicatorUpdate = CannonIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
 			} 
 		});
 		shipComponents.insert(
@@ -551,9 +679,10 @@ public:
 			ShipType::hedgehogBoat, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 75, 
-				.shootCooldown = 0.4, .specialCooldown = 0.8, .ammoRechargeCooldown = 0.8, 
-				.holdShoot = false, .maxAmmo = 8, 
-				.mainAction = ShootHedgehog, .specialAction = Boost 
+				.shootCooldown = 0.4, .specialCooldown = 999999, .ammoRechargeCooldown = 5,
+				.holdShoot = false, .maxAmmo = 1, 
+				.shootAction = ShootHedgehog, .specialAction = Boost,
+				.shootIndicatorUpdate = HedgehogIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
 			} 
 		});
 
@@ -814,12 +943,14 @@ public:
 			float finalBoostScale = player._boostScale;
 			if (player._offroadThisFrame)
 			{
-				if (player._boostScale <= 1)
+				if (player._boostScale > 1 || player.submerged)
 				{
-					// Ignore slower speed due to boost when already offtrack
+					// Ignore offtrack while boosting or submerged
+				}
+				else
+				{
 					finalBoostScale = player.offtrackSpeedScale;
 				}
-				// Ignore offtrack while boosting
 			}
 
 			// Apply the final impulse to the object
@@ -880,7 +1011,7 @@ public:
 				}
 
 				// Create a projectile using the parameters of the player object.
-				player.mainAction(entity);
+				player.shootAction(entity);
 
 				player.ammo--;
 
@@ -903,36 +1034,40 @@ public:
 				}
 			}
 
-			// Shoot indicators
-
-			std::cout << player.shootIndicators.size() << " " << player.maxAmmo << "\n";
-
-			if (player.shootIndicators.size() >= player.maxAmmo)
-			{
-				for (int i = 0; i < player.maxAmmo; i++)
-				{
-					indicatorStruct it = player.shootIndicators[i];
-					
-					engine::SpriteRenderer& sprite = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
-					if (player.ammo > i)
-					{
-						sprite.texture = it.texture1;
-						std::cout << "yes!";
-					}
-					else
-					{
-						sprite.texture = it.texture2;
-						std::cout << "no!";
-					}
-				}
-				std::cout << "hello!!! \n";
-			}
+			player.shootIndicatorUpdate(entity);
+			player.specialIndicatorUpdate(entity);
 
 			if (player.animationEntity != 0) 
 			{
 				TransformSystem::SetRotation(player.animationEntity, {0, 0, modelTransform.rotation.y});
 			}
 		}
+	}
+
+	indicatorStruct CreateIndicator(engine::ecs::Entity entity, Vector3 pos, Vector3 scale, std::vector<std::string> textureNames)
+	{
+		Player& player = engine::ecs::GetComponent<Player>(entity);
+
+		engine::ecs::Entity shootIndicator = engine::ecs::NewEntity();
+
+		engine::ecs::AddComponent(shootIndicator, engine::SpriteRenderer{ .texture = resources::uiTextures[textureNames[1]] });
+		engine::ecs::AddComponent(shootIndicator, engine::Transform{ .position = pos, .scale = scale });
+		engine::TransformSystem::AddParent(shootIndicator, entity);
+
+		std::vector<engine::Texture*> textures;
+		for (auto& textureName : textureNames)
+		{
+			textures.push_back(resources::uiTextures[textureName]);
+		}
+
+		return indicatorStruct(shootIndicator, textures);
+	}
+
+	float generateEquidistantPoint(float minRange, float maxRange, int numOfPoints, int iteration)
+	{
+		double interval = (maxRange - minRange) / (numOfPoints - 1);
+
+		return minRange + (iteration * interval);
 	}
 
 	//Spawn 1-4 players, all in a line from top to bottom
@@ -971,57 +1106,54 @@ public:
 
 			Player& player = engine::ecs::GetComponent<Player>(playerEntity);
 
-			//Create the players's shoot indicators
-			float totalWidth = 0;
-			float indicatorDistance = 0;
+			// Create shoot indicators
+			float rangeEnd = 2;
+			float rangeStart = -2;
+			Vector3 offset = Vector3(-2, -2, 10);
+			Vector3 scale = Vector3(2, 2, 1);
+			auto func = *player.shootAction.target<void(*)(engine::ecs::Entity)>();
 
-			switch (playerShip.second)
+			if (*func == CreateTorpedo)
 			{ 
-				case ShipType::torpedoBoat:
-				case ShipType::submarine:
-					totalWidth = -2;
-					indicatorDistance = 2;
+				scale = Vector3(2, 0.5, 1);
 
-					for (int i = 0; i < player.maxAmmo; i++)
-					{
-						engine::ecs::Entity shootIndicator = engine::ecs::NewEntity();
+				// Add max ammo's number of indicators
+				for (int i = 0; i < player.maxAmmo; i++)
+				{
+					// Place indicators equidistant along the range
+					offset.x = generateEquidistantPoint(rangeStart, rangeEnd, player.maxAmmo, i);
 
-						engine::ecs::AddComponent(shootIndicator, engine::SpriteRenderer{  });
-						engine::ecs::AddComponent(shootIndicator, engine::Transform{ .position = Vector3( totalWidth + (i * indicatorDistance), -2, 10), .scale = Vector3(2, .5, 1) });
-						engine::TransformSystem::AddParent(shootIndicator, playerEntity);
-
-						auto a = indicatorStruct(shootIndicator, resources::uiTextures["UI_Green_Torpedo_Icon.png"], resources::uiTextures["UI_Red_Torpedo_Icon.png"]);
-
-						player.shootIndicators.push_back(a);
-					}
-					break;
-				case ShipType::hedgehogBoat:
-					break;
-				case ShipType::cannonBoat:
-				case ShipType::pirateShip:
-						break;
-				default:
-					break;
+					player.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Torpedo_Icon.png", "UI_Red_Torpedo_Icon.png" }));
+				}
 			}
-			//Create the players's special indicators
-			switch (playerShip.second)
+			else if (*func == ShootHedgehog)
 			{
-				case ShipType::torpedoBoat:
-				case ShipType::submarine:
-					break;
-				case ShipType::hedgehogBoat:
-					break;
-				case ShipType::cannonBoat:
-				case ShipType::pirateShip:
-					break;
-				default:
-					break;
+				scale = Vector3(1, 1, 1);
+
+				player.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Hedgehog_Icon.png", "UI_Red_Hedgehog_Icon.png" }));
+			}
+			else if (*func == ShootShell)
+			{
+				scale = Vector3(1, 1, 1);
+
+				player.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Cannon_Icon.png", "UI_Red_Cannon_Icon.png" }));
 			}
 
-			/*
-			engine::ecs::AddComponent(torpIndicator2, engine::SpriteRenderer{ .texture = resources::uiTextures["UI_Green_Torpedo_Icon.png"] });
-			engine::ecs::AddComponent(torpIndicator2, engine::Transform{ .position = Vector3(2, -2, 10), .scale = Vector3(2, .5, 1) });
-			engine::TransformSystem::AddParent(torpIndicator2, player);*/
+			// Create special indicators
+			rangeEnd = 2;
+			rangeStart = -2;
+			offset = Vector3(-2, -4, 10);
+			scale = Vector3(1.25, 1.25, 1);
+			func = *player.specialAction.target<void(*)(engine::ecs::Entity)>();
+
+			if (*func == Boost)
+			{
+				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Booster_Icon.png", "UI_Red_Booster_Icon.png" }));
+			}
+			else if (*func == ToggleSubmerge)
+			{
+				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Surface_Icon.png", "UI_Red_Surface_Icon.png", "UI_Green_Submerge_Icon.png", "UI_Red_Submerge_Icon.png" }));
+			}
 
 			// Works
 			Audio* audio = engine::AddAudio("Gameplay", "audio/dink.wav", false, 100000);
