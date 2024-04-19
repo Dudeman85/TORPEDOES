@@ -239,7 +239,7 @@ int main()
 	// Load the third level
 	//LoadLevel3(&cam);
 
-	//ShipSelectionSystem->ToggleMenuPlayerSelection();
+
 
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
@@ -247,7 +247,9 @@ int main()
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Goal_Ver2.obj"] });
 
 	
-	PlayersMenu(ShipSelectionSystem);
+	//PlayersMenu(ShipSelectionSystem);
+	ShipSelectionSystem->isShipSelectionMenuOn = true;
+	isGamePaused = true;
 	bool mapLoaded = false;
 
 	//Game Loop
@@ -342,11 +344,11 @@ int main()
 
 		if (input::GetNewPress("Menu"))
 		{
-		/*	ShipSelectionSystem->isShipSelectionMenuOn = !ShipSelectionSystem->isShipSelectionMenuOn;
+			ShipSelectionSystem->isShipSelectionMenuOn = !ShipSelectionSystem->isShipSelectionMenuOn;
 			isGamePaused = !isGamePaused;
 
 
-			ShipSelectionSystem->ToggleMenuPlayerSelection();*/
+			ShipSelectionSystem->ToggleMenuPlayerSelection();
 
 
 			std::cout << "is Ship selection open:" << ShipSelectionSystem->isShipSelectionMenuOn;
