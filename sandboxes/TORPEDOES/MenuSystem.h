@@ -279,7 +279,7 @@ public:
 			engine::ecs::AddComponent(shipModel, engine::Transform{ .position = Vector3(0.7f, -0.2f, -0.1f) , .scale = 0});
 			engine::ecs::AddComponent(shipModel, engine::ModelRenderer{ .model = shipModels[0], .uiElement = true });
 
-			engine::ecs::AddComponent(backgroundImage, engine::Transform{ .position = Vector3(0,0,-0.9f), .rotation = Vector3(0,0,0), .scale = Vector3(1.2) });
+			engine::ecs::AddComponent(backgroundImage, engine::Transform{ .position = Vector3(0.06f,0,-0.9f), .rotation = Vector3(0,0,0), .scale = Vector3(1.2) });
 			engine::ecs::AddComponent(backgroundImage, engine::SpriteRenderer{ .texture = resources::menuTextures["Selection_BG_Var3.png"], .enabled = false, .uiElement = true });
 
 			engine::ecs::AddComponent(readyText, engine::Transform{ .position = Vector3(arrowsPosX-0.4f,arrowDownposY,-0.1f) , .scale = 0.003f });
@@ -391,7 +391,7 @@ public:
 				if (!playerSelection.isActivePlayer)
 				{
 					
-					//engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.backgroundImage).enabled = true;
+					engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.backgroundImage).enabled = true;
 
 
 					//add player to selectedShipsAtTheFrame if not yet have that player ID
@@ -628,7 +628,7 @@ public:
 */				  canStartLoadingMap = false;
 
 
-				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.backgroundImage).enabled = false;
+				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.backgroundImage).enabled = true;
 
 				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowUp).enabled = true;
 				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowDown).enabled = true;
