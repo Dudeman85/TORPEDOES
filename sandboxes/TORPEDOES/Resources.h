@@ -14,7 +14,7 @@ namespace resources
 
 	Font* niagaraFont;
 
-	Tilemap* level1Map; // Old tilemap
+	Tilemap* level4Map; // Long map
 	Tilemap* level2Map; // Viksteri WIP tilemap
 	Tilemap* level3Map; // Tropical tilemap
 
@@ -37,8 +37,8 @@ namespace resources
 
 		niagaraFont = new Font("Niagara Solid.ttf", 0, 0, 48);
 
-		level1Map = new Tilemap(cam);
-		level1Map->loadMap("/levels/level1.tmx");
+		level4Map = new Tilemap(cam);
+		level4Map->loadMap("/levels/level4.tmx");
 
 		level2Map = new Tilemap(cam);
 		level2Map->loadMap("/levels/level2.tmx");
@@ -69,7 +69,7 @@ namespace resources
 		}
 
 		delete niagaraFont;
-		delete level1Map;
+		delete level4Map;
 		delete level2Map;
 		delete level3Map;
 	}

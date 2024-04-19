@@ -45,7 +45,7 @@ static void PlayCountdown(Vector3 pos)
 }
 
 //Create everything for level 1
-static void LoadLevel1(engine::Camera* cam)
+static void LoadLevel3(engine::Camera* cam)
 {
 	engine::collisionSystem->cam = cam;
 
@@ -53,8 +53,8 @@ static void LoadLevel1(engine::Camera* cam)
 	//resources::level1Map->enabledLayers[1] = false;
 
 	//Set this level's tilemap
-	engine::spriteRenderSystem->SetTilemap(resources::level1Map);
-	engine::collisionSystem->SetTilemap(resources::level1Map);
+	engine::spriteRenderSystem->SetTilemap(resources::level3Map);
+	engine::collisionSystem->SetTilemap(resources::level3Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(2480.0f, -1520.0f));
@@ -101,14 +101,14 @@ void LoadLevel2(engine::Camera* cam)
 	CreateCheckpoint(Vector3(1505.000000, -335.000000, 100.000000), Vector3(52.500000, -32.500000, -5.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 60.0f);					// Sixth checkpoint
 	CreateCheckpoint(Vector3(600.000000, -665.000000, 100.000000), Vector3(40.000000, -25.000000, -17.500000), Vector3(17), resources::models["Prop_Buoy.obj"], 60.0f);					// Seventh checkpoint
 	CreateCheckpoint(Vector3(530.000000, -1675.000000, 100.000000), Vector3(45.000000, 32.500000, 47.500000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 145.0f);		// Eight checkpoint
-	CreateCheckpoint(Vector3(1230.000000, -1695.000000, 100.000000), Vector3(-52.500000, -87.500000, -90.000000), Vector3(20), resources::models["Prop_Goal_Ver2.obj"], 0.0f, true);			// Finish line
+	CreateCheckpoint(Vector3(1230.000000, -1685.000000, 100.000000), Vector3(-17.500000, -87.500000, -90.000000), Vector3(17.5), resources::models["Prop_Goal_Ver2.obj"], 0.0f, true);	// Finish line
 
 	PlayCountdown(Vector3(1260.0f, -1500.0f, 0.0f));
-	PlayerController::lapCount = 0;
+	PlayerController::lapCount = 1;
 }
 
 // Create everything for level 3
-void LoadLevel3(engine::Camera* cam)
+void LoadLevel4(engine::Camera* cam)
 {
 	engine::collisionSystem->cam = cam;
 
@@ -245,7 +245,7 @@ int main()
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 0), .scale = 20 });
-	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Buoy.obj"] });
+	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Goal_Ver2.obj"] });
 
 	
 	PlayersMenu(ShipSelectionSystem);
