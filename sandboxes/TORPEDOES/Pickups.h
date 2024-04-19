@@ -27,8 +27,8 @@ public:
 		//For each entity
 		for (ecs::Entity entity : entities)
 		{
-			TransformSystem::Translate(entity, {0, (float)sin(programTime) * 0.2f, 0 });
-			TransformSystem::Rotate(entity, {0, 1, 0});
+			TransformSystem::Translate(entity, { 0, (float)sin(programTime * 2) * 0.07f, (float)sin(programTime * 2) * 0.05f });;
+			TransformSystem::Rotate(entity, { 0, (float)sin(programTime * 2) * 0.2f, 0 });
 		}
 	}
 
@@ -37,42 +37,47 @@ public:
 	{
 		ecs::Entity pickup = ecs::NewEntity();
 		ecs::AddComponent(pickup, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
-		ecs::AddComponent(pickup, Transform{ .position = position, .rotation = {45, 0, 0}, .scale = 30 });
-		ecs::AddComponent(pickup, PickupComponent{.respawn = respawn});
+		ecs::AddComponent(pickup, Transform{ .position = position, .rotation = {60, 35, 0}, .scale = 25 });
+		ecs::AddComponent(pickup, PickupComponent{ .respawn = respawn });
 		vector<Vector2> colliderVerts{ Vector2(.5, .5), Vector2(.5, -.5), Vector2(-.5, -.5), Vector2(-.5, .5) };
-		ecs::AddComponent(pickup, PolygonCollider{.vertices = colliderVerts, .callback = OnCollision, .trigger = true, .visualise = true});
+		ecs::AddComponent(pickup, PolygonCollider{ .vertices = colliderVerts, .callback = OnCollision, .trigger = true, .visualise = true });
 	}
 
-	static void OnCollision(Collision collision) 
+	//Disables a pickup, it will re-enable after a while if set
+	static void Disable(ecs::Entity pickup)
 	{
-		ModelRenderer& model = ecs::GetComponent<ModelRenderer>(collision.a);
-		PickupComponent& pickupComponent = ecs::GetComponent<PickupComponent>(collision.a);
+		ModelRenderer& model = ecs::GetComponent<ModelRenderer>(pickup);
+		PickupComponent& pickupComponent = ecs::GetComponent<PickupComponent>(pickup);
 
+		model.enabled = false;
+		pickupComponent.active = false;
+		TimerSystem::ScheduleFunction(
+			[pickup]()
+			{
+				ecs::GetComponent<ModelRenderer>(pickup).enabled = true;
+				ecs::GetComponent<PickupComponent>(pickup).active = true;
+			}, respawnTime);
+	}
+
+	static void OnCollision(Collision collision)
+	{
 		//Don't do anything if not active
-		if (!pickupComponent.active)
+		if (!ecs::GetComponent<PickupComponent>(collision.a).active)
 			return;
 
 		//Only pickable by player
-		if (ecs::HasComponent<Player>(collision.b)) 
+		if (ecs::HasComponent<Player>(collision.b))
 		{
-			model.enabled = false;
-			pickupComponent.active = false;
-			TimerSystem::ScheduleFunction([collision]() 
-				{
-					ecs::GetComponent<ModelRenderer>(collision.a).enabled = true;
-					ecs::GetComponent<PickupComponent>(collision.a).active = true;
-				}, respawnTime);
+			Disable(collision.a);
+			
+			//Enable the special action
+			Player& player = ecs::GetComponent<Player>(collision.b);
+			player._specialTimer = 999999;
 		}
 		//Destroy if hit by a projectile
-		if (ecs::HasComponent<Projectile>(collision.b)) 
+		if (ecs::HasComponent<Projectile>(collision.b))
 		{
-			model.enabled = false;
-			pickupComponent.active = false;
-			TimerSystem::ScheduleFunction([collision]()
-				{
-					ecs::GetComponent<ModelRenderer>(collision.a).enabled = true;
-					ecs::GetComponent<PickupComponent>(collision.a).active = true;
-				}, respawnTime);
+			Disable(collision.a);
 
 			Transform& transform = ecs::GetComponent<Transform>(collision.a);
 

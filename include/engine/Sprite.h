@@ -320,9 +320,12 @@ namespace engine
 		//Update every entity with relevant components
 		void Update()
 		{
+			int i = 0;
 			//For each entity that has the required components
 			for (ecs::Entity entity : entities)
 			{
+				i++;
+
 				//Get the relevant components from entity
 				Animator& animator = ecs::GetComponent<Animator>(entity);
 

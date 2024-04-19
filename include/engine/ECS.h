@@ -119,6 +119,8 @@ namespace engine::ecs
 			}
 			Entity& operator*() const
 			{
+				if (*currentPtr == 0)
+					std::cout << errorFormat << "ECS ERROR in Iterator: fuck\n" << normalFormat;
 				return *currentPtr;
 			}
 		};

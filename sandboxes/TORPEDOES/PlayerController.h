@@ -255,7 +255,6 @@ struct aimingGuideStruct
 	engine::ScheduledFunction* timerFunction;
 };
 
-//const float HedgehogAngleOffset = Radians(5.0f); // Ajuste de ángulo para las direcciones de los proyectiles
 static std::map<int, aimingGuideStruct> playerIdToAimGuides;
 
 void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> aimingGuides, float guideSpeed, float shootAngle, int shootAmount)
@@ -521,7 +520,7 @@ public:
 			ShipType::torpedoBoat, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 75, 
-				.shootCooldown = 0.2, .specialCooldown = 0.8, 
+				.shootCooldown = 0.2, .specialCooldown = 999999, .ammoRechargeCooldown = 2,
 				.holdShoot = false, .maxAmmo = 2, 
 				.mainAction = CreateTorpedo, .specialAction = Boost 
 			} 
@@ -531,7 +530,7 @@ public:
 			ShipType::submarine, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 75, 
-				.shootCooldown = 0.2, .specialCooldown = 4, 
+				.shootCooldown = 0.2, .specialCooldown = 4, .ammoRechargeCooldown = 2,
 				.holdShoot = false, .maxAmmo = 2, 
 				.mainAction = CreateTorpedo, .specialAction = ToggleSubmerge 
 			} 
@@ -541,7 +540,7 @@ public:
 			ShipType::cannonBoat, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 75, .reloading = true,
-				.shootCooldown = 0.1, .specialCooldown = 0.8, .ammoRechargeCooldown = 0.16,
+				.shootCooldown = 0.1, .specialCooldown = 999999, .ammoRechargeCooldown = 0.16,
 				.holdShoot = true, .maxAmmo = 10,
 				.mainAction = ShootShell, .specialAction = Boost 
 			} 
@@ -551,8 +550,8 @@ public:
 			ShipType::hedgehogBoat, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 75, 
-				.shootCooldown = 0.4, .specialCooldown = 0.8, .ammoRechargeCooldown = 0.8, 
-				.holdShoot = false, .maxAmmo = 8, 
+				.shootCooldown = 0.4, .specialCooldown = 999999, .ammoRechargeCooldown = 5,
+				.holdShoot = false, .maxAmmo = 1, 
 				.mainAction = ShootHedgehog, .specialAction = Boost 
 			} 
 		});
