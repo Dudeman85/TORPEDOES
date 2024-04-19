@@ -131,12 +131,11 @@ namespace engine
 				}
 			}
 
+			//Disable the depth buffer to always draw UI elements on top
+			glDisable(GL_DEPTH_BUFFER_BIT);
 			//Draw all UI elements by layer
 			for (const float& layer : uiLayersToDraw)
 			{
-				//Clear the depth buffer to always draw UI elements on top
-				glDisable(GL_DEPTH_BUFFER_BIT);
-
 				//Draw entities for this layer
 				for (const ecs::Entity& entity : sortedUIElements[layer])
 				{

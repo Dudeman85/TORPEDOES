@@ -49,16 +49,13 @@ static void LoadLevel1(engine::Camera* cam)
 {
 	engine::collisionSystem->cam = cam;
 
-	//TEST
-	//resources::level1Map->enabledLayers[1] = false;
-
 	//Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level1Map);
 	engine::collisionSystem->SetTilemap(resources::level1Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
+	//Create the players
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(2480.0f, -1520.0f));
-
 
 	//Make all the checkpoints manually
 	CreateCheckpoint(Vector3(3015.000000, -760.000000, 100.000000), Vector3(27.500000, 47.500000, 7.500000), Vector3(19), resources::models["Prop_Buoy.obj"], 37.5f + 90.f);
@@ -67,7 +64,7 @@ static void LoadLevel1(engine::Camera* cam)
 	CreateCheckpoint(Vector3(885.000000, -780.000000, 100.000000), Vector3(15.000000, 25.000000, 7.500000), Vector3(14.5f), resources::models["Prop_Buoy.obj"], 15.0f + 90.f);
 	CreateCheckpoint(Vector3(1185.000000, -480.000000, 100.000000), Vector3(25.000000, 7.500000, 7.500000), Vector3(14.5f), resources::models["Prop_Buoy.obj"], 15.0f + 90.f);
 	CreateCheckpoint(Vector3(1170.000000, -1250.000000, 100.000000), Vector3(37.500000, 0.000000, 0.000000), Vector3(13), resources::models["Prop_Buoy.obj"], 13.0f + 80.f);
-	CreateCheckpoint(Vector3(2555.000000, -1600.000000, 100.000000), Vector3(-17.500000, -87.500000, -90.000000), Vector3(20.5f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true); // 10
+	CreateCheckpoint(Vector3(2555.000000, -1600.000000, 100.000000), Vector3(-17.500000, -87.500000, -90.000000), Vector3(20.5f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
 
 	//Make the crowds manually
 	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims);
@@ -178,16 +175,11 @@ int main()
 	soundSystem->AddSoundEngine("Background");
 	soundSystem->AddSoundEngine("Music");
 
-	//startLevel = LoadLevel1(&cam);
 	std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem = engine::ecs::GetSystem<PlayerSelectSystem>();
 	ShipSelectionSystem->Init();
 
 	//Bind all input actions
 	SetupInput();
-
-	//Load the first level
-	//LoadLevel1(&cam);
-	//ShipSelectionSystem->ToggleMenuPlayerSelection();
 
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
@@ -200,12 +192,6 @@ int main()
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
-	/*	if (PlayerSelectSystem::GetCanStartLoadingMap() && mapLoaded)
-		{						  5
-			mapLoaded = true;
-			LoadLevel1(&cam);
-		}*/
-
 		glfwPollEvents();
 
 		//Close window when Esc is pressed

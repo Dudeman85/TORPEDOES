@@ -105,7 +105,7 @@ namespace engine
 			return -1;
 		}
 
-		///Solve a collision between two colliders, Returns 0 on success, >0 on trigger, and <0 on failure
+		///Solve a collision between an entity and a tilemap, Returns 0 on success, >0 on trigger, and <0 on failure
 		static int SolveTilemapCollision(std::vector<Collision> collisions)
 		{
 			//No collision, nothing needs to be done
