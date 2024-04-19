@@ -3,6 +3,7 @@
 #include "MenuSystem.h"	
 #include "GameCamera.h"
 #include "engine/SoundComponent.h"
+#include "Pickups.h"
 
 using namespace engine;
 

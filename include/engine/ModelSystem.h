@@ -1,3 +1,4 @@
+#pragma once
 //Engine
 #include <engine/ECS.h>
 #include <engine/Transform.h>
