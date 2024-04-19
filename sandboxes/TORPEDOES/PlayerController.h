@@ -18,10 +18,9 @@ struct indicatorStruct
 	engine::ecs::Entity entity;
 	std::vector<engine::Texture*> textures;
 
-	indicatorStruct(engine::ecs::Entity e, engine::Texture* t1, engine::Texture* t2) : entity(e)
+	indicatorStruct(engine::ecs::Entity e, std::vector<engine::Texture*> t) : entity(e), textures(t)
 	{
-		textures.push_back(t1);
-		textures.push_back(t2);
+
 	}
 };
 
@@ -508,7 +507,7 @@ void CannonIndicatorUpdate(engine::ecs::Entity entity)
 	indicatorStruct& it = player.shootIndicators.back();
 
 	engine::SpriteRenderer& sprite = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
-	if (!player.reloading)
+	if (!player.reloading || (player.ammo >= player.maxAmmo))
 	{
 		sprite.texture = it.textures[0];
 	}
@@ -1046,7 +1045,7 @@ public:
 		}
 	}
 
-	indicatorStruct CreateIndicator(engine::ecs::Entity entity, Vector3 pos, Vector3 scale, std::string textureOn, std::string textureOff)
+	indicatorStruct CreateIndicator(engine::ecs::Entity entity, Vector3 pos, Vector3 scale, std::vector<std::string> textureNames)
 	{
 		Player& player = engine::ecs::GetComponent<Player>(entity);
 
@@ -1056,7 +1055,13 @@ public:
 		engine::ecs::AddComponent(shootIndicator, engine::Transform{ .position = pos, .scale = scale });
 		engine::TransformSystem::AddParent(shootIndicator, entity);
 
-		return indicatorStruct(shootIndicator, resources::uiTextures[textureOn], resources::uiTextures[textureOff]);
+		std::vector<engine::Texture*> textures;
+		for (auto& textureName : textureNames)
+		{
+			textures.push_back(resources::uiTextures[textureName]);
+		}
+
+		return indicatorStruct(shootIndicator, textures);
 	}
 
 	float generateEquidistantPoint(float minRange, float maxRange, int numOfPoints, int iteration)
@@ -1119,33 +1124,36 @@ public:
 					// Place indicators equidistant along the range
 					offset.x = generateEquidistantPoint(rangeStart, rangeEnd, player.maxAmmo, i);
 
-					player.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, "UI_Green_Torpedo_Icon.png", "UI_Red_Torpedo_Icon.png"));
+					player.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Torpedo_Icon.png", "UI_Red_Torpedo_Icon.png" }));
 				}
 			}
 			else if (*func == ShootHedgehog)
 			{
-				player.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, "UI_Green_Hedgehog_Icon.png", "UI_Red_Hedgehog_Icon.png"));
+				scale = Vector3(1, 1, 1);
+
+				player.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Hedgehog_Icon.png", "UI_Red_Hedgehog_Icon.png" }));
 			}
 			else if (*func == ShootShell)
 			{
-				player.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, "UI_Green_Cannon_Icon.png", "UI_Red_Cannon_Icon.png"));
+				scale = Vector3(1, 1, 1);
+
+				player.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Cannon_Icon.png", "UI_Red_Cannon_Icon.png" }));
 			}
 
 			// Create special indicators
 			rangeEnd = 2;
 			rangeStart = -2;
 			offset = Vector3(-2, -4, 10);
-			scale = Vector3(2, 2, 1);
+			scale = Vector3(1.25, 1.25, 1);
 			func = *player.specialAction.target<void(*)(engine::ecs::Entity)>();
 
 			if (*func == Boost)
 			{
-				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, "UI_Green_Booster_Icon.png", "UI_Red_Booster_Icon.png"));
+				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Booster_Icon.png", "UI_Red_Booster_Icon.png" }));
 			}
 			else if (*func == ToggleSubmerge)
 			{
-				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, "UI_Green_Submerge_Icon.png", "UI_Red_Submerge_Icon.png"));
-				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, "UI_Green_Surface_Icon.png", "UI_Red_Surface_Icon.png"));
+				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Surface_Icon.png", "UI_Red_Surface_Icon.png", "UI_Green_Submerge_Icon.png", "UI_Red_Submerge_Icon.png" }));
 			}
 
 			// Works
