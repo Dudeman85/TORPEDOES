@@ -66,6 +66,8 @@ static void LoadLevel1(engine::Camera* cam)
 	CreateCheckpoint(Vector3(1170.000000, -1250.000000, 100.000000), Vector3(37.500000, 0.000000, 0.000000), Vector3(13), resources::models["Prop_Buoy.obj"], 13.0f + 80.f);
 	CreateCheckpoint(Vector3(2555.000000, -1600.000000, 100.000000), Vector3(-17.500000, -87.500000, -90.000000), Vector3(20.5f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
 
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3015.000000, -1560.000000, 100.000000));
+
 	//Make the crowds manually
 	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims);
 	CreateCrowd({ 1545, -1715, 11 }, resources::crowdAnims);
@@ -168,6 +170,7 @@ int main()
 	std::shared_ptr<PlayerController> playerController = engine::ecs::GetSystem<PlayerController>();
 	playerController->Init();
 	std::shared_ptr<HedgehogSystem> hedgehogSystem = engine::ecs::GetSystem<HedgehogSystem>();
+	std::shared_ptr<PickupSystem> pickupSystem = engine::ecs::GetSystem<PickupSystem>();
 
 	std::shared_ptr<engine::SoundSystem> soundSystem = engine::ecs::GetSystem<engine::SoundSystem>();
 	soundSystem->AddSoundEngine("Gameplay");
@@ -249,12 +252,15 @@ int main()
 			}
 		}
 
+
+
 		input::update();
 
 		if(!isGamePaused)
 			UpdateCam(&cam, resources::level1Map);
 
 		hedgehogSystem->Update();
+		pickupSystem->Update();
 		engine::Update(&cam);
 
 		if(canStartLoadingMap) 
