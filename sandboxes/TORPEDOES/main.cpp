@@ -127,6 +127,8 @@ static void SetupInput()
 	input::ConstructDigitalEvent("Pause");
 	input::ConstructDigitalEvent("Menu");
 	input::bindDigitalInput(GLFW_KEY_U, { "Menu" });
+	input::ConstructDigitalEvent("StartGame");
+	input::bindDigitalInput(GLFW_KEY_G, { "StartGame" });
 	// TODO: add controller pause key
 
 	float AnalogPositiveMinDeadZone = 0;
@@ -177,6 +179,7 @@ static void SetupInput()
 	input::bindDigitalInput(GLFW_KEY_N, { "Shoot" + std::to_string(KeyboardPlayer) });
 	input::bindDigitalInput(GLFW_KEY_M, { "Boost" + std::to_string(KeyboardPlayer) });
 	input::bindDigitalInput(GLFW_KEY_P, { "Pause"  });
+	input::bindDigitalInput(GLFW_KEY_G, { "StartGame" });
 }
 
 static void PlayersMenu(std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem)
@@ -339,11 +342,11 @@ int main()
 
 		if (input::GetNewPress("Menu"))
 		{
-			ShipSelectionSystem->isShipSelectionMenuOn = !ShipSelectionSystem->isShipSelectionMenuOn;
+		/*	ShipSelectionSystem->isShipSelectionMenuOn = !ShipSelectionSystem->isShipSelectionMenuOn;
 			isGamePaused = !isGamePaused;
 
 
-			ShipSelectionSystem->ToggleMenuPlayerSelection();
+			ShipSelectionSystem->ToggleMenuPlayerSelection();*/
 
 
 			std::cout << "is Ship selection open:" << ShipSelectionSystem->isShipSelectionMenuOn;
