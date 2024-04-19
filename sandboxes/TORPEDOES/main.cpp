@@ -9,7 +9,6 @@ using namespace engine;
 int checkPointNumber = 0;
 bool isGamePaused = false;
 
-
 static void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine::Model* checkPointModel, float hitboxrotation, bool finish_line = false)
 {
 	engine::ecs::Entity checkpoint = engine::ecs::NewEntity();
@@ -160,7 +159,6 @@ int main()
 	engine::Camera cam = engine::Camera(1120, 630);
 	cam.SetPosition(Vector3(0, 0, 1500));
 	cam.SetRotation(Vector3(0, 0, 0));
-	
 
 	//Loads all globally used resources
 	resources::LoadResources(&cam);
@@ -207,7 +205,6 @@ int main()
 			mapLoaded = true;
 			LoadLevel1(&cam);
 		}*/
-
 
 		glfwPollEvents();
 

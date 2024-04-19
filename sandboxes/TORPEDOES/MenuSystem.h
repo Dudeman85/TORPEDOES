@@ -599,7 +599,7 @@ public:
 
 				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowUp).enabled = false;
 				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowDown).enabled = false;
-				engine::ecs::GetComponent< engine::Transform>(playerSelection.shipModel).scale = 0;
+				engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).enabled = false;
 
 				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).text = "";
 				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).color = Vector3(0, 0, 255);
@@ -615,7 +615,7 @@ public:
 
 				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowUp).enabled = false;
 				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowDown).enabled = false;
-				engine::ecs::GetComponent< engine::Transform>(playerSelection.shipModel).scale = 0;
+				engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).enabled = false;
 
 				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).text = "";
 				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).scale = Vector3(1, 1, 1);

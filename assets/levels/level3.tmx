@@ -25,7 +25,7 @@
    eJzt3DtOw0AURuFxjJMaaIAKGlgPpqGEgGBNrAoCO2AljKVYQlYC46sBe+5/PmmUiDxscuQ3JIQ060XiE+ES/bXRXxv9tdFfG/0BQFPq+v+B7cSf2zQhvA/Guo6ffRyP9bj7qeg/H4fL/58m/eeD/tror43+2uhfhn4//aPJ+74e+t/aZ6UYfafjzL089L9chXC1ss9PCei/31Ns/7zt/2Kbpdmj/35nVQifB/b5KUFKf8s+gof+Pc/7ASn9u+ccLcetIzz19yyl/3V8rI3jRrj/STX+NSVg+/+zU6fde/TX5qn/JnH/NPe5rpJ56p86zdy/a8nor81T/+44ZXieotsmtNuf97djjmO8sxzbpZii/65ps6xPg/7a6K+N/tror43+2uivjf7acvYf/h/Zb+P7uYz+nJB1cK3AZsrlPyfWHzb010Z/bfTXlrN/u5xucK3QxsvyDxv6a6O/Nvpro782+mujvzb6a6O/Nvpro782+mujvzb6a6O/tl1/d3leh3Ax4vv8Ua7XRQhvg3EX29/TXwL9MdRUtgEf6K+N/tror83a/wssmGZV
   </data>
  </layer>
- <layer id="10" name="collider" width="128" height="64">
+ <layer id="10" name="collider" width="128" height="64" visible="0">
   <data encoding="base64" compression="zlib">
    eJzt19tywyAMhGE37//QvawnBYOQ5OXw78zeOcboI63zua7rQymllFJKKaWUUmrsD02t2tfj3xP1fD3tzWn+I1FbZrhH7E/ta/X3RO2aZe/Zm9oXf+3+1L74449/e3/3mUTuT+0b4d+ai2c+o174v++fMZ8RK896teA/l39v8N/P35I3/Z/mhr/G37puLfjP4f9074h1a8Hf55/9vY86d0/3b/mPrK/23cE/8u9Oa40R/6fnUPtG+F9fn+nde+R3H3+tvzKr+JeeR+27uv99hk/XRPp754B/TL5n2Lou4n9MxEzw96c0w55rM/ytM5rVP+p9LDu1d6je6617sszFegbU5qP+qjNQeo4If+ua+Nv2HnXvDP9W8F/b/2n9nuC/vv9oImdQuq/aHP96omdQurfafAf/3plbg/9a/pFnIPs5ZvSPOj8Z83zzDLzxDPjPdwbeXB//ec6AYm38924r+O/dVvDfu62s6O/Zu9oD/zP9o/eGP/5e+/s81Kb4x/r35jT/q+NzszcyJ/qTv+B/dvA/NyPvJzMUf19Ks1KbZvhzDv6nNiO1aab/iWfAOh+1abb/bmcg4nfkaf4Uf4o/XdufUkoppZRSSukc/QVKUylq
   </data>
