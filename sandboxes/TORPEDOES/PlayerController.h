@@ -312,7 +312,7 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 
 			modifiedDirection = Vector2(cos(angle), sin(angle));
 
-			Transform& guideTransform = ecs::GetComponent<Transform>(aimingGuides[positive_i]);
+			Transform& guideTransform = ecs::GetComponent<Transform>(aimingGuides[positive_i ]);
 			guideTransform.position = playerTransform.position
 				+ (modifiedDirection * _HedgehogMinDistance)
 				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, _HedgehogChargeTime)));
