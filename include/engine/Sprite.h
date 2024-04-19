@@ -24,7 +24,7 @@ namespace engine
 {
 	///2D Sprite Renderer component
 	ECS_REGISTER_COMPONENT(SpriteRenderer)
-	struct SpriteRenderer
+		struct SpriteRenderer
 	{
 		///Abstraction class for textures
 		Texture* texture = nullptr;
@@ -43,7 +43,7 @@ namespace engine
 		Animation(std::vector<Texture*> animationTextures, std::vector<int> animationDelays)
 		{
 			assert(animationTextures.size() == animationDelays.size() && "Failed to create animation! Number of frames and delays do not match!");
-			
+
 			textures = animationTextures;
 			delays = animationDelays;
 			length = animationDelays.size();
@@ -55,7 +55,7 @@ namespace engine
 
 	///Animator component
 	ECS_REGISTER_COMPONENT(Animator)
-	struct Animator
+		struct Animator
 	{
 		std::map<std::string, Animation> animations;
 
@@ -71,7 +71,7 @@ namespace engine
 
 	///2D Sprite Render system, Requires SpriteRenderer and Transform
 	ECS_REGISTER_SYSTEM(SpriteRenderSystem, SpriteRenderer, Transform)
-	class SpriteRenderSystem : public ecs::System
+		class SpriteRenderSystem : public ecs::System
 	{
 	public:
 		~SpriteRenderSystem()
@@ -213,6 +213,7 @@ namespace engine
 			}
 
 			//Draw all UI elements by layer
+			glDisable(GL_DEPTH_BUFFER_BIT);
 			for (const float& layer : uiLayersToDraw)
 			{
 				//Bind the right VAO after tilemap
@@ -224,6 +225,7 @@ namespace engine
 					DrawEntity(entity, cam);
 				}
 			}
+			glEnable(GL_DEPTH_BUFFER_BIT);
 
 			//Unbind vertex array
 			glBindVertexArray(0);
@@ -254,7 +256,7 @@ namespace engine
 			//Get the view and projection locations
 			unsigned int projLoc = glGetUniformLocation(shader->ID, "projection");
 			unsigned int viewLoc = glGetUniformLocation(shader->ID, "view");
-			
+
 			if (!sprite.uiElement)
 			{
 				//Give the shader the camera's view matrix
@@ -312,7 +314,7 @@ namespace engine
 
 	///Animator system, Requires Animator and SpriteRenderer
 	ECS_REGISTER_SYSTEM(AnimationSystem, Animator, SpriteRenderer)
-	class AnimationSystem : public ecs::System
+		class AnimationSystem : public ecs::System
 	{
 	public:
 		//Update every entity with relevant components
@@ -363,7 +365,7 @@ namespace engine
 					animator.playingAnimation = false;
 					animator.currentAnimation = "";
 					//Call callback if applicable
-					if(animator.onAnimationEnd)
+					if (animator.onAnimationEnd)
 						animator.onAnimationEnd(entity);
 					return;
 				}

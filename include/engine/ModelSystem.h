@@ -1,3 +1,4 @@
+#pragma once
 //Engine
 #include <engine/ECS.h>
 #include <engine/Transform.h>
@@ -94,13 +95,12 @@ namespace engine
 		///Call this every frame
 		void Update(Camera* cam)
 		{
+			uiLayersToDraw.clear();
+			sortedUIElements.clear();
+
 			//Sort the entities and tilemap by Z
 			std::set<float> layersToDraw;
 			std::map<float, std::vector<ecs::Entity>> sortedEntities;
-
-			//UI elements are sorted seperately
-			std::set<float> uiLayersToDraw;
-			std::map<float, std::vector<ecs::Entity>> sortedUIElements;
 
 			//Sort the entities into sprite and UI layers
 			for (ecs::Entity entity : entities)
@@ -130,13 +130,16 @@ namespace engine
 					DrawEntity(entity, cam);
 				}
 			}
+		}
 
+		//This whole UI thing is becomming a disaster
+		void DrawUIElements(Camera* cam) 
+		{
+			//Disable the depth buffer to always draw UI elements on top
+			glDisable(GL_DEPTH_BUFFER_BIT);
 			//Draw all UI elements by layer
 			for (const float& layer : uiLayersToDraw)
 			{
-				//Clear the depth buffer to always draw UI elements on top
-				glDisable(GL_DEPTH_BUFFER_BIT);
-
 				//Draw entities for this layer
 				for (const ecs::Entity& entity : sortedUIElements[layer])
 				{
@@ -267,6 +270,10 @@ namespace engine
 		}
 
 	private:
+		//This is a goddamn mess
+		std::set<float> uiLayersToDraw;
+		std::map<float, std::vector<ecs::Entity>> sortedUIElements;
+
 		Vector3 lightPos;
 		Vector3 lightColor = Vector3(255);
 

@@ -79,6 +79,7 @@ namespace engine
 			//ModelRenderer must be before SpriteRenderer
 			modelRenderSystem->Update(cam);
 			spriteRenderSystem->Update(cam);
+			modelRenderSystem->DrawUIElements(cam); //This is a bandaid patch for UI models
 			textRenderSystem->Update(cam);
 			primitiveRenderSystem->Update(cam);
 		}
