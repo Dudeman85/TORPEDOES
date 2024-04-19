@@ -300,7 +300,7 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 			guideTransform.position = playerTransform.position
 				+ (modifiedDirection * _HedgehogMinDistance)
 				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, _HedgehogChargeTime)));
-			guideTransform.scale = 100;
+			guideTransform.scale = 20;
 		}
 		else
 		{
@@ -319,7 +319,7 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 			guideTransform.position = playerTransform.position
 				+ (modifiedDirection * _HedgehogMinDistance)
 				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, _HedgehogChargeTime)));
-			guideTransform.scale = 100;
+			guideTransform.scale = 20;
 		}
 		// Guide negative:
 		for (int negative_i = 1; negative_i < (shootAmount / 2) + 1; ++negative_i)
@@ -332,7 +332,7 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 			guideTransform.position = playerTransform.position
 				+ (modifiedDirection * _HedgehogMinDistance)
 				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, _HedgehogChargeTime)));
-			guideTransform.scale = 100;
+			guideTransform.scale = 20;
 		}
 	}
 	else
@@ -370,8 +370,8 @@ void CreateAimingGuides(engine::ecs::Entity entity, float guideSpeed, float shoo
 	{
 		engine::ecs::Entity newGuide = engine::ecs::NewEntity();
 
-		engine::ecs::AddComponent(newGuide, engine::Transform{ .position = transform.position, .rotation = transform.rotation, .scale = transform.scale });
-		engine::ecs::AddComponent(newGuide, engine::ModelRenderer{ .model = resources::models["Weapon_HedgehogAmmo.obj"] });
+		engine::ecs::AddComponent(newGuide, engine::Transform{ .position = transform.position, .rotation = transform.rotation, .scale = transform.scale});
+		engine::ecs::AddComponent(newGuide, engine::SpriteRenderer{ .texture= resources::uiTextures["crosshair.png"] });
 
 		aimingGuides.push_back(newGuide);
 	}
