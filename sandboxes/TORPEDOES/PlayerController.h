@@ -460,16 +460,14 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 		TransformSystem::AddParent(playerComponent.animationEntity, playerEntity);
 
 		//Start submerging and slow down
-		playerComponent.forwardSpeed /= 1.5f;
-
-		//Cannot surface for 5 seconds
+		playerComponent._boostScale = 0.75;
+		playerComponent.submerged = true;
 
 		//Finished submerging after 1 second
 		TimerSystem::ScheduleFunction(
 			[playerEntity]()
 			{
 				Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
-				playerComponent.submerged = true;
 				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures.push_back(resources::modelTextures["Player_Black.png"]);
 			}, 0.3);
 	}
@@ -480,7 +478,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 		playerComponent.animationEntity = 0;
 
 		//Start surfacing and speed up
-		playerComponent.forwardSpeed *= 1.5f;
+		playerComponent._boostScale = 1;
 
 		//Finished surfacing after 1 second
 		TimerSystem::ScheduleFunction(
@@ -946,12 +944,14 @@ public:
 			float finalBoostScale = player._boostScale;
 			if (player._offroadThisFrame)
 			{
-				if (player._boostScale <= 1)
+				if (player._boostScale > 1 || player.submerged)
 				{
-					// Ignore slower speed due to boost when already offtrack
+					// Ignore offtrack while boosting or submerged
+				}
+				else
+				{
 					finalBoostScale = player.offtrackSpeedScale;
 				}
-				// Ignore offtrack while boosting
 			}
 
 			// Apply the final impulse to the object
@@ -1051,7 +1051,7 @@ public:
 
 		engine::ecs::Entity shootIndicator = engine::ecs::NewEntity();
 
-		engine::ecs::AddComponent(shootIndicator, engine::SpriteRenderer{  });
+		engine::ecs::AddComponent(shootIndicator, engine::SpriteRenderer{ .texture = resources::uiTextures[textureNames[1]] });
 		engine::ecs::AddComponent(shootIndicator, engine::Transform{ .position = pos, .scale = scale });
 		engine::TransformSystem::AddParent(shootIndicator, entity);
 
