@@ -134,7 +134,7 @@ public:
 		{
 			shipName = "Cannon boat";
 			baseSpeed = to_string(24)+" knots";
-			mainAttack = "shells";
+			mainAttack = "Shells";
 			special = "Boost";
 			break;
 		}
@@ -269,7 +269,7 @@ public:
 			engine::ecs::AddComponent(shipModel, engine::Transform{ .position = Vector3(0.7f, -0.2f, -0.1f) , .scale = 0});
 			engine::ecs::AddComponent(shipModel, engine::ModelRenderer{ .model = shipModels[0], .uiElement = true });
 
-			engine::ecs::AddComponent(backgroundImage, engine::Transform{ .position = Vector3(0,0,-0.9f), .rotation = Vector3(0,0,0), .scale = Vector3(1) });
+			engine::ecs::AddComponent(backgroundImage, engine::Transform{ .position = Vector3(0,0,-0.9f), .rotation = Vector3(0,0,0), .scale = Vector3(1.2) });
 			engine::ecs::AddComponent(backgroundImage, engine::SpriteRenderer{ .texture = resources::menuTextures["Selection_BG_Var3.png"], .enabled = false, .uiElement = true });
 
 			engine::ecs::AddComponent(readyText, engine::Transform{ .position = Vector3(arrowsPosX-0.4f,arrowDownposY,-0.1f) , .scale = 0 });
@@ -599,7 +599,7 @@ public:
 
 				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowUp).enabled = false;
 				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowDown).enabled = false;
-				engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).enabled = false;
+				engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).enabled = true;
 
 				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).text = "";
 				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).color = Vector3(0, 0, 255);
