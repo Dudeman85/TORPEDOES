@@ -100,6 +100,19 @@ void LoadLevel2(engine::Camera* cam)
 	CreateCheckpoint(Vector3(530.000000, -1675.000000, 100.000000), Vector3(45.000000, 32.500000, 47.500000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 145.0f);		// Eight checkpoint
 	CreateCheckpoint(Vector3(1230.000000, -1685.000000, 100.000000), Vector3(-17.500000, -87.500000, -90.000000), Vector3(17.5), resources::models["Prop_Goal_Ver2.obj"], 0.0f, true);	// Finish line
 
+	// Make the crowds manually
+	// Start/Finish line crowd
+	CreateCrowd({ 1030.000000, -1820.000000, 100 }, resources::crowdAnims);	// First row, first crowd
+	CreateCrowd({ 1230.000000, -1820.000000, 100 }, resources::crowdAnims);	// First row, second crowd
+	CreateCrowd({ 1430.000000, -1820.000000, 100 }, resources::crowdAnims);	// First row, third crowd
+	CreateCrowd({ 1010.000000, -1840.000000, 101 }, resources::crowdAnims);	// Second row, first crowd
+	CreateCrowd({ 1210.000000, -1840.000000, 101 }, resources::crowdAnims);	// Second row, second crowd
+	CreateCrowd({ 1410.000000, -1840.000000, 101 }, resources::crowdAnims);	// Second row, third crowd	
+	// ********************
+	// Cave crowd
+	CreateCrowd({ 3165.000000, -480.000000, 100 }, resources::crowdAnims);	// First row, first crowd
+	// ********************
+
 	PlayCountdown(Vector3(1260.0f, -1500.0f, 0.0f));
 	PlayerController::lapCount = 1;
 }
