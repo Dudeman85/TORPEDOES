@@ -16,6 +16,8 @@ namespace engine
 
 		bool uiElement = false;
 
+		bool enabled = true;
+
 		///Alternate textures, will override default ones from model
 		std::vector<Texture*> textures;
 	};
@@ -150,6 +152,9 @@ namespace engine
 			//Get relevant components
 			Transform& transform = ecs::GetComponent<Transform>(entity);
 			ModelRenderer& modelRenderer = ecs::GetComponent<ModelRenderer>(entity);
+
+			if (!modelRenderer.enabled)
+				return;
 
 			if (!modelRenderer.model)
 			{
