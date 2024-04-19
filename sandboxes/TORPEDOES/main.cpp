@@ -62,7 +62,6 @@ static void LoadLevel1(engine::Camera* cam)
 	CreateCheckpoint(Vector3(3015.000000, -760.000000, 100.000000), Vector3(27.500000, 47.500000, 7.500000), Vector3(19), resources::models["Prop_Buoy.obj"], 37.5f + 90.f);
 	CreateCheckpoint(Vector3(2645.000000, -975.000000, 100.000000), Vector3(27.500000, -40.000000, -7.500000), Vector3(19), resources::models["Prop_Buoy.obj"], -20.0f + 90.f);
 	CreateCheckpoint(Vector3(2140.000000, -635.000000, 100.000000), Vector3(27.500000, 0.000000, 12.500000), Vector3(15.f), resources::models["Prop_Buoy.obj"], -2.5f + 90.f);
-	CreateCheckpoint(Vector3(885.000000, -780.000000, 100.000000), Vector3(15.000000, 25.000000, 7.500000), Vector3(14.5f), resources::models["Prop_Buoy.obj"], 15.0f + 90.f);
 	CreateCheckpoint(Vector3(1185.000000, -480.000000, 100.000000), Vector3(25.000000, 7.500000, 7.500000), Vector3(14.5f), resources::models["Prop_Buoy.obj"], 15.0f + 90.f);
 	CreateCheckpoint(Vector3(1170.000000, -1250.000000, 100.000000), Vector3(37.500000, 0.000000, 0.000000), Vector3(13), resources::models["Prop_Buoy.obj"], 13.0f + 80.f);
 	CreateCheckpoint(Vector3(2555.000000, -1600.000000, 100.000000), Vector3(-17.500000, -87.500000, -90.000000), Vector3(20.5f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
