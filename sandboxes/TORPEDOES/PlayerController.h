@@ -43,6 +43,8 @@ struct Player
 	float _boostScale = 1;
 	bool _offroadThisFrame = false;
 
+	// State variables
+	bool specialEnabled = false;
 	bool submerged = false;
 	bool reloading = false;
 	int secondaryAmmo = 0;
@@ -99,12 +101,10 @@ void CreateTorpedo(engine::ecs::Entity entity)
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-	std::cout << modelTransform.rotation.ToString() << "\n";
-
 	float speed = 500;
 
 	ecs::Entity torpedo = ecs::NewEntity();
-	ecs::AddComponent(torpedo, Projectile{ .ownerID = player.id, .speed = 500 });
+	ecs::AddComponent(torpedo, Projectile{ .ownerID = player.id, .speed = 500, .hitType = HitStates::Stop, .hitTime = 0.8 });
 
 	Projectile& torpedoProjectile = ecs::GetComponent<Projectile>(torpedo);
 
@@ -131,7 +131,7 @@ void CreateShell(engine::ecs::Entity entity)
 
 	Projectile& shellProjectile = ecs::GetComponent<Projectile>(shell);
 
-	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(40)});
+	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(20)});
 	ecs::AddComponent(shell, Rigidbody{ .velocity = player.forwardDirection * shellProjectile.speed });
 	ecs::AddComponent(shell, ModelRenderer{ .model = resources::models[shellProjectile.model = "Weapon_CannonAmmo.obj"] });
 	float shellSize = 0.1;
@@ -426,11 +426,12 @@ static void BoostEnd(engine::ecs::Entity entity, float boostStrenght)
 // Increases player speed for a short while
 void Boost(engine::ecs::Entity entity)
 {
-	double boostTime = 1;
-	float boostStrenght = 0.4f;
+	double boostTime = 5;
+	float boostStrenght = 0.8f;
 
 	Player& player = engine::ecs::GetComponent<Player>(entity);
 
+	player.specialEnabled = false;
 	player._boostScale += boostStrenght;
 
 	engine::timerSystem->ScheduleFunction(&BoostEnd, boostTime, false, engine::ScheduledFunction::Type::seconds, entity, boostStrenght);
@@ -486,6 +487,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 
 		//Start surfacing and speed up
 		playerComponent._boostScale = 1;
+		playerComponent.specialEnabled = false;
 
 		//Finished surfacing after 1 second
 		TimerSystem::ScheduleFunction(
@@ -581,13 +583,20 @@ void BoostIndicatorUpdate(engine::ecs::Entity entity)
 	indicatorStruct& it = player.specialIndicators[0];
 	engine::SpriteRenderer& sprite = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
 
-	if (player.specialCooldown <= player._specialTimer)
+	if (player._boostScale > 1)
 	{
+		// Available to use
+		sprite.texture = it.textures[1];
+	}
+	else if (player.specialCooldown <= player._specialTimer)
+	{
+		// In use
 		sprite.texture = it.textures[0];
 	}
 	else
 	{
-		sprite.texture = it.textures[1];
+		// Not available
+		sprite.texture = it.textures[2];
 	}
 }
 
@@ -600,9 +609,8 @@ void SubmergeIndicatorUpdate(engine::ecs::Entity entity)
 
 	if (player.submerged)
 	{
-		if (player.specialCooldown <= player._specialTimer)
+		if (player.specialCooldown <= player._specialTimer || player.specialEnabled)
 		{
-
 			sprite.texture = it.textures[0];
 		}
 		else
@@ -612,7 +620,7 @@ void SubmergeIndicatorUpdate(engine::ecs::Entity entity)
 	}
 	else
 	{
-		if (player.specialCooldown <= player._specialTimer)
+		if (player.specialCooldown <= player._specialTimer || player.specialEnabled)
 		{
 
 			sprite.texture = it.textures[2];
@@ -654,7 +662,7 @@ public:
 			ShipType::torpedoBoat, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 100, 
-				.shootCooldown = 0.2, .specialCooldown = 999999, .ammoRechargeCooldown = 2,
+				.shootCooldown = 0.2, .specialCooldown = 5, .ammoRechargeCooldown = 2,
 				.holdShoot = false, .maxAmmo = 2, 
 				.shootAction = CreateTorpedo, .specialAction = Boost,
 				.shootIndicatorUpdate = TorpedoIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
@@ -676,7 +684,7 @@ public:
 			ShipType::cannonBoat, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 100, .reloading = true,
-				.shootCooldown = 0.1, .specialCooldown = 999999, .ammoRechargeCooldown = 0.16,
+				.shootCooldown = 0.1, .specialCooldown = 5, .ammoRechargeCooldown = 0.16,
 				.holdShoot = true, .maxAmmo = 10,
 				.shootAction = ShootShell, .specialAction = Boost,
 				.shootIndicatorUpdate = CannonIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
@@ -687,7 +695,7 @@ public:
 			ShipType::hedgehogBoat, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 100, 
-				.shootCooldown = 0.4, .specialCooldown = 999999, .ammoRechargeCooldown = 5,
+				.shootCooldown = 0.4, .specialCooldown = 5, .ammoRechargeCooldown = 5,
 				.holdShoot = false, .maxAmmo = 1, 
 				.shootAction = ShootHedgehog, .specialAction = Boost,
 				.shootIndicatorUpdate = HedgehogIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
@@ -907,8 +915,7 @@ public:
 				// Slow rotation based on speed
 				// TODO: this function could be improved by testing
 				float rotationScalar = std::clamp(std::abs(log10(rigidbody.velocity.Length() / player.forwardSpeed / 2)), 0.5f, 1.0f);
-				std::cout << rigidbody.velocity.Length() << ", " << log10(rigidbody.velocity.Length() / 240.f) << ", " << rotationScalar << std::endl;
-
+				
 				float trueRotateInput = -rotateInput * player.rotationSpeed * rotationScalar;
 
 				// Apply forward impulse if rotating or receiving a rotation command
@@ -935,9 +942,9 @@ public:
 			// If the special cooldown has passed
 			while (player._specialTimer >= player.specialCooldown)
 			{
-				if (!newSpecialInput)
+				if (!newSpecialInput || !player.specialEnabled)
 				{
-					// We haven't pressed the special button, keep _specialTimer at max value
+					// We haven't pressed the special button or we don't have special enabled, keep _specialTimer at max value
 					player._specialTimer = player.specialCooldown;
 					break;
 				}
@@ -1157,7 +1164,7 @@ public:
 
 			if (*func == Boost)
 			{
-				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Booster_Icon.png", "UI_Red_Booster_Icon.png" }));
+				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Booster_Icon.png", "UI_Booster_Icon.png", "UI_Red_Booster_Icon.png" }));
 			}
 			else if (*func == ToggleSubmerge)
 			{
