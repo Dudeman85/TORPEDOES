@@ -378,7 +378,7 @@ void CreateAimingGuides(engine::ecs::Entity entity, float guideSpeed, float shoo
 		engine::ecs::Entity newGuide = engine::ecs::NewEntity();
 
 		engine::ecs::AddComponent(newGuide, engine::Transform{ .position = transform.position, .rotation = transform.rotation, .scale = transform.scale});
-		engine::ecs::AddComponent(newGuide, engine::SpriteRenderer{ .texture= resources::uiTextures["Green_crosshair.png"] });
+		engine::ecs::AddComponent(newGuide, engine::SpriteRenderer{ .texture= resources::uiTextures["Orange_crosshair.png"] });
 
 		aimingGuides.push_back(newGuide);
 	}
