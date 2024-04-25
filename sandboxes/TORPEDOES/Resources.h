@@ -14,9 +14,10 @@ namespace resources
 
 	Font* niagaraFont;
 
-	Tilemap* level4Map; // Long map
-	Tilemap* level2Map; // Viksteri WIP tilemap
+	Tilemap* level1Map; // Green tilemap
+	Tilemap* level2Map; // Cave tilemap
 	Tilemap* level3Map; // Tropical tilemap
+	Tilemap* level4Map; // Long tilemap	
 
 	Animation explosionAnimation;
 	Animation WaterexplosionAnimation;
@@ -42,14 +43,17 @@ namespace resources
 
 		niagaraFont = new Font("Niagara Solid.ttf", 0, 0, 48);
 
-		level4Map = new Tilemap(cam);
-		level4Map->loadMap("/levels/level4.tmx");
+		level1Map = new Tilemap(cam);
+		level1Map->loadMap("/levels/level1.tmx");
 
 		level2Map = new Tilemap(cam);
 		level2Map->loadMap("/levels/level2backup.tmx");
 
 		level3Map = new Tilemap(cam);
 		level3Map->loadMap("levels/level3.tmx");
+
+		level4Map = new Tilemap(cam);
+		level4Map->loadMap("/levels/level4.tmx");
 
 		explosionAnimation = AnimationsFromSpritesheet("/spritesheets/explosion.png", 6, 1, vector<int>(6, 150))[0];
 		WaterexplosionAnimation = AnimationsFromSpritesheet("/spritesheets/Hedgehog_Explosion.png", 14, 1, vector<int>(14, 70))[0];
@@ -75,8 +79,9 @@ namespace resources
 		}
 
 		delete niagaraFont;
-		delete level4Map;
+		delete level1Map;
 		delete level2Map;
 		delete level3Map;
+		delete level4Map;
 	}
 }

@@ -52,14 +52,17 @@ static void PlayCountdown(Vector3 pos)
 	engine::ecs::GetSystem<PlayerController>()->countdownTimer = 3;
 }
 
-//Create everything for level 3
-static void LoadLevel3(engine::Camera* cam)
+// Create everything for level 1
+void LoadLevel1(engine::Camera* cam)
 {
 	engine::collisionSystem->cam = cam;
 
-	//Set this level's tilemap
-	engine::spriteRenderSystem->SetTilemap(resources::level3Map);
-	engine::collisionSystem->SetTilemap(resources::level3Map);
+	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat };
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(500, -500));
+
+	// Set this level's tilemap
+	engine::spriteRenderSystem->SetTilemap(resources::level1Map);
+	engine::collisionSystem->SetTilemap(resources::level1Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
 	//Create the players
@@ -113,17 +116,17 @@ static void LoadLevel3(engine::Camera* cam)
 }
 
 // Create everything for level 2
-static void LoadLevel2(engine::Camera* cam)
+void LoadLevel2(engine::Camera* cam)
 {
 	engine::collisionSystem->cam = cam;
 
-	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
+	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat };
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1160.0f, -1600.0f));
 
 	// Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level2Map);
 	engine::collisionSystem->SetTilemap(resources::level2Map);
-	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty { true });
+	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
 	// Make all the checkpoint's manually
 	CreateCheckpoint(Vector3(1455.000000, -995.000000, 100.000000), Vector3(35.000000, -15.000000, -20.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 65.0f);				// First checkpoint
@@ -149,7 +152,7 @@ static void LoadLevel2(engine::Camera* cam)
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2950.000000, -1585.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2885.000000, -1055.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2710.000000, -1790.000000, 0.300000));
-	
+
 	//topright hairpin
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3355.000000, -410.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3355.000000, -375.000000, 0.300000));
@@ -157,14 +160,68 @@ static void LoadLevel2(engine::Camera* cam)
 	//before last loop
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2255.000000, -800.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2155.000000, -605.000000, 0.300000));
-	
+
 	//before chicane
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(425.000000, -855.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(480.000000, -855.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(540.000000, -855.000000, 0.300000));
 
+	// Make the crowds manually
+	// Start/Finish line crowd
+	CreateCrowd({ 1030.000000, -1820.000000, 100 }, resources::crowdAnims);	// First row, first crowd
+	CreateCrowd({ 1230.000000, -1820.000000, 100 }, resources::crowdAnims);	// First row, second crowd
+	CreateCrowd({ 1430.000000, -1820.000000, 100 }, resources::crowdAnims);	// First row, third crowd
+	CreateCrowd({ 1010.000000, -1840.000000, 101 }, resources::crowdAnims);	// Second row, first crowd
+	CreateCrowd({ 1210.000000, -1840.000000, 101 }, resources::crowdAnims);	// Second row, second crowd
+	CreateCrowd({ 1410.000000, -1840.000000, 101 }, resources::crowdAnims);	// Second row, third crowd	
+	// ********************
+	// Cave crowd
+	CreateCrowd({ 3165.000000, -480.000000, 100 }, resources::crowdAnims);	// First row, first crowd
+	// ********************
+	// Overhang crowd
+	CreateCrowd({ 1210.000000, -825.000000, 100 }, resources::crowdAnims); // First row, first crowd
+	CreateCrowd({ 1410.000000, -825.000000, 100 }, resources::crowdAnims); // First row, second crowd
+	CreateCrowd({ 1610.000000, -825.000000, 100 }, resources::crowdAnims); // First row, third crowd
+	CreateCrowd({ 1810.000000, -825.000000, 100 }, resources::crowdAnims); // First row, fourth crowd
+	CreateCrowd({ 1250.000000, -865.000000, 101 }, resources::crowdAnims); // Second row, first crowd
+	CreateCrowd({ 1450.000000, -865.000000, 101 }, resources::crowdAnims); // Second row, second crowd
+	CreateCrowd({ 1650.000000, -865.000000, 101 }, resources::crowdAnims); // Second row, third crowd
+	CreateCrowd({ 1850.000000, -865.000000, 101 }, resources::crowdAnims); // Second row, fourth crowd
+	// ********************
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1455.000000, -1295.000000, 0.300000));
 
 	PlayCountdown(Vector3(1260.0f, -1500.0f, 0.0f));
+	PlayerController::lapCount = 1;
+}
+
+//Create everything for level 3
+static void LoadLevel3(engine::Camera* cam)
+{
+	engine::collisionSystem->cam = cam;
+
+	//Set this level's tilemap
+	engine::spriteRenderSystem->SetTilemap(resources::level3Map);
+	engine::collisionSystem->SetTilemap(resources::level3Map);
+	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
+
+	//Create the players
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(2480.0f, -1520.0f));
+
+	//Make all the checkpoints manually
+	CreateCheckpoint(Vector3(3015.000000, -760.000000, 100.000000), Vector3(27.500000, 47.500000, 7.500000), Vector3(19), resources::models["Prop_Buoy.obj"], 37.5f + 90.f);
+	CreateCheckpoint(Vector3(2645.000000, -975.000000, 100.000000), Vector3(27.500000, -40.000000, -7.500000), Vector3(19), resources::models["Prop_Buoy.obj"], -20.0f + 90.f);
+	CreateCheckpoint(Vector3(2140.000000, -635.000000, 100.000000), Vector3(27.500000, 0.000000, 12.500000), Vector3(15.f), resources::models["Prop_Buoy.obj"], -2.5f + 90.f);
+	CreateCheckpoint(Vector3(1185.000000, -480.000000, 100.000000), Vector3(25.000000, 7.500000, 7.500000), Vector3(14.5f), resources::models["Prop_Buoy.obj"], 15.0f + 90.f);
+	CreateCheckpoint(Vector3(1170.000000, -1250.000000, 100.000000), Vector3(37.500000, 0.000000, 0.000000), Vector3(13), resources::models["Prop_Buoy.obj"], 13.0f + 80.f);
+	CreateCheckpoint(Vector3(2555.000000, -1600.000000, 100.000000), Vector3(-17.500000, -87.500000, -90.000000), Vector3(20.5f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
+
+	//Make the crowds manually
+	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims);
+	CreateCrowd({ 1545, -1715, 11 }, resources::crowdAnims);
+	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims);
+
+	PlayCountdown(Vector3(2480.0f, -1520.0f, 0.0f));
 	PlayerController::lapCount = 1;
 }
 
@@ -177,8 +234,8 @@ static void LoadLevel4(engine::Camera* cam)
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1434.0f, -1370.0f));
 
 	//set this level's tilemap
-	engine::spriteRenderSystem->SetTilemap(resources::level3Map);
-	engine::collisionSystem->SetTilemap(resources::level3Map);
+	engine::spriteRenderSystem->SetTilemap(resources::level4Map);
+	engine::collisionSystem->SetTilemap(resources::level4Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{true});
 
 	// Make all the checkpoints manually
@@ -260,6 +317,7 @@ static void PlayersMenu(std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem)
 
 int main()
 {
+	GameStates currentGameState = menuMainState;
 	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window");
 
 	engine::EngineInit();
@@ -311,7 +369,7 @@ int main()
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
 
 	
-	//PlayersMenu(ShipSelectionSystem);
+
 	ShipSelectionSystem->isShipSelectionMenuOn = true;
 	isGamePaused = true;
 	bool mapLoaded = false;
@@ -381,7 +439,7 @@ int main()
 		input::update();
 
 		if(!isGamePaused)
-			UpdateCam(&cam, resources::level2Map);
+			UpdateCam(&cam, collisionSystem->tilemap);
 		hedgehogSystem->Update();
 		pickupSystem->Update();
 		engine::Update(&cam);
@@ -391,14 +449,14 @@ int main()
 			isGamePaused = false;
 			canStartLoadingMap = false;
 			ShipSelectionSystem->isShipSelectionMenuOn = false;
-			LoadLevel3(&cam);
+			LoadLevel2(&cam);
 		}
 
 		// if paused or Pause pressed update PauseSystem
 		if (input::GetNewPress("Pause"))
 		{
 			pauseSystem->isGamePause = true;// !(pauseSystem->isGamePause);
-			//isGamePaused = !isGamePaused;
+			isGamePaused = !isGamePaused;
 			//printf("\nGamePause pressed\n");
 			pauseSystem->ToggleShowUIOptionsMenu();
 
