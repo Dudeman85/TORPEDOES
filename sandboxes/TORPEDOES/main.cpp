@@ -10,14 +10,21 @@ using namespace engine;
 int checkPointNumber = 0;
 bool isGamePaused = false;
 
-static void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine::Model* checkPointModel, float hitboxrotation, bool finish_line = false)
+static void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine::Model* checkPointModel, float hitboxrotation, bool finishLine = false)
 {
 	engine::ecs::Entity checkpoint = engine::ecs::NewEntity();
 
 	engine::ecs::AddComponent(checkpoint, engine::Transform{.position = position, .rotation = rotation, .scale = scale });
 	engine::ecs::AddComponent(checkpoint, engine::ModelRenderer{.model = checkPointModel });
-	engine::ecs::AddComponent(checkpoint, CheckPoint{ .checkPointID = checkPointNumber , .Finish_line = finish_line });
-	std::vector<Vector2> CheckpointcolliderVerts{ Vector2(4, 8), Vector2(4, -8), Vector2(-4, -8), Vector2(-4, 8) };
+	engine::ecs::AddComponent(checkpoint, CheckPoint{ .checkPointID = checkPointNumber , .Finish_line = finishLine });
+	std::vector<Vector2> CheckpointcolliderVerts;
+	if (finishLine)
+	{
+		CheckpointcolliderVerts = { Vector2(1, 8), Vector2(1, -8), Vector2(-1, -8), Vector2(-1, 8) };
+	}
+	else {
+		CheckpointcolliderVerts = { Vector2(4, 8), Vector2(4, -8), Vector2(-4, -8), Vector2(-4, 8) };
+	}
 	engine::ecs::AddComponent(checkpoint, engine::PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = true, .rotationOverride = hitboxrotation }));
 
 	checkPointNumber++;
@@ -119,7 +126,7 @@ void LoadLevel4(engine::Camera* cam)
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{true});
 
 	// Make all the checkpoints manually
-	CreateCheckpoint(Vector3(2635.000000, -1355.000000, 0.000000), Vector3(77.500000, -40.000000, -7.500000), Vector3(20), resources::models["Prop_Buoy_Checkpoint.obj"], 45.0f);
+	CreateCheckpoint(Vector3(15760.000000, -925.000000, 100.000000), Vector3(-12.500000, -90.000000, -87.500000), Vector3(43.0f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
 }
 
 //Bind all input events here
