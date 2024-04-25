@@ -21,11 +21,12 @@ namespace resources
 	Animation explosionAnimation;
 	Animation WaterexplosionAnimation;
 	Animation crowdAnims;
-	Animation countdownAnim;	
-	Animation divingAnim;	
-	Animation continuousDivingAnim;	
+	Animation countdownAnim;
+	Animation divingAnim;
+	Animation continuousDivingAnim;
 
-	
+	std::vector<Texture*> playerIdToTexture;
+
 	//Load all the global resources here
 	//Stuff that is only used in one system can be loaded there 
 	void LoadResources(Camera* cam)
@@ -33,6 +34,9 @@ namespace resources
 		uiTextures = engine::PreloadTextures("GUI");
 		menuTextures = engine::PreloadTextures("menuUI", true, GL_LINEAR_MIPMAP_NEAREST);
 		modelTextures = engine::PreloadTextures("3dmodels");
+
+		//Set the player textures
+		playerIdToTexture = { modelTextures["Player_Red.png"], modelTextures["Player_Red.png"], modelTextures["Player_Red.png"], modelTextures["Player_Red.png"] };
 
 		models = engine::PreloadModels("3dmodels");
 
