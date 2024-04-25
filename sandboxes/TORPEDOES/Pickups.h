@@ -33,7 +33,7 @@ public:
 	}
 
 	//Create a pickup at position
-	void SpawnPickup(Vector3 position, bool respawn = true)
+	static void SpawnPickup(Vector3 position, bool respawn = true)
 	{
 		ecs::Entity pickup = ecs::NewEntity();
 		ecs::AddComponent(pickup, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
@@ -68,11 +68,13 @@ public:
 		//Only pickable by player
 		if (ecs::HasComponent<Player>(collision.b))
 		{
-			Disable(collision.a);
-			
-			//Enable the special action
+			//Enable the special action if player does not already have it
 			Player& player = ecs::GetComponent<Player>(collision.b);
-			player._specialTimer = 999999;
+			if (player.specialEnabled)
+				return;
+			player.specialEnabled = true;
+
+			Disable(collision.a);
 		}
 		//Destroy if hit by a projectile
 		if (ecs::HasComponent<Projectile>(collision.b))

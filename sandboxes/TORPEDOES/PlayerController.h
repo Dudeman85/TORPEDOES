@@ -43,6 +43,8 @@ struct Player
 	float _boostScale = 1;
 	bool _offroadThisFrame = false;
 
+	// State variables
+	bool specialEnabled = false;
 	bool submerged = false;
 	bool reloading = false;
 	int secondaryAmmo = 0;
@@ -99,12 +101,10 @@ void CreateTorpedo(engine::ecs::Entity entity)
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-	std::cout << modelTransform.rotation.ToString() << "\n";
-
 	float speed = 500;
 
 	ecs::Entity torpedo = ecs::NewEntity();
-	ecs::AddComponent(torpedo, Projectile{ .ownerID = player.id, .speed = 500 });
+	ecs::AddComponent(torpedo, Projectile{ .ownerID = player.id, .speed = 500, .hitType = HitStates::Stop, .hitTime = 0.8 });
 
 	Projectile& torpedoProjectile = ecs::GetComponent<Projectile>(torpedo);
 
@@ -131,9 +131,9 @@ void CreateShell(engine::ecs::Entity entity)
 
 	Projectile& shellProjectile = ecs::GetComponent<Projectile>(shell);
 
-	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(40) });
+	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(20)});
 	ecs::AddComponent(shell, Rigidbody{ .velocity = player.forwardDirection * shellProjectile.speed });
-	ecs::AddComponent(shell, ModelRenderer{ .model = resources::models[shellProjectile.model = "Weapon_HedgehogAmmo.obj"] });
+	ecs::AddComponent(shell, ModelRenderer{ .model = resources::models[shellProjectile.model = "Weapon_CannonAmmo.obj"] });
 	float shellSize = 0.1;
 
 	std::vector<Vector2> shellverts{ Vector2(shellSize, shellSize), Vector2(shellSize, -shellSize), Vector2(-shellSize, -shellSize), Vector2(-shellSize, shellSize) };
@@ -240,14 +240,22 @@ void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide,
 	engine::ecs::Entity hedgehog = engine::ecs::NewEntity();
 	engine::ecs::AddComponent(hedgehog, Transform{ .position = transform.position, .rotation = modelTransform.rotation });
 
-	Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * ecs::GetSystem<HedgehogSystem>()->hedgehogSpeedVo;
+	Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * ecs::GetSystem<HedgehogSystem>()->speed;
 
 	engine::ecs::AddComponent(hedgehog, engine::Rigidbody{ .velocity = finalVelocity });
 
 	engine::ecs::AddComponent(hedgehog, ModelRenderer{ .model = resources::models["Weapon_HedgehogAmmo.obj"] });
 	std::vector<Vector2> Hedgehogverts{ Vector2(0.4, 0.5), Vector2(0.4, -0.5), Vector2(-0.4, -0.5), Vector2(-0.4, 0.5) };
 	ecs::AddComponent(hedgehog, Projectile{ .ownerID = player.id });
-	ecs::AddComponent(hedgehog, Hedgehog{ .targetDistance = std::clamp(input::map_value(timeHeld, 0, _HedgehogChargeTime, _HedgehogMinDistance, _HedgehogMaxDistance), _HedgehogMinDistance, _HedgehogMaxDistance), .aimingGuide = aimingGuide });
+	
+	auto& hedgehogTransform = engine::ecs::GetComponent<engine::Transform>(hedgehog);
+	auto& aimingGuideTransform = engine::ecs::GetComponent<engine::Transform>(aimingGuide);
+	ecs::AddComponent(hedgehog, 
+	Hedgehog
+	{ 
+		.targetDistance = (hedgehogTransform.position - aimingGuideTransform.position).Length(),
+		.aimingGuide = aimingGuide 
+	});
 }
 
 struct aimingGuideStruct
@@ -270,7 +278,6 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 		// When button is pressed, move aim guide forward
 		Transform& transform = ecs::GetComponent<Transform>(entity);
 		Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
-
 
 		Player& player = ecs::GetComponent<Player>(entity);
 		Transform& playerTransform = ecs::GetComponent<Transform>(entity);
@@ -296,8 +303,8 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 
 			Transform& guideTransform = ecs::GetComponent<Transform>(aimingGuides[0]);
 			guideTransform.position = playerTransform.position
-				+ (modifiedDirection * _HedgehogMinDistance)
-				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, _HedgehogChargeTime)));
+				+ (modifiedDirection * ecs::GetSystem<HedgehogSystem>()->minDistance)
+				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, ecs::GetSystem<HedgehogSystem>()->chargeTime)));
 			guideTransform.scale = 20;
 		}
 		else
@@ -315,8 +322,8 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 
 			Transform& guideTransform = ecs::GetComponent<Transform>(aimingGuides[positive_i ]);
 			guideTransform.position = playerTransform.position
-				+ (modifiedDirection * _HedgehogMinDistance)
-				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, _HedgehogChargeTime)));
+				+ (modifiedDirection * ecs::GetSystem<HedgehogSystem>()->minDistance)
+				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, ecs::GetSystem<HedgehogSystem>()->chargeTime)));
 			guideTransform.scale = 20;
 		}
 		// Guide negative:
@@ -328,8 +335,8 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 
 			Transform& guideTransform = ecs::GetComponent<Transform>(aimingGuides[(negative_i)+(positive_i - 1)]);
 			guideTransform.position = playerTransform.position
-				+ (modifiedDirection * _HedgehogMinDistance)
-				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, _HedgehogChargeTime)));
+				+ (modifiedDirection * ecs::GetSystem<HedgehogSystem>()->minDistance)
+				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, ecs::GetSystem<HedgehogSystem>()->chargeTime)));
 			guideTransform.scale = 20;
 		}
 	}
@@ -351,7 +358,9 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 
 		for (auto& aimingGuide : aimingGuides)
 		{
-			// TODO: Change guide animation
+			auto& spriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(aimingGuide);
+
+			spriteRenderer.texture = resources::uiTextures["crosshair.png"];
 		}
 	}
 }
@@ -369,7 +378,7 @@ void CreateAimingGuides(engine::ecs::Entity entity, float guideSpeed, float shoo
 		engine::ecs::Entity newGuide = engine::ecs::NewEntity();
 
 		engine::ecs::AddComponent(newGuide, engine::Transform{ .position = transform.position, .rotation = transform.rotation, .scale = transform.scale});
-		engine::ecs::AddComponent(newGuide, engine::SpriteRenderer{ .texture= resources::uiTextures["crosshair.png"] });
+		engine::ecs::AddComponent(newGuide, engine::SpriteRenderer{ .texture= resources::uiTextures["Green_crosshair.png"] });
 
 		aimingGuides.push_back(newGuide);
 	}
@@ -398,13 +407,12 @@ void ShootHedgehog(engine::ecs::Entity entity)
 		}
 	}
 
-	float guideSpeed = 500;
-	float shootAngle = Radians(5.0f);
+	float shootAngle = Radians(8.0f);
 	//float shootAmount = player.ammo;
 	float shootAmount = 4;
 	//player.ammo++; // We don't use up ammo until we shoot
 
-	CreateAimingGuides(entity, 500, shootAngle, shootAmount);
+	CreateAimingGuides(entity, ecs::GetSystem<HedgehogSystem>()->speed, shootAngle, shootAmount);
 }
 
 /* BOOST */
@@ -418,11 +426,12 @@ static void BoostEnd(engine::ecs::Entity entity, float boostStrenght)
 // Increases player speed for a short while
 void Boost(engine::ecs::Entity entity)
 {
-	double boostTime = 1;
-	float boostStrenght = 0.4f;
+	double boostTime = 5;
+	float boostStrenght = 0.8f;
 
 	Player& player = engine::ecs::GetComponent<Player>(entity);
 
+	player.specialEnabled = false;
 	player._boostScale += boostStrenght;
 
 	engine::timerSystem->ScheduleFunction(&BoostEnd, boostTime, false, engine::ScheduledFunction::Type::seconds, entity, boostStrenght);
@@ -478,6 +487,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 
 		//Start surfacing and speed up
 		playerComponent._boostScale = 1;
+		playerComponent.specialEnabled = false;
 
 		//Finished surfacing after 1 second
 		TimerSystem::ScheduleFunction(
@@ -573,13 +583,20 @@ void BoostIndicatorUpdate(engine::ecs::Entity entity)
 	indicatorStruct& it = player.specialIndicators[0];
 	engine::SpriteRenderer& sprite = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
 
-	if (player.specialCooldown <= player._specialTimer)
+	if (player._boostScale > 1)
 	{
+		// Available to use
+		sprite.texture = it.textures[1];
+	}
+	else if (player.specialCooldown <= player._specialTimer)
+	{
+		// In use
 		sprite.texture = it.textures[0];
 	}
 	else
 	{
-		sprite.texture = it.textures[1];
+		// Not available
+		sprite.texture = it.textures[2];
 	}
 }
 
@@ -592,9 +609,8 @@ void SubmergeIndicatorUpdate(engine::ecs::Entity entity)
 
 	if (player.submerged)
 	{
-		if (player.specialCooldown <= player._specialTimer)
+		if (player.specialCooldown <= player._specialTimer || player.specialEnabled)
 		{
-
 			sprite.texture = it.textures[0];
 		}
 		else
@@ -604,7 +620,7 @@ void SubmergeIndicatorUpdate(engine::ecs::Entity entity)
 	}
 	else
 	{
-		if (player.specialCooldown <= player._specialTimer)
+		if (player.specialCooldown <= player._specialTimer || player.specialEnabled)
 		{
 
 			sprite.texture = it.textures[2];
@@ -645,8 +661,8 @@ public:
 		{ 
 			ShipType::torpedoBoat, Player
 			{
-				.forwardSpeed = 400, .rotationSpeed = 75, 
-				.shootCooldown = 0.2, .specialCooldown = 999999, .ammoRechargeCooldown = 2,
+				.forwardSpeed = 400, .rotationSpeed = 100, 
+				.shootCooldown = 0.2, .specialCooldown = 5, .ammoRechargeCooldown = 2,
 				.holdShoot = false, .maxAmmo = 2, 
 				.shootAction = CreateTorpedo, .specialAction = Boost,
 				.shootIndicatorUpdate = TorpedoIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
@@ -656,7 +672,7 @@ public:
 		{ 
 			ShipType::submarine, Player
 			{
-				.forwardSpeed = 400, .rotationSpeed = 75, 
+				.forwardSpeed = 400, .rotationSpeed = 100, 
 				.shootCooldown = 0.2, .specialCooldown = 4, .ammoRechargeCooldown = 2,
 				.holdShoot = false, .maxAmmo = 2, 
 				.shootAction = CreateTorpedo, .specialAction = ToggleSubmerge,
@@ -667,8 +683,8 @@ public:
 		{ 
 			ShipType::cannonBoat, Player
 			{
-				.forwardSpeed = 400, .rotationSpeed = 75, .reloading = true,
-				.shootCooldown = 0.1, .specialCooldown = 999999, .ammoRechargeCooldown = 0.16,
+				.forwardSpeed = 400, .rotationSpeed = 100, .reloading = true,
+				.shootCooldown = 0.1, .specialCooldown = 5, .ammoRechargeCooldown = 0.16,
 				.holdShoot = true, .maxAmmo = 10,
 				.shootAction = ShootShell, .specialAction = Boost,
 				.shootIndicatorUpdate = CannonIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
@@ -678,8 +694,8 @@ public:
 		{	
 			ShipType::hedgehogBoat, Player
 			{
-				.forwardSpeed = 400, .rotationSpeed = 75, 
-				.shootCooldown = 0.4, .specialCooldown = 999999, .ammoRechargeCooldown = 5,
+				.forwardSpeed = 400, .rotationSpeed = 100, 
+				.shootCooldown = 0.4, .specialCooldown = 5, .ammoRechargeCooldown = 5,
 				.holdShoot = false, .maxAmmo = 1, 
 				.shootAction = ShootHedgehog, .specialAction = Boost,
 				.shootIndicatorUpdate = HedgehogIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
@@ -896,10 +912,10 @@ public:
 			}
 			if (rotateInput != 0.0f)
 			{
-				// Slow rotation based on throttle setting
+				// Slow rotation based on speed
 				// TODO: this function could be improved by testing
-				float rotationScalar = 1 - log10(2.0f * std::max(0.5f, accelerationInput));
-
+				float rotationScalar = std::clamp(std::abs(log10(rigidbody.velocity.Length() / player.forwardSpeed / 2)), 0.5f, 1.0f);
+				
 				float trueRotateInput = -rotateInput * player.rotationSpeed * rotationScalar;
 
 				// Apply forward impulse if rotating or receiving a rotation command
@@ -926,9 +942,9 @@ public:
 			// If the special cooldown has passed
 			while (player._specialTimer >= player.specialCooldown)
 			{
-				if (!newSpecialInput)
+				if (!newSpecialInput || !player.specialEnabled)
 				{
-					// We haven't pressed the special button, keep _specialTimer at max value
+					// We haven't pressed the special button or we don't have special enabled, keep _specialTimer at max value
 					player._specialTimer = player.specialCooldown;
 					break;
 				}
@@ -1148,7 +1164,7 @@ public:
 
 			if (*func == Boost)
 			{
-				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Booster_Icon.png", "UI_Red_Booster_Icon.png" }));
+				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Booster_Icon.png", "UI_Booster_Icon.png", "UI_Red_Booster_Icon.png" }));
 			}
 			else if (*func == ToggleSubmerge)
 			{
