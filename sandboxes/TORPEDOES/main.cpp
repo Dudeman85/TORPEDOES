@@ -139,21 +139,21 @@ void LoadLevel2(engine::Camera* cam)
 
 	// Make the crowds manually
 	// Start/Finish line crowd
-	CreateCrowd({ 1030.000000, -1820.000000, 100 }, resources::crowdAnims);	// First row, first crowd
-	CreateCrowd({ 1230.000000, -1820.000000, 100 }, resources::crowdAnims);	// First row, second crowd
-	CreateCrowd({ 1430.000000, -1820.000000, 100 }, resources::crowdAnims);	// First row, third crowd
-	CreateCrowd({ 1010.000000, -1840.000000, 101 }, resources::crowdAnims);	// Second row, first crowd
-	CreateCrowd({ 1210.000000, -1840.000000, 101 }, resources::crowdAnims);	// Second row, second crowd
-	CreateCrowd({ 1410.000000, -1840.000000, 101 }, resources::crowdAnims);	// Second row, third crowd	
+	CreateCrowd({ 1030.000000, -1835.000000, 100 }, resources::crowdAnims);	// First row, first crowd
+	CreateCrowd({ 1230.000000, -1835.000000, 100 }, resources::crowdAnims);	// First row, second crowd
+	CreateCrowd({ 1430.000000, -1835.000000, 100 }, resources::crowdAnims);	// First row, third crowd
+	CreateCrowd({ 1010.000000, -1865.000000, 101 }, resources::crowdAnims);	// Second row, first crowd
+	CreateCrowd({ 1210.000000, -1865.000000, 101 }, resources::crowdAnims);	// Second row, second crowd
+	CreateCrowd({ 1410.000000, -1865.000000, 101 }, resources::crowdAnims);	// Second row, third crowd	
 	// ********************
 	// Cave crowd
 	CreateCrowd({ 3165.000000, -480.000000, 100 }, resources::crowdAnims);	// First row, first crowd
 	// ********************
 	// Overhang crowd
-	CreateCrowd({ 1210.000000, -825.000000, 100 }, resources::crowdAnims); // First row, first crowd
-	CreateCrowd({ 1410.000000, -825.000000, 100 }, resources::crowdAnims); // First row, second crowd
-	CreateCrowd({ 1610.000000, -825.000000, 100 }, resources::crowdAnims); // First row, third crowd
-	CreateCrowd({ 1810.000000, -825.000000, 100 }, resources::crowdAnims); // First row, fourth crowd
+	CreateCrowd({ 1210.000000, -845.000000, 100 }, resources::crowdAnims); // First row, first crowd
+	CreateCrowd({ 1410.000000, -845.000000, 100 }, resources::crowdAnims); // First row, second crowd
+	CreateCrowd({ 1610.000000, -845.000000, 100 }, resources::crowdAnims); // First row, third crowd
+	CreateCrowd({ 1810.000000, -845.000000, 100 }, resources::crowdAnims); // First row, fourth crowd
 	CreateCrowd({ 1250.000000, -865.000000, 101 }, resources::crowdAnims); // Second row, first crowd
 	CreateCrowd({ 1450.000000, -865.000000, 101 }, resources::crowdAnims); // Second row, second crowd
 	CreateCrowd({ 1650.000000, -865.000000, 101 }, resources::crowdAnims); // Second row, third crowd
@@ -443,7 +443,7 @@ int main()
 			isGamePaused = false;
 			canStartLoadingMap = false;
 			ShipSelectionSystem->isShipSelectionMenuOn = false;
-			LoadLevel3(&cam);
+			LoadLevel2(&cam);
 		}
 
 		// if paused or Pause pressed update PauseSystem
