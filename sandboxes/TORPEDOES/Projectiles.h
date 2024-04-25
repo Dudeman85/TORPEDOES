@@ -39,12 +39,6 @@ struct Hedgehog
 	engine::ecs::Entity aimingGuide;
 };
 
-//Temporary function for testing
-void SpawnProjectile(engine::ecs::Entity p, int playerID)
-{
-	std::cout << engine::ecs::GetComponent<engine::Transform>(p).position.ToString();
-}
-
 static void CreateAnimation(engine::ecs::Entity entity)
 {
 	Projectile& projectile = engine::ecs::GetComponent<Projectile>(entity);
