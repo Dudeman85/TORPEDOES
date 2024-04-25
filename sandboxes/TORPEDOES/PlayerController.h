@@ -645,7 +645,7 @@ public:
 		{ 
 			ShipType::torpedoBoat, Player
 			{
-				.forwardSpeed = 400, .rotationSpeed = 75, 
+				.forwardSpeed = 400, .rotationSpeed = 100, 
 				.shootCooldown = 0.2, .specialCooldown = 999999, .ammoRechargeCooldown = 2,
 				.holdShoot = false, .maxAmmo = 2, 
 				.shootAction = CreateTorpedo, .specialAction = Boost,
@@ -656,7 +656,7 @@ public:
 		{ 
 			ShipType::submarine, Player
 			{
-				.forwardSpeed = 400, .rotationSpeed = 75, 
+				.forwardSpeed = 400, .rotationSpeed = 100, 
 				.shootCooldown = 0.2, .specialCooldown = 4, .ammoRechargeCooldown = 2,
 				.holdShoot = false, .maxAmmo = 2, 
 				.shootAction = CreateTorpedo, .specialAction = ToggleSubmerge,
@@ -667,7 +667,7 @@ public:
 		{ 
 			ShipType::cannonBoat, Player
 			{
-				.forwardSpeed = 400, .rotationSpeed = 75, .reloading = true,
+				.forwardSpeed = 400, .rotationSpeed = 100, .reloading = true,
 				.shootCooldown = 0.1, .specialCooldown = 999999, .ammoRechargeCooldown = 0.16,
 				.holdShoot = true, .maxAmmo = 10,
 				.shootAction = ShootShell, .specialAction = Boost,
@@ -678,7 +678,7 @@ public:
 		{	
 			ShipType::hedgehogBoat, Player
 			{
-				.forwardSpeed = 400, .rotationSpeed = 75, 
+				.forwardSpeed = 400, .rotationSpeed = 100, 
 				.shootCooldown = 0.4, .specialCooldown = 999999, .ammoRechargeCooldown = 5,
 				.holdShoot = false, .maxAmmo = 1, 
 				.shootAction = ShootHedgehog, .specialAction = Boost,
@@ -896,9 +896,10 @@ public:
 			}
 			if (rotateInput != 0.0f)
 			{
-				// Slow rotation based on throttle setting
+				// Slow rotation based on speed
 				// TODO: this function could be improved by testing
-				float rotationScalar = 1 - log10(2.0f * std::max(0.5f, accelerationInput));
+				float rotationScalar = std::clamp(std::abs(log10(rigidbody.velocity.Length() / player.forwardSpeed / 2)), 0.5f, 1.0f);
+				std::cout << rigidbody.velocity.Length() << ", " << log10(rigidbody.velocity.Length() / 240.f) << ", " << rotationScalar << std::endl;
 
 				float trueRotateInput = -rotateInput * player.rotationSpeed * rotationScalar;
 

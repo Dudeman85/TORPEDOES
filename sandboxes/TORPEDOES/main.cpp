@@ -83,7 +83,7 @@ static void LoadLevel3(engine::Camera* cam)
 }
 
 // Create everything for level 2
-void LoadLevel2(engine::Camera* cam)
+static void LoadLevel2(engine::Camera* cam)
 {
 	engine::collisionSystem->cam = cam;
 
@@ -113,7 +113,7 @@ void LoadLevel2(engine::Camera* cam)
 }
 
 // Create everything for level 3
-void LoadLevel4(engine::Camera* cam)
+static void LoadLevel4(engine::Camera* cam)
 {
 	engine::collisionSystem->cam = cam;
 
@@ -204,7 +204,6 @@ static void PlayersMenu(std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem)
 
 int main()
 {
-
 	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window");
 
 	engine::EngineInit();
