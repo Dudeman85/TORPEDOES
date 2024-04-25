@@ -124,7 +124,7 @@ void CreateShell(engine::ecs::Entity entity)
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-	float speed = 600;
+	float speed = 800;
 
 	ecs::Entity shell = ecs::NewEntity();
 	ecs::AddComponent(shell, Projectile{ .ownerID = player.id, .speed = 500, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
@@ -137,7 +137,7 @@ void CreateShell(engine::ecs::Entity entity)
 	float shellSize = 0.1;
 
 	std::vector<Vector2> shellverts{ Vector2(shellSize, shellSize), Vector2(shellSize, -shellSize), Vector2(-shellSize, -shellSize), Vector2(-shellSize, shellSize) };
-	ecs::AddComponent(shell, PolygonCollider{ .vertices = shellverts, .callback = OnProjectileCollision, .trigger = true, .visualise = true,  .rotationOverride = std::abs(modelTransform.rotation.y) });
+	ecs::AddComponent(shell, PolygonCollider{ .vertices = shellverts, .callback = OnProjectileCollision, .trigger = true, .visualise = false,  .rotationOverride = std::abs(modelTransform.rotation.y) });
 }
 
 void ShootShell(engine::ecs::Entity entity)
@@ -419,6 +419,7 @@ static void BoostEnd(engine::ecs::Entity entity, float boostStrenght)
 {
 	Player& player = engine::ecs::GetComponent<Player>(entity);
 	player._boostScale -= boostStrenght;
+	player.specialEnabled = false;
 }
 
 // Increases player speed for a short while
@@ -429,7 +430,6 @@ void Boost(engine::ecs::Entity entity)
 
 	Player& player = engine::ecs::GetComponent<Player>(entity);
 
-	player.specialEnabled = false;
 	player._boostScale += boostStrenght;
 
 	engine::timerSystem->ScheduleFunction(&BoostEnd, boostTime, false, engine::ScheduledFunction::Type::seconds, entity, boostStrenght);
@@ -636,7 +636,6 @@ class PlayerController : public engine::ecs::System
 {
 	static engine::ecs::Entity winScreen;
 	static bool hasWon;
-
 
 	//A map from a ship type to a pre-initialized Player component with the proper stats
 	std::unordered_map<ShipType, Player> shipComponents;
