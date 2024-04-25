@@ -37,7 +37,7 @@ namespace resources
 		modelTextures = engine::PreloadTextures("3dmodels");
 
 		//Set the player textures
-		playerIdToTexture = { modelTextures["Player_Red.png"], modelTextures["Player_Red.png"], modelTextures["Player_Red.png"], modelTextures["Player_Red.png"] };
+		playerIdToTexture = { modelTextures["Buoy_Color_2.png"], modelTextures["Prop_Color.png"], modelTextures["Player_Red.png"], modelTextures["Buoy_Color.png"] };
 
 		models = engine::PreloadModels("3dmodels");
 
