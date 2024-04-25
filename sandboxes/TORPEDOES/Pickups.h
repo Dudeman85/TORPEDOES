@@ -33,7 +33,7 @@ public:
 	}
 
 	//Create a pickup at position
-	void SpawnPickup(Vector3 position, bool respawn = true)
+	static void SpawnPickup(Vector3 position, bool respawn = true)
 	{
 		ecs::Entity pickup = ecs::NewEntity();
 		ecs::AddComponent(pickup, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
