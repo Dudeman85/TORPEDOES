@@ -421,6 +421,8 @@ static void BoostEnd(engine::ecs::Entity entity, float boostStrenght)
 {
 	Player& player = engine::ecs::GetComponent<Player>(entity);
 	player._boostScale -= boostStrenght;
+
+	player.specialEnabled = false;
 }
 
 // Increases player speed for a short while
@@ -431,7 +433,6 @@ void Boost(engine::ecs::Entity entity)
 
 	Player& player = engine::ecs::GetComponent<Player>(entity);
 
-	player.specialEnabled = false;
 	player._boostScale += boostStrenght;
 
 	engine::timerSystem->ScheduleFunction(&BoostEnd, boostTime, false, engine::ScheduledFunction::Type::seconds, entity, boostStrenght);
@@ -583,15 +584,18 @@ void BoostIndicatorUpdate(engine::ecs::Entity entity)
 	indicatorStruct& it = player.specialIndicators[0];
 	engine::SpriteRenderer& sprite = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
 
-	if (player._boostScale > 1)
+	if (player.specialEnabled)
 	{
-		// Available to use
-		sprite.texture = it.textures[1];
-	}
-	else if (player.specialCooldown <= player._specialTimer)
-	{
-		// In use
-		sprite.texture = it.textures[0];
+		if (player.specialCooldown <= player._specialTimer)
+		{
+			// In use
+			sprite.texture = it.textures[0];
+		}
+		else
+		{
+			// Available to use
+			sprite.texture = it.textures[1];
+		}
 	}
 	else
 	{
@@ -609,7 +613,7 @@ void SubmergeIndicatorUpdate(engine::ecs::Entity entity)
 
 	if (player.submerged)
 	{
-		if (player.specialCooldown <= player._specialTimer || player.specialEnabled)
+		if (/*player.specialCooldown <= player._specialTimer ||*/ player.specialEnabled)
 		{
 			sprite.texture = it.textures[0];
 		}
@@ -620,7 +624,7 @@ void SubmergeIndicatorUpdate(engine::ecs::Entity entity)
 	}
 	else
 	{
-		if (player.specialCooldown <= player._specialTimer || player.specialEnabled)
+		if (/*player.specialCooldown <= player._specialTimer ||*/ player.specialEnabled)
 		{
 
 			sprite.texture = it.textures[2];
