@@ -197,7 +197,7 @@ static void PlayersMenu(std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem)
 
 int main()
 {
-
+	GameStates currentGameState = menuMainState;
 	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window");
 
 	engine::EngineInit();
@@ -249,7 +249,7 @@ int main()
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Goal_Ver2.obj"] });
 
 	
-	//PlayersMenu(ShipSelectionSystem);
+
 	ShipSelectionSystem->isShipSelectionMenuOn = true;
 	isGamePaused = true;
 	bool mapLoaded = false;
@@ -336,7 +336,7 @@ int main()
 		if (input::GetNewPress("Pause"))
 		{
 			pauseSystem->isGamePause = true;// !(pauseSystem->isGamePause);
-			//isGamePaused = !isGamePaused;
+			isGamePaused = !isGamePaused;
 			//printf("\nGamePause pressed\n");
 			pauseSystem->ToggleShowUIOptionsMenu();
 

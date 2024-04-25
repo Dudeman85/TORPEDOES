@@ -4,16 +4,33 @@
 #include <engine/Application.h>
 #include "engine/Input.h"  
 #include "engine/Timing.h"
+#include <functional>
 
 
-enum GameStates { PauseMenuMainState, pauseMenuOptionsState, SelectShipState, GameState };
-enum ShipPlayDifficulty { easy, normal, hard };
+enum GameStates { menuMainState,  selectPlayersState, mapSelection, gamePlayState, inGameOptionsState};
+
 
 static bool canStartLoadingMap;
 static bool isSceneloaded;
 std::unordered_map<int, ShipType> playerShips;
+vector < std::function <void()> > allLevels;
 
-//PlayerShipSelection
+ECS_REGISTER_SYSTEM(LevelSelection)
+class LevelSelection : public engine::ecs::System
+{
+	std::function<void()> selectedLevel;
+	
+	void Init() 
+	{
+
+	}
+	void update() 
+	{
+
+	}
+
+};
+
 ECS_REGISTER_COMPONENT(PlayerSelection)
 struct PlayerSelection
 {
@@ -695,6 +712,8 @@ struct PauseComponent
 ECS_REGISTER_SYSTEM(PauseSystem, PauseComponent, engine::Transform)
 class PauseSystem : public engine::ecs::System
 {
+	enum inGamePauseOptionsStates { mainOptions, sounds };  
+	inGamePauseOptionsStates pauseMenuAt;
 	engine::ecs::Entity pausedImage;
 
 	engine::ecs::Entity resumeButton;
@@ -1074,6 +1093,7 @@ public:
 	}
 	void ToggleShowUIOptionsMenu()
 	{
+		pauseMenuAt = mainOptions;
 		printf("options menu UI\n");
 
 		PauseComponent& pauseComponentOld = engine::ecs::GetComponent<PauseComponent>(currentSelection);
