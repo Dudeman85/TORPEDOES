@@ -40,7 +40,7 @@ public:
 		ecs::AddComponent(pickup, Transform{ .position = position, .rotation = {60, 35, 0}, .scale = 25 });
 		ecs::AddComponent(pickup, PickupComponent{ .respawn = respawn });
 		vector<Vector2> colliderVerts{ Vector2(.5, .5), Vector2(.5, -.5), Vector2(-.5, -.5), Vector2(-.5, .5) };
-		ecs::AddComponent(pickup, PolygonCollider{ .vertices = colliderVerts, .callback = OnCollision, .trigger = true, .visualise = true });
+		ecs::AddComponent(pickup, PolygonCollider{ .vertices = colliderVerts, .callback = OnCollision, .trigger = true, .visualise = false });
 	}
 
 	//Disables a pickup, it will re-enable after a while if set
