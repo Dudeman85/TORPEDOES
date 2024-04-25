@@ -124,7 +124,7 @@ void CreateShell(engine::ecs::Entity entity)
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-	float speed = 400;
+	float speed = 600;
 
 	ecs::Entity shell = ecs::NewEntity();
 	ecs::AddComponent(shell, Projectile{ .ownerID = player.id, .speed = 500, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
@@ -144,28 +144,26 @@ void ShootShell(engine::ecs::Entity entity)
 {
 	Player& player = ecs::GetComponent<Player>(entity);
 
-	if (player.reloading)
+	int maxSecondaryAmmo = 15;
+
+	if (player.ammo == 2)
 	{
-		// Reloading
-		if (player.ammo < player.maxAmmo)
-		{
-			// Not reloaded
-			player.ammo++; // We didn't shoot
-			return;
-		}
 		// Fully reloaded
-		player.reloading = false;
-		player.secondaryAmmo = player.maxAmmo;
+		player.secondaryAmmo = maxSecondaryAmmo;
 	}
 
-	if (player.secondaryAmmo <= 1)
+	// Ammo will be 1 after this, meaning ammoRechargeTimer will increment after this
+	player.ammo = 2;
+
+	if (player.secondaryAmmo <= 0)
 	{
-		// Last ammo, start reload
-		player.reloading = true;
+		// No ammo, do not shoot
+		return;
 	}
-
+	
+	// We fired, reset reload timer
+	player._ammoRechargeTimer = 0;
 	player.secondaryAmmo--;
-	player.ammo = 0;
 
 	CreateShell(entity);
 }
@@ -684,8 +682,8 @@ public:
 			ShipType::cannonBoat, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 100, .reloading = true,
-				.shootCooldown = 0.1, .specialCooldown = 5, .ammoRechargeCooldown = 0.16,
-				.holdShoot = true, .maxAmmo = 10,
+				.shootCooldown = 0.1, .specialCooldown = 5, .ammoRechargeCooldown = 2.25,
+				.holdShoot = true, .maxAmmo = 2,
 				.shootAction = ShootShell, .specialAction = Boost,
 				.shootIndicatorUpdate = CannonIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
 			} 
