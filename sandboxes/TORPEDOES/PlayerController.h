@@ -476,7 +476,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 			[playerEntity]()
 			{
 				Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
-				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures.push_back(resources::modelTextures["Player_Black.png"]);
+				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures = { resources::modelTextures["Player_Black.png"] };
 			}, 0.3);
 	}
 	//Surface if submerged
@@ -495,7 +495,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 			{
 				Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
 				playerComponent.submerged = false;
-				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures.clear();
+				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures = {resources::playerIdToTexture[playerComponent.id]};
 			}, 0.3);
 	}
 }
