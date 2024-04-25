@@ -443,7 +443,7 @@ int main()
 			isGamePaused = false;
 			canStartLoadingMap = false;
 			ShipSelectionSystem->isShipSelectionMenuOn = false;
-			LoadLevel3(&cam);
+			LoadLevel2(&cam);
 		}
 
 		// if paused or Pause pressed update PauseSystem
