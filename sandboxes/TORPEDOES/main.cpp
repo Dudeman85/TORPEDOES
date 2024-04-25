@@ -10,14 +10,21 @@ using namespace engine;
 int checkPointNumber = 0;
 bool isGamePaused = false;
 
-static void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine::Model* checkPointModel, float hitboxrotation, bool finish_line = false)
+static void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine::Model* checkPointModel, float hitboxrotation, bool finishLine = false)
 {
 	engine::ecs::Entity checkpoint = engine::ecs::NewEntity();
 
 	engine::ecs::AddComponent(checkpoint, engine::Transform{.position = position, .rotation = rotation, .scale = scale });
 	engine::ecs::AddComponent(checkpoint, engine::ModelRenderer{.model = checkPointModel });
-	engine::ecs::AddComponent(checkpoint, CheckPoint{ .checkPointID = checkPointNumber , .Finish_line = finish_line });
-	std::vector<Vector2> CheckpointcolliderVerts{ Vector2(4, 8), Vector2(4, -8), Vector2(-4, -8), Vector2(-4, 8) };
+	engine::ecs::AddComponent(checkpoint, CheckPoint{ .checkPointID = checkPointNumber , .Finish_line = finishLine });
+	std::vector<Vector2> CheckpointcolliderVerts;
+	if (finishLine)
+	{
+		CheckpointcolliderVerts = { Vector2(1, 8), Vector2(1, -8), Vector2(-1, -8), Vector2(-1, 8) };
+	}
+	else {
+		CheckpointcolliderVerts = { Vector2(4, 8), Vector2(4, -8), Vector2(-4, -8), Vector2(-4, 8) };
+	}
 	engine::ecs::AddComponent(checkpoint, engine::PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = true, .rotationOverride = hitboxrotation }));
 
 	checkPointNumber++;
@@ -66,7 +73,6 @@ static void LoadLevel3(engine::Camera* cam)
 	CreateCheckpoint(Vector3(1170.000000, -1250.000000, 100.000000), Vector3(37.500000, 0.000000, 0.000000), Vector3(13), resources::models["Prop_Buoy.obj"], 13.0f + 80.f);
 	CreateCheckpoint(Vector3(2555.000000, -1600.000000, 100.000000), Vector3(-17.500000, -87.500000, -90.000000), Vector3(20.5f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
 
-
 	//Make the crowds manually
 	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims);
 	CreateCrowd({ 1545, -1715, 11 }, resources::crowdAnims);
@@ -113,6 +119,8 @@ void LoadLevel2(engine::Camera* cam)
 	CreateCrowd({ 3165.000000, -480.000000, 100 }, resources::crowdAnims);	// First row, first crowd
 	// ********************
 
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1455.000000, -1295.000000, 0.300000));
+
 	PlayCountdown(Vector3(1260.0f, -1500.0f, 0.0f));
 	PlayerController::lapCount = 1;
 }
@@ -131,7 +139,7 @@ void LoadLevel4(engine::Camera* cam)
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{true});
 
 	// Make all the checkpoints manually
-	CreateCheckpoint(Vector3(2635.000000, -1355.000000, 0.000000), Vector3(77.500000, -40.000000, -7.500000), Vector3(20), resources::models["Prop_Buoy_Checkpoint.obj"], 45.0f);
+	CreateCheckpoint(Vector3(15760.000000, -925.000000, 100.000000), Vector3(-12.500000, -90.000000, -87.500000), Vector3(43.0f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
 }
 
 //Bind all input events here
@@ -230,6 +238,7 @@ int main()
 	std::shared_ptr<PlayerController> playerController = engine::ecs::GetSystem<PlayerController>();
 	playerController->Init();
 	std::shared_ptr<HedgehogSystem> hedgehogSystem = engine::ecs::GetSystem<HedgehogSystem>();
+	std::shared_ptr<PickupSystem> pickupSystem = engine::ecs::GetSystem<PickupSystem>();
 
 	std::shared_ptr<engine::SoundSystem> soundSystem = engine::ecs::GetSystem<engine::SoundSystem>();
 	soundSystem->AddSoundEngine("Gameplay");
@@ -252,7 +261,7 @@ int main()
 	// Load the third level
 	//LoadLevel3(&cam);
 
-	//ShipSelectionSystem->ToggleMenuPlayerSelection();
+
 
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
@@ -260,7 +269,9 @@ int main()
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Goal_Ver2.obj"] });
 
 	
-	PlayersMenu(ShipSelectionSystem);
+	//PlayersMenu(ShipSelectionSystem);
+	ShipSelectionSystem->isShipSelectionMenuOn = true;
+	isGamePaused = true;
 	bool mapLoaded = false;
 
 	//Game Loop
@@ -323,11 +334,14 @@ int main()
 			}
 		}
 
+
+
 		input::update();
 
 		if(!isGamePaused)
 			UpdateCam(&cam, resources::level2Map);
 		hedgehogSystem->Update();
+		pickupSystem->Update();
 		engine::Update(&cam);
 
 		if(canStartLoadingMap) 
@@ -355,11 +369,11 @@ int main()
 
 		if (input::GetNewPress("Menu"))
 		{
-		/*	ShipSelectionSystem->isShipSelectionMenuOn = !ShipSelectionSystem->isShipSelectionMenuOn;
+			ShipSelectionSystem->isShipSelectionMenuOn = !ShipSelectionSystem->isShipSelectionMenuOn;
 			isGamePaused = !isGamePaused;
 
 
-			ShipSelectionSystem->ToggleMenuPlayerSelection();*/
+			ShipSelectionSystem->ToggleMenuPlayerSelection();
 
 
 			std::cout << "is Ship selection open:" << ShipSelectionSystem->isShipSelectionMenuOn;

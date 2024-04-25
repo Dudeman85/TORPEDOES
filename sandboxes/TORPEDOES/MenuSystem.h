@@ -53,7 +53,7 @@ class PlayerSelectSystem : public engine::ecs::System
 	const float cooldownTime = 1.2f;
 
 	bool isLoadingMap = false;
-	const double startGameTimerInitValue = 30.f;
+	const double startGameTimerInitValue = 10.f;
 	float startGameCurrentTime ;
 
 	Vector2 gameStartTimerPosition;
@@ -279,10 +279,10 @@ public:
 			engine::ecs::AddComponent(shipModel, engine::Transform{ .position = Vector3(0.7f, -0.2f, -0.1f) , .scale = 0});
 			engine::ecs::AddComponent(shipModel, engine::ModelRenderer{ .model = shipModels[0], .uiElement = true });
 
-			engine::ecs::AddComponent(backgroundImage, engine::Transform{ .position = Vector3(0,0,-0.9f), .rotation = Vector3(0,0,0), .scale = Vector3(1.2) });
+			engine::ecs::AddComponent(backgroundImage, engine::Transform{ .position = Vector3(0.06f,0,-0.9f), .rotation = Vector3(0,0,0), .scale = Vector3(1.2) });
 			engine::ecs::AddComponent(backgroundImage, engine::SpriteRenderer{ .texture = resources::menuTextures["Selection_BG_Var3.png"], .enabled = false, .uiElement = true });
 
-			engine::ecs::AddComponent(readyText, engine::Transform{ .position = Vector3(arrowsPosX-0.4f,arrowDownposY,-0.1f) , .scale = 0 });
+			engine::ecs::AddComponent(readyText, engine::Transform{ .position = Vector3(arrowsPosX-0.4f,arrowDownposY,-0.1f) , .scale = 0.003f });
 			engine::ecs::AddComponent(readyText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "unready", .uiElement = true });
 
 			//shipInfo Entity
@@ -401,8 +401,11 @@ public:
 					engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowUp).enabled = true;
 					engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowDown).enabled = true;
 					playerReadyText = "UNready";
+					
 					playerSelection.isActivePlayer = true;
 					engine::ecs::GetComponent< engine::Transform>(playerSelection.shipModel).scale = 0.2;
+					engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).color = Vector3(0, 0, 255);
+
 					//engine::ecs::GetComponent< engine::Transform>(playerSelection.shipModel).position = (0.9f, 0.2f, -0.1f);
 					//engine::ecs::GetComponent<engine::TextRenderer>(playerSelection.playerWindow).text = "P" + to_string(playerSelection.playerID);
 				}
@@ -528,7 +531,7 @@ public:
 
 				if (startGameCurrentTime < 0) 
 				{
-					engine::ecs::GetComponent<engine::TextRenderer>(startGameTimerEntity).text = "Loading...";
+					engine::ecs::GetComponent<engine::TextRenderer>(startGameTimerEntity).text = "Loading map...";
 
 				}
 				else 
@@ -561,7 +564,7 @@ public:
 			{
 				isReseted = true;
 				printf(" TIMER REsETed \n");
-				startGameCurrentTime = startGameTimerInitValue;
+				//startGameCurrentTime = startGameTimerInitValue;
 				engine::ecs::GetComponent<engine::TextRenderer>(startGameTimerEntity).text = "";
 				engine::ecs::GetComponent<engine::TextRenderer>(startGameTimerEntity).offset = Vector3(-1.f, 0, 0);
 				engine::ecs::GetComponent<engine::TextRenderer>(startGameTimerEntity).color = Vector3(200, 140, 50);
@@ -584,7 +587,7 @@ public:
 		if (startGameCurrentTime <= -1 || input::GetNewPress("StartGame"))
 		{	//START GAME
 			canStartLoadingMap = true;
-
+			startGameCurrentTime = startGameTimerInitValue;
 			
 			printf("============= GAME STARTING ==========\n");
 			playerShips = selectedShipsAtTheFrame;
@@ -611,7 +614,7 @@ public:
 			if (isShipSelectionMenuOn)// Show every thing
 			{
 
-				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowUp).enabled = false;
+			/*	engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowUp).enabled = false;
 				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowDown).enabled = false;
 				engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).enabled = true;
 
@@ -621,21 +624,44 @@ public:
 
 				engine::ecs::GetComponent<engine::TextRenderer>(playerSelection.playerWindow).scale = 0.002f;
 				std::cout << "\nisShipSelectionMenuOn: " << isShipSelectionMenuOn << "\n";
+
+*/				  canStartLoadingMap = false;
+
+
+				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.backgroundImage).enabled = true;
+
+				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowUp).enabled = true;
+				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowDown).enabled = true;
+				engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).enabled = true;
+
+				//engine::ecs::GetComponent< engine::Transform>(playerSelection.readyText).scale = 0.003f;
+
+				PrintShipInfos(playerSelection);
+			
+
+				std::cout << "\nisShipSelectionMenuOn: " << isShipSelectionMenuOn << "\n";
+
 			}
 
 			if (!isShipSelectionMenuOn)	//hide every thing
 			{
 
+				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.backgroundImage).enabled = false;
 
 				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowUp).enabled = false;
 				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowDown).enabled = false;
 				engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).enabled = false;
 
 				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).text = "";
-				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).scale = Vector3(1, 1, 1);
+			
 		
-				
-				
+				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.specialEntity).text = "";
+				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.boostEntity).text = "";
+				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.baseSpeedEntity).text = "";
+				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipNameEntity).text = "";
+				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipInfo).text = "";
+
+				engine::ecs::GetComponent<engine::TextRenderer>(startGameTimerEntity).text = "";
 
 				std::cout << "\nisShipSelectionMenuOn: " << isShipSelectionMenuOn << "\n";
 

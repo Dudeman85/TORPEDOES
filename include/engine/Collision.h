@@ -484,7 +484,7 @@ namespace engine
 		///Camera is needed for visualisation
 		Camera* cam = nullptr;
 
-	private:
+	
 		Tilemap* tilemap = nullptr;
 	};
 }
