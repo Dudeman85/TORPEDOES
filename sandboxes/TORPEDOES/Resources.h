@@ -14,18 +14,20 @@ namespace resources
 
 	Font* niagaraFont;
 
-	Tilemap* level4Map; // Long map
-	Tilemap* level2Map; // Viksteri WIP tilemap
+	Tilemap* level1Map; // Green tilemap
+	Tilemap* level2Map; // Cave tilemap
 	Tilemap* level3Map; // Tropical tilemap
+	Tilemap* level4Map; // Long tilemap	
 
 	Animation explosionAnimation;
 	Animation WaterexplosionAnimation;
 	Animation crowdAnims;
-	Animation countdownAnim;	
-	Animation divingAnim;	
-	Animation continuousDivingAnim;	
+	Animation countdownAnim;
+	Animation divingAnim;
+	Animation continuousDivingAnim;
 
-	
+	std::vector<Texture*> playerIdToTexture;
+
 	//Load all the global resources here
 	//Stuff that is only used in one system can be loaded there 
 	void LoadResources(Camera* cam)
@@ -34,18 +36,24 @@ namespace resources
 		menuTextures = engine::PreloadTextures("menuUI", true, GL_LINEAR_MIPMAP_NEAREST);
 		modelTextures = engine::PreloadTextures("3dmodels");
 
+		//Set the player textures
+		playerIdToTexture = { modelTextures["Player_Red.png"], modelTextures["Player_Red.png"], modelTextures["Player_Red.png"], modelTextures["Player_Red.png"] };
+
 		models = engine::PreloadModels("3dmodels");
 
 		niagaraFont = new Font("Niagara Solid.ttf", 0, 0, 48);
 
-		level4Map = new Tilemap(cam);
-		level4Map->loadMap("/levels/level4.tmx");
+		level1Map = new Tilemap(cam);
+		level1Map->loadMap("/levels/level1.tmx");
 
 		level2Map = new Tilemap(cam);
 		level2Map->loadMap("/levels/level2backup.tmx");
 
 		level3Map = new Tilemap(cam);
 		level3Map->loadMap("levels/level3.tmx");
+
+		level4Map = new Tilemap(cam);
+		level4Map->loadMap("/levels/level4.tmx");
 
 		explosionAnimation = AnimationsFromSpritesheet("/spritesheets/explosion.png", 6, 1, vector<int>(6, 150))[0];
 		WaterexplosionAnimation = AnimationsFromSpritesheet("/spritesheets/Hedgehog_Explosion.png", 14, 1, vector<int>(14, 70))[0];
@@ -71,8 +79,9 @@ namespace resources
 		}
 
 		delete niagaraFont;
-		delete level4Map;
+		delete level1Map;
 		delete level2Map;
 		delete level3Map;
+		delete level4Map;
 	}
 }

@@ -4,16 +4,87 @@
 #include <engine/Application.h>
 #include "engine/Input.h"  
 #include "engine/Timing.h"
+#include <functional>
 
 
-enum GameStates { PauseMenuMainState, pauseMenuOptionsState, SelectShipState, GameState };
-enum ShipPlayDifficulty { easy, normal, hard };
+enum GameStates { menuMainState,  selectPlayersState, mapSelection, gamePlayState, inGameOptionsState};
+
 
 static bool canStartLoadingMap;
 static bool isSceneloaded;
 std::unordered_map<int, ShipType> playerShips;
 
-//PlayerShipSelection
+//ECS_REGISTER_COMPONENT(Level)
+//struct Level
+//{
+//	
+//	engine::ecs::Entity upper;
+//	engine::ecs::Entity lower;
+//	vector<std::string> text;
+//};
+//ECS_REGISTER_SYSTEM(LevelSelectionSystem, Level)
+//class LevelSelectionSystem : public engine::ecs::System
+//{
+//
+//
+//	std::function<void()> selectedLevel;
+//	vector <  std::function <void()>> allLevelsAndFunc;
+//	std::function <void() > operation;
+//	vector < engine::ecs::Entity> ;
+//
+//	vector < std::function <void()>> allLevels;
+//
+//	
+//	void Init() 
+//	{
+//		engine::ecs::AddComponent(level1, Level{ .upper = pausedImage, .lower = optionsButton, .selectedTexture = resources::menuTextures["UI_Paused.png"], .unselectedTexture = resources::menuTextures["UI_Paused.png"], .operation = PauseSystem::OnResumePressed });
+//
+//	}
+//	void update() 
+//	{
+//
+//	}
+//
+//	void Addlevels()
+//	{
+//		int i = 0;
+//		engine::ecs::Entity previousLevel;
+//		engine::ecs::Entity nextLevel;
+//		for (int level = 0; level < allLevelsAndFunc.size(); level++)
+//		{
+//			if (level == 0) {
+//				previousLevel = allLevels.size() - 1;
+//				nextLevel = 2;
+//			}
+//			if (level == allLevels.size() - 1)
+//			{
+//			    
+//			}
+//			else 
+//			{
+//				previousLevel++;
+//				nextLevel ++;
+//			}   
+//			/*text.push_back("level" + level);*/
+//			engine::ecs::AddComponent(level, Level{ .upper = previousLevel, .lower = nextLevel, Image,  operation = allLevels[level]});
+//
+//		}
+//		/*for (auto level : allLevels)
+//		{
+//			engine::ecs::AddComponent(level, LevelSelection{ .upper = previousLevel, .lower = nextLevel, .selectedTexture = resources::menuTextures["UI_Paused.png"], .unselectedTexture = resources::menuTextures["UI_Paused.png"], .operation = PauseSystem::OnResumePressed });
+//			i++;
+//
+//		}
+//		switch (switch_on)
+//		{
+//		default:
+//			break;
+//		}*/
+//	
+//	}
+//};
+
+
 ECS_REGISTER_COMPONENT(PlayerSelection)
 struct PlayerSelection
 {
@@ -196,6 +267,9 @@ public:
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipInfo).text = playerNumStats;
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipInfo).color = Vector3(nameColor.x, nameColor.y, nameColor.z);
 		
+		//engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).textures = { resources::modelTextures["Player_Red.png"] };
+		 //PUT SHIP COLOR HERE
+
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipNameEntity).text = "shipName: " + shipName;
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.specialEntity).text = "special: " + special;
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.boostEntity).text = "Boost: " + mainAttack;
@@ -426,6 +500,7 @@ public:
 						printf(" TIMER s TARTED \n");
 						
 						engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).model = shipModelsReady[playerSelection.selection];
+						engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).textures = { resources::modelTextures["Player_Red.png"] };
 						engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).color = Vector3(0, 255, 0);
 					}
 					else
@@ -695,6 +770,8 @@ struct PauseComponent
 ECS_REGISTER_SYSTEM(PauseSystem, PauseComponent, engine::Transform)
 class PauseSystem : public engine::ecs::System
 {
+	enum inGamePauseOptionsStates { mainOptions, sounds };  
+	inGamePauseOptionsStates pauseMenuAt;
 	engine::ecs::Entity pausedImage;
 
 	engine::ecs::Entity resumeButton;
@@ -708,7 +785,7 @@ class PauseSystem : public engine::ecs::System
 
 	//options buttons
 	engine::ecs::Entity optionsResumeButton;
-	engine::ecs::Entity musicSliderEntity, musicSliderNub;;
+	engine::ecs::Entity musicSliderEntity, musicSliderNub;
 	engine::ecs::Entity fullscreenEntity;
 
 	vector<engine::ecs::Entity>  optionsButtons = { {optionsResumeButton},{musicSliderEntity}, {fullscreenEntity} };
@@ -1074,6 +1151,7 @@ public:
 	}
 	void ToggleShowUIOptionsMenu()
 	{
+		pauseMenuAt = mainOptions;
 		printf("options menu UI\n");
 
 		PauseComponent& pauseComponentOld = engine::ecs::GetComponent<PauseComponent>(currentSelection);
