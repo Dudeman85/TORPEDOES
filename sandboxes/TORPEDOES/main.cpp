@@ -52,7 +52,76 @@ static void PlayCountdown(Vector3 pos)
 	engine::ecs::GetSystem<PlayerController>()->countdownTimer = 3;
 }
 
-//Create everything for level 1
+// Create everything for level 1
+void LoadLevel1(engine::Camera* cam)
+{
+	engine::collisionSystem->cam = cam;
+
+	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat };
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(500, -500));
+
+	// Set this level's tilemap
+	engine::spriteRenderSystem->SetTilemap(resources::level1Map);
+	engine::collisionSystem->SetTilemap(resources::level1Map);
+	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
+
+}
+
+// Create everything for level 2
+void LoadLevel2(engine::Camera* cam)
+{
+	engine::collisionSystem->cam = cam;
+
+	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat };
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1160.0f, -1600.0f));
+
+	// Set this level's tilemap
+	engine::spriteRenderSystem->SetTilemap(resources::level2Map);
+	engine::collisionSystem->SetTilemap(resources::level2Map);
+	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
+
+	// Make all the checkpoint's manually
+	CreateCheckpoint(Vector3(1455.000000, -995.000000, 100.000000), Vector3(35.000000, -15.000000, -20.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 65.0f);				// First checkpoint
+	CreateCheckpoint(Vector3(2430.000000, -1630.000000, 100.000000), Vector3(7.500000, 92.500000, 90.000000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 0.0f);			// Second checkpoint
+	CreateCheckpoint(Vector3(3595.000000, -1095.000000, 100.000000), Vector3(40.000000, 0.000000, 47.500000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 130.0f);		// Third checkpoint
+	CreateCheckpoint(Vector3(2715.000000, -1130.000000, 100.000000), Vector3(45.000000, 0.000000, 0.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 90.0f);					// Fourth checkpoint
+	CreateCheckpoint(Vector3(2415.000000, -500.000000, 100.000000), Vector3(25.000000, -17.500000, -30.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 55.0f);				// Fifth checkpoint
+	CreateCheckpoint(Vector3(1505.000000, -335.000000, 100.000000), Vector3(52.500000, -32.500000, -5.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 60.0f);					// Sixth checkpoint
+	CreateCheckpoint(Vector3(600.000000, -665.000000, 100.000000), Vector3(40.000000, -25.000000, -17.500000), Vector3(17), resources::models["Prop_Buoy.obj"], 60.0f);					// Seventh checkpoint
+	CreateCheckpoint(Vector3(530.000000, -1675.000000, 100.000000), Vector3(45.000000, 32.500000, 47.500000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 145.0f);		// Eight checkpoint
+	CreateCheckpoint(Vector3(1230.000000, -1685.000000, 100.000000), Vector3(-17.500000, -87.500000, -90.000000), Vector3(17.5), resources::models["Prop_Goal_Ver2.obj"], 0.0f, true);	// Finish line
+
+	// Make the crowds manually
+	// Start/Finish line crowd
+	CreateCrowd({ 1030.000000, -1820.000000, 100 }, resources::crowdAnims);	// First row, first crowd
+	CreateCrowd({ 1230.000000, -1820.000000, 100 }, resources::crowdAnims);	// First row, second crowd
+	CreateCrowd({ 1430.000000, -1820.000000, 100 }, resources::crowdAnims);	// First row, third crowd
+	CreateCrowd({ 1010.000000, -1840.000000, 101 }, resources::crowdAnims);	// Second row, first crowd
+	CreateCrowd({ 1210.000000, -1840.000000, 101 }, resources::crowdAnims);	// Second row, second crowd
+	CreateCrowd({ 1410.000000, -1840.000000, 101 }, resources::crowdAnims);	// Second row, third crowd	
+	// ********************
+	// Cave crowd
+	CreateCrowd({ 3165.000000, -480.000000, 100 }, resources::crowdAnims);	// First row, first crowd
+	// ********************
+	// Overhang crowd
+	CreateCrowd({ 1210.000000, -825.000000, 100 }, resources::crowdAnims); // First row, first crowd
+	CreateCrowd({ 1410.000000, -825.000000, 100 }, resources::crowdAnims); // First row, second crowd
+	CreateCrowd({ 1610.000000, -825.000000, 100 }, resources::crowdAnims); // First row, third crowd
+	CreateCrowd({ 1810.000000, -825.000000, 100 }, resources::crowdAnims); // First row, fourth crowd
+	CreateCrowd({ 1250.000000, -865.000000, 101 }, resources::crowdAnims); // Second row, first crowd
+	CreateCrowd({ 1450.000000, -865.000000, 101 }, resources::crowdAnims); // Second row, second crowd
+	CreateCrowd({ 1650.000000, -865.000000, 101 }, resources::crowdAnims); // Second row, third crowd
+	CreateCrowd({ 1850.000000, -865.000000, 101 }, resources::crowdAnims); // Second row, fourth crowd
+	// ********************
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1455.000000, -1295.000000, 0.300000));
+
+	PlayCountdown(Vector3(1260.0f, -1500.0f, 0.0f));
+	PlayerController::lapCount = 1;
+}
+
+
+//Create everything for level 3
 static void LoadLevel3(engine::Camera* cam)
 {
 	engine::collisionSystem->cam = cam;
@@ -82,50 +151,7 @@ static void LoadLevel3(engine::Camera* cam)
 	PlayerController::lapCount = 1;
 }
 
-// Create everything for level 2
-void LoadLevel2(engine::Camera* cam)
-{
-	engine::collisionSystem->cam = cam;
-
-	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1160.0f, -1600.0f));
-
-	// Set this level's tilemap
-	engine::spriteRenderSystem->SetTilemap(resources::level2Map);
-	engine::collisionSystem->SetTilemap(resources::level2Map);
-	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty { true });
-
-	// Make all the checkpoint's manually
-	CreateCheckpoint(Vector3(1455.000000, -995.000000, 100.000000), Vector3(35.000000, -15.000000, -20.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 65.0f);				// First checkpoint
-	CreateCheckpoint(Vector3(2430.000000, -1630.000000, 100.000000), Vector3(7.500000, 92.500000, 90.000000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 0.0f);			// Second checkpoint
-	CreateCheckpoint(Vector3(3595.000000, -1095.000000, 100.000000), Vector3(40.000000, 0.000000, 47.500000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 130.0f);		// Third checkpoint
-	CreateCheckpoint(Vector3(2715.000000, -1130.000000, 100.000000), Vector3(45.000000, 0.000000, 0.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 90.0f);					// Fourth checkpoint
-	CreateCheckpoint(Vector3(2415.000000, -500.000000, 100.000000), Vector3(25.000000, -17.500000, -30.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 55.0f);				// Fifth checkpoint
-	CreateCheckpoint(Vector3(1505.000000, -335.000000, 100.000000), Vector3(52.500000, -32.500000, -5.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 60.0f);					// Sixth checkpoint
-	CreateCheckpoint(Vector3(600.000000, -665.000000, 100.000000), Vector3(40.000000, -25.000000, -17.500000), Vector3(17), resources::models["Prop_Buoy.obj"], 60.0f);					// Seventh checkpoint
-	CreateCheckpoint(Vector3(530.000000, -1675.000000, 100.000000), Vector3(45.000000, 32.500000, 47.500000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 145.0f);		// Eight checkpoint
-	CreateCheckpoint(Vector3(1230.000000, -1685.000000, 100.000000), Vector3(-17.500000, -87.500000, -90.000000), Vector3(17.5), resources::models["Prop_Goal_Ver2.obj"], 0.0f, true);	// Finish line
-
-	// Make the crowds manually
-	// Start/Finish line crowd
-	CreateCrowd({ 1030.000000, -1820.000000, 100 }, resources::crowdAnims);	// First row, first crowd
-	CreateCrowd({ 1230.000000, -1820.000000, 100 }, resources::crowdAnims);	// First row, second crowd
-	CreateCrowd({ 1430.000000, -1820.000000, 100 }, resources::crowdAnims);	// First row, third crowd
-	CreateCrowd({ 1010.000000, -1840.000000, 101 }, resources::crowdAnims);	// Second row, first crowd
-	CreateCrowd({ 1210.000000, -1840.000000, 101 }, resources::crowdAnims);	// Second row, second crowd
-	CreateCrowd({ 1410.000000, -1840.000000, 101 }, resources::crowdAnims);	// Second row, third crowd	
-	// ********************
-	// Cave crowd
-	CreateCrowd({ 3165.000000, -480.000000, 100 }, resources::crowdAnims);	// First row, first crowd
-	// ********************
-
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1455.000000, -1295.000000, 0.300000));
-
-	PlayCountdown(Vector3(1260.0f, -1500.0f, 0.0f));
-	PlayerController::lapCount = 1;
-}
-
-// Create everything for level 3
+// Create everything for level 4
 void LoadLevel4(engine::Camera* cam)
 {
 	engine::collisionSystem->cam = cam;
@@ -134,8 +160,8 @@ void LoadLevel4(engine::Camera* cam)
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1434.0f, -1370.0f));
 
 	//set this level's tilemap
-	engine::spriteRenderSystem->SetTilemap(resources::level3Map);
-	engine::collisionSystem->SetTilemap(resources::level3Map);
+	engine::spriteRenderSystem->SetTilemap(resources::level4Map);
+	engine::collisionSystem->SetTilemap(resources::level4Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{true});
 
 	// Make all the checkpoints manually
@@ -339,7 +365,7 @@ int main()
 		input::update();
 
 		if(!isGamePaused)
-			UpdateCam(&cam, resources::level2Map);
+			UpdateCam(&cam, resources::level1Map);
 		hedgehogSystem->Update();
 		pickupSystem->Update();
 		engine::Update(&cam);
@@ -349,7 +375,7 @@ int main()
 			isGamePaused = false;
 			canStartLoadingMap = false;
 			ShipSelectionSystem->isShipSelectionMenuOn = false;
-			LoadLevel2(&cam);
+			LoadLevel1(&cam);
 		}
 
 		// if paused or Pause pressed update PauseSystem
