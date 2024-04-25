@@ -68,11 +68,13 @@ public:
 		//Only pickable by player
 		if (ecs::HasComponent<Player>(collision.b))
 		{
-			Disable(collision.a);
-			
-			//Enable the special action
+			//Enable the special action if player does not already have it
 			Player& player = ecs::GetComponent<Player>(collision.b);
+			if (player.specialEnabled)
+				return;
 			player.specialEnabled = true;
+
+			Disable(collision.a);
 		}
 		//Destroy if hit by a projectile
 		if (ecs::HasComponent<Projectile>(collision.b))
