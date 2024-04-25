@@ -360,7 +360,7 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 		{
 			auto& spriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(aimingGuide);
 
-			spriteRenderer.texture = resources::uiTextures["Hedgehog_Aim_Icon.png"];
+			spriteRenderer.texture = resources::uiTextures["crosshair.png"];
 		}
 	}
 }
@@ -378,7 +378,7 @@ void CreateAimingGuides(engine::ecs::Entity entity, float guideSpeed, float shoo
 		engine::ecs::Entity newGuide = engine::ecs::NewEntity();
 
 		engine::ecs::AddComponent(newGuide, engine::Transform{ .position = transform.position, .rotation = transform.rotation, .scale = transform.scale});
-		engine::ecs::AddComponent(newGuide, engine::SpriteRenderer{ .texture= resources::uiTextures["crosshair.png"] });
+		engine::ecs::AddComponent(newGuide, engine::SpriteRenderer{ .texture= resources::uiTextures["Green_crosshair.png"] });
 
 		aimingGuides.push_back(newGuide);
 	}
@@ -684,7 +684,7 @@ public:
 			ShipType::cannonBoat, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 100, .reloading = true,
-				.shootCooldown = 0.1, .specialCooldown = 999999, .ammoRechargeCooldown = 0.16,
+				.shootCooldown = 0.1, .specialCooldown = 5, .ammoRechargeCooldown = 0.16,
 				.holdShoot = true, .maxAmmo = 10,
 				.shootAction = ShootShell, .specialAction = Boost,
 				.shootIndicatorUpdate = CannonIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
@@ -695,7 +695,7 @@ public:
 			ShipType::hedgehogBoat, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 100, 
-				.shootCooldown = 0.4, .specialCooldown = 999999, .ammoRechargeCooldown = 5,
+				.shootCooldown = 0.4, .specialCooldown = 5, .ammoRechargeCooldown = 5,
 				.holdShoot = false, .maxAmmo = 1, 
 				.shootAction = ShootHedgehog, .specialAction = Boost,
 				.shootIndicatorUpdate = HedgehogIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
