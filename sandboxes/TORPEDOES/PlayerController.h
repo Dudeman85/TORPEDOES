@@ -673,7 +673,7 @@ public:
 			ShipType::submarine, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 150, 
-				.shootCooldown = 0.2, .specialCooldown = 0.0f, .ammoRechargeCooldown = 2,
+				.shootCooldown = 0.2, .specialCooldown = 4, .ammoRechargeCooldown = 2,
 				.holdShoot = false, .maxAmmo = 2, 
 				.shootAction = CreateTorpedo, .specialAction = ToggleSubmerge,
 				.shootIndicatorUpdate = TorpedoIndicatorUpdate, .specialIndicatorUpdate = SubmergeIndicatorUpdate
