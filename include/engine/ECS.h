@@ -49,6 +49,7 @@ namespace engine::ecs
 	template<typename T>
 	inline uint16_t GetComponentID();
 	inline std::vector<std::string> GetTags(Entity);
+	bool EntityExists(Entity);
 	inline void LogWarning(std::string message)
 	{
 		std::cout << warningFormat << message << normalFormat << std::endl;
