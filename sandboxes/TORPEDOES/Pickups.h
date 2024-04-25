@@ -72,7 +72,7 @@ public:
 			
 			//Enable the special action
 			Player& player = ecs::GetComponent<Player>(collision.b);
-			player._specialTimer = 999999;
+			player.specialEnabled = true;
 		}
 		//Destroy if hit by a projectile
 		if (ecs::HasComponent<Projectile>(collision.b))

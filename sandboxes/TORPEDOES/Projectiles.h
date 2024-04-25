@@ -64,13 +64,16 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 
 	engine::ecs::DestroyEntity(hedgehog.aimingGuide);
 
+	Vector2 explosionSize = Vector2(0.5, -0.5);
+	Vector2 explosionScale = Vector3(20);
+
 	engine::ecs::Entity hedgehogExplosion = engine::ecs::NewEntity();
-	engine::ecs::AddComponent(hedgehogExplosion, engine::Transform{ .position = transform.position + Vector3(0, 0, 100 + (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(40) });
+	engine::ecs::AddComponent(hedgehogExplosion, engine::Transform{ .position = transform.position + Vector3(0, 0, 100 + (double)rand() / ((double)RAND_MAX + 1)), .scale = explosionScale });
 	engine::ecs::AddComponent(hedgehogExplosion, engine::SpriteRenderer{ });
 	engine::ecs::AddComponent(hedgehogExplosion, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
-	std::vector<Vector2> explosionverts{ Vector2(0.5, 0.55), Vector2(0.5, -0.55), Vector2(-0.5, -0.55), Vector2(-0.5, 0.55) };
+	std::vector<Vector2> explosionverts{ Vector2(explosionSize.x, explosionSize.x), Vector2(explosionSize.x, explosionSize.y), Vector2(explosionSize.y, -explosionSize.y), Vector2(explosionSize.y, explosionSize.x) };
 	engine::ecs::AddComponent(hedgehogExplosion, engine::PolygonCollider{ .vertices = explosionverts, .trigger = true, .visualise = true });
-	engine::ecs::AddComponent(hedgehogExplosion, Projectile{ .ownerID = projectile.ownerID, .hitType = HitStates::Stop, .hitSpeedFactor = 0.5, .hitTime = 3, .canHitSubmerged = true, .hitAnimation = "" });
+	engine::ecs::AddComponent(hedgehogExplosion, Projectile{ .ownerID = projectile.ownerID, .hitType = HitStates::Stop, .hitSpeedFactor = 0.5, .hitTime = 1, .canHitSubmerged = true, .hitAnimation = "" });
 
 	// aqui verifica si el id del tilecolare y activa la otra animacion 
 	if (engine::collisionSystem->tilemap->checkCollision(transform.position.x, transform.position.y) > 1)
@@ -98,21 +101,20 @@ static void OnProjectileCollision(engine::Collision collision)
 	}
 }
 
-static const float _HedgehogMaxDistance = 700.0f;	// Full charge distance
-static const float _HedgehogMinDistance = 100.0f;	// No charge distance   ( can guied go close if charge to value)
-static const float _HedgehogChargeTime = 1.0f;		// Time until full charge
-
 ECS_REGISTER_SYSTEM(HedgehogSystem, engine::Rigidbody, engine::Transform, Hedgehog)
 class HedgehogSystem : public engine::ecs::System
 {
 public:
-	const float hedgehogSpeedVo = 500.0f;
-	const float maxDistance = 700.0f;
 	const float maxScale = 100.0f;
 	const float minScale = 50.0f;
 	const float minRotation = -50.0f;
 	const float maxRotation = +50.0f;
 
+	const float maxDistance = 700.0f;	// Full charge distance
+	const float minDistance = 100.0f;	// No charge distance 
+	const float chargeTime = 1.0f;		// Time until full charge
+
+	const float speed = 500.0f;
 
 	void Update()
 	{
@@ -123,12 +125,12 @@ public:
 			Hedgehog& hedgehogComp = engine::ecs::GetComponent<Hedgehog>(entity);
 			engine::Transform& transformComp = engine::ecs::GetComponent<engine::Transform>(entity);
 
-			if (hedgehogComp.distanceTraveled < hedgehogComp.targetDistance)
+			if (hedgehogComp.distanceTraveled <= hedgehogComp.targetDistance)
 			{
 				// Projectile is still travelling to it's target distance
 
 				// Increment distance travelled
-				hedgehogComp.distanceTraveled += hedgehogSpeedVo * engine::deltaTime;
+				hedgehogComp.distanceTraveled += engine::ecs::GetSystem<HedgehogSystem>()->speed * engine::deltaTime;
 
 				// Ratio of distance travelled to the target distance
 				float distanceRatio = hedgehogComp.distanceTraveled / hedgehogComp.targetDistance;
