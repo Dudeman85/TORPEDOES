@@ -1117,7 +1117,7 @@ public:
 
 			//Create the player's rendered entity
 			engine::ecs::AddComponent(playerRender, engine::Transform{ .rotation = Vector3(45, 0, 0), .scale = Vector3(1.5) });
-			engine::ecs::AddComponent(playerRender, engine::ModelRenderer{ .model = shipModels[playerShip.second] });
+			engine::ecs::AddComponent(playerRender, engine::ModelRenderer{ .model = shipModels[playerShip.second], .textures = {resources::playerIdToTexture[playerShip.first]} });
 			engine::TransformSystem::AddParent(playerRender, playerEntity);
 
 			Player& player = engine::ecs::GetComponent<Player>(playerEntity);
