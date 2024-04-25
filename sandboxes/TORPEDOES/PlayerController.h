@@ -684,7 +684,7 @@ public:
 			ShipType::cannonBoat, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 100, .reloading = true,
-				.shootCooldown = 0.1, .specialCooldown = 999999, .ammoRechargeCooldown = 0.16,
+				.shootCooldown = 0.1, .specialCooldown = 5, .ammoRechargeCooldown = 0.16,
 				.holdShoot = true, .maxAmmo = 10,
 				.shootAction = ShootShell, .specialAction = Boost,
 				.shootIndicatorUpdate = CannonIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
@@ -695,7 +695,7 @@ public:
 			ShipType::hedgehogBoat, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 100, 
-				.shootCooldown = 0.4, .specialCooldown = 999999, .ammoRechargeCooldown = 5,
+				.shootCooldown = 0.4, .specialCooldown = 5, .ammoRechargeCooldown = 5,
 				.holdShoot = false, .maxAmmo = 1, 
 				.shootAction = ShootHedgehog, .specialAction = Boost,
 				.shootIndicatorUpdate = HedgehogIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
