@@ -250,7 +250,7 @@ public:
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipInfo).color = Vector3(nameColor.x, nameColor.y, nameColor.z);
 		
 		//engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).textures = { resources::modelTextures["Player_Red.png"] };
-		 //PUT SHIP COLOR HERE
+		//PUT SHIP COLOR HERE
 
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipNameEntity).text = "shipName: " + shipName;
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.specialEntity).text = "special: " + special;
@@ -457,7 +457,7 @@ public:
 			bool selectInput = input::GetNewPress("Shoot" + std::to_string(playerSelection.playerID));
 
 			std::string& playerReadyText = engine::ecs::GetComponent<engine::TextRenderer>(playerSelection.readyText).text;
-
+			
 			// Shoot input adds player to the game and after that makes player Ready/Not ready
 			if (selectInput)
 			{
@@ -508,7 +508,8 @@ public:
 				}
 			}
 			// Ready players can't change ships
-			if (!playerSelection.ready /* && playerSelection.isActivePlayer*/)
+			// TODO: What is ActivePlayer and is it required?
+			if (!playerSelection.ready && playerSelection.isActivePlayer)
 			{
 				if (turnInput >= 0.5f)
 				{
