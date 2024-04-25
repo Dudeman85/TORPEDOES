@@ -31,7 +31,7 @@ struct Projectile
 };
 
 ECS_REGISTER_COMPONENT(Hedgehog)
-struct  Hedgehog : public Projectile
+struct Hedgehog
 {
 	float distanceTraveled = 0;	// Distance travelled
 	float targetDistance = 0;	// Distance until explosion
@@ -66,6 +66,7 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 {
 	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(entity);
 	Hedgehog& hedgehog = engine::ecs::GetComponent<Hedgehog>(entity);
+	Projectile& projectile = engine::ecs::GetComponent<Projectile>(entity);
 
 	engine::ecs::DestroyEntity(hedgehog.aimingGuide);
 
@@ -75,7 +76,7 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 	engine::ecs::AddComponent(hedgehogExplosion, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
 	std::vector<Vector2> explosionverts{ Vector2(0.5, 0.55), Vector2(0.5, -0.55), Vector2(-0.5, -0.55), Vector2(-0.5, 0.55) };
 	engine::ecs::AddComponent(hedgehogExplosion, engine::PolygonCollider{ .vertices = explosionverts, .trigger = true, .visualise = true });
-	engine::ecs::AddComponent(hedgehogExplosion, Projectile{ .ownerID = hedgehog.ownerID, .hitType = HitStates::Stop, .hitSpeedFactor = 0.5, .hitTime = 3, .canHitSubmerged = true, .hitAnimation = "" });
+	engine::ecs::AddComponent(hedgehogExplosion, Projectile{ .ownerID = projectile.ownerID, .hitType = HitStates::Stop, .hitSpeedFactor = 0.5, .hitTime = 3, .canHitSubmerged = true, .hitAnimation = "" });
 
 	// aqui verifica si el id del tilecolare y activa la otra animacion 
 	if (engine::collisionSystem->tilemap->checkCollision(transform.position.x, transform.position.y) > 1)
