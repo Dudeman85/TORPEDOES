@@ -240,14 +240,22 @@ void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide,
 	engine::ecs::Entity hedgehog = engine::ecs::NewEntity();
 	engine::ecs::AddComponent(hedgehog, Transform{ .position = transform.position, .rotation = modelTransform.rotation });
 
-	Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * ecs::GetSystem<HedgehogSystem>()->hedgehogSpeedVo;
+	Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * ecs::GetSystem<HedgehogSystem>()->speed;
 
 	engine::ecs::AddComponent(hedgehog, engine::Rigidbody{ .velocity = finalVelocity });
 
 	engine::ecs::AddComponent(hedgehog, ModelRenderer{ .model = resources::models["Weapon_HedgehogAmmo.obj"] });
 	std::vector<Vector2> Hedgehogverts{ Vector2(0.4, 0.5), Vector2(0.4, -0.5), Vector2(-0.4, -0.5), Vector2(-0.4, 0.5) };
 	ecs::AddComponent(hedgehog, Projectile{ .ownerID = player.id });
-	ecs::AddComponent(hedgehog, Hedgehog{ .targetDistance = std::clamp(input::map_value(timeHeld, 0, _HedgehogChargeTime, _HedgehogMinDistance, _HedgehogMaxDistance), _HedgehogMinDistance, _HedgehogMaxDistance), .aimingGuide = aimingGuide });
+	
+	auto& hedgehogTransform = engine::ecs::GetComponent<engine::Transform>(hedgehog);
+	auto& aimingGuideTransform = engine::ecs::GetComponent<engine::Transform>(aimingGuide);
+	ecs::AddComponent(hedgehog, 
+	Hedgehog
+	{ 
+		.targetDistance = (hedgehogTransform.position - aimingGuideTransform.position).Length(),
+		.aimingGuide = aimingGuide 
+	});
 }
 
 struct aimingGuideStruct
@@ -270,7 +278,6 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 		// When button is pressed, move aim guide forward
 		Transform& transform = ecs::GetComponent<Transform>(entity);
 		Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
-
 
 		Player& player = ecs::GetComponent<Player>(entity);
 		Transform& playerTransform = ecs::GetComponent<Transform>(entity);
@@ -296,8 +303,8 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 
 			Transform& guideTransform = ecs::GetComponent<Transform>(aimingGuides[0]);
 			guideTransform.position = playerTransform.position
-				+ (modifiedDirection * _HedgehogMinDistance)
-				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, _HedgehogChargeTime)));
+				+ (modifiedDirection * ecs::GetSystem<HedgehogSystem>()->minDistance)
+				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, ecs::GetSystem<HedgehogSystem>()->chargeTime)));
 			guideTransform.scale = 20;
 		}
 		else
@@ -315,8 +322,8 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 
 			Transform& guideTransform = ecs::GetComponent<Transform>(aimingGuides[positive_i ]);
 			guideTransform.position = playerTransform.position
-				+ (modifiedDirection * _HedgehogMinDistance)
-				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, _HedgehogChargeTime)));
+				+ (modifiedDirection * ecs::GetSystem<HedgehogSystem>()->minDistance)
+				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, ecs::GetSystem<HedgehogSystem>()->chargeTime)));
 			guideTransform.scale = 20;
 		}
 		// Guide negative:
@@ -328,8 +335,8 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 
 			Transform& guideTransform = ecs::GetComponent<Transform>(aimingGuides[(negative_i)+(positive_i - 1)]);
 			guideTransform.position = playerTransform.position
-				+ (modifiedDirection * _HedgehogMinDistance)
-				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, _HedgehogChargeTime)));
+				+ (modifiedDirection * ecs::GetSystem<HedgehogSystem>()->minDistance)
+				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, ecs::GetSystem<HedgehogSystem>()->chargeTime)));
 			guideTransform.scale = 20;
 		}
 	}
@@ -351,7 +358,9 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 
 		for (auto& aimingGuide : aimingGuides)
 		{
-			// TODO: Change guide animation
+			auto& spriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(aimingGuide);
+
+			spriteRenderer.texture = resources::uiTextures["Hedgehog_Aim_Icon.png"];
 		}
 	}
 }
@@ -398,13 +407,12 @@ void ShootHedgehog(engine::ecs::Entity entity)
 		}
 	}
 
-	float guideSpeed = 500;
-	float shootAngle = Radians(5.0f);
+	float shootAngle = Radians(8.0f);
 	//float shootAmount = player.ammo;
 	float shootAmount = 4;
 	//player.ammo++; // We don't use up ammo until we shoot
 
-	CreateAimingGuides(entity, 500, shootAngle, shootAmount);
+	CreateAimingGuides(entity, ecs::GetSystem<HedgehogSystem>()->speed, shootAngle, shootAmount);
 }
 
 /* BOOST */
