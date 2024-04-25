@@ -124,7 +124,7 @@ void CreateShell(engine::ecs::Entity entity)
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-	float speed = 800;
+	float speed = 400;
 
 	ecs::Entity shell = ecs::NewEntity();
 	ecs::AddComponent(shell, Projectile{ .ownerID = player.id, .speed = 500, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
@@ -137,33 +137,35 @@ void CreateShell(engine::ecs::Entity entity)
 	float shellSize = 0.1;
 
 	std::vector<Vector2> shellverts{ Vector2(shellSize, shellSize), Vector2(shellSize, -shellSize), Vector2(-shellSize, -shellSize), Vector2(-shellSize, shellSize) };
-	ecs::AddComponent(shell, PolygonCollider{ .vertices = shellverts, .callback = OnProjectileCollision, .trigger = true, .visualise = false,  .rotationOverride = std::abs(modelTransform.rotation.y) });
+	ecs::AddComponent(shell, PolygonCollider{ .vertices = shellverts, .callback = OnProjectileCollision, .trigger = true, .visualise = true,  .rotationOverride = std::abs(modelTransform.rotation.y) });
 }
 
 void ShootShell(engine::ecs::Entity entity)
 {
 	Player& player = ecs::GetComponent<Player>(entity);
 
-	int maxSecondaryAmmo = 15;
-
-	if (player.ammo == 2)
+	if (player.reloading)
 	{
+		// Reloading
+		if (player.ammo < player.maxAmmo)
+		{
+			// Not reloaded
+			player.ammo++; // We didn't shoot
+			return;
+		}
 		// Fully reloaded
-		player.secondaryAmmo = maxSecondaryAmmo;
+		player.reloading = false;
+		player.secondaryAmmo = player.maxAmmo;
 	}
 
-	// Ammo will be 1 after this, meaning ammoRechargeTimer will increment after this
-	player.ammo = 2;
-
-	if (player.secondaryAmmo <= 0)
+	if (player.secondaryAmmo <= 1)
 	{
-		// No ammo, do not shoot
-		return;
+		// Last ammo, start reload
+		player.reloading = true;
 	}
-	
-	// We fired, reset reload timer
-	player._ammoRechargeTimer = 0;
+
 	player.secondaryAmmo--;
+	player.ammo = 0;
 
 	CreateShell(entity);
 }
@@ -419,7 +421,6 @@ static void BoostEnd(engine::ecs::Entity entity, float boostStrenght)
 {
 	Player& player = engine::ecs::GetComponent<Player>(entity);
 	player._boostScale -= boostStrenght;
-	player.specialEnabled = false;
 }
 
 // Increases player speed for a short while
@@ -430,6 +431,7 @@ void Boost(engine::ecs::Entity entity)
 
 	Player& player = engine::ecs::GetComponent<Player>(entity);
 
+	player.specialEnabled = false;
 	player._boostScale += boostStrenght;
 
 	engine::timerSystem->ScheduleFunction(&BoostEnd, boostTime, false, engine::ScheduledFunction::Type::seconds, entity, boostStrenght);
@@ -474,7 +476,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 			[playerEntity]()
 			{
 				Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
-				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures = { resources::modelTextures["Player_Black.png"] };
+				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures.push_back(resources::modelTextures["Player_Black.png"]);
 			}, 0.3);
 	}
 	//Surface if submerged
@@ -493,7 +495,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 			{
 				Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
 				playerComponent.submerged = false;
-				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures = {resources::playerIdToTexture[playerComponent.id]};
+				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures.clear();
 			}, 0.3);
 	}
 }
@@ -637,6 +639,7 @@ class PlayerController : public engine::ecs::System
 	static engine::ecs::Entity winScreen;
 	static bool hasWon;
 
+
 	//A map from a ship type to a pre-initialized Player component with the proper stats
 	std::unordered_map<ShipType, Player> shipComponents;
 	//A map from a ship type to its 3D model
@@ -670,7 +673,7 @@ public:
 			ShipType::submarine, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 100, 
-				.shootCooldown = 0.2, .specialCooldown = 4, .ammoRechargeCooldown = 2,
+				.shootCooldown = 0.2, .specialCooldown = 0.0f, .ammoRechargeCooldown = 2,
 				.holdShoot = false, .maxAmmo = 2, 
 				.shootAction = CreateTorpedo, .specialAction = ToggleSubmerge,
 				.shootIndicatorUpdate = TorpedoIndicatorUpdate, .specialIndicatorUpdate = SubmergeIndicatorUpdate
@@ -681,8 +684,8 @@ public:
 			ShipType::cannonBoat, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 100, .reloading = true,
-				.shootCooldown = 0.1, .specialCooldown = 5, .ammoRechargeCooldown = 2.25,
-				.holdShoot = true, .maxAmmo = 2,
+				.shootCooldown = 0.05, .specialCooldown = 5, .ammoRechargeCooldown = 0.16,
+				.holdShoot = true, .maxAmmo = 15,
 				.shootAction = ShootShell, .specialAction = Boost,
 				.shootIndicatorUpdate = CannonIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
 			} 
@@ -1105,7 +1108,7 @@ public:
 			engine::ecs::AddComponent(playerEntity, engine::Transform{ .position = Vector3(startPos - offset * playerShip.first, 150), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			engine::ecs::AddComponent(playerEntity, engine::Rigidbody{ .drag = 1.5 });
 			vector<Vector2> colliderVerts{ Vector2(3, 1), Vector2(3, -1), Vector2(-3, -1), Vector2(-3, 1) };
-			engine::ecs::AddComponent(playerEntity, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = true });
+			engine::ecs::AddComponent(playerEntity, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
 
 			//Create the player's name tag
 			engine::ecs::AddComponent(playerNameText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "P" + to_string(playerShip.first + 1), .color = Vector3(0.5, 0.8, 0.2) });
