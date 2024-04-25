@@ -426,8 +426,8 @@ static void BoostEnd(engine::ecs::Entity entity, float boostStrenght)
 // Increases player speed for a short while
 void Boost(engine::ecs::Entity entity)
 {
-	double boostTime = 5;
-	float boostStrenght = 0.8f;
+	double boostTime = 1.5f;
+	float boostStrenght = 0.4f;
 
 	Player& player = engine::ecs::GetComponent<Player>(entity);
 
@@ -684,8 +684,8 @@ public:
 			ShipType::cannonBoat, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 100, .reloading = true,
-				.shootCooldown = 0.1, .specialCooldown = 5, .ammoRechargeCooldown = 0.16,
-				.holdShoot = true, .maxAmmo = 10,
+				.shootCooldown = 0.05, .specialCooldown = 5, .ammoRechargeCooldown = 0.16,
+				.holdShoot = true, .maxAmmo = 15,
 				.shootAction = ShootShell, .specialAction = Boost,
 				.shootIndicatorUpdate = CannonIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
 			} 

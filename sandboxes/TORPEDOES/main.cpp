@@ -25,7 +25,7 @@ static void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, 
 	else {
 		CheckpointcolliderVerts = { Vector2(4, 8), Vector2(4, -8), Vector2(-4, -8), Vector2(-4, 8) };
 	}
-	engine::ecs::AddComponent(checkpoint, engine::PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = true, .rotationOverride = hitboxrotation }));
+	engine::ecs::AddComponent(checkpoint, engine::PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = false, .rotationOverride = hitboxrotation }));
 
 	checkPointNumber++;
 };
@@ -52,7 +52,7 @@ static void PlayCountdown(Vector3 pos)
 	engine::ecs::GetSystem<PlayerController>()->countdownTimer = 3;
 }
 
-//Create everything for level 1
+//Create everything for level 3
 static void LoadLevel3(engine::Camera* cam)
 {
 	engine::collisionSystem->cam = cam;
@@ -77,6 +77,22 @@ static void LoadLevel3(engine::Camera* cam)
 	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims);
 	CreateCrowd({ 1545, -1715, 11 }, resources::crowdAnims);
 	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims);
+
+	//Pickups
+	//first corner
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3220.000000, -1280.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3290.000000, -1280.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3385.000000, -1280.000000, 0.300000));
+
+	////first hairpin
+	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3220.000000, -1280.000000, 0.300000));
+	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3220.000000, -1280.000000, 0.300000));
+
+
+	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3220.000000, -1280.000000, 0.300000));
+	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3220.000000, -1280.000000, 0.300000));
+	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3220.000000, -1280.000000, 0.300000));
+
 
 	PlayCountdown(Vector3(2480.0f, -1520.0f, 0.0f));
 	PlayerController::lapCount = 1;
@@ -138,7 +154,7 @@ static void LoadLevel2(engine::Camera* cam)
 	PlayerController::lapCount = 1;
 }
 
-// Create everything for level 3
+// Create everything for level 4
 static void LoadLevel4(engine::Camera* cam)
 {
 	engine::collisionSystem->cam = cam;
@@ -362,7 +378,7 @@ int main()
 			isGamePaused = false;
 			canStartLoadingMap = false;
 			ShipSelectionSystem->isShipSelectionMenuOn = false;
-			LoadLevel2(&cam);
+			LoadLevel3(&cam);
 		}
 
 		// if paused or Pause pressed update PauseSystem
