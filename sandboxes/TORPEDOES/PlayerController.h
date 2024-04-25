@@ -468,7 +468,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 		TransformSystem::AddParent(playerComponent.animationEntity, playerEntity);
 
 		//Start submerging and slow down
-		playerComponent._boostScale = 0.75;
+		playerComponent._boostScale -= 0.1;
 		playerComponent.submerged = true;
 
 		//Finished submerging after 1 second
@@ -486,7 +486,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 		playerComponent.animationEntity = 0;
 
 		//Start surfacing and speed up
-		playerComponent._boostScale = 1;
+		playerComponent._boostScale += 0.1;
 		playerComponent.specialEnabled = false;
 
 		//Finished surfacing after 1 second
@@ -652,7 +652,7 @@ public:
 	{
 		//Create the entity to be shown at a win
 		winScreen = engine::ecs::NewEntity();
-		engine::ecs::AddComponent(winScreen, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.5, 2, 1), .scale = Vector3(0.03f), .color = Vector3(0.5f, 0.8f, 0.2f), .uiElement = true });
+		engine::ecs::AddComponent(winScreen, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.5, 2, 1), .scale = Vector3(0.03f), .color = Vector3(1.f, 1.f, 1.f), .uiElement = true });
 		engine::ecs::AddComponent(winScreen, engine::SpriteRenderer{ .texture = resources::uiTextures["winner.png"], .enabled = false, .uiElement = true });
 		engine::ecs::AddComponent(winScreen, engine::Transform{ .position = Vector3(0, 0, 0.5f), .scale = Vector3(0.3f) });
 
@@ -661,7 +661,7 @@ public:
 		{ 
 			ShipType::torpedoBoat, Player
 			{
-				.forwardSpeed = 400, .rotationSpeed = 100, 
+				.forwardSpeed = 450, .rotationSpeed = 150, 
 				.shootCooldown = 0.2, .specialCooldown = 5, .ammoRechargeCooldown = 2,
 				.holdShoot = false, .maxAmmo = 2, 
 				.shootAction = CreateTorpedo, .specialAction = Boost,
@@ -672,8 +672,8 @@ public:
 		{ 
 			ShipType::submarine, Player
 			{
-				.forwardSpeed = 400, .rotationSpeed = 100, 
-				.shootCooldown = 0.2, .specialCooldown = 0.0f, .ammoRechargeCooldown = 2,
+				.forwardSpeed = 400, .rotationSpeed = 150, 
+				.shootCooldown = 0.2, .specialCooldown = 4, .ammoRechargeCooldown = 2,
 				.holdShoot = false, .maxAmmo = 2, 
 				.shootAction = CreateTorpedo, .specialAction = ToggleSubmerge,
 				.shootIndicatorUpdate = TorpedoIndicatorUpdate, .specialIndicatorUpdate = SubmergeIndicatorUpdate
@@ -683,7 +683,7 @@ public:
 		{ 
 			ShipType::cannonBoat, Player
 			{
-				.forwardSpeed = 400, .rotationSpeed = 100, .reloading = true,
+				.forwardSpeed = 400, .rotationSpeed = 150, .reloading = true,
 				.shootCooldown = 0.05, .specialCooldown = 5, .ammoRechargeCooldown = 0.16,
 				.holdShoot = true, .maxAmmo = 15,
 				.shootAction = ShootShell, .specialAction = Boost,
@@ -694,7 +694,7 @@ public:
 		{	
 			ShipType::hedgehogBoat, Player
 			{
-				.forwardSpeed = 400, .rotationSpeed = 100, 
+				.forwardSpeed = 380, .rotationSpeed = 150, 
 				.shootCooldown = 0.4, .specialCooldown = 5, .ammoRechargeCooldown = 5,
 				.holdShoot = false, .maxAmmo = 1, 
 				.shootAction = ShootHedgehog, .specialAction = Boost,
@@ -871,7 +871,7 @@ public:
 				{
 				case HitStates::Stop:
 					// Rotate player
-					engine::TransformSystem::Rotate(player.renderedEntity, 0, (720.0f / hitProjectile.first.hitTime) * engine::deltaTime, 0);
+					engine::TransformSystem::Rotate(player.renderedEntity, 0, (360.0f / hitProjectile.first.hitTime) * engine::deltaTime, 0);
 
 					// Ignore all input
 					accelerationInput = 0;
@@ -959,7 +959,7 @@ public:
 			float finalBoostScale = player._boostScale;
 			if (player._offroadThisFrame)
 			{
-				if (player._boostScale > 1 || player.submerged)
+				if (player.submerged)
 				{
 					// Ignore offtrack while boosting or submerged
 				}
