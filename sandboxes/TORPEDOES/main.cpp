@@ -162,7 +162,7 @@ void LoadLevel2(engine::Camera* cam)
 
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1455.000000, -1295.000000, 0.300000));
 
-	PlayCountdown(Vector3(1260.0f, -1500.0f, 0.0f));
+	PlayCountdown(Vector3(1150.0f, -1500.0f, 0.0f));
 	PlayerController::lapCount = 3;
 }
 
@@ -224,7 +224,7 @@ static void LoadLevel3(engine::Camera* cam)
 	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims);
 
 
-	PlayCountdown(Vector3(2480.0f, -1520.0f, 0.0f));
+	PlayCountdown(Vector3(2480.0f, -1460.0f, 150.0f));
 	PlayerController::lapCount = 3;
 }
 
@@ -450,7 +450,7 @@ int main()
 			isGamePaused = false;
 			canStartLoadingMap = false;
 			ShipSelectionSystem->isShipSelectionMenuOn = false;
-			LoadLevel2(&cam);
+			LoadLevel3(&cam);
 		}
 
 		// if paused or Pause pressed update PauseSystem
