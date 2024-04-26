@@ -35,7 +35,7 @@ static void CreateCrowd(Vector3 pos, engine::Animation& anim)
 	engine::ecs::Entity crowd = engine::ecs::NewEntity();
 	engine::ecs::AddComponent(crowd, engine::Transform{ .position = pos, .scale = Vector3(100, 30, 0) });
 	engine::ecs::AddComponent(crowd, engine::SpriteRenderer{});
-	engine::ecs::AddComponent(crowd, engine::Animator{});
+	engine::ecs::AddComponent(crowd, engine::Animator{.playbackSpeed = ((float)rand() / (RAND_MAX)) + 1 });
 	engine::AnimationSystem::AddAnimation(crowd, anim, "CrowdCheer");
 	engine::AnimationSystem::PlayAnimation(crowd, "CrowdCheer", true);
 }
