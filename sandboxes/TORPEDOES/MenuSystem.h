@@ -109,8 +109,6 @@ struct PlayerSelection
 ECS_REGISTER_SYSTEM(PlayerSelectSystem, PlayerSelection)
 class PlayerSelectSystem : public engine::ecs::System
 {
-	const float cooldownTime = 1.2f;
-
 	bool isLoadingMap = false;
 
 	Vector2 gameStartTimerPosition;
@@ -125,7 +123,7 @@ class PlayerSelectSystem : public engine::ecs::System
 	const float startLevelLoadingTime = 1.f;	// Time we have "loading" text before we start the level
 	float startLevelTimer = 0;					// Timer until we start the level
 
-	const float throttleMoveWaitTime = 0.5f;
+	const float throttleMoveWaitTime = 0.4f;
 	engine::ecs::Entity selectionWindow;
 
 	std::unordered_map<int, ShipType>selectedShipsAtTheFrame;
@@ -171,14 +169,14 @@ public:
 
 		ShipType shipType = ShipType(playerSelection.selection);
 
-		//TODO: GET REFERENCE ABOUT STATS AND PUT THEM HERE	
+		//TODO: Get reference to stats and add them here
 		switch (shipType)
 		{
 
 		case ShipType::torpedoBoat:
 		{
 			shipName = "Torpedo boat";
-			baseSpeed = to_string(50) + " knots";
+			baseSpeed = to_string(100) + " knots";
 			mainAttack = "Torpedo";
 			special = "Boost";
 			break;
@@ -186,24 +184,24 @@ public:
 		case ShipType::submarine:
 		{
 			shipName = "Submarine";
-			baseSpeed = to_string(35) + " knots";
+			baseSpeed = to_string(100) + " knots";
 			mainAttack = "Torpedo";
-			special = "Diving";
+			special = "Submerge";
 			break;
 		}
 		case ShipType::cannonBoat:
 		{
-			shipName = "Cannon boat";
-			baseSpeed = to_string(24) + " knots";
-			mainAttack = "Shells";
+			shipName = "Warship";
+			baseSpeed = to_string(100) + " knots";
+			mainAttack = "Heavy-Shell Turret";
 			special = "Boost";
 			break;
 		}
 		case ShipType::hedgehogBoat:
 		{
-			shipName = "Hedgehog boat";
-			baseSpeed = to_string(30) + " knots";
-			mainAttack = "Anti-Submarine projectile";
+			shipName = "Artillery Ship";
+			baseSpeed = to_string(100) + " knots";
+			mainAttack = "Anti-Submarine Mortar";
 			special = "Boost";
 			break;
 		}
@@ -211,8 +209,8 @@ public:
 		{
 			shipName = "PirateShip";
 			baseSpeed = to_string(8) + " knots";
-			mainAttack = "cannonballs";
-			special = "reload";
+			mainAttack = "Cannonballs";
+			special = "Reload";
 			break;
 		}
 		default:
@@ -520,67 +518,14 @@ public:
 			// TODO: What is ActivePlayer and is it required?
 			if (!playerSelection.ready && playerSelection.isActivePlayer)
 			{
-				if (turnInput >= 0.5f)
+				if (turnInput == 0)
 				{
-					// Throttle up
-					playerSelection.throttleCurrentWaitedTimeUp += engine::deltaTime;
+					// Throttle in deadzone
 
-					while (playerSelection.throttleCurrentWaitedTimeUp >= throttleMoveWaitTime)
-					{
-						// Next ship
-						playerSelection.throttleCurrentWaitedTimeUp -= throttleMoveWaitTime;;
-						//std::cout << "\n--Ship Selection moveUP--\n";
+					playerSelection.throttleCurrentWaitedTimeUp = throttleMoveWaitTime;
+					playerSelection.throttleCurrentWaitedTimeDown = throttleMoveWaitTime;
 
-						playerSelection.selection++;
-						if (playerSelection.selection >= shipModels.size())
-						{
-							playerSelection.selection = 0;
-						}
-						engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowUp).scale = Vector3(0.08f);
-						engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).model = shipModels[playerSelection.selection];
-						playerSelection.isArrowBig = true;
-					}
-				}
-				else
-				{
-					// No throttle input up
-					playerSelection.throttleCurrentWaitedTimeUp = 0;
-				}
-
-				if (turnInput <= -0.5f)
-				{
-					// Throttle down
-					playerSelection.throttleCurrentWaitedTimeDown += engine::deltaTime;
-
-					while (playerSelection.throttleCurrentWaitedTimeDown >= throttleMoveWaitTime)
-					{
-						//TODO:: KORJAA alusken vaihtoa aika jokaiselle
-
-						// Previous ship
-						playerSelection.throttleCurrentWaitedTimeDown -= throttleMoveWaitTime;
-
-						printf("\nShip Selection moveDown\n");
-
-						playerSelection.selection--;
-						if (playerSelection.selection < 0)
-						{
-							playerSelection.selection = shipModels.size() - 1;
-						}
-
-						engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowDown).scale = Vector3(0.08f);
-						engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).model = shipModels[playerSelection.selection];
-						playerSelection.isArrowBig = true;
-					}
-				}
-				else
-				{
-					// No throttle input down
-					playerSelection.throttleCurrentWaitedTimeDown = 0;
-				}
-
-				// Set arrow indicator scale to normal
-				if (playerSelection.isArrowBig)
-				{
+					// Set arrow size to normal
 					playerSelection.timeArrowBigTime += engine::deltaTime;
 					if (playerSelection.timeArrowBigTime > 0.15f)
 					{
@@ -590,11 +535,66 @@ public:
 						playerSelection.isArrowBig = false;
 						playerSelection.timeArrowBigTime = 0;
 					}
+
+					goto SkipTurnInput;
+				}
+
+				if (turnInput > 0)
+				{
+					// Throttle up
+					playerSelection.throttleCurrentWaitedTimeUp += engine::deltaTime;
+
+					while (playerSelection.throttleCurrentWaitedTimeUp >= throttleMoveWaitTime)
+					{
+						// Next ship
+						playerSelection.throttleCurrentWaitedTimeUp -= throttleMoveWaitTime;;
+
+						playerSelection.selection++;
+						if (playerSelection.selection >= shipModels.size())
+						{
+							playerSelection.selection = 0;
+						}
+					}
+					engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowUp).scale = Vector3(0.08f);
+					engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).model = shipModels[playerSelection.selection];
+					playerSelection.isArrowBig = true;
+				}
+				else
+				{
+					// No throttle input up
+					playerSelection.throttleCurrentWaitedTimeUp = 0;
+				}
+
+				if (turnInput < 0)
+				{
+					// Throttle down
+					playerSelection.throttleCurrentWaitedTimeDown += engine::deltaTime;
+
+					while (playerSelection.throttleCurrentWaitedTimeDown >= throttleMoveWaitTime)
+					{
+						// Previous ship
+						playerSelection.throttleCurrentWaitedTimeDown -= throttleMoveWaitTime;
+
+						playerSelection.selection--;
+						if (playerSelection.selection < 0)
+						{
+							playerSelection.selection = shipModels.size() - 1;
+						}
+					}
+					engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowDown).scale = Vector3(0.08f);
+					engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).model = shipModels[playerSelection.selection];
+					playerSelection.isArrowBig = true;
+				}
+				else
+				{
+					// No throttle input down
+					playerSelection.throttleCurrentWaitedTimeDown = 0;
 				}
 
 				// Set ship info	
 				PrintShipInfos(playerSelection);
 			}
+			SkipTurnInput:
 
 			engine::Transform& ShipModelTransform = engine::ecs::GetComponent<engine::Transform>(playerSelection.shipModel);
 
