@@ -95,6 +95,7 @@ namespace engine
 				}
 				else
 				{
+					glDisable(GL_DEPTH_BUFFER_BIT);
 					//Give the shader a constant view matrix
 					glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
 
@@ -140,6 +141,8 @@ namespace engine
 
 				glBindVertexArray(0);
 				glBindTexture(GL_TEXTURE_2D, 0);
+
+				glEnable(GL_DEPTH_BUFFER_BIT);
 			}
 		}
 
