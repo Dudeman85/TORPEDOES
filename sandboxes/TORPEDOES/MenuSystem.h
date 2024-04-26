@@ -6,7 +6,7 @@
 #include "engine/Timing.h"
 #include <functional>
 
-enum GameStates { menuMainState,  selectPlayersState, mapSelection, gamePlayState, inGameOptionsState};
+enum GameStates { menuMainState, selectPlayersState, mapSelection, gamePlayState, inGameOptionsState };
 
 static bool canStartLoadingMap;
 static bool isSceneloaded;
@@ -132,6 +132,9 @@ class PlayerSelectSystem : public engine::ecs::System
 
 	int playersThatAreReadyAmount = 0;
 
+	//This is a temporary constol scheme display for playtesting
+	engine::ecs::Entity controlScheme;
+
 public:
 	//std::vector<ShipType> playerShips;
 	//static bool canStartLoadingMap;
@@ -175,15 +178,15 @@ public:
 		case ShipType::torpedoBoat:
 		{
 			shipName = "Torpedo boat";
-			baseSpeed = to_string(50)+" knots";
-			mainAttack ="Torpedo";
+			baseSpeed = to_string(50) + " knots";
+			mainAttack = "Torpedo";
 			special = "Boost";
 			break;
 		}
 		case ShipType::submarine:
 		{
 			shipName = "Submarine";
-			baseSpeed = to_string(35)+" knots";
+			baseSpeed = to_string(35) + " knots";
 			mainAttack = "Torpedo";
 			special = "Diving";
 			break;
@@ -191,7 +194,7 @@ public:
 		case ShipType::cannonBoat:
 		{
 			shipName = "Cannon boat";
-			baseSpeed = to_string(24)+" knots";
+			baseSpeed = to_string(24) + " knots";
 			mainAttack = "Shells";
 			special = "Boost";
 			break;
@@ -199,7 +202,7 @@ public:
 		case ShipType::hedgehogBoat:
 		{
 			shipName = "Hedgehog boat";
-			baseSpeed = to_string(30)+" knots";
+			baseSpeed = to_string(30) + " knots";
 			mainAttack = "Anti-Submarine projectile";
 			special = "Boost";
 			break;
@@ -207,7 +210,7 @@ public:
 		case ShipType::pirateShip:
 		{
 			shipName = "PirateShip";
-			baseSpeed = to_string(8)+" knots";
+			baseSpeed = to_string(8) + " knots";
 			mainAttack = "cannonballs";
 			special = "reload";
 			break;
@@ -221,18 +224,18 @@ public:
 		{
 		case 0:
 		{
-			nameColor = nameColor = Vector3(109,0, 255);		
+			nameColor = nameColor = Vector3(109, 0, 255);
 			break;
 		}
 		case 1:
 		{
-			
+
 			nameColor = nameColor = Vector3(0, 255, 0);
 			break;
 		}
 		case 2:
 		{
-			nameColor = Vector3(0,230, 255);
+			nameColor = Vector3(0, 230, 255);
 			break;
 		}
 		case 3:
@@ -245,10 +248,10 @@ public:
 			break;
 		}
 
-		std::string playerNumStats ="Player: "+ to_string(playerSelection.playerID+1);
+		std::string playerNumStats = "Player: " + to_string(playerSelection.playerID + 1);
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipInfo).text = playerNumStats;
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipInfo).color = Vector3(nameColor.x, nameColor.y, nameColor.z);
-		
+
 		//engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).textures = { resources::modelTextures["Player_Red.png"] };
 		//PUT SHIP COLOR HERE
 
@@ -275,11 +278,11 @@ public:
 		engine::ecs::AddComponent(sceneParent, engine::TextRenderer{ .font = resources::niagaraFont, .text = "",.scale = 0.005f,.color = Vector3(0, 0, 250), .uiElement = true });
 
 		startGameTimerEntity = engine::ecs::NewEntity();
-		engine::ecs::AddComponent(startGameTimerEntity, engine::Transform{ .position = gameStartTimerPosition, .rotation = Vector3(0, 0, 0), .scale = Vector3(0.04f) });
+		engine::ecs::AddComponent(startGameTimerEntity, engine::Transform{ .position = Vector3(-0.1, 0.08, -0.5), .rotation = Vector3(0, 0, 0), .scale = Vector3(0.04f)});
 		//engine::ecs::AddComponent(startGameTimerEntity, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"], .enabled = false, .uiElement = true });
 		engine::ecs::AddComponent(startGameTimerEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "&",.scale = 0.05f,.color = Vector3(200, 140, 50), .uiElement = true });
 
-		float statsOffset =-0.1f;
+		float statsOffset = -0.1f;
 		float statsOffsetY = 100.0f;
 		float statsOffsetEatch = -90.0f;
 		float scaleForStatsChilds = .9f;
@@ -312,19 +315,19 @@ public:
 			//engine::ecs::AddComponent(pausedImage, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Paused.png"],  .enabled = false, .uiElement = true });
 			//engine::ecs::AddComponent(pausedImage, PauseComponent{ .upper = pausedImage, .lower = optionsButton, .selectedTexture = resources::menuTextures["UI_Paused.png"], .unselectedTexture = resources::menuTextures["UI_Paused.png"], .operation = PauseSystem::OnResumePressed });
 
-			engine::ecs::AddComponent(arrowUp, engine::Transform{ .position = Vector3(arrowsPosX+0.2f, arrowUPposY, -0.1f), .rotation = Vector3(0, 0, 180), .scale = Vector3(0.04f) });
+			engine::ecs::AddComponent(arrowUp, engine::Transform{ .position = Vector3(arrowsPosX + 0.2f, arrowUPposY, -0.1f), .rotation = Vector3(0, 0, 180), .scale = Vector3(0.04f) });
 			engine::ecs::AddComponent(arrowUp, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"], .enabled = false, .uiElement = true });
 
 			engine::ecs::AddComponent(arrowDown, engine::Transform{ .position = Vector3(arrowsPosX, arrowUPposY, -0.1f), .rotation = Vector3(0, 0, 0), .scale = Vector3(0.04f) });
 			engine::ecs::AddComponent(arrowDown, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"], .enabled = false, .uiElement = true });
 
-			engine::ecs::AddComponent(shipModel, engine::Transform{ .position = Vector3(0.7f, -0.2f, -0.1f) , .scale = 0});
+			engine::ecs::AddComponent(shipModel, engine::Transform{ .position = Vector3(0.7f, -0.2f, -0.1f) , .scale = 0 });
 			engine::ecs::AddComponent(shipModel, engine::ModelRenderer{ .model = shipModels[0], .uiElement = true });
 
 			engine::ecs::AddComponent(backgroundImage, engine::Transform{ .position = Vector3(0.06f,0,-0.9f), .rotation = Vector3(0,0,0), .scale = Vector3(1.2) });
 			engine::ecs::AddComponent(backgroundImage, engine::SpriteRenderer{ .texture = resources::menuTextures["Selection_BG_Var3.png"], .enabled = false, .uiElement = true });
 
-			engine::ecs::AddComponent(readyText, engine::Transform{ .position = Vector3(arrowsPosX-0.4f,arrowDownposY,-0.1f) , .scale = 0.003f });
+			engine::ecs::AddComponent(readyText, engine::Transform{ .position = Vector3(arrowsPosX - 0.4f,arrowDownposY,-0.1f) , .scale = 0.003f });
 			engine::ecs::AddComponent(readyText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "unready", .uiElement = true });
 
 			//shipInfo Entity
@@ -332,7 +335,7 @@ public:
 			engine::ecs::AddComponent(shipInfo, engine::TextRenderer{ .font = resources::niagaraFont, .text = "PRESS { SHOOT } BUTTON TO JOIN!",.color = Vector3(57, 150, 54),.uiElement = true });
 
 			//shipNameEntity
-			engine::ecs::AddComponent(shipNameEntity, engine::Transform{ .position = Vector3(-statsOffset,0*statsOffsetEatch - statsOffsetY,-0.1f) , .scale = scaleForStatsChilds });
+			engine::ecs::AddComponent(shipNameEntity, engine::Transform{ .position = Vector3(-statsOffset,0 * statsOffsetEatch - statsOffsetY,-0.1f) , .scale = scaleForStatsChilds });
 			engine::ecs::AddComponent(shipNameEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "",.color = Vector3(57, 150, 54),.uiElement = true });
 
 			//baseSpeedEntity
@@ -350,32 +353,32 @@ public:
 			Vector3 offsetPlayerWindows;
 			switch (i)
 			{
-				case 0:
-				{
-					offsetPlayerWindows = Vector3(-offsetX, offsetY, 0);
-					break;
-				}
-				case 1:
-				{
-					offsetPlayerWindows = Vector3(offsetX, offsetY, 0);
-					break;
-				}
-				case 2:
-				{
-					offsetPlayerWindows = Vector3(-offsetX, -offsetY, 0);
-					break;
-				}
-				case 3:
-				{
-					offsetPlayerWindows = Vector3(offsetX, -offsetY, 0);
-					break;
-				}
+			case 0:
+			{
+				offsetPlayerWindows = Vector3(-offsetX, offsetY, 0);
+				break;
+			}
+			case 1:
+			{
+				offsetPlayerWindows = Vector3(offsetX, offsetY, 0);
+				break;
+			}
+			case 2:
+			{
+				offsetPlayerWindows = Vector3(-offsetX, -offsetY, 0);
+				break;
+			}
+			case 3:
+			{
+				offsetPlayerWindows = Vector3(offsetX, -offsetY, 0);
+				break;
+			}
 			}
 
 			engine::ecs::AddComponent(selectionWindow, engine::Transform{ .position = offsetPlayerWindows, .scale = Vector3(0.5, 0.5, -0.1f) });
-			engine::ecs::AddComponent(selectionWindow, PlayerSelection{ .playerID = i, .arrowUp = arrowUp, .arrowDown = arrowDown, .shipModel = shipModel, .readyText = readyText, .playerWindow = selectionWindow, .shipInfo = shipInfo,.shipNameEntity= shipNameEntity,.baseSpeedEntity= baseSpeedEntity,.boostEntity= boostEntity ,.specialEntity = specialEntity, .backgroundImage = backgroundImage });
+			engine::ecs::AddComponent(selectionWindow, PlayerSelection{ .playerID = i, .arrowUp = arrowUp, .arrowDown = arrowDown, .shipModel = shipModel, .readyText = readyText, .playerWindow = selectionWindow, .shipInfo = shipInfo,.shipNameEntity = shipNameEntity,.baseSpeedEntity = baseSpeedEntity,.boostEntity = boostEntity ,.specialEntity = specialEntity, .backgroundImage = backgroundImage });
 
-			engine::ecs::AddComponent(selectionWindow, engine::TextRenderer{ .font = resources::niagaraFont, .text = "",.offset=Vector3(0,0.15f,0),.uiElement = true});
+			engine::ecs::AddComponent(selectionWindow, engine::TextRenderer{ .font = resources::niagaraFont, .text = "",.offset = Vector3(0,0.15f,0),.uiElement = true });
 
 			engine::TextRenderer& selectWin = engine::ecs::GetComponent<engine::TextRenderer>(selectionWindow);
 			selectWin.scale = 0.001f;
@@ -395,6 +398,12 @@ public:
 			engine::TransformSystem::AddParent(boostEntity, shipInfo);
 			engine::TransformSystem::AddParent(baseSpeedEntity, shipInfo);
 		}
+
+		//Temporary control scheme display for playtesting
+		controlScheme = ecs::NewEntity();
+		engine::ecs::AddComponent(controlScheme, engine::Transform{ .position = Vector3(-0.08, -0.1, 0), .scale = Vector3(1.8, 1, 0) * 0.2});
+		resources::menuTextures["UI_Controls.png"]->SetScalingFilter(GL_LINEAR);
+		engine::ecs::AddComponent(controlScheme, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Controls.png"], .uiElement = true });
 	}
 
 	void StartGameTest()
@@ -457,7 +466,7 @@ public:
 			bool selectInput = input::GetNewPress("Shoot" + std::to_string(playerSelection.playerID));
 
 			std::string& playerReadyText = engine::ecs::GetComponent<engine::TextRenderer>(playerSelection.readyText).text;
-			
+
 			// Shoot input adds player to the game and after that makes player Ready/Not ready
 			if (selectInput)
 			{
@@ -474,7 +483,7 @@ public:
 					engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowUp).enabled = true;
 					engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowDown).enabled = true;
 					playerReadyText = "Not Ready";
-					
+
 					playerSelection.isActivePlayer = true;
 					engine::ecs::GetComponent< engine::Transform>(playerSelection.shipModel).scale = 0.2;
 					engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).color = Vector3(0, 0, 255);
@@ -494,7 +503,7 @@ public:
 					{
 						playersThatAreReadyAmount++;
 						printf(" TIMER STARTED \n");
-						
+
 						engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).model = shipModelsReady[playerSelection.selection];
 						engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).textures = { resources::modelTextures["Player_Red.png"] };
 						engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).color = Vector3(0, 255, 0);
@@ -638,7 +647,7 @@ public:
 				//engine::ecs::GetComponent< engine::Transform>(playerSelection.readyText).scale = 0.003f;
 
 				PrintShipInfos(playerSelection);
-			
+
 				std::cout << "\nisShipSelectionMenuOn: " << isShipSelectionMenuOn << "\n";
 			}
 
@@ -651,7 +660,7 @@ public:
 				engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).enabled = false;
 
 				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).text = "";
-			
+
 				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.specialEntity).text = "";
 				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.boostEntity).text = "";
 				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.baseSpeedEntity).text = "";
@@ -659,6 +668,9 @@ public:
 				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipInfo).text = "";
 
 				engine::ecs::GetComponent<engine::TextRenderer>(startGameTimerEntity).text = "";
+
+				//This is a temporary control cheme disaply for playtesting
+				engine::ecs::GetComponent<engine::SpriteRenderer>(controlScheme).enabled = false;
 
 				std::cout << "\nisShipSelectionMenuOn: " << isShipSelectionMenuOn << "\n";
 			}
@@ -687,7 +699,7 @@ struct PauseComponent
 ECS_REGISTER_SYSTEM(PauseSystem, PauseComponent, engine::Transform)
 class PauseSystem : public engine::ecs::System
 {
-	enum inGamePauseOptionsStates { mainOptions, sounds };  
+	enum inGamePauseOptionsStates { mainOptions, sounds };
 	inGamePauseOptionsStates pauseMenuAt;
 	engine::ecs::Entity pausedImage;
 

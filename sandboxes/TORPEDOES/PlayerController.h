@@ -472,12 +472,12 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 		playerComponent._boostScale -= 0.1;
 		playerComponent.submerged = true;
 
-		//Finished submerging after 1 second
+		//Finished submerging after .3 second
 		TimerSystem::ScheduleFunction(
 			[playerEntity]()
 			{
 				Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
-				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures.push_back(resources::modelTextures["Player_Black.png"]);
+				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures = { resources::modelTextures["Player_Underwater.png"] };
 			}, 0.3);
 	}
 	//Surface if submerged
@@ -490,13 +490,13 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 		playerComponent._boostScale += 0.1;
 		playerComponent.specialEnabled = false;
 
-		//Finished surfacing after 1 second
+		//Finished surfacing after .3 second
 		TimerSystem::ScheduleFunction(
 			[playerEntity]()
 			{
 				Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
 				playerComponent.submerged = false;
-				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures.clear();
+				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures = { resources::playerIdToTexture[playerComponent.id]};
 			}, 0.3);
 	}
 }
@@ -677,7 +677,7 @@ public:
 			ShipType::submarine, Player
 			{
 				.forwardSpeed = 400, .rotationSpeed = 150, 
-				.shootCooldown = 0.2, .specialCooldown = 4, .ammoRechargeCooldown = 2,
+				.shootCooldown = 0.2, .specialCooldown = 1, .ammoRechargeCooldown = 2,
 				.holdShoot = false, .maxAmmo = 2, 
 				.shootAction = CreateTorpedo, .specialAction = ToggleSubmerge,
 				.shootIndicatorUpdate = TorpedoIndicatorUpdate, .specialIndicatorUpdate = SubmergeIndicatorUpdate
