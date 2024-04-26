@@ -194,12 +194,18 @@ namespace engine
 					Vector2((float)tilemap->tileSize.x / 2, -((float)tilemap->tileSize.y / 2)), //Bottom-Right
 					Vector2(-((float)tilemap->tileSize.x / 2), -((float)tilemap->tileSize.y / 2)) //Bottom-Left
 			};
+
 			//Visualise tile collider
 			Primitive tileCollider = Primitive::Polygon(tileVerts);
 
 			//For each tile inside the bounding box
 			for (int i = 0; i < possibleCollisions.size(); i++)
 			{
+
+
+				//const auto& test = tilemap->tileColliders[tilemap->checkCollision()];
+
+
 				//Move the tile verts to position
 				Vector2 tilePosition = tilemap->GetTilePosition(possibleCollisions[i].x, possibleCollisions[i].y);
 				std::vector<Vector2> transformedTileVerts = TransformSystem::ApplyTransforms2D(tileVerts, 0, 1, tilePosition);
