@@ -209,9 +209,11 @@ namespace engine
 				//If collided with tile
 				if (collision.type != Collision::Type::miss)
 				{
+#ifdef _DEBUG
 					//Draw tiles which are colliding
 					if (collider.visualise)
 						tileCollider.Draw(cam, Vector3(255, 0, 0), Transform{ .position = Vector3(tilePosition, 10) });
+#endif
 
 					//If the mtv is facing in to the other collider, flip it
 					Vector3 directionAtoB = transform.position - tilePosition;
@@ -227,9 +229,11 @@ namespace engine
 				}
 				else
 				{
+#ifdef _DEBUG
 					//Draw tiles inside bounding box
 					if (collider.visualise)
 						tileCollider.Draw(cam, Vector3(0, 255, 0), Transform{ .position = Vector3(tilePosition, 10) });
+#endif
 				}
 			}
 
