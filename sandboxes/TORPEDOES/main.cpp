@@ -108,7 +108,7 @@ void LoadLevel2(engine::Camera* cam)
 	CreateCheckpoint(Vector3(1505.000000, -335.000000, 100.000000), Vector3(52.500000, -32.500000, -5.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 60.0f);					// Sixth checkpoint
 	CreateCheckpoint(Vector3(600.000000, -665.000000, 100.000000), Vector3(40.000000, -25.000000, -17.500000), Vector3(17), resources::models["Prop_Buoy.obj"], 60.0f);					// Seventh checkpoint
 	CreateCheckpoint(Vector3(530.000000, -1675.000000, 100.000000), Vector3(45.000000, 32.500000, 47.500000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 145.0f);		// Eight checkpoint
-	CreateCheckpoint(Vector3(1230.000000, -1685.000000, 100.000000), Vector3(-17.500000, -87.500000, -90.000000), Vector3(17.5), resources::models["Prop_Goal_Ver2.obj"], 0.0f, true);	// Finish line
+	CreateCheckpoint(Vector3(1245.000000, -1680.000000, 100.000000), Vector3(75.000000, -90.000000, 7.500000), Vector3(22), resources::models["Prop_Goal_Ver2.obj"], 0.0f, true);	// Finish line
 
 	//first loop
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1495.000000, -1240.000000, 0.300000));
@@ -162,8 +162,8 @@ void LoadLevel2(engine::Camera* cam)
 
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1455.000000, -1295.000000, 0.300000));
 
-	PlayCountdown(Vector3(1260.0f, -1500.0f, 0.0f));
-	PlayerController::lapCount = 1;
+	PlayCountdown(Vector3(1150.0f, -1500.0f, 0.0f));
+	PlayerController::lapCount = 3;
 }
 
 //Create everything for level 3
@@ -224,7 +224,7 @@ static void LoadLevel3(engine::Camera* cam)
 	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims);
 
 
-	PlayCountdown(Vector3(2480.0f, -1520.0f, 0.0f));
+	PlayCountdown(Vector3(2480.0f, -1460.0f, 150.0f));
 	PlayerController::lapCount = 3;
 }
 
@@ -369,7 +369,7 @@ int main()
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 100), .scale = 20 });
-	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
+	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Goal_Ver2.obj"] });
 
 
 
@@ -450,7 +450,7 @@ int main()
 			isGamePaused = false;
 			canStartLoadingMap = false;
 			ShipSelectionSystem->isShipSelectionMenuOn = false;
-			LoadLevel2(&cam);
+			LoadLevel3(&cam);
 		}
 
 		// if paused or Pause pressed update PauseSystem
