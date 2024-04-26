@@ -101,10 +101,10 @@ void CreateTorpedo(engine::ecs::Entity entity)
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-	float speed = 500;
+	const float speed = 500;
 
 	ecs::Entity torpedo = ecs::NewEntity();
-	ecs::AddComponent(torpedo, Projectile{ .ownerID = player.id, .speed = 500, .hitType = HitStates::Stop, .hitTime = 0.8 });
+	ecs::AddComponent(torpedo, Projectile{ .ownerID = player.id, .speed = speed, .hitType = HitStates::Stop, .hitTime = 0.8 });
 
 	Projectile& torpedoProjectile = ecs::GetComponent<Projectile>(torpedo);
 
@@ -124,10 +124,10 @@ void CreateShell(engine::ecs::Entity entity)
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-	float speed = 400;
+	const float speed = 800;
 
 	ecs::Entity shell = ecs::NewEntity();
-	ecs::AddComponent(shell, Projectile{ .ownerID = player.id, .speed = 500, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
+	ecs::AddComponent(shell, Projectile{ .ownerID = player.id, .speed = speed, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
 
 	Projectile& shellProjectile = ecs::GetComponent<Projectile>(shell);
 
