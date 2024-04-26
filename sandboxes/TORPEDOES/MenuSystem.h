@@ -175,7 +175,7 @@ public:
 
 		case ShipType::torpedoBoat:
 		{
-			shipName = "Torpedo boat";
+			shipName = "Torpedo Boat";
 			baseSpeed = to_string(100) + " knots";
 			mainAttack = "Torpedo";
 			special = "Boost";
@@ -513,6 +513,8 @@ public:
 						engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).color = Vector3(0, 0, 255);
 					}
 				}
+
+				PrintShipInfos(playerSelection);
 			}
 			// Ready players can't change ships
 			// TODO: What is ActivePlayer and is it required?

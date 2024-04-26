@@ -148,16 +148,19 @@ void ShootShell(engine::ecs::Entity entity)
 
 	if (player.ammo >= player.maxAmmo)
 	{
+		std::cout << "reloaded!\n";
 		// Reloading has finished, reset ammo count
 		player.secondaryAmmo = maxSecondaryAmmo;
 	}
 
 	if (player.secondaryAmmo <= 0)
 	{
+		std::cout << "no ammot!\n";
 		// No ammo, do nothing
 		return;
 	}
 	// Shoot
+	std::cout << "shot!\n";
 	player.ammo = 1;					// Reloading will begin
 
 	player.ammoRechargeCooldown = 0;	// Reset reloading time after shot
