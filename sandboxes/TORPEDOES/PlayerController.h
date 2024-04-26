@@ -101,10 +101,10 @@ void CreateTorpedo(engine::ecs::Entity entity)
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-	const float speed = 500;
+	float speed = 500;
 
 	ecs::Entity torpedo = ecs::NewEntity();
-	ecs::AddComponent(torpedo, Projectile{ .ownerID = player.id, .speed = speed, .hitType = HitStates::Stop, .hitTime = 0.8 });
+	ecs::AddComponent(torpedo, Projectile{ .ownerID = player.id, .speed = 500, .hitType = HitStates::Stop, .hitTime = 0.8 });
 
 	Projectile& torpedoProjectile = ecs::GetComponent<Projectile>(torpedo);
 
@@ -124,14 +124,14 @@ void CreateShell(engine::ecs::Entity entity)
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-	const float speed = 800;
+	float speed = 400;
 
 	ecs::Entity shell = ecs::NewEntity();
-	ecs::AddComponent(shell, Projectile{ .ownerID = player.id, .speed = speed, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
+	ecs::AddComponent(shell, Projectile{ .ownerID = player.id, .speed = 500, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
 
 	Projectile& shellProjectile = ecs::GetComponent<Projectile>(shell);
 
-	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(20)});
+	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(20) });
 	ecs::AddComponent(shell, Rigidbody{ .velocity = player.forwardDirection * shellProjectile.speed });
 	ecs::AddComponent(shell, ModelRenderer{ .model = resources::models[shellProjectile.model = "Weapon_CannonAmmo.obj"] });
 	float shellSize = 0.1;
@@ -144,28 +144,29 @@ void ShootShell(engine::ecs::Entity entity)
 {
 	Player& player = ecs::GetComponent<Player>(entity);
 
-	int maxSecondaryAmmo = 15;
-
-	if (player.ammo >= player.maxAmmo)
+	if (player.reloading)
 	{
-		std::cout << "reloaded!\n";
-		// Reloading has finished, reset ammo count
-		player.secondaryAmmo = maxSecondaryAmmo;
+		// Reloading
+		if (player.ammo < player.maxAmmo)
+		{
+			// Not reloaded
+			player.ammo++; // We didn't shoot
+			return;
+		}
+		// Fully reloaded
+		player.reloading = false;
+		player.secondaryAmmo = player.maxAmmo;
 	}
 
-	if (player.secondaryAmmo <= 0)
+	if (player.secondaryAmmo <= 1)
 	{
-		std::cout << "no ammot!\n";
-		// No ammo, do nothing
-		return;
+		// Last ammo, start reload
+		player.reloading = true;
 	}
-	// Shoot
-	std::cout << "shot!\n";
-	player.ammo = 1;					// Reloading will begin
-
-	player.ammoRechargeCooldown = 0;	// Reset reloading time after shot
 
 	player.secondaryAmmo--;
+	player.ammo = 0;
+
 	CreateShell(entity);
 }
 
@@ -246,15 +247,15 @@ void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide,
 	engine::ecs::AddComponent(hedgehog, ModelRenderer{ .model = resources::models["Weapon_HedgehogAmmo.obj"] });
 	std::vector<Vector2> Hedgehogverts{ Vector2(0.4, 0.5), Vector2(0.4, -0.5), Vector2(-0.4, -0.5), Vector2(-0.4, 0.5) };
 	ecs::AddComponent(hedgehog, Projectile{ .ownerID = player.id });
-	
+
 	auto& hedgehogTransform = engine::ecs::GetComponent<engine::Transform>(hedgehog);
 	auto& aimingGuideTransform = engine::ecs::GetComponent<engine::Transform>(aimingGuide);
-	ecs::AddComponent(hedgehog, 
-	Hedgehog
-	{ 
-		.targetDistance = (hedgehogTransform.position - aimingGuideTransform.position).Length(),
-		.aimingGuide = aimingGuide 
-	});
+	ecs::AddComponent(hedgehog,
+		Hedgehog
+		{
+			.targetDistance = (hedgehogTransform.position - aimingGuideTransform.position).Length(),
+			.aimingGuide = aimingGuide
+		});
 }
 
 struct aimingGuideStruct
@@ -319,7 +320,7 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 
 			modifiedDirection = Vector2(cos(angle), sin(angle));
 
-			Transform& guideTransform = ecs::GetComponent<Transform>(aimingGuides[positive_i ]);
+			Transform& guideTransform = ecs::GetComponent<Transform>(aimingGuides[positive_i]);
 			guideTransform.position = playerTransform.position
 				+ (modifiedDirection * ecs::GetSystem<HedgehogSystem>()->minDistance)
 				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, ecs::GetSystem<HedgehogSystem>()->chargeTime)));
@@ -376,8 +377,8 @@ void CreateAimingGuides(engine::ecs::Entity entity, float guideSpeed, float shoo
 	{
 		engine::ecs::Entity newGuide = engine::ecs::NewEntity();
 
-		engine::ecs::AddComponent(newGuide, engine::Transform{ .position = transform.position, .rotation = transform.rotation, .scale = transform.scale});
-		engine::ecs::AddComponent(newGuide, engine::SpriteRenderer{ .texture= resources::uiTextures["Orange_crosshair.png"] });
+		engine::ecs::AddComponent(newGuide, engine::Transform{ .position = transform.position, .rotation = transform.rotation, .scale = transform.scale });
+		engine::ecs::AddComponent(newGuide, engine::SpriteRenderer{ .texture = resources::uiTextures["Orange_crosshair.png"] });
 
 		aimingGuides.push_back(newGuide);
 	}
@@ -427,40 +428,14 @@ static void BoostEnd(engine::ecs::Entity entity, float boostStrenght)
 // Increases player speed for a short while
 void Boost(engine::ecs::Entity entity)
 {
-	Player& player = engine::ecs::GetComponent<Player>(entity);
-
+	double boostTime = 1.5f;
 	float boostStrenght = 0.4f;
-	double boostTime = player.specialCooldown;
+
+	Player& player = engine::ecs::GetComponent<Player>(entity);
 
 	player._boostScale += boostStrenght;
 
 	engine::timerSystem->ScheduleFunction(&BoostEnd, boostTime, false, engine::ScheduledFunction::Type::seconds, entity, boostStrenght);
-}
-
-void SubmergeEnd(engine::ecs::Entity playerEntity, float boostStrenght)
-{
-	Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
-	Transform& transformComponent = ecs::GetComponent<Transform>(playerEntity);
-	Transform& modelTransform = ecs::GetComponent<Transform>(playerComponent.renderedEntity);
-
-	ecs::DestroyEntity(playerComponent.animationEntity);
-	playerComponent.animationEntity = 0;
-
-	//Start surfacing and speed up
-	playerComponent._boostScale += 0.1;
-	playerComponent.specialEnabled = false;
-
-	//Finished surfacing after .3 second
-	TimerSystem::ScheduleFunction
-	(
-		[playerEntity]()
-		{
-			Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
-			playerComponent.submerged = false;
-			ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures = { resources::playerIdToTexture[playerComponent.id] };
-		}, 
-		0.3
-	);
 }
 
 //Submerge function for submarine, slightly slower and invincible for the duration
@@ -480,36 +455,50 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 	AnimationSystem::PlayAnimation(divingEntity, "dive");
 	TransformSystem::AddParent(divingEntity, playerEntity);
 
-	//Submerge
+	//Submerge if surfaced
+	if (!playerComponent.submerged)
+	{
+		//Make the continuous diving animation
+		playerComponent.animationEntity = ecs::NewEntity();
+		ecs::AddComponent(playerComponent.animationEntity, Transform{ .position = {0, 0, 5}, .scale = {5, 2, 1} });
+		ecs::AddComponent(playerComponent.animationEntity, SpriteRenderer{});
+		ecs::AddComponent(playerComponent.animationEntity, Animator{ });
+		TransformSystem::SetRotation(playerComponent.animationEntity, { 0, 0, modelTransform.rotation.y });
+		AnimationSystem::AddAnimation(playerComponent.animationEntity, resources::continuousDivingAnim, "diving");
+		AnimationSystem::PlayAnimation(playerComponent.animationEntity, "diving", true);
+		TransformSystem::AddParent(playerComponent.animationEntity, playerEntity);
 
-	//Make the continuous diving animation
-	playerComponent.animationEntity = ecs::NewEntity();
-	ecs::AddComponent(playerComponent.animationEntity, Transform{ .position = {0, 0, 5}, .scale = {5, 2, 1} });
-	ecs::AddComponent(playerComponent.animationEntity, SpriteRenderer{});
-	ecs::AddComponent(playerComponent.animationEntity, Animator{ });
-	TransformSystem::SetRotation(playerComponent.animationEntity, { 0, 0, modelTransform.rotation.y });
-	AnimationSystem::AddAnimation(playerComponent.animationEntity, resources::continuousDivingAnim, "diving");
-	AnimationSystem::PlayAnimation(playerComponent.animationEntity, "diving", true);
-	TransformSystem::AddParent(playerComponent.animationEntity, playerEntity);
+		//Start submerging and slow down
+		playerComponent._boostScale -= 0.1;
+		playerComponent.submerged = true;
 
-	float boostStrenght = 0.1;
+		//Finished submerging after .3 second
+		TimerSystem::ScheduleFunction(
+			[playerEntity]()
+			{
+				Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
+				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures = { resources::modelTextures["Player_Underwater.png"] };
+			}, 0.3);
+	}
+	//Surface if submerged
+	else
+	{
+		ecs::DestroyEntity(playerComponent.animationEntity);
+		playerComponent.animationEntity = 0;
 
-	//Start submerging and slow down
-	playerComponent._boostScale -= boostStrenght;
-	playerComponent.submerged = true;
+		//Start surfacing and speed up
+		playerComponent._boostScale += 0.1;
+		playerComponent.specialEnabled = false;
 
-	//Finished submerging after .3 second
-	TimerSystem::ScheduleFunction
-	(
-		[playerEntity]()
-		{
-			Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
-			ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures = { resources::modelTextures["Player_Underwater.png"] };
-		}, 
-		0.3
-	);
-
-	engine::timerSystem->ScheduleFunction(&SubmergeEnd, playerComponent.specialCooldown, false, engine::ScheduledFunction::Type::seconds, playerEntity, boostStrenght);
+		//Finished surfacing after .3 second
+		TimerSystem::ScheduleFunction(
+			[playerEntity]()
+			{
+				Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
+				playerComponent.submerged = false;
+				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures = { resources::playerIdToTexture[playerComponent.id] };
+			}, 0.3);
+	}
 }
 
 /* INDICATOR UPDATES */
@@ -673,49 +662,49 @@ public:
 
 		//Initialize each ship type's stats
 		shipComponents.insert(
-		{ 
-			ShipType::torpedoBoat, Player
 			{
-				.forwardSpeed = 450, .rotationSpeed = 150, 
-				.shootCooldown = 0.2, .specialCooldown = 1.5, .ammoRechargeCooldown = 2,
-				.holdShoot = false, .maxAmmo = 2, 
-				.shootAction = CreateTorpedo, .specialAction = Boost,
-				.shootIndicatorUpdate = TorpedoIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
-			} 
-		});
+				ShipType::torpedoBoat, Player
+				{
+					.forwardSpeed = 450, .rotationSpeed = 150,
+					.shootCooldown = 0.2, .specialCooldown = 5, .ammoRechargeCooldown = 2,
+					.holdShoot = false, .maxAmmo = 2,
+					.shootAction = CreateTorpedo, .specialAction = Boost,
+					.shootIndicatorUpdate = TorpedoIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
+				}
+			});
 		shipComponents.insert(
-		{ 
-			ShipType::submarine, Player
 			{
-				.forwardSpeed = 400, .rotationSpeed = 150, 
-				.shootCooldown = 0.2, .specialCooldown = 1, .ammoRechargeCooldown = 2,
-				.holdShoot = false, .maxAmmo = 2, 
-				.shootAction = CreateTorpedo, .specialAction = ToggleSubmerge,
-				.shootIndicatorUpdate = TorpedoIndicatorUpdate, .specialIndicatorUpdate = SubmergeIndicatorUpdate
-			} 
-		});
+				ShipType::submarine, Player
+				{
+					.forwardSpeed = 400, .rotationSpeed = 150,
+					.shootCooldown = 0.2, .specialCooldown = 1, .ammoRechargeCooldown = 2,
+					.holdShoot = false, .maxAmmo = 2,
+					.shootAction = CreateTorpedo, .specialAction = ToggleSubmerge,
+					.shootIndicatorUpdate = TorpedoIndicatorUpdate, .specialIndicatorUpdate = SubmergeIndicatorUpdate
+				}
+			});
 		shipComponents.insert(
-		{ 
-			ShipType::cannonBoat, Player
 			{
-				.forwardSpeed = 400, .rotationSpeed = 150, .reloading = true,
-				.shootCooldown = 0.05, .specialCooldown = 1.5, .ammoRechargeCooldown = 1.8,
-				.holdShoot = true, .maxAmmo = 2,
-				.shootAction = ShootShell, .specialAction = Boost,
-				.shootIndicatorUpdate = CannonIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
-			} 
-		});
+				ShipType::cannonBoat, Player
+				{
+					.forwardSpeed = 400, .rotationSpeed = 150, .reloading = true,
+					.shootCooldown = 0.05, .specialCooldown = 5, .ammoRechargeCooldown = 0.16,
+					.holdShoot = true, .maxAmmo = 15,
+					.shootAction = ShootShell, .specialAction = Boost,
+					.shootIndicatorUpdate = CannonIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
+				}
+			});
 		shipComponents.insert(
-		{	
-			ShipType::hedgehogBoat, Player
 			{
-				.forwardSpeed = 380, .rotationSpeed = 150, 
-				.shootCooldown = 0.4, .specialCooldown = 1.5, .ammoRechargeCooldown = 5,
-				.holdShoot = false, .maxAmmo = 1, 
-				.shootAction = ShootHedgehog, .specialAction = Boost,
-				.shootIndicatorUpdate = HedgehogIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
-			} 
-		});
+				ShipType::hedgehogBoat, Player
+				{
+					.forwardSpeed = 380, .rotationSpeed = 150,
+					.shootCooldown = 0.4, .specialCooldown = 5, .ammoRechargeCooldown = 5,
+					.holdShoot = false, .maxAmmo = 1,
+					.shootAction = ShootHedgehog, .specialAction = Boost,
+					.shootIndicatorUpdate = HedgehogIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
+				}
+			});
 
 		//Initialize ship type models
 		shipModels.insert({ ShipType::torpedoBoat, resources::models["Ship_PT_109_Torpedo.obj"] });
@@ -930,7 +919,7 @@ public:
 				// Slow rotation based on speed
 				// TODO: this function could be improved by testing
 				float rotationScalar = std::clamp(std::abs(log10(rigidbody.velocity.Length() / player.forwardSpeed / 2)), 0.5f, 1.0f);
-				
+
 				float trueRotateInput = -rotateInput * player.rotationSpeed * rotationScalar;
 
 				// Apply forward impulse if rotating or receiving a rotation command
@@ -1068,9 +1057,9 @@ public:
 			player.shootIndicatorUpdate(entity);
 			player.specialIndicatorUpdate(entity);
 
-			if (player.animationEntity != 0) 
+			if (player.animationEntity != 0)
 			{
-				TransformSystem::SetRotation(player.animationEntity, {0, 0, modelTransform.rotation.y});
+				TransformSystem::SetRotation(player.animationEntity, { 0, 0, modelTransform.rotation.y });
 			}
 		}
 	}
@@ -1145,7 +1134,7 @@ public:
 			auto func = *player.shootAction.target<void(*)(engine::ecs::Entity)>();
 
 			if (*func == CreateTorpedo)
-			{ 
+			{
 				scale = Vector3(2, 0.5, 1);
 
 				// Add max ammo's number of indicators
