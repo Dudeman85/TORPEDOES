@@ -44,7 +44,7 @@ static void CreateCrowd(Vector3 pos, engine::Animation& anim)
 static void PlayCountdown(Vector3 pos)
 {
 	engine::ecs::Entity countdown = engine::ecs::NewEntity();
-	engine::ecs::AddComponent(countdown, engine::Transform{ .position = pos, .scale = Vector3(60, 100, 0) });
+	engine::ecs::AddComponent(countdown, engine::Transform{ .position = pos, .scale = Vector3(60, 100, 100) });
 	engine::ecs::AddComponent(countdown, engine::SpriteRenderer{});
 	engine::ecs::AddComponent(countdown, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
 	engine::AnimationSystem::AddAnimation(countdown, resources::countdownAnim, "CountDown");
@@ -77,9 +77,9 @@ void LoadLevel1(engine::Camera* cam)
 	CreateCheckpoint(Vector3(2555.000000, -1600.000000, 100.000000), Vector3(-17.500000, -87.500000, -90.000000), Vector3(20.5f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
 
 	//Make the crowds manually
-	//CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims);
-	//CreateCrowd({ 1545, -1715, 11 }, resources::crowdAnims);
-	//CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims);
+	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims);
+	CreateCrowd({ 1545, -1715, 11 }, resources::crowdAnims);
+	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims);
 
 	
 	PlayCountdown(Vector3(2480.0f, -1520.0f, 0.0f));
@@ -183,7 +183,7 @@ static void LoadLevel3(engine::Camera* cam)
 	CreateCheckpoint(Vector3(3015.000000, -760.000000, 100.000000), Vector3(27.500000, 47.500000, 7.500000), Vector3(19), resources::models["Prop_Buoy.obj"], 37.5f + 90.f);
 	CreateCheckpoint(Vector3(2645.000000, -975.000000, 100.000000), Vector3(27.500000, -40.000000, -7.500000), Vector3(19), resources::models["Prop_Buoy.obj"], -20.0f + 90.f);
 	CreateCheckpoint(Vector3(2140.000000, -635.000000, 100.000000), Vector3(27.500000, 0.000000, 12.500000), Vector3(15.f), resources::models["Prop_Buoy.obj"], -2.5f + 90.f);
-	CreateCheckpoint(Vector3(870.000000, -465.000000, 100.000000), Vector3(35.000000, -10.000000, 7.500000), Vector3(14.5f), resources::models["Prop_Buoy.obj"], 15.0f + 90.f);
+	CreateCheckpoint(Vector3(875.000000, -465.000000, 100.000000), Vector3(37.500000, -15.000000, 0.000000), Vector3(12.5f), resources::models["Prop_Buoy.obj"], 15.0f + 90.f);
 	CreateCheckpoint(Vector3(1170.000000, -1250.000000, 100.000000), Vector3(37.500000, 0.000000, 0.000000), Vector3(13), resources::models["Prop_Buoy.obj"], 13.0f + 80.f);
 	CreateCheckpoint(Vector3(2555.000000, -1600.000000, 100.000000), Vector3(-17.500000, -87.500000, -90.000000), Vector3(20.5f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
 
@@ -217,6 +217,12 @@ static void LoadLevel3(engine::Camera* cam)
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1175.000000, -1700.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1260.000000, -1740.000000, 0.300000));
 	*/
+
+	//Make the crowds manually
+	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims);
+	CreateCrowd({ 1545, -1715, 11 }, resources::crowdAnims);
+	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims);
+
 
 	PlayCountdown(Vector3(2480.0f, -1520.0f, 0.0f));
 	PlayerController::lapCount = 3;
@@ -362,8 +368,8 @@ int main()
 
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
-	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 0), .scale = 20 });
-	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Buoy.obj"] });
+	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 100), .scale = 20 });
+	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
 
 
 
