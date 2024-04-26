@@ -69,6 +69,8 @@ public:
 
 	///A 2D vector of tile IDs used for simple tile collision checking
 	std::vector<std::vector<unsigned int>> collisionLayer;
+	std::unordered_map<unsigned int, std::vector<Vector2>> tileColliders;
+
 private:
 	void initGLStuff(const tmx::Map&);
 	std::shared_ptr<engine::Texture> loadTexture(const std::string&);

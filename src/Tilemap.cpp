@@ -42,7 +42,7 @@ source distribution.
 Tilemap::Tilemap(engine::Camera* cam)
 {
 	m_shader = new engine::Shader(
-	R"(
+		R"(
 	#version 460 core
 	in vec3 a_position;
 	in vec2 a_texCoord;
@@ -226,6 +226,19 @@ void Tilemap::loadMap(const std::string ownMap)
 					}
 				}
 
+				//Log the collider shapes per tile id
+				for (const auto& tile : tileset.getTiles())
+				{
+					if (tile.objectGroup.getObjects().size() > 0)
+					{
+						//Get the first object in a tile to be used as a collider
+						for (const auto& point : tile.objectGroup.getObjects()[0].getPoints())
+						{
+							tileColliders[tile.ID].push_back(Vector2(point.x, point.y));
+						}
+					}
+				}
+
 				mapLayers[layer->zLayer].push_back(layer);
 				enabledLayers[layer->zLayer] = true;
 			}
@@ -276,7 +289,7 @@ std::vector<Vector2> Tilemap::CheckCollisionBox(Vector2 topLeft, Vector2 bottomR
 			{
 				//If tile is in collision layer log it
 				if (collisionLayer[x][y] != 0)
-				{ 
+				{
 					collisions.push_back(Vector2(x, y));
 				}
 			}
