@@ -64,7 +64,7 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 
 	engine::ecs::DestroyEntity(hedgehog.aimingGuide);
 
-	Vector2 explosionSize = Vector2(0.5, -0.5);
+	Vector2 explosionSize = Vector2(0.7, -0.7);
 	Vector2 explosionScale = Vector3(20);
 
 	engine::ecs::Entity hedgehogExplosion = engine::ecs::NewEntity();
