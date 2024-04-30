@@ -75,6 +75,12 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 	engine::ecs::AddComponent(hedgehogExplosion, engine::PolygonCollider{ .vertices = explosionverts, .trigger = true, .visualise = true });
 	engine::ecs::AddComponent(hedgehogExplosion, Projectile{ .ownerID = projectile.ownerID, .hitType = HitStates::Stop, .hitSpeedFactor = 0.5, .hitTime = 1, .canHitSubmerged = true, .hitAnimation = "" });
 
+	//Disable the hedgehog collider after .5 seconds
+	engine::TimerSystem::ScheduleFunction([hedgehogExplosion]()
+		{
+			engine::ecs::RemoveComponent<engine::PolygonCollider>(hedgehogExplosion);
+		}, 0.5);
+
 	// aqui verifica si el id del tilecolare y activa la otra animacion 
 	if (engine::collisionSystem->tilemap->checkCollision(transform.position.x, transform.position.y) > 1)
 	{
