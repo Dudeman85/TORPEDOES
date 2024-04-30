@@ -44,10 +44,10 @@ static void CreateAnimation(engine::ecs::Entity entity)
 	Projectile& projectile = engine::ecs::GetComponent<Projectile>(entity);
 	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(entity);
 	Vector3 animPosition = transform.position;
-	animPosition.z += 100;
+	animPosition.z += 500;
 
 	engine::ecs::Entity torpedoAnim = engine::ecs::NewEntity();
-	engine::ecs::AddComponent(torpedoAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20) });
+	engine::ecs::AddComponent(torpedoAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, ((double)rand() / (double)RAND_MAX) + 2), .scale = Vector3(20) });
 	engine::ecs::AddComponent(torpedoAnim, engine::SpriteRenderer{ });
 	engine::ecs::AddComponent(torpedoAnim, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
 

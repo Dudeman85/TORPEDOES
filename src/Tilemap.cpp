@@ -255,9 +255,9 @@ void Tilemap::loadMap(const std::string ownMap)
 //Returns the vertices making up this tile's collider
 std::vector<Vector2> Tilemap::GetTileCollider(unsigned int id)
 {
-	if (tileColliders.count(id) > 0)
+	if (tileColliders.count(id - 1) > 0)
 	{
-		return tileColliders[id];
+		return tileColliders[id - 1];
 	}
 	else
 	{
