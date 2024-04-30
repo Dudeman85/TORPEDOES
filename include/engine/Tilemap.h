@@ -53,8 +53,12 @@ public:
 	Vector2 GetTilePosition(unsigned int x, unsigned int y);
 	///Check larger area collisionbox
 	std::vector<Vector2> CheckCollisionBox(Vector2 topLeft, Vector2 bottomRight);
+	//Returns the id of the collision layer's tile at tilemap coords x and y
+	unsigned int GetCollisionTileAtLocation(unsigned int x, unsigned int y);
 	///Check the smaller Collisions that are turned on upon the larger collision box colliding
 	unsigned int checkCollision(float x, float y);
+	//Returns the vertices making up this tile's collider
+	std::vector<Vector2> GetTileCollider(unsigned int id);
 	///The size of a tile
 	tmx::Vector2u tileSize;
 	///The position of a tile
