@@ -275,18 +275,43 @@ static void SetupInput()
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "Boost" + std::to_string(i) });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_START, { "Pause" });
 
+		input::bindDigitalControllerInput(i,  GLFW_GAMEPAD_BUTTON_DPAD_LEFT , { "Turn" + std::to_string(i) });
+		input::bindDigitalControllerInput(i,  GLFW_GAMEPAD_BUTTON_DPAD_RIGHT , { "Turn" + std::to_string(i) });
+
+		
+
+
+
 		input::bindAnalogControllerInput(i,
 			{
-				{ { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER },
+				{ { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER ,  },
 				{ { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_TRIGGER }
 			},
 			{ "Throttle" + std::to_string(i) });
 
+
 		input::bindAnalogControllerInput(i,
 			{
-				{ { input::controllerMixedInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_X }
+				{ { input::controllerMixedInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_X } 
 			},
 			{ "Turn" + std::to_string(i) });
+
+
+		// Mika check tämä 
+		input::bindAnalogControllerInput(i,
+			{
+				{ { input::digitalPositiveInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT , } ,
+			},
+			{ "Turn" + std::to_string(i) });
+
+		input::bindAnalogControllerInput(i,
+			{
+				{ { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_BUTTON_DPAD_LEFT ,},
+			},
+			{ "Turn" + std::to_string(i) });
+
+		
+		
 	}
 
 	// Keyboard input
