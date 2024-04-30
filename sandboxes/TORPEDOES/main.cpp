@@ -4,6 +4,7 @@
 #include "GameCamera.h"
 #include "engine/SoundComponent.h"
 #include "Pickups.h"
+#include "engine/Random.h"
 
 using namespace engine;
 
@@ -35,7 +36,18 @@ static void CreateCrowd(Vector3 pos, engine::Animation& anim)
 	engine::ecs::Entity crowd = engine::ecs::NewEntity();
 	engine::ecs::AddComponent(crowd, engine::Transform{ .position = pos, .scale = Vector3(100, 30, 0) });
 	engine::ecs::AddComponent(crowd, engine::SpriteRenderer{});
-	engine::ecs::AddComponent(crowd, engine::Animator{.playbackSpeed = ((float)rand() / (RAND_MAX)) + 1 });
+	// C++ random: ((float)rand() / (RAND_MAX)) + 1
+	engine::ecs::AddComponent(crowd, engine::Animator{.playbackSpeed = Random(0.6f, 2.0f)});
+	engine::AnimationSystem::AddAnimation(crowd, anim, "CrowdCheer");
+	engine::AnimationSystem::PlayAnimation(crowd, "CrowdCheer", true);
+}
+
+static void CreateSmallCrowd(Vector3 pos, engine::Animation& anim)
+{
+	engine::ecs::Entity crowd = engine::ecs::NewEntity();
+	engine::ecs::AddComponent(crowd, engine::Transform{ .position = pos, .scale = Vector3(35, 30,0) });
+	engine::ecs::AddComponent(crowd, engine::SpriteRenderer{});
+	engine::ecs::AddComponent(crowd, engine::Animator{ .playbackSpeed = Random(0.6f, 2.0f) });
 	engine::AnimationSystem::AddAnimation(crowd, anim, "CrowdCheer");
 	engine::AnimationSystem::PlayAnimation(crowd, "CrowdCheer", true);
 }
@@ -77,9 +89,9 @@ void LoadLevel1(engine::Camera* cam)
 	CreateCheckpoint(Vector3(2555.000000, -1600.000000, 100.000000), Vector3(-17.500000, -87.500000, -90.000000), Vector3(20.5f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
 
 	//Make the crowds manually
-	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims);
-	CreateCrowd({ 1545, -1715, 11 }, resources::crowdAnims);
-	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims);
+	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims1);
+	CreateCrowd({ 1545, -1715, 11 }, resources::crowdAnims1);
+	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims1);
 
 	
 	PlayCountdown(Vector3(2480.0f, -1520.0f, 0.0f));
@@ -139,25 +151,25 @@ void LoadLevel2(engine::Camera* cam)
 
 	// Make the crowds manually
 	// Start/Finish line crowd
-	CreateCrowd({ 1030.000000, -1850.000000, 100 }, resources::crowdAnims);	// First row, first crowd
-	CreateCrowd({ 1230.000000, -1850.000000, 100 }, resources::crowdAnims);	// First row, second crowd
-	CreateCrowd({ 1430.000000, -1850.000000, 100 }, resources::crowdAnims);	// First row, third crowd
-	CreateCrowd({ 1010.000000, -1865.000000, 101 }, resources::crowdAnims);	// Second row, first crowd
-	CreateCrowd({ 1210.000000, -1865.000000, 101 }, resources::crowdAnims);	// Second row, second crowd
-	CreateCrowd({ 1410.000000, -1865.000000, 101 }, resources::crowdAnims);	// Second row, third crowd	
+	CreateCrowd({ 1030.000000, -1850.000000, 100 }, resources::crowdAnims1);	// First row, first crowd
+	CreateCrowd({ 1230.000000, -1850.000000, 100 }, resources::crowdAnims1);	// First row, second crowd
+	CreateCrowd({ 1430.000000, -1850.000000, 100 }, resources::crowdAnims1);	// First row, third crowd
+	CreateCrowd({ 1010.000000, -1865.000000, 101 }, resources::crowdAnims1);	// Second row, first crowd
+	CreateCrowd({ 1210.000000, -1865.000000, 101 }, resources::crowdAnims1);	// Second row, second crowd
+	CreateCrowd({ 1410.000000, -1865.000000, 101 }, resources::crowdAnims1);	// Second row, third crowd	
 	// ********************
 	// Cave crowd
-	CreateCrowd({ 3165.000000, -480.000000, 100 }, resources::crowdAnims);	// First row, first crowd
+	CreateCrowd({ 3165.000000, -480.000000, 100 }, resources::crowdAnims1);	// First row, first crowd
 	// ********************
 	// Overhang crowd
-	CreateCrowd({ 1210.000000, -850.000000, 100 }, resources::crowdAnims); // First row, first crowd
-	CreateCrowd({ 1410.000000, -850.000000, 100 }, resources::crowdAnims); // First row, second crowd
-	CreateCrowd({ 1610.000000, -850.000000, 100 }, resources::crowdAnims); // First row, third crowd
-	CreateCrowd({ 1810.000000, -850.000000, 100 }, resources::crowdAnims); // First row, fourth crowd
-	CreateCrowd({ 1250.000000, -860.000000, 101 }, resources::crowdAnims); // Second row, first crowd
-	CreateCrowd({ 1450.000000, -860.000000, 101 }, resources::crowdAnims); // Second row, second crowd
-	CreateCrowd({ 1650.000000, -860.000000, 101 }, resources::crowdAnims); // Second row, third crowd
-	CreateCrowd({ 1850.000000, -860.000000, 101 }, resources::crowdAnims); // Second row, fourth crowd
+	CreateCrowd({ 1210.000000, -850.000000, 100 }, resources::crowdAnims1); // First row, first crowd
+	CreateCrowd({ 1410.000000, -850.000000, 100 }, resources::crowdAnims1); // First row, second crowd
+	CreateCrowd({ 1610.000000, -850.000000, 100 }, resources::crowdAnims1); // First row, third crowd
+	CreateCrowd({ 1810.000000, -850.000000, 100 }, resources::crowdAnims1); // First row, fourth crowd
+	CreateCrowd({ 1250.000000, -860.000000, 101 }, resources::crowdAnims1); // Second row, first crowd
+	CreateCrowd({ 1450.000000, -860.000000, 101 }, resources::crowdAnims1); // Second row, second crowd
+	CreateCrowd({ 1650.000000, -860.000000, 101 }, resources::crowdAnims1); // Second row, third crowd
+	CreateCrowd({ 1850.000000, -860.000000, 101 }, resources::crowdAnims1); // Second row, fourth crowd
 	// ********************
 
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1455.000000, -1295.000000, 0.300000));
@@ -219,10 +231,15 @@ static void LoadLevel3(engine::Camera* cam)
 	*/
 
 	//Make the crowds manually
-	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims);
-	CreateCrowd({ 1545, -1715, 11 }, resources::crowdAnims);
-	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims);
-
+	// Start/Finish line crowd
+	CreateCrowd({ 2300, -1410, 10 }, resources::crowdAnims1);	// First row, first crowd
+	CreateCrowd({ 2431, -1410, 10 }, resources::crowdAnims1);	// First row, second crowd
+	CreateCrowd({ 2315, -1395, 9 }, resources::crowdAnims1);		// Second row, first crowd
+	CreateCrowd({ 2380, -1395, 9 }, resources::crowdAnims1);		// Second row, second crowd
+	// ********************
+	// First checkpoint crowd
+	CreateSmallCrowd({ 3119, -615, 10 }, resources::crowdAnims2);	// First row, first crowd
+	// ********************
 
 	PlayCountdown(Vector3(2480.0f, -1460.0f, 150.0f));
 	PlayerController::lapCount = 3;
@@ -450,7 +467,7 @@ int main()
 			isGamePaused = false;
 			canStartLoadingMap = false;
 			ShipSelectionSystem->isShipSelectionMenuOn = false;
-			LoadLevel2(&cam);
+			LoadLevel3(&cam);
 		}
 
 		// if paused or Pause pressed update PauseSystem
