@@ -101,17 +101,17 @@ void CreateTorpedo(engine::ecs::Entity entity)
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-	float speed = 500;
+	float speed = 700;
 
 	ecs::Entity torpedo = ecs::NewEntity();
-	ecs::AddComponent(torpedo, Projectile{ .ownerID = player.id, .speed = 500, .hitType = HitStates::Stop, .hitTime = 0.8 });
+	ecs::AddComponent(torpedo, Projectile{ .ownerID = player.id, .speed = speed, .hitType = HitStates::Stop, .hitTime = 0.8 });
 
 	Projectile& torpedoProjectile = ecs::GetComponent<Projectile>(torpedo);
 
 	ecs::AddComponent(torpedo, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(10) });
 	ecs::AddComponent(torpedo, Rigidbody{ .velocity = player.forwardDirection * torpedoProjectile.speed });
 	std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .visualise = true,  .rotationOverride = std::abs(modelTransform.rotation.y) });
+	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .layer = 1, .visualise = true,  .rotationOverride = std::abs(modelTransform.rotation.y) });
 
 	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models[torpedoProjectile.model] });
 }
@@ -124,10 +124,10 @@ void CreateShell(engine::ecs::Entity entity)
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-	float speed = 400;
+	float speed = 1000;
 
 	ecs::Entity shell = ecs::NewEntity();
-	ecs::AddComponent(shell, Projectile{ .ownerID = player.id, .speed = 500, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
+	ecs::AddComponent(shell, Projectile{ .ownerID = player.id, .speed = speed, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
 
 	Projectile& shellProjectile = ecs::GetComponent<Projectile>(shell);
 
@@ -665,7 +665,7 @@ public:
 			{
 				ShipType::torpedoBoat, Player
 				{
-					.forwardSpeed = 450, .rotationSpeed = 150,
+					.forwardSpeed = 550, .rotationSpeed = 100,
 					.shootCooldown = 0.2, .specialCooldown = 5, .ammoRechargeCooldown = 2,
 					.holdShoot = false, .maxAmmo = 2,
 					.shootAction = CreateTorpedo, .specialAction = Boost,
@@ -676,7 +676,7 @@ public:
 			{
 				ShipType::submarine, Player
 				{
-					.forwardSpeed = 400, .rotationSpeed = 150,
+					.forwardSpeed = 500, .rotationSpeed = 150,
 					.shootCooldown = 0.2, .specialCooldown = 1, .ammoRechargeCooldown = 2,
 					.holdShoot = false, .maxAmmo = 2,
 					.shootAction = CreateTorpedo, .specialAction = ToggleSubmerge,
@@ -687,9 +687,9 @@ public:
 			{
 				ShipType::cannonBoat, Player
 				{
-					.forwardSpeed = 400, .rotationSpeed = 150, .reloading = true,
-					.shootCooldown = 0.05, .specialCooldown = 5, .ammoRechargeCooldown = 0.16,
-					.holdShoot = true, .maxAmmo = 15,
+					.forwardSpeed = 470, .rotationSpeed = 180, .reloading = true,
+					.shootCooldown = 0.02, .specialCooldown = 5, .ammoRechargeCooldown = 0.16,
+					.holdShoot = true, .maxAmmo = 20,
 					.shootAction = ShootShell, .specialAction = Boost,
 					.shootIndicatorUpdate = CannonIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
 				}
@@ -698,7 +698,7 @@ public:
 			{
 				ShipType::hedgehogBoat, Player
 				{
-					.forwardSpeed = 380, .rotationSpeed = 150,
+					.forwardSpeed = 500, .rotationSpeed = 150,
 					.shootCooldown = 0.4, .specialCooldown = 5, .ammoRechargeCooldown = 5,
 					.holdShoot = false, .maxAmmo = 1,
 					.shootAction = ShootHedgehog, .specialAction = Boost,
