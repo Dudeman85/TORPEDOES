@@ -187,24 +187,13 @@ namespace engine
 			float rotation = collider.rotationOverride >= 0 ? collider.rotationOverride : transform.rotation.z;
 			std::vector<Vector2> entityVerts = TransformSystem::ApplyTransforms2D(collider.vertices, rotation, transform.scale, transform.position);
 
-			//Vertices of a tile
-			std::vector<Vector2> tileVerts{
-				Vector2(-((float)tilemap->tileSize.x / 2), (float)tilemap->tileSize.y / 2), //Top-Left
-					Vector2((float)tilemap->tileSize.x / 2, (float)tilemap->tileSize.y / 2),  //Top-Right
-					Vector2((float)tilemap->tileSize.x / 2, -((float)tilemap->tileSize.y / 2)), //Bottom-Right
-					Vector2(-((float)tilemap->tileSize.x / 2), -((float)tilemap->tileSize.y / 2)) //Bottom-Left
-			};
-
-			//Visualise tile collider
-			Primitive tileCollider = Primitive::Polygon(tileVerts);
 
 			//For each tile inside the bounding box
 			for (int i = 0; i < possibleCollisions.size(); i++)
 			{
-
-
-				//const auto& test = tilemap->tileColliders[tilemap->checkCollision()];
-
+				//Get the final polygon collider of the tile
+				unsigned int tileID = tilemap->GetCollisionTileAtLocation(possibleCollisions[i].x, possibleCollisions[i].y) - 1;
+				std::vector<Vector2> tileVerts = tilemap->GetTileCollider(tileID);
 
 				//Move the tile verts to position
 				Vector2 tilePosition = tilemap->GetTilePosition(possibleCollisions[i].x, possibleCollisions[i].y);
@@ -218,7 +207,10 @@ namespace engine
 #ifdef _DEBUG
 					//Draw tiles which are colliding
 					if (collider.visualise)
+					{
+						Primitive tileCollider = Primitive::Polygon(tileVerts);
 						tileCollider.Draw(cam, Vector3(255, 0, 0), Transform{ .position = Vector3(tilePosition, 10) });
+					}
 #endif
 
 					//If the mtv is facing in to the other collider, flip it
@@ -237,8 +229,18 @@ namespace engine
 				{
 #ifdef _DEBUG
 					//Draw tiles inside bounding box
-					if (collider.visualise)
+					if (collider.visualise) 
+					{
+						//Vertices of a tile's aabb
+						const std::vector<Vector2> boundingBoxVerts{
+							Vector2(-((float)tilemap->tileSize.x / 2), (float)tilemap->tileSize.y / 2), //Top-Left
+								Vector2((float)tilemap->tileSize.x / 2, (float)tilemap->tileSize.y / 2),  //Top-Right
+								Vector2((float)tilemap->tileSize.x / 2, -((float)tilemap->tileSize.y / 2)), //Bottom-Right
+								Vector2(-((float)tilemap->tileSize.x / 2), -((float)tilemap->tileSize.y / 2)) //Bottom-Left
+						};
+						Primitive tileCollider = Primitive::Polygon(boundingBoxVerts);
 						tileCollider.Draw(cam, Vector3(0, 255, 0), Transform{ .position = Vector3(tilePosition, 10) });
+					}
 #endif
 				}
 			}

@@ -26,7 +26,7 @@ static void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, 
 	else {
 		CheckpointcolliderVerts = { Vector2(4, 8), Vector2(4, -8), Vector2(-4, -8), Vector2(-4, 8) };
 	}
-	engine::ecs::AddComponent(checkpoint, engine::PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = false, .rotationOverride = hitboxrotation }));
+	engine::ecs::AddComponent(checkpoint, engine::PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = true, .rotationOverride = hitboxrotation }));
 
 	checkPointNumber++;
 };
@@ -70,32 +70,54 @@ void LoadLevel1(engine::Camera* cam)
 	engine::collisionSystem->cam = cam;
 
 	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat };
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(500, -500));
-
+	
 	// Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level1Map);
 	engine::collisionSystem->SetTilemap(resources::level1Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
 	//Create the players
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(2480.0f, -1520.0f));
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1225.0f, -420.0f));
 
-	//Make all the checkpoints manually
-	CreateCheckpoint(Vector3(3015.000000, -760.000000, 100.000000), Vector3(27.500000, 47.500000, 7.500000), Vector3(19), resources::models["Prop_Buoy.obj"], 37.5f + 90.f);
-	CreateCheckpoint(Vector3(2645.000000, -975.000000, 100.000000), Vector3(27.500000, -40.000000, -7.500000), Vector3(19), resources::models["Prop_Buoy.obj"], -20.0f + 90.f);
-	CreateCheckpoint(Vector3(2140.000000, -635.000000, 100.000000), Vector3(27.500000, 0.000000, 12.500000), Vector3(15.f), resources::models["Prop_Buoy.obj"], -2.5f + 90.f);
-	CreateCheckpoint(Vector3(1185.000000, -480.000000, 100.000000), Vector3(25.000000, 7.500000, 7.500000), Vector3(14.5f), resources::models["Prop_Buoy.obj"], 15.0f + 90.f);
-	CreateCheckpoint(Vector3(1170.000000, -1250.000000, 100.000000), Vector3(37.500000, 0.000000, 0.000000), Vector3(13), resources::models["Prop_Buoy.obj"], 13.0f + 80.f);
-	CreateCheckpoint(Vector3(2555.000000, -1600.000000, 100.000000), Vector3(-17.500000, -87.500000, -90.000000), Vector3(20.5f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
+	////Make all the checkpoints manually
+	CreateCheckpoint(Vector3(1925.000000, -895.000000, 100.000000), Vector3(27.500000, 27.500000, 10.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 110.f);
+	CreateCheckpoint(Vector3(2590.000000, -1475.000000, 100.000000), Vector3(30.000000, 37.500000, 5.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"],110.f);
+	CreateCheckpoint(Vector3(3590.000000, -1425.000000, 100.000000), Vector3(30.000000, 12.500000, -5.000000), Vector3(17.5f), resources::models["Prop_Buoy.obj"], 95.f);
+	CreateCheckpoint(Vector3(3280.000000, -640.000000, 100.000000), Vector3(35.000000, 77.500000, 17.500000), Vector3(17.5f), resources::models["Prop_Buoy.obj"], 160.f);
+	CreateCheckpoint(Vector3(1770.000000, -1585.000000, 100.000000), Vector3(50.000000, -62.500000, 0.000000), Vector3(18.5f), resources::models["Prop_Buoy.obj"], 20.f);
+	CreateCheckpoint(Vector3(820.000000, -1610.000000, 100.000000), Vector3(47.500000, -77.500000, -5.000000), Vector3(20.5f), resources::models["Prop_Buoy.obj"], 10.f);
+	CreateCheckpoint(Vector3(545.000000, -900.000000, 100.000000), Vector3(35.000000, -22.500000, 0.000000), Vector3(17.5f), resources::models["Prop_Buoy.obj"], 70.f);
+	CreateCheckpoint(Vector3(1475.000000, -460.000000, 100.000000), Vector3(-25.000000, -90.000000, -90.000000), Vector3(24.f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
+
+	//crossroad
+	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1075.000000, 0.300000));
+	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1145.000000, 0.300000));
+	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1230.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2170.000000, -1190.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1085.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2270.000000, -1150.000000, 0.300000));
+
+	//center slalom
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3270.000000, -1125.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3270.000000, -1045.000000, 0.300000));
+
+	////hairpin top
+	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1305.000000, -995.000000, 0.300000));
+	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1170.000000, -995.000000, 0.300000));
+	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1020.000000, -995.000000, 0.300000));
+
+	//second last corner
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(700.000000, -1710.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(615.000000, -1645.000000, 0.300000));
 
 	//Make the crowds manually
 	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims1);
 	CreateCrowd({ 1545, -1715, 11 }, resources::crowdAnims1);
 	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims1);
-
 	
-	PlayCountdown(Vector3(2480.0f, -1520.0f, 0.0f));
-	PlayerController::lapCount = 1;
+	PlayCountdown(Vector3(1225.0f, -320.0f, 0.0f));
+	PlayerController::lapCount = 3;
 }
 
 // Create everything for level 2
@@ -386,8 +408,10 @@ int main()
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 100), .scale = 20 });
-	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Goal_Ver2.obj"] });
+	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
 
+	//Testing stuff
+	physicsSystem->SetTileProperty(201, TileProperty{false});
 
 
 	ShipSelectionSystem->isShipSelectionMenuOn = true;
@@ -467,7 +491,7 @@ int main()
 			isGamePaused = false;
 			canStartLoadingMap = false;
 			ShipSelectionSystem->isShipSelectionMenuOn = false;
-			LoadLevel3(&cam);
+			LoadLevel1(&cam);
 		}
 
 		// if paused or Pause pressed update PauseSystem
