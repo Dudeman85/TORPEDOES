@@ -396,8 +396,10 @@ int main()
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 100), .scale = 20 });
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
 
+
 	//Testing stuff
-	physicsSystem->SetTileProperty(201, TileProperty{false});
+	collisionSystem->SetTileCollisionLayer(3, 3);
+	collisionSystem->SetLayerInteraction(1, 3, CollisionSystem::LayerInteraction::none);
 
 
 	ShipSelectionSystem->isShipSelectionMenuOn = true;
