@@ -35,7 +35,7 @@ static void CreateCrowd(Vector3 pos, engine::Animation& anim)
 	engine::ecs::Entity crowd = engine::ecs::NewEntity();
 	engine::ecs::AddComponent(crowd, engine::Transform{ .position = pos, .scale = Vector3(100, 30, 0) });
 	engine::ecs::AddComponent(crowd, engine::SpriteRenderer{});
-	engine::ecs::AddComponent(crowd, engine::Animator{.playbackSpeed = ((float)rand() / (RAND_MAX)) + 1 });
+	engine::ecs::AddComponent(crowd, engine::Animator{.playbackSpeed = (((float)rand() / (RAND_MAX)) + 2) / 2 });
 	engine::AnimationSystem::AddAnimation(crowd, anim, "CrowdCheer");
 	engine::AnimationSystem::PlayAnimation(crowd, "CrowdCheer", true);
 }
@@ -396,6 +396,8 @@ int main()
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 100), .scale = 20 });
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
 
+	//Testing stuff
+	physicsSystem->SetTileProperty(201, TileProperty{false});
 
 
 	ShipSelectionSystem->isShipSelectionMenuOn = true;

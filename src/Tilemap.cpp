@@ -181,6 +181,25 @@ void Tilemap::loadMap(const std::string ownMap)
 	tileSize = map.getTileSize();
 	zLayers.insert(0);
 
+	tmx::Tileset tileset = map.getTilesets()[0];
+	//Log the collider shapes per tile id
+	for (const auto& tile : tileset.getTiles())
+	{
+		if (tile.objectGroup.getObjects().size() > 0)
+		{
+			//Get the first object in a tile to be used as a collider
+			for (const auto& point : tile.objectGroup.getObjects()[0].getPoints())
+			{
+				Vector2 vertice(point.x, point.y);
+				//transform the vertice to work with our coordinate system
+				vertice.y = -vertice.y;
+				vertice += Vector2(-(float)tileSize.x / 2, (float)tileSize.y / 2);
+
+				tileColliders[tile.ID].push_back(vertice);
+			}
+		}
+	}
+
 	//create a drawable object for each tile layer
 	const auto& layers = map.getLayers();
 	for (auto i = 0u; i < layers.size(); ++i)
@@ -226,24 +245,41 @@ void Tilemap::loadMap(const std::string ownMap)
 					}
 				}
 
-				//Log the collider shapes per tile id
-				for (const auto& tile : tileset.getTiles())
-				{
-					if (tile.objectGroup.getObjects().size() > 0)
-					{
-						//Get the first object in a tile to be used as a collider
-						for (const auto& point : tile.objectGroup.getObjects()[0].getPoints())
-						{
-							tileColliders[tile.ID].push_back(Vector2(point.x, point.y));
-						}
-					}
-				}
-
 				mapLayers[layer->zLayer].push_back(layer);
 				enabledLayers[layer->zLayer] = true;
 			}
 		}
 	}
+}
+
+//Returns the vertices making up this tile's collider
+std::vector<Vector2> Tilemap::GetTileCollider(unsigned int id)
+{
+	if (tileColliders.count(id) > 0)
+	{
+		return tileColliders[id];
+	}
+	else
+	{
+		//Default collider of a tile
+		return std::vector<Vector2>{
+			Vector2(-((float)tileSize.x / 2), (float)tileSize.y / 2), //Top-Left
+			Vector2((float)tileSize.x / 2, (float)tileSize.y / 2),  //Top-Right
+			Vector2((float)tileSize.x / 2, -((float)tileSize.y / 2)), //Bottom-Right
+			Vector2(-((float)tileSize.x / 2), -((float)tileSize.y / 2)) //Bottom-Left
+		};
+	}
+}
+
+//Returns the id of the collision layer's tile at tilemap coords x and y
+unsigned int Tilemap::GetCollisionTileAtLocation(unsigned int x, unsigned int y)
+{
+	if (collisionLayer.empty())
+	{
+		return 0;
+	}
+
+	return collisionLayer[x][y];
 }
 
 //Get the center position of a tile in world coordinates
