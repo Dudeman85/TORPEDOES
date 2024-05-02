@@ -95,7 +95,9 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 	//Disable the hedgehog collider after .5 seconds
 	engine::TimerSystem::ScheduleFunction([hedgehogExplosion]()
 		{
-			engine::ecs::RemoveComponent<engine::PolygonCollider>(hedgehogExplosion);
+			if(engine::ecs::EntityExists(hedgehogExplosion))
+				if(engine::ecs::HasComponent<engine::PolygonCollider>(hedgehogExplosion))
+					engine::ecs::RemoveComponent<engine::PolygonCollider>(hedgehogExplosion);
 		}, 0.5);
 
 	// aqui verifica si el id del tilecolare y activa la otra animacion 
