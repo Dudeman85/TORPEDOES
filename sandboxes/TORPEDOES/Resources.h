@@ -37,7 +37,7 @@ namespace resources
 		modelTextures = engine::PreloadTextures("3dmodels");
 
 		//Set the player textures
-		playerIdToTexture = { modelTextures["Buoy_Color_2.png"], modelTextures["Prop_Color.png"], modelTextures["Player_Red.png"], modelTextures["Buoy_Color.png"] };
+		playerIdToTexture = { modelTextures["Player_Green.png"], modelTextures["Player_Orange.png"], modelTextures["Player_Red.png"], modelTextures["Player_Purple.png"] };
 
 		models = engine::PreloadModels("3dmodels");
 
@@ -47,7 +47,7 @@ namespace resources
 		level1Map->loadMap("/levels/level1.tmx");
 
 		level2Map = new Tilemap(cam);
-		level2Map->loadMap("/levels/level2backup.tmx");
+		level2Map->loadMap("/levels/level2.tmx");
 
 		level3Map = new Tilemap(cam);
 		level3Map->loadMap("levels/level3.tmx");

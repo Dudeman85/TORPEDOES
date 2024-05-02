@@ -44,10 +44,10 @@ static void CreateAnimation(engine::ecs::Entity entity)
 	Projectile& projectile = engine::ecs::GetComponent<Projectile>(entity);
 	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(entity);
 	Vector3 animPosition = transform.position;
-	animPosition.z += 100;
+	animPosition.z += 500;
 
 	engine::ecs::Entity torpedoAnim = engine::ecs::NewEntity();
-	engine::ecs::AddComponent(torpedoAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, (double)rand() / ((double)RAND_MAX + 1)),  .scale = Vector3(20) });
+	engine::ecs::AddComponent(torpedoAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, ((double)rand() / (double)RAND_MAX) + 2), .scale = Vector3(20) });
 	engine::ecs::AddComponent(torpedoAnim, engine::SpriteRenderer{ });
 	engine::ecs::AddComponent(torpedoAnim, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
 
@@ -64,7 +64,7 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 
 	engine::ecs::DestroyEntity(hedgehog.aimingGuide);
 
-	Vector2 explosionSize = Vector2(0.5, -0.5);
+	Vector2 explosionSize = Vector2(0.7, -0.7);
 	Vector2 explosionScale = Vector3(20);
 
 	engine::ecs::Entity hedgehogExplosion = engine::ecs::NewEntity();
@@ -74,6 +74,12 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 	std::vector<Vector2> explosionverts{ Vector2(explosionSize.x, explosionSize.x), Vector2(explosionSize.x, explosionSize.y), Vector2(explosionSize.y, explosionSize.y), Vector2(explosionSize.y, explosionSize.x) };
 	engine::ecs::AddComponent(hedgehogExplosion, engine::PolygonCollider{ .vertices = explosionverts, .trigger = true, .visualise = true });
 	engine::ecs::AddComponent(hedgehogExplosion, Projectile{ .ownerID = projectile.ownerID, .hitType = HitStates::Stop, .hitSpeedFactor = 0.5, .hitTime = 1, .canHitSubmerged = true, .hitAnimation = "" });
+
+	//Disable the hedgehog collider after .5 seconds
+	engine::TimerSystem::ScheduleFunction([hedgehogExplosion]()
+		{
+			engine::ecs::RemoveComponent<engine::PolygonCollider>(hedgehogExplosion);
+		}, 0.5);
 
 	// aqui verifica si el id del tilecolare y activa la otra animacion 
 	if (engine::collisionSystem->tilemap->checkCollision(transform.position.x, transform.position.y) > 1)

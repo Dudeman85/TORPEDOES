@@ -2,6 +2,7 @@
 #include <bitset>
 
 #include <engine/Application.h>
+#include "Globals.h"
 #include "Resources.h"
 #include "Projectiles.h"
 #include "engine/Input.h"
@@ -93,6 +94,14 @@ struct CheckPoint
 	bool Finish_line = false;
 };
 
+ECS_REGISTER_COMPONENT(SubmarineComponent)
+struct SubmarineComponent
+{
+	float maxSubmergeTime = 3;
+	float timeSubmerged = 0;
+	bool submerged = false;
+};
+
 /* TORPEDO */
 
 void CreateTorpedo(engine::ecs::Entity entity)
@@ -101,17 +110,17 @@ void CreateTorpedo(engine::ecs::Entity entity)
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-	float speed = 500;
+	float speed = 700;
 
 	ecs::Entity torpedo = ecs::NewEntity();
-	ecs::AddComponent(torpedo, Projectile{ .ownerID = player.id, .speed = 500, .hitType = HitStates::Stop, .hitTime = 0.8 });
+	ecs::AddComponent(torpedo, Projectile{ .ownerID = player.id, .speed = speed, .hitType = HitStates::Stop, .hitTime = 0.8 });
 
 	Projectile& torpedoProjectile = ecs::GetComponent<Projectile>(torpedo);
 
 	ecs::AddComponent(torpedo, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(10) });
 	ecs::AddComponent(torpedo, Rigidbody{ .velocity = player.forwardDirection * torpedoProjectile.speed });
 	std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .visualise = true,  .rotationOverride = std::abs(modelTransform.rotation.y) });
+	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .layer = 4, .visualise = false,  .rotationOverride = std::abs(modelTransform.rotation.y) });
 
 	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models[torpedoProjectile.model] });
 }
@@ -124,20 +133,20 @@ void CreateShell(engine::ecs::Entity entity)
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-	float speed = 400;
+	float speed = 1000;
 
 	ecs::Entity shell = ecs::NewEntity();
-	ecs::AddComponent(shell, Projectile{ .ownerID = player.id, .speed = 500, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
+	ecs::AddComponent(shell, Projectile{ .ownerID = player.id, .speed = speed, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
 
 	Projectile& shellProjectile = ecs::GetComponent<Projectile>(shell);
 
-	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(20)});
+	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(20) });
 	ecs::AddComponent(shell, Rigidbody{ .velocity = player.forwardDirection * shellProjectile.speed });
 	ecs::AddComponent(shell, ModelRenderer{ .model = resources::models[shellProjectile.model = "Weapon_CannonAmmo.obj"] });
 	float shellSize = 0.1;
 
 	std::vector<Vector2> shellverts{ Vector2(shellSize, shellSize), Vector2(shellSize, -shellSize), Vector2(-shellSize, -shellSize), Vector2(-shellSize, shellSize) };
-	ecs::AddComponent(shell, PolygonCollider{ .vertices = shellverts, .callback = OnProjectileCollision, .trigger = true, .visualise = true,  .rotationOverride = std::abs(modelTransform.rotation.y) });
+	ecs::AddComponent(shell, PolygonCollider{ .vertices = shellverts, .callback = OnProjectileCollision, .trigger = true, .layer = 4, .visualise = true,  .rotationOverride = std::abs(modelTransform.rotation.y) });
 }
 
 void ShootShell(engine::ecs::Entity entity)
@@ -238,7 +247,7 @@ void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide,
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
 	engine::ecs::Entity hedgehog = engine::ecs::NewEntity();
-	engine::ecs::AddComponent(hedgehog, Transform{ .position = transform.position, .rotation = modelTransform.rotation });
+	engine::ecs::AddComponent(hedgehog, Transform{ .position = transform.position + Vector3(0, 0, 100), .rotation = modelTransform.rotation });
 
 	Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * ecs::GetSystem<HedgehogSystem>()->speed;
 
@@ -247,15 +256,15 @@ void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide,
 	engine::ecs::AddComponent(hedgehog, ModelRenderer{ .model = resources::models["Weapon_HedgehogAmmo.obj"] });
 	std::vector<Vector2> Hedgehogverts{ Vector2(0.4, 0.5), Vector2(0.4, -0.5), Vector2(-0.4, -0.5), Vector2(-0.4, 0.5) };
 	ecs::AddComponent(hedgehog, Projectile{ .ownerID = player.id });
-	
+
 	auto& hedgehogTransform = engine::ecs::GetComponent<engine::Transform>(hedgehog);
 	auto& aimingGuideTransform = engine::ecs::GetComponent<engine::Transform>(aimingGuide);
-	ecs::AddComponent(hedgehog, 
-	Hedgehog
-	{ 
-		.targetDistance = (hedgehogTransform.position - aimingGuideTransform.position).Length(),
-		.aimingGuide = aimingGuide 
-	});
+	ecs::AddComponent(hedgehog,
+		Hedgehog
+		{
+			.targetDistance = (hedgehogTransform.position - aimingGuideTransform.position).Length(),
+			.aimingGuide = aimingGuide
+		});
 }
 
 struct aimingGuideStruct
@@ -320,11 +329,13 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 
 			modifiedDirection = Vector2(cos(angle), sin(angle));
 
-			Transform& guideTransform = ecs::GetComponent<Transform>(aimingGuides[positive_i ]);
+			Transform& guideTransform = ecs::GetComponent<Transform>(aimingGuides[positive_i]);
 			guideTransform.position = playerTransform.position
 				+ (modifiedDirection * ecs::GetSystem<HedgehogSystem>()->minDistance)
 				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, ecs::GetSystem<HedgehogSystem>()->chargeTime)));
 			guideTransform.scale = 20;
+
+			guideTransform.position.z += 170;
 		}
 		// Guide negative:
 		for (int negative_i = 1; negative_i < (shootAmount / 2) + 1; ++negative_i)
@@ -338,6 +349,8 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 				+ (modifiedDirection * ecs::GetSystem<HedgehogSystem>()->minDistance)
 				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, ecs::GetSystem<HedgehogSystem>()->chargeTime)));
 			guideTransform.scale = 20;
+
+			guideTransform.position.z += 170;
 		}
 	}
 	else
@@ -377,8 +390,8 @@ void CreateAimingGuides(engine::ecs::Entity entity, float guideSpeed, float shoo
 	{
 		engine::ecs::Entity newGuide = engine::ecs::NewEntity();
 
-		engine::ecs::AddComponent(newGuide, engine::Transform{ .position = transform.position, .rotation = transform.rotation, .scale = transform.scale});
-		engine::ecs::AddComponent(newGuide, engine::SpriteRenderer{ .texture= resources::uiTextures["Orange_crosshair.png"] });
+		engine::ecs::AddComponent(newGuide, engine::Transform{ .position = transform.position, .rotation = transform.rotation, .scale = transform.scale });
+		engine::ecs::AddComponent(newGuide, engine::SpriteRenderer{ .texture = resources::uiTextures["Orange_crosshair.png"] });
 
 		aimingGuides.push_back(newGuide);
 	}
@@ -421,6 +434,8 @@ static void BoostEnd(engine::ecs::Entity entity, float boostStrenght)
 {
 	Player& player = engine::ecs::GetComponent<Player>(entity);
 	player._boostScale -= boostStrenght;
+
+	player.specialEnabled = false;
 }
 
 // Increases player speed for a short while
@@ -431,18 +446,101 @@ void Boost(engine::ecs::Entity entity)
 
 	Player& player = engine::ecs::GetComponent<Player>(entity);
 
-	player.specialEnabled = false;
 	player._boostScale += boostStrenght;
 
 	engine::timerSystem->ScheduleFunction(&BoostEnd, boostTime, false, engine::ScheduledFunction::Type::seconds, entity, boostStrenght);
 }
 
-//Submerge function for submarine, slightly slower and invincible for the duration
+//Submerge function for submarine
 void ToggleSubmerge(engine::ecs::Entity playerEntity)
 {
 	Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
 	Transform& transformComponent = ecs::GetComponent<Transform>(playerEntity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(playerComponent.renderedEntity);
+
+	//Submerge if surfaced
+	if (!playerComponent.submerged)
+	{
+		//Make the continuous diving animation
+		playerComponent.animationEntity = ecs::NewEntity();
+		ecs::AddComponent(playerComponent.animationEntity, Transform{ .position = {0, 0, 1}, .scale = {5, 2, 0} });
+		ecs::AddComponent(playerComponent.animationEntity, SpriteRenderer{});
+		ecs::AddComponent(playerComponent.animationEntity, Animator{ });
+		TransformSystem::SetRotation(playerComponent.animationEntity, { 0, 0, modelTransform.rotation.y });
+		AnimationSystem::AddAnimation(playerComponent.animationEntity, resources::continuousDivingAnim, "diving");
+		AnimationSystem::PlayAnimation(playerComponent.animationEntity, "diving", true);
+		TransformSystem::AddParent(playerComponent.animationEntity, playerEntity);
+
+		//Start submerging and slow down
+		playerComponent._boostScale -= 0.1;
+
+		TransformSystem::Translate(playerEntity, { 0, 0, -20 });
+
+		SubmarineComponent& sc = ecs::GetComponent<SubmarineComponent>(playerEntity);
+		sc.submerged = true;
+		sc.timeSubmerged = 0;
+
+		//Finished submerging after .3 second
+		TimerSystem::ScheduleFunction(
+			[playerEntity]()
+			{
+				Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
+
+				playerComponent.submerged = true;
+				ecs::GetComponent<PolygonCollider>(playerEntity).layer = 2;
+				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures = { resources::modelTextures["Player_Underwater.png"] };
+			}, 0.3);
+	}
+	//Surface if submerged
+	else
+	{
+		//Make sure the submarine is not under a bridge
+		ecs::GetComponent<PolygonCollider>(playerEntity).layer = 1;
+		std::vector<Collision> collisions = collisionSystem->CheckCollision(playerEntity);
+		for (const Collision& c : collisions)
+		{
+			//If any hits were with a player, disallow surfacing
+			if (c.type == Collision::Type::collision)
+			{
+				if (ecs::GetComponent<PolygonCollider>(c.b).layer == 1)
+				{
+					ecs::GetComponent<PolygonCollider>(playerEntity).layer = 2;
+					return;
+				}
+			}
+			else
+			{
+				//If any hits were with a bridge tile, disallow surfacing
+				if (collisionSystem->GetTileCollisionLayer(c.b) == 3)
+				{
+					ecs::GetComponent<PolygonCollider>(playerEntity).layer = 2;
+					return;
+				}
+			}
+		}
+
+		SubmarineComponent& sc = ecs::GetComponent<SubmarineComponent>(playerEntity);
+		sc.submerged = false;
+		sc.timeSubmerged = 0;
+
+		//Get rid of the submerged bubbles animation
+		ecs::DestroyEntity(playerComponent.animationEntity);
+		playerComponent.animationEntity = 0;
+
+		//Start surfacing and speed up
+		playerComponent._boostScale += 0.1;
+		playerComponent.specialEnabled = false;
+		TransformSystem::Translate(playerEntity, { 0, 0, 20 });
+
+		//Finished surfacing after .3 second
+		TimerSystem::ScheduleFunction(
+			[playerEntity]()
+			{
+				Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
+				playerComponent.submerged = false;
+				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures = { resources::playerIdToTexture[playerComponent.id] };
+			}, 0.3);
+	}
 
 	//Make the diving bubbles animation
 	ecs::Entity divingEntity = ecs::NewEntity();
@@ -453,51 +551,6 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 	AnimationSystem::AddAnimation(divingEntity, resources::divingAnim, "dive");
 	AnimationSystem::PlayAnimation(divingEntity, "dive");
 	TransformSystem::AddParent(divingEntity, playerEntity);
-
-	//Submerge if surfaced
-	if (!playerComponent.submerged)
-	{
-		//Make the continuous diving animation
-		playerComponent.animationEntity = ecs::NewEntity();
-		ecs::AddComponent(playerComponent.animationEntity, Transform{ .position = {0, 0, 5}, .scale = {5, 2, 1} });
-		ecs::AddComponent(playerComponent.animationEntity, SpriteRenderer{});
-		ecs::AddComponent(playerComponent.animationEntity, Animator{ });
-		TransformSystem::SetRotation(playerComponent.animationEntity, { 0, 0, modelTransform.rotation.y });
-		AnimationSystem::AddAnimation(playerComponent.animationEntity, resources::continuousDivingAnim, "diving");
-		AnimationSystem::PlayAnimation(playerComponent.animationEntity, "diving", true);
-		TransformSystem::AddParent(playerComponent.animationEntity, playerEntity);
-
-		//Start submerging and slow down
-		playerComponent._boostScale -= 0.1;
-		playerComponent.submerged = true;
-
-		//Finished submerging after 1 second
-		TimerSystem::ScheduleFunction(
-			[playerEntity]()
-			{
-				Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
-				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures.push_back(resources::modelTextures["Player_Black.png"]);
-			}, 0.3);
-	}
-	//Surface if submerged
-	else
-	{
-		ecs::DestroyEntity(playerComponent.animationEntity);
-		playerComponent.animationEntity = 0;
-
-		//Start surfacing and speed up
-		playerComponent._boostScale += 0.1;
-		playerComponent.specialEnabled = false;
-
-		//Finished surfacing after 1 second
-		TimerSystem::ScheduleFunction(
-			[playerEntity]()
-			{
-				Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
-				playerComponent.submerged = false;
-				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures.clear();
-			}, 0.3);
-	}
 }
 
 /* INDICATOR UPDATES */
@@ -514,6 +567,8 @@ void CannonIndicatorUpdate(engine::ecs::Entity entity)
 	indicatorStruct& it = player.shootIndicators.back();
 
 	engine::SpriteRenderer& sprite = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
+	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
+
 	if (!player.reloading || (player.ammo >= player.maxAmmo))
 	{
 		sprite.texture = it.textures[0];
@@ -522,6 +577,8 @@ void CannonIndicatorUpdate(engine::ecs::Entity entity)
 	{
 		sprite.texture = it.textures[1];
 	}
+
+	transform.scale = { camHeight * 0.001f, (camHeight * aspectRatio) * 0.001f, 0 };
 }
 
 void HedgehogIndicatorUpdate(engine::ecs::Entity entity)
@@ -583,15 +640,18 @@ void BoostIndicatorUpdate(engine::ecs::Entity entity)
 	indicatorStruct& it = player.specialIndicators[0];
 	engine::SpriteRenderer& sprite = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
 
-	if (player._boostScale > 1)
+	if (player.specialEnabled)
 	{
-		// Available to use
-		sprite.texture = it.textures[1];
-	}
-	else if (player.specialCooldown <= player._specialTimer)
-	{
-		// In use
-		sprite.texture = it.textures[0];
+		if (player.specialCooldown <= player._specialTimer)
+		{
+			// In use
+			sprite.texture = it.textures[0];
+		}
+		else
+		{
+			// Available to use
+			sprite.texture = it.textures[1];
+		}
 	}
 	else
 	{
@@ -609,7 +669,7 @@ void SubmergeIndicatorUpdate(engine::ecs::Entity entity)
 
 	if (player.submerged)
 	{
-		if (player.specialCooldown <= player._specialTimer || player.specialEnabled)
+		if (/*player.specialCooldown <= player._specialTimer ||*/ player.specialEnabled)
 		{
 			sprite.texture = it.textures[0];
 		}
@@ -620,7 +680,7 @@ void SubmergeIndicatorUpdate(engine::ecs::Entity entity)
 	}
 	else
 	{
-		if (player.specialCooldown <= player._specialTimer || player.specialEnabled)
+		if (/*player.specialCooldown <= player._specialTimer ||*/ player.specialEnabled)
 		{
 
 			sprite.texture = it.textures[2];
@@ -658,49 +718,49 @@ public:
 
 		//Initialize each ship type's stats
 		shipComponents.insert(
-		{ 
-			ShipType::torpedoBoat, Player
 			{
-				.forwardSpeed = 450, .rotationSpeed = 150, 
-				.shootCooldown = 0.2, .specialCooldown = 5, .ammoRechargeCooldown = 2,
-				.holdShoot = false, .maxAmmo = 2, 
-				.shootAction = CreateTorpedo, .specialAction = Boost,
-				.shootIndicatorUpdate = TorpedoIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
-			} 
-		});
+				ShipType::torpedoBoat, Player
+				{
+					.forwardSpeed = 550, .rotationSpeed = 100,
+					.shootCooldown = 0.2, .specialCooldown = 5, .ammoRechargeCooldown = 2,
+					.holdShoot = false, .maxAmmo = 2,
+					.shootAction = CreateTorpedo, .specialAction = Boost,
+					.shootIndicatorUpdate = TorpedoIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
+				}
+			});
 		shipComponents.insert(
-		{ 
-			ShipType::submarine, Player
 			{
-				.forwardSpeed = 400, .rotationSpeed = 150, 
-				.shootCooldown = 0.2, .specialCooldown = 0.0f, .ammoRechargeCooldown = 2,
-				.holdShoot = false, .maxAmmo = 2, 
-				.shootAction = CreateTorpedo, .specialAction = ToggleSubmerge,
-				.shootIndicatorUpdate = TorpedoIndicatorUpdate, .specialIndicatorUpdate = SubmergeIndicatorUpdate
-			} 
-		});
+				ShipType::submarine, Player
+				{
+					.forwardSpeed = 500, .rotationSpeed = 150,
+					.shootCooldown = 0.2, .specialCooldown = 1, .ammoRechargeCooldown = 2,
+					.holdShoot = false, .maxAmmo = 2,
+					.shootAction = CreateTorpedo, .specialAction = ToggleSubmerge,
+					.shootIndicatorUpdate = TorpedoIndicatorUpdate, .specialIndicatorUpdate = SubmergeIndicatorUpdate
+				}
+			});
 		shipComponents.insert(
-		{ 
-			ShipType::cannonBoat, Player
 			{
-				.forwardSpeed = 400, .rotationSpeed = 150, .reloading = true,
-				.shootCooldown = 0.05, .specialCooldown = 5, .ammoRechargeCooldown = 0.16,
-				.holdShoot = true, .maxAmmo = 15,
-				.shootAction = ShootShell, .specialAction = Boost,
-				.shootIndicatorUpdate = CannonIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
-			} 
-		});
+				ShipType::cannonBoat, Player
+				{
+					.forwardSpeed = 470, .rotationSpeed = 180, .reloading = true,
+					.shootCooldown = 0.02, .specialCooldown = 5, .ammoRechargeCooldown = 0.16,
+					.holdShoot = true, .maxAmmo = 20,
+					.shootAction = ShootShell, .specialAction = Boost,
+					.shootIndicatorUpdate = CannonIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
+				}
+			});
 		shipComponents.insert(
-		{	
-			ShipType::hedgehogBoat, Player
 			{
-				.forwardSpeed = 380, .rotationSpeed = 150, 
-				.shootCooldown = 0.4, .specialCooldown = 5, .ammoRechargeCooldown = 5,
-				.holdShoot = false, .maxAmmo = 1, 
-				.shootAction = ShootHedgehog, .specialAction = Boost,
-				.shootIndicatorUpdate = HedgehogIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
-			} 
-		});
+				ShipType::hedgehogBoat, Player
+				{
+					.forwardSpeed = 500, .rotationSpeed = 150,
+					.shootCooldown = 0.4, .specialCooldown = 5, .ammoRechargeCooldown = 5,
+					.holdShoot = false, .maxAmmo = 1,
+					.shootAction = ShootHedgehog, .specialAction = Boost,
+					.shootIndicatorUpdate = HedgehogIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
+				}
+			});
 
 		//Initialize ship type models
 		shipModels.insert({ ShipType::torpedoBoat, resources::models["Ship_PT_109_Torpedo.obj"] });
@@ -802,8 +862,8 @@ public:
 
 				CreateAnimation(collision.b);
 
-				//engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(collision.a);
-				//soundComponent.Sounds["Dink"]->play();
+				engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(collision.a);
+				soundComponent.Sounds["Dink"]->play();
 
 				//Destroy projectile at end of frame
 				engine::ecs::DestroyEntity(collision.b);
@@ -915,7 +975,7 @@ public:
 				// Slow rotation based on speed
 				// TODO: this function could be improved by testing
 				float rotationScalar = std::clamp(std::abs(log10(rigidbody.velocity.Length() / player.forwardSpeed / 2)), 0.5f, 1.0f);
-				
+
 				float trueRotateInput = -rotateInput * player.rotationSpeed * rotationScalar;
 
 				// Apply forward impulse if rotating or receiving a rotation command
@@ -959,14 +1019,7 @@ public:
 			float finalBoostScale = player._boostScale;
 			if (player._offroadThisFrame)
 			{
-				if (player.submerged)
-				{
-					// Ignore offtrack while boosting or submerged
-				}
-				else
-				{
-					finalBoostScale = player.offtrackSpeedScale;
-				}
+				finalBoostScale = player.offtrackSpeedScale;
 			}
 
 			// Apply the final impulse to the object
@@ -1053,9 +1106,9 @@ public:
 			player.shootIndicatorUpdate(entity);
 			player.specialIndicatorUpdate(entity);
 
-			if (player.animationEntity != 0) 
+			if (player.animationEntity != 0)
 			{
-				TransformSystem::SetRotation(player.animationEntity, {0, 0, modelTransform.rotation.y});
+				TransformSystem::SetRotation(player.animationEntity, { 0, 0, modelTransform.rotation.y });
 			}
 		}
 	}
@@ -1067,7 +1120,7 @@ public:
 		engine::ecs::Entity shootIndicator = engine::ecs::NewEntity();
 
 		engine::ecs::AddComponent(shootIndicator, engine::SpriteRenderer{ .texture = resources::uiTextures[textureNames[1]] });
-		engine::ecs::AddComponent(shootIndicator, engine::Transform{ .position = pos, .scale = scale });
+		engine::ecs::AddComponent(shootIndicator, engine::Transform{ .position = pos + Vector3(0, 0, 50), .scale = scale });
 		engine::TransformSystem::AddParent(shootIndicator, entity);
 
 		std::vector<engine::Texture*> textures;
@@ -1108,7 +1161,7 @@ public:
 			engine::ecs::AddComponent(playerEntity, engine::Transform{ .position = Vector3(startPos - offset * playerShip.first, 150), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			engine::ecs::AddComponent(playerEntity, engine::Rigidbody{ .drag = 1.5 });
 			vector<Vector2> colliderVerts{ Vector2(3, 1), Vector2(3, -1), Vector2(-3, -1), Vector2(-3, 1) };
-			engine::ecs::AddComponent(playerEntity, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = false });
+			engine::ecs::AddComponent(playerEntity, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .layer = 1, .visualise = true });
 
 			//Create the player's name tag
 			engine::ecs::AddComponent(playerNameText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "P" + to_string(playerShip.first + 1), .color = Vector3(0.5, 0.8, 0.2) });
@@ -1130,7 +1183,7 @@ public:
 			auto func = *player.shootAction.target<void(*)(engine::ecs::Entity)>();
 
 			if (*func == CreateTorpedo)
-			{ 
+			{
 				scale = Vector3(2, 0.5, 1);
 
 				// Add max ammo's number of indicators
@@ -1168,12 +1221,37 @@ public:
 			}
 			else if (*func == ToggleSubmerge)
 			{
+				ecs::AddComponent(playerEntity, SubmarineComponent{});
 				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Surface_Icon.png", "UI_Red_Surface_Icon.png", "UI_Green_Submerge_Icon.png", "UI_Red_Submerge_Icon.png" }));
 			}
 
 			// Works
 			Audio* audio = engine::AddAudio("Gameplay", "audio/dink.wav", false, 100000);
 			audio->pause();
+			engine::ecs::AddComponent(playerEntity, engine::SoundComponent{ .Sounds = {{"Dink", audio}} });
+		}
+	}
+};
+
+ECS_REGISTER_SYSTEM(SubmarineSystem, SubmarineComponent, Transform, Player, PolygonCollider)
+class SubmarineSystem : public ecs::System
+{
+public:
+	void Update()
+	{
+		for (ecs::Entity entity : entities)
+		{
+			SubmarineComponent& sc = ecs::GetComponent<SubmarineComponent>(entity);
+
+			//Force surface after some time
+			if (sc.timeSubmerged >= sc.maxSubmergeTime)
+			{
+				ToggleSubmerge(entity);
+			}
+			else if (sc.submerged)
+			{
+				sc.timeSubmerged += deltaTime;
+			}
 		}
 	}
 };

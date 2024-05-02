@@ -40,6 +40,8 @@ namespace engine
 		std::function<void(Collision)> callback;
 		///Should the collider only act as a trigger
 		bool trigger = false;
+		///The layer of the collider, behavior is determined by the collision layer matrix
+		int layer = 0;
 		///Draw this collider
 		bool visualise = false;
 		///Override the rotation of the collider, (0-360)degrees. This is useful if attaching a 2D collider to a 3D model
@@ -53,6 +55,7 @@ namespace engine
 		class CollisionSystem : public ecs::System
 	{
 	public:
+		enum class LayerInteraction { all, none, collisions, triggers };
 
 		///Called every frame
 		void Update(Camera* camera)
@@ -78,6 +81,7 @@ namespace engine
 					}
 				}
 
+#ifdef _DEBUG
 				//Draw the bounding box and polygon collider
 				if (collider.visualise)
 				{
@@ -92,10 +96,11 @@ namespace engine
 					colliderPrimitive.Draw(cam, Vector3(255, 0, 0), Transform{ .position = Vector3(0, 0, 0) });
 					boundingBoxPrimitive.Draw(cam, Vector3(0, 255, 0), Transform{ .position = Vector3(0, 0, 0) });
 				}
+#endif
 			}
 		}
 
-		///Checks collision between entity a and every other entity, Returns the collisions from the perspective of a, and calls every applicable callback function
+		///Checks collision between entity a and every other entity and tilemap, Returns the collisions from the perspective of a, and calls every applicable callback function
 		std::vector<Collision> CheckCollision(ecs::Entity a)
 		{
 			Transform& aTransform = ecs::GetComponent<Transform>(a);
@@ -110,10 +115,6 @@ namespace engine
 			{
 				//Don't collide with self
 				if (a == b)
-					continue;
-
-				//Check AABB collision first because it's cheaper
-				if (!AABBIntersect(a, b))
 					continue;
 
 				Collision collision = CheckEntityCollision(a, b);
@@ -185,49 +186,76 @@ namespace engine
 			float rotation = collider.rotationOverride >= 0 ? collider.rotationOverride : transform.rotation.z;
 			std::vector<Vector2> entityVerts = TransformSystem::ApplyTransforms2D(collider.vertices, rotation, transform.scale, transform.position);
 
-			//Vertices of a tile
-			std::vector<Vector2> tileVerts{
-				Vector2(-((float)tilemap->tileSize.x / 2), (float)tilemap->tileSize.y / 2), //Top-Left
-					Vector2((float)tilemap->tileSize.x / 2, (float)tilemap->tileSize.y / 2),  //Top-Right
-					Vector2((float)tilemap->tileSize.x / 2, -((float)tilemap->tileSize.y / 2)), //Bottom-Right
-					Vector2(-((float)tilemap->tileSize.x / 2), -((float)tilemap->tileSize.y / 2)) //Bottom-Left
-			};
-			//Visualise tile collider
-			Primitive tileCollider = Primitive::Polygon(tileVerts);
 
 			//For each tile inside the bounding box
 			for (int i = 0; i < possibleCollisions.size(); i++)
 			{
+				//Get the final polygon collider of the tile
+				unsigned int tileID = tilemap->GetCollisionTileAtLocation(possibleCollisions[i].x, possibleCollisions[i].y);
+				std::vector<Vector2> tileVerts = tilemap->GetTileCollider(tileID);
+
+				//Comply with the layer matrix
+				LayerInteraction collisionInteraction = GetLayerInteraction(GetTileCollisionLayer(tileID), collider.layer);
+				if (collisionInteraction == LayerInteraction::none)
+					continue;
+
 				//Move the tile verts to position
 				Vector2 tilePosition = tilemap->GetTilePosition(possibleCollisions[i].x, possibleCollisions[i].y);
 				std::vector<Vector2> transformedTileVerts = TransformSystem::ApplyTransforms2D(tileVerts, 0, 1, tilePosition);
 				//Check entity-tile collision
 				Collision collision = SATIntersect(entityVerts, transformedTileVerts);
 
+				Collision::Type collisionType = collider.trigger || tileIDToTrigger[tileID] ? Collision::Type::tilemapTrigger : Collision::Type::tilemapCollision;
+
+				//Comply with the layer matrix
+				if (collisionInteraction == LayerInteraction::triggers)
+					if (collisionType != Collision::Type::tilemapTrigger)
+						continue;
+				if (collisionInteraction == LayerInteraction::collisions)
+					if (collisionType != Collision::Type::tilemapCollision)
+						continue;
+
 				//If collided with tile
 				if (collision.type != Collision::Type::miss)
 				{
+#ifdef _DEBUG
 					//Draw tiles which are colliding
 					if (collider.visualise)
+					{
+						Primitive tileCollider = Primitive::Polygon(tileVerts);
 						tileCollider.Draw(cam, Vector3(255, 0, 0), Transform{ .position = Vector3(tilePosition, 10) });
+					}
+#endif
 
 					//If the mtv is facing in to the other collider, flip it
 					Vector3 directionAtoB = transform.position - tilePosition;
 					if (directionAtoB.Dot(collision.mtv) < 0)
 						collision.mtv = Vector2() - collision.mtv;
 
-					//Setup the collision and call the callback
+					//Setup the collision
 					collision.a = entity;
-					collision.b = tilemap->collisionLayer[possibleCollisions[i].x][possibleCollisions[i].y];
-					collision.type = collider.trigger ? Collision::Type::tilemapTrigger : Collision::Type::tilemapCollision;
+					collision.b = tileID;
+					collision.type = collisionType;
 
 					collisions.push_back(collision);
 				}
 				else
 				{
+#ifdef _DEBUG
 					//Draw tiles inside bounding box
 					if (collider.visualise)
+					{
+						//Vertices of a tile's aabb
+						const std::vector<Vector2> boundingBoxVerts{
+							Vector2(-((float)tilemap->tileSize.x / 2), (float)tilemap->tileSize.y / 2), //Top-Left
+								Vector2((float)tilemap->tileSize.x / 2, (float)tilemap->tileSize.y / 2),  //Top-Right
+								Vector2((float)tilemap->tileSize.x / 2, -((float)tilemap->tileSize.y / 2)), //Bottom-Right
+								Vector2(-((float)tilemap->tileSize.x / 2), -((float)tilemap->tileSize.y / 2)) //Bottom-Left
+						};
+						Primitive tileCollider = Primitive::Polygon(boundingBoxVerts);
 						tileCollider.Draw(cam, Vector3(0, 255, 0), Transform{ .position = Vector3(tilePosition, 10) });
+					}
+#endif
 				}
 			}
 
@@ -235,13 +263,22 @@ namespace engine
 		}
 
 		///Check Entity-Entity collision. Does not call callbacks
-		static Collision CheckEntityCollision(ecs::Entity a, ecs::Entity b)
+		Collision CheckEntityCollision(ecs::Entity a, ecs::Entity b)
 		{
+			//Check AABB collision first because it's cheaper
+			if (!AABBIntersect(a, b))
+				return Collision{ .type = Collision::Type::miss, .a = a, .b = b };
+
 			//Get relevant components from a and b
 			Transform& aTransform = ecs::GetComponent<Transform>(a);
 			PolygonCollider& aCollider = ecs::GetComponent<PolygonCollider>(a);
 			Transform& bTransform = ecs::GetComponent<Transform>(b);
 			PolygonCollider& bCollider = ecs::GetComponent<PolygonCollider>(b);
+
+			//If collision layer matrix specifies to ignore, return miss
+			const LayerInteraction collisionInteraction = GetLayerInteraction(aCollider.layer, bCollider.layer);
+			if (collisionInteraction == LayerInteraction::none)
+				return Collision{ .type = Collision::Type::miss, .a = a, .b = b };
 
 			//Rotate and scale every vertex of a, movement is handled later
 			float aRotation = aCollider.rotationOverride >= 0 ? aCollider.rotationOverride : aTransform.rotation.z;
@@ -257,6 +294,14 @@ namespace engine
 			if (collision.type != Collision::Type::miss)
 			{
 				Collision::Type type = aCollider.trigger || bCollider.trigger ? Collision::Type::trigger : Collision::Type::collision;
+
+				//Comply with the layer matrix
+				if (collisionInteraction == LayerInteraction::triggers)
+					if (type != Collision::Type::trigger)
+						return Collision{ .type = Collision::Type::miss, .a = a, .b = b };
+				if (collisionInteraction == LayerInteraction::collisions)
+					if (type != Collision::Type::collision)
+						return Collision{ .type = Collision::Type::miss, .a = a, .b = b };
 
 				//If the mtv is facing in to the other collider from a's pov, flip it
 				Vector3 directionAtoB = aTransform.position - bTransform.position;
@@ -281,7 +326,7 @@ namespace engine
 				return aToB;
 
 			}
-			return Collision{ .type = Collision::Type::miss };
+			return Collision{ .type = Collision::Type::miss, .a = a, .b = b };
 		}
 
 		///Check SAT intersection between two convex polygons, Expects Vertices to have Transforms applied
@@ -481,10 +526,36 @@ namespace engine
 			tilemap = nullptr;
 		}
 
+		//Set the collision layer of a tile id
+		inline void SetTileCollisionLayer(unsigned int tileID, int layer)
+		{
+			tileIDTolayer[tileID] = layer;
+		}
+		//Get the collision layer of a tile id, defaults to 0
+		inline int GetTileCollisionLayer(unsigned int tileID)
+		{
+			return tileIDTolayer[tileID];
+		}
+		//Sets the interaction state between two layers
+		inline void SetLayerInteraction(int layer1, int layer2, LayerInteraction interaction)
+		{
+			layerCollisionMatrix[layer1][layer2] = interaction;
+			layerCollisionMatrix[layer2][layer1] = interaction;
+		}
+		//Get the interaction type between two collision layers
+		inline LayerInteraction GetLayerInteraction(int layer1, int layer2)
+		{
+			//Default is all, this is added automatically
+			return layerCollisionMatrix[layer1][layer2];
+		}
+
 		///Camera is needed for visualisation
 		Camera* cam = nullptr;
-
-	
 		Tilemap* tilemap = nullptr;
+
+	private:
+		std::unordered_map<int, std::unordered_map<int, LayerInteraction>> layerCollisionMatrix;
+		std::unordered_map<unsigned int, int> tileIDTolayer;
+		std::unordered_map<unsigned int, bool> tileIDToTrigger;
 	};
 }

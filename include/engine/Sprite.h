@@ -59,6 +59,8 @@ namespace engine
 	{
 		std::map<std::string, Animation> animations;
 
+		float playbackSpeed = 1;
+
 		std::string currentAnimation;
 		int animationFrame = 0;
 		bool repeatAnimation = false;
@@ -320,19 +322,16 @@ namespace engine
 		//Update every entity with relevant components
 		void Update()
 		{
-			int i = 0;
 			//For each entity that has the required components
 			for (ecs::Entity entity : entities)
 			{
-				i++;
-
 				//Get the relevant components from entity
 				Animator& animator = ecs::GetComponent<Animator>(entity);
 
 				//If the entity is currently playing an animation
 				if (animator.playingAnimation)
 				{
-					animator.animationTimer += engine::deltaTime * 1000;
+					animator.animationTimer += (engine::deltaTime * 1000) * animator.playbackSpeed;
 
 					//If enough time (defined by animation) has passed advance the animation frame
 					if (animator.animationTimer >= animator.animations[animator.currentAnimation].delays[animator.animationFrame])
