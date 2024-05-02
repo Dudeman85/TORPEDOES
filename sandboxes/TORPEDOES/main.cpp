@@ -1,3 +1,4 @@
+#define ECS_ENABLE_CHECKS
 #include "PlayerController.h"
 #include "engine/Input.h"  
 #include "MenuSystem.h"	
@@ -359,21 +360,6 @@ static void SetupInput()
 			},
 			{ "Turn" + std::to_string(i) });
 
-
-		// Mika check tämä 
-		input::bindAnalogControllerInput(i,
-			{
-				{ { input::digitalPositiveInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT , } ,
-			},
-			{ "Turn" + std::to_string(i) });
-
-		input::bindAnalogControllerInput(i,
-			{
-				{ { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_BUTTON_DPAD_LEFT ,},
-			},
-			{ "Turn" + std::to_string(i) });
-
-		
 		
 	}
 
@@ -443,28 +429,17 @@ int main()
 	//Bind all input actions
 	SetupInput();
 
-	//Load the first level
-	//LoadLevel1(&cam);
-
-	// Load the second level
-	//LoadLevel2(&cam);
-
-	// Load the third level
-	//LoadLevel3(&cam);
-
-
-
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 100), .scale = 20 });
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
 
-
 	//Collision layer matrix setup
-	//Currently 0 = default, 1 = underwater, 3 = bridges
+	//Currently 0 = default, 1 = surface players, 2 = underwater, 3 = bridges, 4 = projectiles
 	collisionSystem->SetTileCollisionLayer(3, 3);
-	collisionSystem->SetLayerInteraction(1, 3, CollisionSystem::LayerInteraction::none);
-
+	collisionSystem->SetLayerInteraction(2, 3, CollisionSystem::LayerInteraction::none);
+	collisionSystem->SetLayerInteraction(2, 1, CollisionSystem::LayerInteraction::none);
+	collisionSystem->SetLayerInteraction(4, 3, CollisionSystem::LayerInteraction::none);
 
 	ShipSelectionSystem->isShipSelectionMenuOn = true;
 	isGamePaused = true;
@@ -591,6 +566,8 @@ int main()
 		{
 			playerController->Update(window);
 		}
+
+		ecs::GetSystem<SubmarineSystem>()->Update();
 
 		ecs::Update();
 		glfwSwapBuffers(window);
