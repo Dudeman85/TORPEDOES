@@ -85,7 +85,7 @@ namespace engine
 			textRenderSystem->Update(cam);
 			primitiveRenderSystem->Update(cam);
 		}
-		soundSystem->Update();
+		//soundSystem->Update();
 		//Collision system should be after rendering
 		if (enablePhysics)
 			collisionSystem->Update(cam);

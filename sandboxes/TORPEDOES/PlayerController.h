@@ -119,7 +119,7 @@ void CreateTorpedo(engine::ecs::Entity entity)
 	ecs::AddComponent(torpedo, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(10) });
 	ecs::AddComponent(torpedo, Rigidbody{ .velocity = player.forwardDirection * torpedoProjectile.speed });
 	std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .layer = 1, .visualise = false,  .rotationOverride = std::abs(modelTransform.rotation.y) });
+	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .layer = 2, .visualise = false,  .rotationOverride = std::abs(modelTransform.rotation.y) });
 
 	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models[torpedoProjectile.model] });
 }
@@ -145,7 +145,7 @@ void CreateShell(engine::ecs::Entity entity)
 	float shellSize = 0.1;
 
 	std::vector<Vector2> shellverts{ Vector2(shellSize, shellSize), Vector2(shellSize, -shellSize), Vector2(-shellSize, -shellSize), Vector2(-shellSize, shellSize) };
-	ecs::AddComponent(shell, PolygonCollider{ .vertices = shellverts, .callback = OnProjectileCollision, .trigger = true, .layer = 1, .visualise = true,  .rotationOverride = std::abs(modelTransform.rotation.y) });
+	ecs::AddComponent(shell, PolygonCollider{ .vertices = shellverts, .callback = OnProjectileCollision, .trigger = true, .layer = 2, .visualise = true,  .rotationOverride = std::abs(modelTransform.rotation.y) });
 }
 
 void ShootShell(engine::ecs::Entity entity)
@@ -486,7 +486,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 				Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
 
 				playerComponent.submerged = true;
-				ecs::GetComponent<PolygonCollider>(playerEntity).layer = 1;
+				ecs::GetComponent<PolygonCollider>(playerEntity).layer = 2;
 				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures = { resources::modelTextures["Player_Underwater.png"] };
 			}, 0.3);
 	}
@@ -494,14 +494,14 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 	else
 	{
 		//Make sure the submarine is not under a bridge
-		ecs::GetComponent<PolygonCollider>(playerEntity).layer = 0;
+		ecs::GetComponent<PolygonCollider>(playerEntity).layer = 1;
 		std::vector<Collision> collisions = collisionSystem->CheckTilemapCollision(playerEntity);
 		for (const Collision& c : collisions)
 		{
 			//If any hits were with a bridge tile, disallow surfacing
 			if (collisionSystem->GetTileCollisionLayer(c.b) == 3)
 			{
-				ecs::GetComponent<PolygonCollider>(playerEntity).layer = 1;
+				ecs::GetComponent<PolygonCollider>(playerEntity).layer = 2;
 				return;
 			}
 		}
@@ -1144,7 +1144,7 @@ public:
 			engine::ecs::AddComponent(playerEntity, engine::Transform{ .position = Vector3(startPos - offset * playerShip.first, 150), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			engine::ecs::AddComponent(playerEntity, engine::Rigidbody{ .drag = 1.5 });
 			vector<Vector2> colliderVerts{ Vector2(3, 1), Vector2(3, -1), Vector2(-3, -1), Vector2(-3, 1) };
-			engine::ecs::AddComponent(playerEntity, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .visualise = true });
+			engine::ecs::AddComponent(playerEntity, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .layer = 1, .visualise = true });
 
 			//Create the player's name tag
 			engine::ecs::AddComponent(playerNameText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "P" + to_string(playerShip.first + 1), .color = Vector3(0.5, 0.8, 0.2) });

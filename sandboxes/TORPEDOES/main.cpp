@@ -396,9 +396,9 @@ int main()
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
 
 	//Collision layer matrix setup
-	//Currently 0 = default, 1 = underwater, 3 = bridges
+	//Currently 0 = default, 1 = surface players, 2 = underwater, 3 = bridges
 	collisionSystem->SetTileCollisionLayer(3, 3);
-	collisionSystem->SetLayerInteraction(1, 3, CollisionSystem::LayerInteraction::none);
+	collisionSystem->SetLayerInteraction(2, 3, CollisionSystem::LayerInteraction::none);
 
 	ShipSelectionSystem->isShipSelectionMenuOn = true;
 	isGamePaused = true;
