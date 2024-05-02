@@ -1,3 +1,4 @@
+#define ECS_ENABLE_CHECKS
 #include "PlayerController.h"
 #include "engine/Input.h"  
 #include "MenuSystem.h"	
