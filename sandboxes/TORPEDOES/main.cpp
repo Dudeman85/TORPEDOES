@@ -321,21 +321,6 @@ static void SetupInput()
 			},
 			{ "Turn" + std::to_string(i) });
 
-
-		// Mika check tämä 
-		input::bindAnalogControllerInput(i,
-			{
-				{ { input::digitalPositiveInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT , } ,
-			},
-			{ "Turn" + std::to_string(i) });
-
-		input::bindAnalogControllerInput(i,
-			{
-				{ { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_BUTTON_DPAD_LEFT ,},
-			},
-			{ "Turn" + std::to_string(i) });
-
-		
 		
 	}
 
@@ -405,28 +390,15 @@ int main()
 	//Bind all input actions
 	SetupInput();
 
-	//Load the first level
-	//LoadLevel1(&cam);
-
-	// Load the second level
-	//LoadLevel2(&cam);
-
-	// Load the third level
-	//LoadLevel3(&cam);
-
-
-
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 100), .scale = 20 });
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
 
-
 	//Collision layer matrix setup
 	//Currently 0 = default, 1 = underwater, 3 = bridges
 	collisionSystem->SetTileCollisionLayer(3, 3);
 	collisionSystem->SetLayerInteraction(1, 3, CollisionSystem::LayerInteraction::none);
-
 
 	ShipSelectionSystem->isShipSelectionMenuOn = true;
 	isGamePaused = true;
@@ -553,6 +525,8 @@ int main()
 		{
 			playerController->Update(window);
 		}
+
+		ecs::GetSystem<SubmarineSystem>()->Update();
 
 		ecs::Update();
 		glfwSwapBuffers(window);

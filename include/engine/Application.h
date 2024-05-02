@@ -11,6 +11,7 @@
 #include <engine/Collision.h>
 #include <engine/TextRender.h>
 #include <engine/Primitive.h>
+#include <engine/SoundComponent.h>
 
 //Other engine libs
 #include <engine/GL/Window.h>
@@ -37,6 +38,7 @@ namespace engine
 	shared_ptr<TextRenderSystem> textRenderSystem;
 	shared_ptr<PrimitiveRenderSystem> primitiveRenderSystem;
 	shared_ptr<TransformSystem> transformSystem;
+	shared_ptr<SoundSystem> soundSystem;
 
 	void EngineInit()
 	{
@@ -83,6 +85,7 @@ namespace engine
 			textRenderSystem->Update(cam);
 			primitiveRenderSystem->Update(cam);
 		}
+		soundSystem->Update();
 		//Collision system should be after rendering
 		if (enablePhysics)
 			collisionSystem->Update(cam);
