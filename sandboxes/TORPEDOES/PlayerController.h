@@ -96,7 +96,7 @@ struct CheckPoint
 ECS_REGISTER_COMPONENT(SubmarineComponent)
 struct SubmarineComponent
 {
-	float maxSubmergeTime = 5;
+	float maxSubmergeTime = 3;
 	float timeSubmerged = 0;
 	bool submerged = false;
 };
@@ -246,7 +246,7 @@ void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide,
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
 	engine::ecs::Entity hedgehog = engine::ecs::NewEntity();
-	engine::ecs::AddComponent(hedgehog, Transform{ .position = transform.position + Vector3(0, 0, 100), .rotation = modelTransform.rotation});
+	engine::ecs::AddComponent(hedgehog, Transform{ .position = transform.position + Vector3(0, 0, 100), .rotation = modelTransform.rotation });
 
 	Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * ecs::GetSystem<HedgehogSystem>()->speed;
 
@@ -473,7 +473,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 		//Start submerging and slow down
 		playerComponent._boostScale -= 0.1;
 
-		TransformSystem::Translate(playerEntity, {0, 0, -20});
+		TransformSystem::Translate(playerEntity, { 0, 0, -20 });
 
 		SubmarineComponent& sc = ecs::GetComponent<SubmarineComponent>(playerEntity);
 		sc.submerged = true;
@@ -496,20 +496,20 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 		//Make sure the submarine is not under a bridge
 		ecs::GetComponent<PolygonCollider>(playerEntity).layer = 0;
 		std::vector<Collision> collisions = collisionSystem->CheckTilemapCollision(playerEntity);
-		for (const Collision& c : collisions) 
+		for (const Collision& c : collisions)
 		{
 			//If any hits were with a bridge tile, disallow surfacing
-			if (collisionSystem->GetTileCollisionLayer(c.b) == 3) 
+			if (collisionSystem->GetTileCollisionLayer(c.b) == 3)
 			{
 				ecs::GetComponent<PolygonCollider>(playerEntity).layer = 1;
 				return;
 			}
 		}
-		
+
 		SubmarineComponent& sc = ecs::GetComponent<SubmarineComponent>(playerEntity);
 		sc.submerged = false;
 		sc.timeSubmerged = 0;
-		
+
 		//Get rid of the submerged bubbles animation
 		ecs::DestroyEntity(playerComponent.animationEntity);
 		playerComponent.animationEntity = 0;
@@ -1002,14 +1002,7 @@ public:
 			float finalBoostScale = player._boostScale;
 			if (player._offroadThisFrame)
 			{
-				if (player.submerged)
-				{
-					// Ignore offtrack while boosting or submerged
-				}
-				else
-				{
-					finalBoostScale = player.offtrackSpeedScale;
-				}
+				finalBoostScale = player.offtrackSpeedScale;
 			}
 
 			// Apply the final impulse to the object
@@ -1110,7 +1103,7 @@ public:
 		engine::ecs::Entity shootIndicator = engine::ecs::NewEntity();
 
 		engine::ecs::AddComponent(shootIndicator, engine::SpriteRenderer{ .texture = resources::uiTextures[textureNames[1]] });
-		engine::ecs::AddComponent(shootIndicator, engine::Transform{ .position = pos + Vector3(0, 0, 50), .scale = scale});
+		engine::ecs::AddComponent(shootIndicator, engine::Transform{ .position = pos + Vector3(0, 0, 50), .scale = scale });
 		engine::TransformSystem::AddParent(shootIndicator, entity);
 
 		std::vector<engine::Texture*> textures;
@@ -1226,14 +1219,14 @@ ECS_REGISTER_SYSTEM(SubmarineSystem, SubmarineComponent, Transform, Player, Poly
 class SubmarineSystem : public ecs::System
 {
 public:
-	void Update() 
+	void Update()
 	{
-		for (ecs::Entity entity : entities) 
+		for (ecs::Entity entity : entities)
 		{
 			SubmarineComponent& sc = ecs::GetComponent<SubmarineComponent>(entity);
 
 			//Force surface after some time
-			if (sc.timeSubmerged >= sc.maxSubmergeTime) 
+			if (sc.timeSubmerged >= sc.maxSubmergeTime)
 			{
 				ToggleSubmerge(entity);
 			}
