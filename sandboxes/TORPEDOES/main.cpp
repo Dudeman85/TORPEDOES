@@ -321,21 +321,6 @@ static void SetupInput()
 			},
 			{ "Turn" + std::to_string(i) });
 
-
-		// Mika check tämä 
-		input::bindAnalogControllerInput(i,
-			{
-				{ { input::digitalPositiveInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT , } ,
-			},
-			{ "Turn" + std::to_string(i) });
-
-		input::bindAnalogControllerInput(i,
-			{
-				{ { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_BUTTON_DPAD_LEFT ,},
-			},
-			{ "Turn" + std::to_string(i) });
-
-		
 		
 	}
 
