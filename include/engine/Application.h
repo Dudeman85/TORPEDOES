@@ -59,6 +59,7 @@ namespace engine
 		textRenderSystem->Init();
 		primitiveRenderSystem = ecs::GetSystem<PrimitiveRenderSystem>();
 		primitiveRenderSystem->Init();
+		soundSystem = ecs::GetSystem<SoundSystem>();
 		transformSystem = ecs::GetSystem<TransformSystem>();
 		ecs::SetComponentDestructor<Transform>(TransformSystem::OnTransformRemoved);
 	}
