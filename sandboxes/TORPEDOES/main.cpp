@@ -1,3 +1,4 @@
+#define ECS_ENABLE_CHECKS
 #include "PlayerController.h"
 #include "engine/Input.h"  
 #include "MenuSystem.h"	
@@ -386,6 +387,12 @@ int main()
 
 	std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem = engine::ecs::GetSystem<PlayerSelectSystem>();
 	ShipSelectionSystem->Init();
+	ShipSelectionSystem->isShipSelectionMenuOn = true;
+	isGamePaused = true;
+	bool mapLoaded = false;
+
+	//MainMenuSystem mainMenu;
+	//mainMenu.Load();
 
 	//Bind all input actions
 	SetupInput();
@@ -402,13 +409,12 @@ int main()
 	collisionSystem->SetLayerInteraction(2, 1, CollisionSystem::LayerInteraction::none);
 	collisionSystem->SetLayerInteraction(4, 3, CollisionSystem::LayerInteraction::none);
 
-	ShipSelectionSystem->isShipSelectionMenuOn = true;
-	isGamePaused = true;
-	bool mapLoaded = false;
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
+		//mainMenu.Update();
+
 		glfwPollEvents();
 
 		//Close window when Esc is pressed
