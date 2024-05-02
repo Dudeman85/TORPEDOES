@@ -1226,9 +1226,9 @@ public:
 			}
 
 			// Works
-			Audio* audio = engine::AddAudio("Gameplay", "audio/dink.wav", false, 100000);
+			Audio* audio = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 100000);
 			audio->pause();
-			engine::ecs::AddComponent(playerEntity, engine::SoundComponent{ .Sounds = {{"Dink", audio}} });
+			engine::ecs::AddComponent(playerEntity, engine::SoundComponent{ .Sounds = {{"Explosion", audio}} });
 		}
 	}
 };
