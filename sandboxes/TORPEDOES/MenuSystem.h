@@ -30,7 +30,7 @@ std::unordered_map<int, ShipType> playerShips;
 //	std::function<void()> selectedLevel;
 //	vector <  std::function <void()>> allLevelsAndFunc;
 //	std::function <void() > operation;
-//	vector < engine::ecs::Entity> ;
+//	vector < engine::ecs::Entity> entityList ;
 //
 //	vector < std::function <void()>> allLevels;
 //
@@ -267,7 +267,7 @@ public:
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipInfo).text = playerNumStats;
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipInfo).color = Vector3(nameColor.x, nameColor.y, nameColor.z);
 		
-		//engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).textures = { resources::modelTextures["Player_Red.png"] };
+		engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).textures = { resources::playerIdToTexture[playerSelection.playerID] };
 		 //PUT SHIP COLOR HERE
 
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipNameEntity).text = "shipName: " + shipName;
