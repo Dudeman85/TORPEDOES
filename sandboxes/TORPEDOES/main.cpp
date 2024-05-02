@@ -539,6 +539,8 @@ int main()
 			playerController->Update(window);
 		}
 
+		ecs::GetSystem<SubmarineSystem>()->Update();
+
 		ecs::Update();
 		glfwSwapBuffers(window);
 	}
