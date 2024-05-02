@@ -111,7 +111,7 @@ void CreateTorpedo(engine::ecs::Entity entity)
 	ecs::AddComponent(torpedo, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(10) });
 	ecs::AddComponent(torpedo, Rigidbody{ .velocity = player.forwardDirection * torpedoProjectile.speed });
 	std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .layer = 1, .visualise = true,  .rotationOverride = std::abs(modelTransform.rotation.y) });
+	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .layer = 1, .visualise = false,  .rotationOverride = std::abs(modelTransform.rotation.y) });
 
 	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models[torpedoProjectile.model] });
 }
@@ -137,7 +137,7 @@ void CreateShell(engine::ecs::Entity entity)
 	float shellSize = 0.1;
 
 	std::vector<Vector2> shellverts{ Vector2(shellSize, shellSize), Vector2(shellSize, -shellSize), Vector2(-shellSize, -shellSize), Vector2(-shellSize, shellSize) };
-	ecs::AddComponent(shell, PolygonCollider{ .vertices = shellverts, .callback = OnProjectileCollision, .trigger = true, .visualise = true,  .rotationOverride = std::abs(modelTransform.rotation.y) });
+	ecs::AddComponent(shell, PolygonCollider{ .vertices = shellverts, .callback = OnProjectileCollision, .trigger = true, .layer = 1, .visualise = true,  .rotationOverride = std::abs(modelTransform.rotation.y) });
 }
 
 void ShootShell(engine::ecs::Entity entity)
@@ -438,22 +438,12 @@ void Boost(engine::ecs::Entity entity)
 	engine::timerSystem->ScheduleFunction(&BoostEnd, boostTime, false, engine::ScheduledFunction::Type::seconds, entity, boostStrenght);
 }
 
-//Submerge function for submarine, slightly slower and invincible for the duration
+//Submerge function for submarine
 void ToggleSubmerge(engine::ecs::Entity playerEntity)
 {
 	Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
 	Transform& transformComponent = ecs::GetComponent<Transform>(playerEntity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(playerComponent.renderedEntity);
-
-	//Make the diving bubbles animation
-	ecs::Entity divingEntity = ecs::NewEntity();
-	ecs::AddComponent(divingEntity, Transform{ .position = {0, 0, 10}, .scale = {5, 2, 1} });
-	ecs::AddComponent(divingEntity, SpriteRenderer{});
-	ecs::AddComponent(divingEntity, Animator{ .onAnimationEnd = ecs::DestroyEntity });
-	TransformSystem::SetRotation(divingEntity, { 0, 0, modelTransform.rotation.y });
-	AnimationSystem::AddAnimation(divingEntity, resources::divingAnim, "dive");
-	AnimationSystem::PlayAnimation(divingEntity, "dive");
-	TransformSystem::AddParent(divingEntity, playerEntity);
 
 	//Submerge if surfaced
 	if (!playerComponent.submerged)
@@ -470,19 +460,35 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 
 		//Start submerging and slow down
 		playerComponent._boostScale -= 0.1;
-		playerComponent.submerged = true;
 
 		//Finished submerging after .3 second
 		TimerSystem::ScheduleFunction(
 			[playerEntity]()
 			{
 				Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
+
+				playerComponent.submerged = true;
+				ecs::GetComponent<PolygonCollider>(playerEntity).layer = 1;
 				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures = { resources::modelTextures["Player_Underwater.png"] };
 			}, 0.3);
 	}
 	//Surface if submerged
 	else
 	{
+		//Make sure the submarine is not under a bridge
+		ecs::GetComponent<PolygonCollider>(playerEntity).layer = 0;
+		std::vector<Collision> collisions = collisionSystem->CheckTilemapCollision(playerEntity);
+		for (const Collision& c : collisions) 
+		{
+			//If any hits were with a bridge tile, disallow surfacing
+			if (collisionSystem->GetTileCollisionLayer(c.b) == 3) 
+			{
+				ecs::GetComponent<PolygonCollider>(playerEntity).layer = 1;
+				return;
+			}
+		}
+
+		//Get rid of the submerged bubbles animation
 		ecs::DestroyEntity(playerComponent.animationEntity);
 		playerComponent.animationEntity = 0;
 
@@ -499,6 +505,16 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures = { resources::playerIdToTexture[playerComponent.id] };
 			}, 0.3);
 	}
+
+	//Make the diving bubbles animation
+	ecs::Entity divingEntity = ecs::NewEntity();
+	ecs::AddComponent(divingEntity, Transform{ .position = {0, 0, 10}, .scale = {5, 2, 1} });
+	ecs::AddComponent(divingEntity, SpriteRenderer{});
+	ecs::AddComponent(divingEntity, Animator{ .onAnimationEnd = ecs::DestroyEntity });
+	TransformSystem::SetRotation(divingEntity, { 0, 0, modelTransform.rotation.y });
+	AnimationSystem::AddAnimation(divingEntity, resources::divingAnim, "dive");
+	AnimationSystem::PlayAnimation(divingEntity, "dive");
+	TransformSystem::AddParent(divingEntity, playerEntity);
 }
 
 /* INDICATOR UPDATES */

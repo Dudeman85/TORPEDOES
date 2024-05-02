@@ -48,7 +48,7 @@ namespace resources
 		level1Map->loadMap("/levels/level1.tmx");
 
 		level2Map = new Tilemap(cam);
-		level2Map->loadMap("/levels/level2backup.tmx");
+		level2Map->loadMap("/levels/level2.tmx");
 
 		level3Map = new Tilemap(cam);
 		level3Map->loadMap("levels/level3.tmx");
