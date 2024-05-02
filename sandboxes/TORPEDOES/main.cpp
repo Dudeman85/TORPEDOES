@@ -260,7 +260,7 @@ static void LoadLevel4(engine::Camera* cam)
 	engine::collisionSystem->cam = cam;
 
 	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat };
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1434.0f, -1370.0f));
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1434.0f, -1520.0f));
 
 	//set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level4Map);
@@ -480,7 +480,7 @@ int main()
 			isGamePaused = false;
 			canStartLoadingMap = false;
 			ShipSelectionSystem->isShipSelectionMenuOn = false;
-			LoadLevel2(&cam);
+			LoadLevel4(&cam);
 		}
 
 		// if paused or Pause pressed update PauseSystem
