@@ -845,8 +845,8 @@ public:
 
 				CreateAnimation(collision.b);
 
-				//engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(collision.a);
-				//soundComponent.Sounds["Dink"]->play();
+				engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(collision.a);
+				soundComponent.Sounds["Dink"]->play();
 
 				//Destroy projectile at end of frame
 				engine::ecs::DestroyEntity(collision.b);
@@ -1140,7 +1140,7 @@ public:
 			playerComponent.id = playerShip.first;
 			playerComponent.renderedEntity = playerRender;
 			playerComponent.nameText = playerNameText;
-
+		
 			engine::ecs::AddComponent(playerEntity, engine::Transform{ .position = Vector3(startPos - offset * playerShip.first, 150), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			engine::ecs::AddComponent(playerEntity, engine::Rigidbody{ .drag = 1.5 });
 			vector<Vector2> colliderVerts{ Vector2(3, 1), Vector2(3, -1), Vector2(-3, -1), Vector2(-3, 1) };
@@ -1209,8 +1209,9 @@ public:
 			}
 
 			// Works
-			Audio* audio = engine::AddAudio("Gameplay", "audio/dink.wav", false, 100000);
+			Audio* audio = engine::AddAudio("Gameplay", "audio/dink.wav", true, 100000);
 			audio->pause();
+			engine::ecs::AddComponent(playerEntity, engine::SoundComponent{ .Sounds = {{"Dink", audio}} });
 		}
 	}
 };
