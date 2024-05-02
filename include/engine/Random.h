@@ -23,6 +23,7 @@ inline static double Random(const double Min, const double Max)             // G
     std::uniform_real_distribution<double> distribution(Min, Max);
     return distribution(generator);
 }
+/*
 inline static Vector2 Random(const Vector2 Min, const Vector2 Max)          // Generate a random, uniformly distributed Vector2
 {
     return { Random(Min.X, Max.X), Random(Min.Y, Max.Y) };
@@ -39,6 +40,7 @@ inline static FMomentum Random(const FMomentum Min, const FMomentum Max)    // G
 {
     return { Random(Min.GetPosition(), Max.GetPosition()), Random(Min.GetVelocity(), Max.GetVelocity()), Random(Min.GetAcceleration(), Max.GetAcceleration()) };
 }
+*/
 template<typename T>
 inline static T Random(const T Min, const T Max)                            // Generate a random, uniformly distributed templated type
 {
