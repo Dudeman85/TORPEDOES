@@ -173,25 +173,25 @@ void LoadLevel2(engine::Camera* cam)
 
 	// Make the crowds manually
 	// Start/Finish line crowd
-	CreateCrowd({ 1030.000000, -1850.000000, 100 }, resources::crowdAnims1);	// First row, first crowd
-	CreateCrowd({ 1230.000000, -1850.000000, 100 }, resources::crowdAnims1);	// First row, second crowd
-	CreateCrowd({ 1430.000000, -1850.000000, 100 }, resources::crowdAnims1);	// First row, third crowd
-	CreateCrowd({ 1010.000000, -1865.000000, 101 }, resources::crowdAnims1);	// Second row, first crowd
-	CreateCrowd({ 1210.000000, -1865.000000, 101 }, resources::crowdAnims1);	// Second row, second crowd
-	CreateCrowd({ 1410.000000, -1865.000000, 101 }, resources::crowdAnims1);	// Second row, third crowd	
+	CreateCrowd({ 1030.000000, -1850.000000, 165 }, resources::crowdAnims1);	// First row, first crowd
+	CreateCrowd({ 1230.000000, -1850.000000, 165 }, resources::crowdAnims1);	// First row, second crowd
+	CreateCrowd({ 1430.000000, -1850.000000, 165 }, resources::crowdAnims1);	// First row, third crowd
+	CreateCrowd({ 1010.000000, -1865.000000, 166 }, resources::crowdAnims1);	// Second row, first crowd
+	CreateCrowd({ 1210.000000, -1865.000000, 166 }, resources::crowdAnims1);	// Second row, second crowd
+	CreateCrowd({ 1410.000000, -1865.000000, 166 }, resources::crowdAnims1);	// Second row, third crowd	
 	// ********************
 	// Cave crowd
-	CreateCrowd({ 3165.000000, -480.000000, 100 }, resources::crowdAnims1);	// First row, first crowd
+	CreateCrowd({ 3165.000000, -480.000000, 165 }, resources::crowdAnims1);	// First row, first crowd
 	// ********************
 	// Overhang crowd
-	CreateCrowd({ 1210.000000, -850.000000, 100 }, resources::crowdAnims1); // First row, first crowd
-	CreateCrowd({ 1410.000000, -850.000000, 100 }, resources::crowdAnims1); // First row, second crowd
-	CreateCrowd({ 1610.000000, -850.000000, 100 }, resources::crowdAnims1); // First row, third crowd
-	CreateCrowd({ 1810.000000, -850.000000, 100 }, resources::crowdAnims1); // First row, fourth crowd
-	CreateCrowd({ 1250.000000, -860.000000, 101 }, resources::crowdAnims1); // Second row, first crowd
-	CreateCrowd({ 1450.000000, -860.000000, 101 }, resources::crowdAnims1); // Second row, second crowd
-	CreateCrowd({ 1650.000000, -860.000000, 101 }, resources::crowdAnims1); // Second row, third crowd
-	CreateCrowd({ 1850.000000, -860.000000, 101 }, resources::crowdAnims1); // Second row, fourth crowd
+	CreateCrowd({ 1210.000000, -850.000000, 165 }, resources::crowdAnims1); // First row, first crowd
+	CreateCrowd({ 1410.000000, -850.000000, 165 }, resources::crowdAnims1); // First row, second crowd
+	CreateCrowd({ 1610.000000, -850.000000, 165 }, resources::crowdAnims1); // First row, third crowd
+	CreateCrowd({ 1810.000000, -850.000000, 165 }, resources::crowdAnims1); // First row, fourth crowd
+	CreateCrowd({ 1250.000000, -860.000000, 166 }, resources::crowdAnims1); // Second row, first crowd
+	CreateCrowd({ 1450.000000, -860.000000, 166 }, resources::crowdAnims1); // Second row, second crowd
+	CreateCrowd({ 1650.000000, -860.000000, 166 }, resources::crowdAnims1); // Second row, third crowd
+	CreateCrowd({ 1850.000000, -860.000000, 166 }, resources::crowdAnims1); // Second row, fourth crowd
 	// ********************
 
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1455.000000, -1295.000000, 0.300000));
@@ -254,16 +254,40 @@ static void LoadLevel3(engine::Camera* cam)
 
 	//Make the crowds manually
 	// Start/Finish line crowd
-	CreateCrowd({ 2300, -1410, 10 }, resources::crowdAnims1);	// First row, first crowd
-	CreateCrowd({ 2431, -1410, 10 }, resources::crowdAnims1);	// First row, second crowd
-	CreateCrowd({ 2315, -1395, 9 }, resources::crowdAnims1);		// Second row, first crowd
-	CreateCrowd({ 2380, -1395, 9 }, resources::crowdAnims1);		// Second row, second crowd
+	CreateCrowd({ 2300, -1410, 166 }, resources::crowdAnims1);	// First row, first crowd
+	CreateCrowd({ 2431, -1410, 166 }, resources::crowdAnims1);	// First row, second crowd
+	CreateCrowd({ 2315, -1395, 165 }, resources::crowdAnims1);	// Second row, first crowd
+	CreateCrowd({ 2380, -1395, 165 }, resources::crowdAnims1);	// Second row, second crowd
 	// ********************
 	// First checkpoint crowd
-	CreateSmallCrowd({ 3119, -615, 10 }, resources::crowdAnims2);	// First row, first crowd
+	CreateSmallCrowd({ 3119, -605, 165 }, resources::crowdAnims2);		// Right crowd
+	CreateSmallCrowd({ 2845, -470, 166 }, resources::crowdAnims2);		// Left, First row, 1. crowd
+	CreateSmallCrowd({ 2845, -500, 167 }, resources::crowdAnims2);		// Left, First row, 2. crowd
+	CreateSmallCrowd({ 2845, -530, 168 }, resources::crowdAnims2);		// Left, First row, 3. crowd
+	CreateSmallCrowd({ 2845, -560, 169 }, resources::crowdAnims2);		// Left, First row, 4. crowd
+	CreateSmallCrowd({ 2845, -590, 170 }, resources::crowdAnims2);		// Left, First row, 5. crowd
+	CreateSmallCrowd({ 2845, -620, 171 }, resources::crowdAnims2);		// Left, First row, 6. crowd
+	CreateSmallCrowd({ 2845, -650, 172 }, resources::crowdAnims2);		// Left, First row, 7. crowd
+	CreateSmallCrowd({ 2845, -680, 173 }, resources::crowdAnims2);		// Left, First row, 8. crowd
+	CreateSmallCrowd({ 2845, -710, 174 }, resources::crowdAnims2);		// Left, First row, 9. crowd
+	CreateSmallCrowd({ 2845, -740, 175 }, resources::crowdAnims2);		// Left, First row, 10. crowd
+	CreateSmallCrowd({ 2845, -770, 176 }, resources::crowdAnims2);		// Left, First row, 11. crowd
+	CreateSmallCrowd({ 2845, -800, 177 }, resources::crowdAnims2);		// Left, First row, 12. crowd
+	CreateSmallCrowd({ 2845, -835, 178 }, resources::crowdAnims2);		// Left, First row, 13. crowd
+	CreateSmallCrowd({ 2820, -510, 167.5 }, resources::crowdAnims2);	// Left, Second row, 1. crowd
+	CreateSmallCrowd({ 2820, -540, 168.5 }, resources::crowdAnims2);	// Left, Second row, 2. crowd
+	CreateSmallCrowd({ 2820, -570, 169.5 }, resources::crowdAnims2);	// Left, Second row, 3. crowd
+	CreateSmallCrowd({ 2820, -600, 170.5 }, resources::crowdAnims2);	// Left, Second row, 4. crowd
+	CreateSmallCrowd({ 2820, -630, 171.5 }, resources::crowdAnims2);	// Left, Second row, 5. crowd
+	CreateSmallCrowd({ 2820, -660, 172.5 }, resources::crowdAnims2);	// Left, Second row, 6. crowd
+	CreateSmallCrowd({ 2820, -690, 173.5 }, resources::crowdAnims2);	// Left, Second row, 7. crowd
+	CreateSmallCrowd({ 2820, -720, 174.5 }, resources::crowdAnims2);	// Left, Second row, 8. crowd
+	CreateSmallCrowd({ 2820, -750, 175.5 }, resources::crowdAnims2);	// Left, Second row, 9. crowd
+	CreateSmallCrowd({ 2820, -780, 176.5 }, resources::crowdAnims2);	// Left, Second row, 10. crowd
+	CreateSmallCrowd({ 2820, -810, 177.5 }, resources::crowdAnims2);	// Left, Second row, 11. crowd
 	// ********************
 
-	PlayCountdown(Vector3(2480.0f, -1460.0f, 150.0f));
+	PlayCountdown(Vector3(2480.0f, -1460.0f, 200.0f));
 	PlayerController::lapCount = 3;
 }
 
@@ -519,7 +543,7 @@ int main()
 			isGamePaused = false;
 			canStartLoadingMap = false;
 			ShipSelectionSystem->isShipSelectionMenuOn = false;
-			LoadLevel2(&cam);
+			LoadLevel3(&cam);
 		}
 
 		// if paused or Pause pressed update PauseSystem
