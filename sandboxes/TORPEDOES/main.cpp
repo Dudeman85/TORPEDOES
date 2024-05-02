@@ -399,6 +399,7 @@ int main()
 	//Currently 0 = default, 1 = surface players, 2 = underwater, 3 = bridges
 	collisionSystem->SetTileCollisionLayer(3, 3);
 	collisionSystem->SetLayerInteraction(2, 3, CollisionSystem::LayerInteraction::none);
+	collisionSystem->SetLayerInteraction(2, 1, CollisionSystem::LayerInteraction::none);
 
 	ShipSelectionSystem->isShipSelectionMenuOn = true;
 	isGamePaused = true;

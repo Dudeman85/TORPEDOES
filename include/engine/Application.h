@@ -60,6 +60,7 @@ namespace engine
 		primitiveRenderSystem = ecs::GetSystem<PrimitiveRenderSystem>();
 		primitiveRenderSystem->Init();
 		transformSystem = ecs::GetSystem<TransformSystem>();
+		soundSystem = ecs::GetSystem<SoundSystem>();
 		ecs::SetComponentDestructor<Transform>(TransformSystem::OnTransformRemoved);
 	}
 
@@ -85,7 +86,7 @@ namespace engine
 			textRenderSystem->Update(cam);
 			primitiveRenderSystem->Update(cam);
 		}
-		//soundSystem->Update();
+		soundSystem->Update();
 		//Collision system should be after rendering
 		if (enablePhysics)
 			collisionSystem->Update(cam);
