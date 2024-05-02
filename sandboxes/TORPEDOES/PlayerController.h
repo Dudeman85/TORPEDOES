@@ -2,6 +2,7 @@
 #include <bitset>
 
 #include <engine/Application.h>
+#include "Globals.h"
 #include "Resources.h"
 #include "Projectiles.h"
 #include "engine/Input.h"
@@ -531,6 +532,8 @@ void CannonIndicatorUpdate(engine::ecs::Entity entity)
 	indicatorStruct& it = player.shootIndicators.back();
 
 	engine::SpriteRenderer& sprite = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
+	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
+
 	if (!player.reloading || (player.ammo >= player.maxAmmo))
 	{
 		sprite.texture = it.textures[0];
@@ -539,6 +542,8 @@ void CannonIndicatorUpdate(engine::ecs::Entity entity)
 	{
 		sprite.texture = it.textures[1];
 	}
+
+	transform.scale = { camHeight * 0.001f, (camHeight * aspectRatio) * 0.001f, 0};
 }
 
 void HedgehogIndicatorUpdate(engine::ecs::Entity entity)

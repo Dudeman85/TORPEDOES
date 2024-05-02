@@ -1,16 +1,7 @@
 #pragma once
 #include <engine/Tilemap.h>
 #include "PlayerController.h"
-
-//Current height of the camera, width is calculated automatically
-float camHeight = 1.f;
-const float aspectRatio = 16.f / 9.f;
-//Maximum units a player can be from the camera's edge before zooming in
-const float zoomInThreshold = 350;
-//Minimum units a player can be from the camera's edge before zooming out
-const float zoomOutThreshold = 300;
-//Minimum height the camera can have
-const float minHeight = 600;
+#include "Globals.h"
 
 static void UpdateCam(engine::Camera* cam, Tilemap* map)
 {
