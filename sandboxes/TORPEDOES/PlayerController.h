@@ -477,9 +477,18 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 	{
 		//Make sure the submarine is not under a bridge
 		ecs::GetComponent<PolygonCollider>(playerEntity).layer = 0;
-		std::vector<Collision> collisions = ecs::GetSystem<CollisionSystem>()->CheckTilemapCollision(playerEntity);
+		std::vector<Collision> collisions = collisionSystem->CheckTilemapCollision(playerEntity);
+		for (const Collision& c : collisions) 
+		{
+			//If any hits were with a bridge tile, disallow surfacing
+			if (collisionSystem->GetTileCollisionLayer(c.b) == 3) 
+			{
+				ecs::GetComponent<PolygonCollider>(playerEntity).layer = 1;
+				return;
+			}
+		}
 
-
+		//Get rid of the submerged bubbles animation
 		ecs::DestroyEntity(playerComponent.animationEntity);
 		playerComponent.animationEntity = 0;
 
