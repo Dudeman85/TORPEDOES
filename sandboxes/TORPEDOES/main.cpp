@@ -232,13 +232,7 @@ static void LoadLevel3(engine::Camera* cam)
 	//first hairpin
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2860.000000, -425.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2810.000000, -425.000000, 0.300000));
-	/*
-	// middle hook
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2385.000000, -1045.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2385.000000, -1095.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2385.000000, -1150.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2385.000000, -1205.000000, 0.300000));
-	*/
+	
 
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1825.000000, -895.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1880.000000, -825.000000, 0.300000));
@@ -246,12 +240,6 @@ static void LoadLevel3(engine::Camera* cam)
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(985.000000, -315.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1060.000000, -315.000000, 0.300000));
 
-	/*
-	//final corner
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1135.000000, -1645.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1175.000000, -1700.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1260.000000, -1740.000000, 0.300000));
-	*/
 
 	//Make the crowds manually
 	// Start/Finish line crowd
@@ -307,6 +295,58 @@ static void LoadLevel4(engine::Camera* cam)
 
 	// Make all the checkpoints manually
 	CreateCheckpoint(Vector3(15760.000000, -925.000000, 100.000000), Vector3(-12.500000, -90.000000, -87.500000), Vector3(43.0f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
+
+	//Collectibles
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1190.000000, -1325.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1265.000000, -1325.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1355.000000, -1325.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2390.000000, -490.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2485.000000, -515.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2540.000000, -570.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2610.000000, -645.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5055.000000, -730.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(4605.000000, -1695.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(4685.000000, -1695.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(4765.000000, -1695.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(4825.000000, -1695.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5715.000000, -1180.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5715.000000, -1125.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5715.000000, -1070.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5740.000000, -555.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5740.000000, -500.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5740.000000, -435.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(7455.000000, -825.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(7325.000000, -900.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(7155.000000, -965.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8560.000000, -670.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8645.000000, -670.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8720.000000, -670.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8790.000000, -670.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10270.000000, -590.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10240.000000, -465.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10095.000000, -570.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10590.000000, -1505.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10665.000000, -1505.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10745.000000, -1505.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(13615.000000, -265.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(13685.000000, -265.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(13775.000000, -265.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(13870.000000, -265.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(14000.000000, -1305.000000, 0.300000));
+
+	PlayCountdown(Vector3(1434.0f, -1470.0f, 200.0f));
+	PlayerController::lapCount = 1;
 }
 
 //Bind all input events here
@@ -523,7 +563,7 @@ int main()
 			isGamePaused = false;
 			canStartLoadingMap = false;
 			ShipSelectionSystem->isShipSelectionMenuOn = false;
-			LoadLevel3(&cam);
+			LoadLevel4(&cam);		//==================================Level change=================================================================================
 		}
 
 		// if paused or Pause pressed update PauseSystem
