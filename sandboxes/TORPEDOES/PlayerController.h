@@ -122,12 +122,7 @@ void CreateTorpedo(engine::ecs::Entity entity)
 
 	ecs::AddComponent(torpedo, Projectile{ .ownerID = player.id, .speed = speed, .hitType = HitStates::Stop, .hitTime = 0.8 });
 	Projectile& torpedoProjectile = ecs::GetComponent<Projectile>(torpedo);
-<<<<<<< HEAD
-	ecs::AddComponent(torpedo, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(10) });
-=======
-
 	ecs::AddComponent(torpedo, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(15) });
->>>>>>> 910108056a28beac2f0acfaf948d18e348d7b94b
 	ecs::AddComponent(torpedo, Rigidbody{ .velocity = player.forwardDirection * torpedoProjectile.speed });
 	std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
 	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .layer = 4, .visualise = false,  .rotationOverride = std::abs(modelTransform.rotation.y) });
@@ -158,12 +153,7 @@ void CreateShell(engine::ecs::Entity entity)
 
 	ecs::AddComponent(shell, Projectile{ .ownerID = player.id, .speed = speed, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
 	Projectile& shellProjectile = ecs::GetComponent<Projectile>(shell);
-<<<<<<< HEAD
-	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(20) });
-=======
-
 	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(30) });
->>>>>>> 910108056a28beac2f0acfaf948d18e348d7b94b
 	ecs::AddComponent(shell, Rigidbody{ .velocity = player.forwardDirection * shellProjectile.speed });
 	ecs::AddComponent(shell, ModelRenderer{ .model = resources::models[shellProjectile.model = "Weapon_CannonAmmo.obj"] });
 	float shellSize = 0.1;

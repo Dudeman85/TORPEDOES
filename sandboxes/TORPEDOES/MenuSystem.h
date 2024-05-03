@@ -686,13 +686,12 @@ public:
 };
 
 using namespace engine;
-class MainMenuSystem
+namespace MainMenuSystem
 {
 	ecs::Entity splashScreen;
 	ecs::Entity startText;
 	ecs::Entity creditsText;
 
-public:
 	//Make and show the main menu
 	void Load()
 	{
