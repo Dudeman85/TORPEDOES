@@ -6,8 +6,8 @@
 #include "engine/Timing.h"
 #include <functional>
 
-enum GameStates { menuMainState, selectPlayersState, mapSelection, gamePlayState, inGameOptionsState };
-
+enum GameState { menuMainState, selectPlayersState, mapSelection, gamePlayState, inGameOptionsState };
+static GameState gameState = menuMainState;
 static bool canStartLoadingMap;
 static bool isSceneloaded;
 std::unordered_map<int, ShipType> playerShips;
@@ -45,7 +45,8 @@ class LevelSelectionSystem : public engine::ecs::System
 
 	engine::Camera* cam;
 
-public:
+public:	
+
 	engine::ecs::Entity arrowLeft = ecs::NewEntity();
 
 
@@ -137,7 +138,7 @@ public:
 					{
 						mapLevelIndex = 0;
 					}
-					allLevels[mapLevelIndex];
+					
 				}
 				TransformSystem::SetScale(arrowRight, Vector3(0.08f));
 				TimerSystem::ScheduleFunction([this]() {TransformSystem::SetScale(arrowRight, Vector3(0.04f)); }, 0.5);
@@ -157,6 +158,11 @@ public:
 					// Next ship
 					throttleCurrentWaitedTimeDown -= waitTime;;
 				}
+			}
+			if(input::GetNewPress("StartGame"))
+			{
+				LoadThisLevel(mapLevelIndex);
+			
 			}
 		}
 	}
@@ -549,12 +555,15 @@ public:
 			printf("============= GAME STARTING ==========\n");
 
 			// Reached timer end: Load level
-			canStartLoadingMap = true;
+			//canStartLoadingMap = true;
 			startLevelTimer = 0;
 
 			playerShips = selectedShipsAtTheFrame;
 			isShipSelectionMenuOn = false;
 			ToggleMenuPlayerSelection();
+			std::shared_ptr<LevelSelectionSystem> levelSelectionSystem = engine::ecs::GetSystem<LevelSelectionSystem>();
+			levelSelectionSystem->Init();
+			currentGameState = mapSelection;
 		}
 	}
 
