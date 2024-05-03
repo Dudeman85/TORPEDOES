@@ -882,7 +882,7 @@ namespace MainMenuSystem
 		TransformSystem::Scale(startText, Vector3((std::sin(programTime * 4) / 700), (std::sin(programTime * 4) / 3150), 0));
 
 		//If start pressed go to player select
-		if (input::GetNewPress("StartGame"))
+		if (input::GetNewPress("Pause") || input::GetNewPress("StartGame"))
 		{
 			ecs::GetSystem<PlayerSelectSystem>()->Init();
 			ecs::GetSystem<PlayerSelectSystem>()->isShipSelectionMenuOn = true;
@@ -890,7 +890,7 @@ namespace MainMenuSystem
 			Unload();
 		}
 		//If special pressed go to credits
-		if (input::GetNewPress("Boost1"))
+		if (input::GetNewPress("Boost0") || input::GetNewPress("Boost1") || input::GetNewPress("Boost2") || input::GetNewPress("Boost3"))
 		{
 			std::cout << "To credits\n";
 		}
