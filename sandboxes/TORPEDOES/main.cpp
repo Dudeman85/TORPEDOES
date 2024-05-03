@@ -118,21 +118,16 @@ static void LoadLevel1(engine::Camera* cam)
 	CreateCrowd({ 1328, -660, 166 }, resources::crowdAnims1);	// Second row, 2. crowd
 	// ********************
 	// Second crowd
-	CreateCrowd({ 2940, -420, 166 }, resources::crowdAnims1);
+	CreateCrowd({ 2940, -420, 167 }, resources::crowdAnims1);	// First row, 1. crowd
+	CreateCrowd({ 3140, -420, 167 }, resources::crowdAnims1);	// First row, 2. crowd
+	CreateCrowd({ 3200, -420, 167 }, resources::crowdAnims1);	// First row, 3. crowd
+	CreateCrowd({ 2980, -405, 166 }, resources::crowdAnims1);	// Second row, 1. crowd
+	CreateCrowd({ 3175, -405, 166 }, resources::crowdAnims1);	// Second row, 1. crowd
 	// ********************
-
-	/*
-	(2870.000000, -420.000000, 166.000000), (0.000000, 0.000000, 0.000000), (20.000000, 20.000000, 20.000000)
-		(2870.000000, -420.000000, 166.000000), (0.000000, 0.000000, 0.000000), (20.000000, 20.000000, 20.000000)
-		(2870.000000, -420.000000, 166.000000), (0.000000, 0.000000, 0.000000), (20.000000, 20.000000, 20.000000)
-		(2870.000000, -420.000000, 166.000000), (0.000000, 0.000000, 0.000000), (20.000000, 20.000000, 20.000000)
-		(2870.000000, -420.000000, 166.000000), (0.000000, 0.000000, 0.000000), (20.000000, 20.000000, 20.000000)
-		(2870.000000, -420.000000, 166.000000), (0.000000, 0.000000, 0.000000), (20.000000, 20.000000, 20.000000)
-		(3295.000000, -825.000000, 166.000000), (0.000000, 0.000000, 0.000000), (20.000000, 20.000000, 20.000000)
-		(3295.000000, -825.000000, 166.000000), (0.000000, 0.000000, 0.000000), (20.000000, 20.000000, 20.000000)
-		(3295.000000, -825.000000, 166.000000), (0.000000, 0.000000, 0.000000), (20.000000, 20.000000, 20.000000)
-		(3295.000000, -825.000000, 166.000000), (0.000000, 0.000000, 0.000000), (20.000000, 20.000000, 20.000000)
-		*/
+	// Small platform crowd
+	CreateSmallCrowd({ 3265, -805,167 }, resources::crowdAnims2);	// 1. crowd
+	CreateSmallCrowd({ 3325, -790,166 }, resources::crowdAnims2);	// 2. crowd
+	// ********************
 
 	PlayCountdown(Vector3(1225.0f, -320.0f, 0.0f));
 	PlayerController::lapCount = 3;
@@ -648,8 +643,8 @@ int main()
 			isGamePaused = false;
 			canStartLoadingMap = false;
 			playerSelectionSystem->isShipSelectionMenuOn = false;
-			//LoadLevel3(&cam);
-			//gameState = gamePlayState;
+			LoadLevel1(&cam);
+			gameState = gamePlayState;
 		}
 
 
