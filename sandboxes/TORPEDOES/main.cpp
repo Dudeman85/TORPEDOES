@@ -368,39 +368,39 @@ void GameStateLogic(GameStates &currentState, GameStates& previousState, GLFWwin
 		break;
 	}
 }
-void LoadThisLevel(int mapIndex, engine::Camera *cam)
-{
-	mapIndex++;
-
-	switch (mapIndex)
-	{
-	case 1:
-	{
-		//LoadLevel1(cam);
-		break;
-	}
-	case 2:
-	{
-		LoadLevel2(cam);
-		break;
-	}
-	case 3:
-	{
-		LoadLevel3(cam);
-		break;
-	}
-	case 4:
-	{
-		LoadLevel4(cam);
-		break;
-	}
-	default:
-	{
-		std::cout << "NO LEVEL ON THAT INDEX" << mapIndex << std::endl;
-	}
-	break;
-	}
-}
+//void LoadThisLevel(int mapIndex, engine::Camera *cam)
+//{
+//	mapIndex++;
+//
+//	switch (mapIndex)
+//	{
+//	case 1:
+//	{
+//		//LoadLevel1(cam);
+//		break;
+//	}
+//	case 2:
+//	{
+//		LoadLevel2(cam);
+//		break;
+//	}
+//	case 3:
+//	{
+//		LoadLevel3(cam);
+//		break;
+//	}
+//	case 4:
+//	{
+//		LoadLevel4(cam);
+//		break;
+//	}
+//	default:
+//	{
+//		std::cout << "NO LEVEL ON THAT INDEX" << mapIndex << std::endl;
+//	}
+//	break;
+//	}
+//}
 
 int main()
 {
