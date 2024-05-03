@@ -32,7 +32,7 @@ class LevelSelectionSystem : public engine::ecs::System
 	std::function <void(engine::Camera*) > operation;
 	vector < engine::ecs::Entity> entityList;
 
-	vector < std::function <void()>> allLevels;
+
 	float arrowX = 0;
 	float arrowY = 0;
 	engine::ecs::Entity arrowRight = ecs::NewEntity();
@@ -45,7 +45,7 @@ class LevelSelectionSystem : public engine::ecs::System
 	int mapLevelIndex = 0;
 
 	engine::Camera* cam;
-
+	vector<Texture*> mapImages;
 public:	
 
 	engine::ecs::Entity arrowLeft = ecs::NewEntity();
@@ -55,8 +55,11 @@ public:
 	void Init()
 	{
 
-
-
+		mapImages.clear();
+		mapImages.push_back(resources::menuTextures["level1.png"]);
+		mapImages.push_back(resources::menuTextures["level2.png"]);
+		mapImages.push_back(resources::menuTextures["level3.png"]);
+		mapImages.push_back(resources::menuTextures["level4.png"]);
 
 		engine::ecs::AddComponent(arrowsPivot, engine::Transform{ .position = Vector3(0, 0.85f, 0), .scale = Vector3(1) });
 
@@ -132,17 +135,20 @@ public:
 				while (throttleCurrentWaitedTimeUp >= waitTime)
 				{
 					// Next ship
-					throttleCurrentWaitedTimeUp -= waitTime;;
+					throttleCurrentWaitedTimeUp -= waitTime;
 
 					mapLevelIndex++;
-					if (mapLevelIndex >= allLevels.size())
+					if (mapLevelIndex >= mapImages.size())
 					{
 						mapLevelIndex = 0;
 					}
 					
 				}
-				TransformSystem::SetScale(arrowRight, Vector3(0.08f));
-				TimerSystem::ScheduleFunction([this]() {TransformSystem::SetScale(arrowRight, Vector3(0.04f)); }, 0.5);
+				ecs::GetComponent<SpriteRenderer>(currentSelectedLevel).texture = mapImages[mapLevelIndex];
+				TransformSystem::SetScale(arrowLeft, Vector3(0.08f));
+				TimerSystem::ScheduleFunction([this]() {TransformSystem::SetScale(arrowLeft, Vector3(0.04f)); }, 0.1);
+				ecs::GetComponent<SpriteRenderer>(currentSelectedLevel).texture = mapImages[mapLevelIndex];
+				std::cout << "\n mapImages[mapLevelIndex]: " << mapImages[mapLevelIndex] << std::endl;
 			}
 			else
 			{
@@ -156,10 +162,22 @@ public:
 
 				while (throttleCurrentWaitedTimeUp >= waitTime)
 				{
+					mapLevelIndex--;
 					// Next ship
-					throttleCurrentWaitedTimeDown -= waitTime;;
+					throttleCurrentWaitedTimeDown -= waitTime;
+					if (mapLevelIndex <=0)
+					{
+						mapLevelIndex = mapImages.size()-1;
+					}
 				}
+				TransformSystem::SetScale(arrowRight, Vector3(0.08f));
+				TimerSystem::ScheduleFunction([this]() {TransformSystem::SetScale(arrowRight, Vector3(0.04f)); }, 0.1);
+				ecs::GetComponent<SpriteRenderer>(currentSelectedLevel).texture = mapImages[mapLevelIndex];
+				std::cout << "\nDOWN mapImages[mapLevelIndex]: " << mapImages[mapLevelIndex] << std::endl;
 			}
+			
+			
+
 			if(input::GetNewPress("StartGame"))
 			{
 				LoadThisLevel(mapLevelIndex);
@@ -564,7 +582,7 @@ public:
 			ToggleMenuPlayerSelection();
 			std::shared_ptr<LevelSelectionSystem> levelSelectionSystem = engine::ecs::GetSystem<LevelSelectionSystem>();
 			levelSelectionSystem->Init();
-			currentGameState = mapSelection;
+			gameState = mapSelection;
 		}
 	}
 
@@ -813,6 +831,7 @@ namespace MainMenuSystem
 	void Load()
 	{
 		active = true;
+		gameState = menuMainState;
 
 		splashScreen = ecs::NewEntity();
 		ecs::AddComponent(splashScreen, Transform{ .position = {0, 0, -0.5}, .scale = {1, 1, 0} });
@@ -848,6 +867,7 @@ namespace MainMenuSystem
 		{
 			ecs::GetSystem<PlayerSelectSystem>()->Init();
 			ecs::GetSystem<PlayerSelectSystem>()->isShipSelectionMenuOn = true;
+			gameState = selectPlayersState;
 			Unload();
 		}
 		//If special pressed go to credits
