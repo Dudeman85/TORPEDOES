@@ -111,22 +111,23 @@ static void LoadLevel1(engine::Camera* cam)
 
 	//Make the crowds manually
 	// Start/Finish line crowd
-	CreateCrowd({ 1090, -670, 167 }, resources::crowdAnims1);	// First row, 1. crowd
-	CreateCrowd({ 1285, -670, 167 }, resources::crowdAnims1);	// First row, 2. crowd
-	CreateCrowd({ 1418, -670, 167 }, resources::crowdAnims1);	// First row 3. crowd
-	CreateCrowd({ 1128, -660, 166 }, resources::crowdAnims1);	// Second row, 1. crowd
-	CreateCrowd({ 1328, -660, 166 }, resources::crowdAnims1);	// Second row, 2. crowd
+	CreateCrowd({ 1090, -665, 167 }, resources::crowdAnims1);	// First row, 1. crowd
+	CreateCrowd({ 1285, -665, 167 }, resources::crowdAnims1);	// First row, 2. crowd
+	CreateCrowd({ 1418, -665, 167 }, resources::crowdAnims1);	// First row 3. crowd
+	CreateCrowd({ 1128, -655, 166 }, resources::crowdAnims1);	// Second row, 1. crowd
+	CreateCrowd({ 1328, -655, 166 }, resources::crowdAnims1);	// Second row, 2. crowd
 	// ********************
 	// Second crowd
-	CreateCrowd({ 2940, -420, 167 }, resources::crowdAnims1);	// First row, 1. crowd
-	CreateCrowd({ 3140, -420, 167 }, resources::crowdAnims1);	// First row, 2. crowd
-	CreateCrowd({ 3200, -420, 167 }, resources::crowdAnims1);	// First row, 3. crowd
-	CreateCrowd({ 2980, -405, 166 }, resources::crowdAnims1);	// Second row, 1. crowd
-	CreateCrowd({ 3175, -405, 166 }, resources::crowdAnims1);	// Second row, 1. crowd
+	CreateCrowd({ 2940, -410, 167 }, resources::crowdAnims1);	// First row, 1. crowd
+	CreateCrowd({ 3140, -410, 167 }, resources::crowdAnims1);	// First row, 2. crowd
+	CreateCrowd({ 3200, -410, 167 }, resources::crowdAnims1);	// First row, 3. crowd
+	CreateCrowd({ 2980, -400, 166 }, resources::crowdAnims1);	// Second row, 1. crowd
+	CreateCrowd({ 3175, -400, 166 }, resources::crowdAnims1);	// Second row, 1. crowd
 	// ********************
 	// Small platform crowd
-	CreateSmallCrowd({ 3265, -805,167 }, resources::crowdAnims2);	// 1. crowd
-	CreateSmallCrowd({ 3325, -790,166 }, resources::crowdAnims2);	// 2. crowd
+	CreateSmallCrowd({ 3265, -795,167 }, resources::crowdAnims2);	// 1. crowd
+	CreateSmallCrowd({ 3325, -780,166 }, resources::crowdAnims2);	// 2. crowd
+	CreateSmallCrowd({ 3290, -790,166.5 }, resources::crowdAnims2);	// 3. crowd
 	// ********************
 
 	PlayCountdown(Vector3(1225.0f, -320.0f, 0.0f));
