@@ -39,7 +39,9 @@ public:
 	///Sets the absolute direction the sound is coming from headphone's perspective, distance lowers volume
 	void setAbsoluteDirection(Vector3 Location);	
 	///Gets the absolute direction the sound is coming from headphone's perspective, distance lowers volume
-	const Vector3 getAbsoluteDirection();					
+	const Vector3 getAbsoluteDirection();	
+	//
+	void setPitch(float factor);
 
 private:
 	AudioEngine* owner;								// AudioEngine which owns this audio TODO: Remove
@@ -59,6 +61,7 @@ public:
 	void setAmbientVolume(float newVolume);
 	///Gets the ambient volume
 	const float getAmbientVolume();
+
 	///miniaudio engine
 	ma_engine soundEngine;
 
