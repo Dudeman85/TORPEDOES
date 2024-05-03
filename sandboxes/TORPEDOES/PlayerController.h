@@ -14,6 +14,8 @@ using namespace engine;
 
 enum ShipType { torpedoBoat, submarine, cannonBoat, hedgehogBoat, pirateShip };
 
+static void ReturnToMainMenu();
+
 struct indicatorStruct
 {
 	engine::ecs::Entity entity;
@@ -731,14 +733,9 @@ class PlayerController : public engine::ecs::System
 public:
 	float countdownTimer = 0;
 	static int lapCount; // How many laps to race through
+
 	void Init()
 	{
-		//Create the entity to be shown at a win
-		winScreen = engine::ecs::NewEntity();
-		engine::ecs::AddComponent(winScreen, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.5, 2, 1), .scale = Vector3(0.03f), .color = Vector3(1.f, 1.f, 1.f), .uiElement = true });
-		engine::ecs::AddComponent(winScreen, engine::SpriteRenderer{ .texture = resources::uiTextures["winner.png"], .enabled = false, .uiElement = true });
-		engine::ecs::AddComponent(winScreen, engine::Transform{ .position = Vector3(0, 0, 0.5f), .scale = Vector3(0.3f) });
-
 		//Initialize each ship type's stats
 		shipComponents.insert(
 			{
@@ -792,6 +789,15 @@ public:
 		shipModels.insert({ ShipType::hedgehogBoat, resources::models["Ship_HMCS_Sackville_Hedgehog.obj"] });
 	}
 
+	static void MakeWinEntity() 
+	{
+		//Create the entity to be shown at a win
+		winScreen = engine::ecs::NewEntity();
+		engine::ecs::AddComponent(winScreen, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.5, 2, 1), .scale = Vector3(0.03f), .color = Vector3(1.f, 1.f, 1.f), .uiElement = true });
+		engine::ecs::AddComponent(winScreen, engine::SpriteRenderer{ .texture = resources::uiTextures["winner.png"], .enabled = false, .uiElement = true });
+		engine::ecs::AddComponent(winScreen, engine::Transform{ .position = Vector3(0, 0, 0.5f), .scale = Vector3(0.3f) });
+	}
+
 	//Get the min and max bounds of every player
 	std::array<float, 4> GetPlayerBounds()
 	{
@@ -840,9 +846,12 @@ public:
 						if (!hasWon)
 						{
 							//Display the win screen
-							hasWon = true;
+							hasWon = true; 
+							MakeWinEntity();
 							engine::ecs::GetComponent<engine::TextRenderer>(winScreen).text = "Player " + std::to_string(player.id + 1);
 							engine::ecs::GetComponent<engine::SpriteRenderer>(winScreen).enabled = true;
+
+							TimerSystem::ScheduleFunction(ReturnToMainMenu, 10);
 						}
 					}
 					else
@@ -1166,6 +1175,7 @@ public:
 	//Spawn 1-4 players, all in a line from top to bottom
 	void CreatePlayers(std::unordered_map<int, ShipType> playerShips, Vector2 startPos)
 	{
+		hasWon = false;
 		Vector2 offset(0, 60);
 		for (const auto& playerShip : playerShips)
 		{
