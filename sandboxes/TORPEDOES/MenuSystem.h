@@ -804,6 +804,7 @@ namespace MainMenuSystem
 	void Load()
 	{
 		active = true;
+		gameState = menuMainState;
 
 		splashScreen = ecs::NewEntity();
 		ecs::AddComponent(splashScreen, Transform{ .position = {0, 0, -0.5}, .scale = {1, 1, 0} });
@@ -839,6 +840,7 @@ namespace MainMenuSystem
 		{
 			ecs::GetSystem<PlayerSelectSystem>()->Init();
 			ecs::GetSystem<PlayerSelectSystem>()->isShipSelectionMenuOn = true;
+			gameState = selectPlayersState;
 			Unload();
 		}
 		//If special pressed go to credits
