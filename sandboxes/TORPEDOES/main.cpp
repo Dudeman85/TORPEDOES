@@ -95,9 +95,6 @@ static void LoadLevel1(engine::Camera* cam)
 	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1145.000000, 0.300000));
 	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1230.000000, 0.300000));
 
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2170.000000, -1190.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1085.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2270.000000, -1150.000000, 0.300000));
 
 	//center slalom
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3270.000000, -1125.000000, 0.300000));
@@ -252,13 +249,7 @@ static void LoadLevel3(engine::Camera* cam)
 	//first hairpin
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2860.000000, -425.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2810.000000, -425.000000, 0.300000));
-	/*
-	// middle hook
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2385.000000, -1045.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2385.000000, -1095.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2385.000000, -1150.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2385.000000, -1205.000000, 0.300000));
-	*/
+	
 
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1825.000000, -895.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1880.000000, -825.000000, 0.300000));
@@ -266,12 +257,6 @@ static void LoadLevel3(engine::Camera* cam)
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(985.000000, -315.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1060.000000, -315.000000, 0.300000));
 
-	/*
-	//final corner
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1135.000000, -1645.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1175.000000, -1700.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1260.000000, -1740.000000, 0.300000));
-	*/
 
 	//Make the crowds manually
 	// Start/Finish line crowd
@@ -334,12 +319,64 @@ static void LoadLevel4(engine::Camera* cam)
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1434.0f, -1520.0f));
 
 	//set this level's tilemap
-	engine::spriteRenderSystem->SetTilemap(resources::level4Map);
-	engine::collisionSystem->SetTilemap(resources::level4Map);
+	engine::spriteRenderSystem->SetTilemap(resources::level3Map);
+	engine::collisionSystem->SetTilemap(resources::level3Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
 	// Make all the checkpoints manually
 	CreateCheckpoint(Vector3(15760.000000, -925.000000, 100.000000), Vector3(-12.500000, -90.000000, -87.500000), Vector3(43.0f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
+
+	//Collectibles
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1190.000000, -1325.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1265.000000, -1325.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1355.000000, -1325.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2390.000000, -490.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2485.000000, -515.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2540.000000, -570.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2610.000000, -645.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5055.000000, -730.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(4605.000000, -1695.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(4685.000000, -1695.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(4765.000000, -1695.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(4825.000000, -1695.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5715.000000, -1180.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5715.000000, -1125.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5715.000000, -1070.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5740.000000, -555.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5740.000000, -500.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5740.000000, -435.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(7455.000000, -825.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(7325.000000, -900.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(7155.000000, -965.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8560.000000, -670.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8645.000000, -670.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8720.000000, -670.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8790.000000, -670.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10270.000000, -590.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10240.000000, -465.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10095.000000, -570.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10590.000000, -1505.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10665.000000, -1505.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10745.000000, -1505.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(13615.000000, -265.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(13685.000000, -265.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(13775.000000, -265.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(13870.000000, -265.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(14000.000000, -1305.000000, 0.300000));
+
+	PlayCountdown(Vector3(1434.0f, -1470.0f, 200.0f));
+	PlayerController::lapCount = 1;
 }
 
 //Bind all input events here
@@ -350,6 +387,11 @@ static void SetupInput()
 	input::bindDigitalInput(GLFW_KEY_U, { "Menu" });
 	input::ConstructDigitalEvent("StartGame");
 	input::bindDigitalInput(GLFW_KEY_G, { "StartGame" });
+
+	input::bindDigitalInput(GLFW_GAMEPAD_BUTTON_DPAD_LEFT, { "Turn" });
+
+
+
 	// TODO: add controller pause key
 
 	float AnalogPositiveMinDeadZone = 0;
@@ -357,6 +399,9 @@ static void SetupInput()
 
 	float AnalogNegativeMinDeadZone = -0.2;
 	float AnalogNegativeMaxDeadZone = 0;
+
+
+
 
 	for (size_t i = 0; i < 4; i++)
 	{
@@ -399,6 +444,7 @@ static void SetupInput()
 	// Keyboard input
 	int KeyboardPlayer = 3;
 
+
 	input::bindAnalogInput(GLFW_KEY_RIGHT, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
 	input::bindAnalogInput(GLFW_KEY_LEFT, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
 
@@ -424,8 +470,9 @@ static void PlayersMenu(std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem)
 
 	std::cout << "is Ship selection open:" << ShipSelectionSystem->isShipSelectionMenuOn;
 }
+
 //Delete all entities and load menu
-static void ReturnToMainMenu() 
+static void ReturnToMainMenu()
 {
 	ecs::DestroyAllEntities();
 
@@ -439,7 +486,6 @@ static void ReturnToMainMenu()
 
 int main()
 {
-	GameStates currentGameState = menuMainState;
 	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window", false);
 
 	engine::EngineInit();
@@ -469,7 +515,9 @@ int main()
 	soundSystem->AddSoundEngine("Background");
 	soundSystem->AddSoundEngine("Music");
 
-	std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem = engine::ecs::GetSystem<PlayerSelectSystem>();
+	std::shared_ptr<LevelSelectionSystem> levelSelectionSystem = engine::ecs::GetSystem<LevelSelectionSystem>();
+
+	std::shared_ptr<PlayerSelectSystem> playerSelectionSystem = engine::ecs::GetSystem<PlayerSelectSystem>();
 	/*
 	ShipSelectionSystem->Init();
 	ShipSelectionSystem->isShipSelectionMenuOn = true;
@@ -561,26 +609,47 @@ int main()
 
 		input::update();
 
-		if (!isGamePaused)
+		//Handle updating of proper systems
+		switch (gameState)
 		{
+		case menuMainState:
+			MainMenuSystem::Update();
+			break;
+		case mapSelection:
+			levelSelectionSystem->Update();
+			break;
+		case inGameOptionsState:
+			pauseSystem->Update();
+			break;
+		case selectPlayersState:
+			engine::modelRenderSystem->SetLight(Vector3(0, 0, -200), 255);
+			playerSelectionSystem->Update();
+			break;
+		case gamePlayState:
 			UpdateCam(&cam, collisionSystem->tilemap);
 			playerController->Update(window);
 			submarineSystem->Update();
 			hedgehogSystem->Update();
 			pickupSystem->Update();
+			break;
+		default:
+			std::cout << "\n ERROR NO STATE FOUND:" << gameState << std::endl;
+			break;
 		}
 
+		//Update engine systems
 		engine::Update(&cam);
 
-		MainMenuSystem::Update();
 
 		if (canStartLoadingMap)
 		{
 			isGamePaused = false;
 			canStartLoadingMap = false;
-			ShipSelectionSystem->isShipSelectionMenuOn = false;
-			LoadLevel1(&cam);
+			playerSelectionSystem->isShipSelectionMenuOn = false;
+			LoadLevel3(&cam);
+			gameState = gamePlayState;
 		}
+
 
 		// if paused or Pause pressed update PauseSystem
 		if (input::GetNewPress("Pause"))
@@ -597,22 +666,18 @@ int main()
 			pauseSystem->Update();
 		}
 
+
+
 		if (input::GetNewPress("Menu"))
 		{
-			ShipSelectionSystem->isShipSelectionMenuOn = !ShipSelectionSystem->isShipSelectionMenuOn;
+			playerSelectionSystem->isShipSelectionMenuOn = !playerSelectionSystem->isShipSelectionMenuOn;
 			isGamePaused = !isGamePaused;
 
 
-			ShipSelectionSystem->ToggleMenuPlayerSelection();
+			playerSelectionSystem->ToggleMenuPlayerSelection();
 
 
-			std::cout << "is Ship selection open:" << ShipSelectionSystem->isShipSelectionMenuOn;
-		}
-		if (ShipSelectionSystem->isShipSelectionMenuOn)
-		{
-			engine::modelRenderSystem->SetLight(Vector3(0, 0, -200), 255);
-			//printf("\nShipSelectionSystem->Update()\n");
-			ShipSelectionSystem->Update();
+			std::cout << "is Ship selection open:" << playerSelectionSystem->isShipSelectionMenuOn;
 		}
 
 		ecs::Update();

@@ -6,77 +6,164 @@
 #include "engine/Timing.h"
 #include <functional>
 
-enum GameStates { menuMainState, selectPlayersState, mapSelection, gamePlayState, inGameOptionsState };
+enum GameState { menuMainState, selectPlayersState, mapSelection, gamePlayState, inGameOptionsState };
+static GameState gameState = menuMainState;
 
 static bool canStartLoadingMap;
 static bool isSceneloaded;
 std::unordered_map<int, ShipType> playerShips;
+static void LoadLevel4(engine::Camera* cam);
+static void LoadLevel3(engine::Camera* cam);
+static void LoadLevel2(engine::Camera* cam);
+ECS_REGISTER_COMPONENT(Level)
+struct Level
+{
+	engine::ecs::Entity upper;
+	engine::ecs::Entity lower;
+	std::function <void() > operation;
+	vector<std::string> text;
+};
+ECS_REGISTER_SYSTEM(LevelSelectionSystem, Level)
+class LevelSelectionSystem : public engine::ecs::System
+{
+
+	std::function<void()> selectedLevel;
+	vector <  std::function <void(engine::Camera*)>> allLevelsAndFunc;
+	std::function <void(engine::Camera*) > operation;
+	vector < engine::ecs::Entity> entityList;
+
+	vector < std::function <void()>> allLevels;
+	float arrowX = 0;
+	float arrowY = 0;
+	engine::ecs::Entity arrowRight = ecs::NewEntity();
+	engine::ecs::Entity levelSelectionBackground = ecs::NewEntity();
+	engine::ecs::Entity currentSelectedLevel = ecs::NewEntity();
+	engine::ecs::Entity arrowsPivot = ecs::NewEntity();
+	float throttleCurrentWaitedTimeUp = 0;
+	float throttleCurrentWaitedTimeDown = 0;
+	float waitTime = 1.2f;
+	int mapLevelIndex = 0;
+
+	engine::Camera* cam;
+
+public:
+	engine::ecs::Entity arrowLeft = ecs::NewEntity();
 
 
-//ECS_REGISTER_COMPONENT(Level)
-//struct Level
-//{
-//	engine::ecs::Entity upper;
-//	engine::ecs::Entity lower;
-//	vector<std::string> text;
-//};
-//ECS_REGISTER_SYSTEM(LevelSelectionSystem, Level)
-//class LevelSelectionSystem : public engine::ecs::System
-//{
-//
-//	std::function<void()> selectedLevel;
-//	vector <  std::function <void()>> allLevelsAndFunc;
-//	std::function <void() > operation;
-//	vector < engine::ecs::Entity> ;
-//
-//	vector < std::function <void()>> allLevels;
-//
-//	void Init() 
-//	{
-//		engine::ecs::AddComponent(level1, Level{ .upper = pausedImage, .lower = optionsButton, .selectedTexture = resources::menuTextures["UI_Paused.png"], .unselectedTexture = resources::menuTextures["UI_Paused.png"], .operation = PauseSystem::OnResumePressed });
-//
-//	}
-//	void update() 
-//	{
-//
-//	}
-//
-//	void Addlevels()
-//	{
-//		int i = 0;
-//		engine::ecs::Entity previousLevel;
-//		engine::ecs::Entity nextLevel;
-//		for (int level = 0; level < allLevelsAndFunc.size(); level++)
-//		{
-//			if (level == 0) {
-//				previousLevel = allLevels.size() - 1;
-//				nextLevel = 2;
-//			}
-//			if (level == allLevels.size() - 1)
-//			{
-//			    
-//			}
-//			else 
-//			{
-//				previousLevel++;
-//				nextLevel ++;
-//			}   
-//			/*text.push_back("level" + level);*/
-//			engine::ecs::AddComponent(level, Level{ .upper = previousLevel, .lower = nextLevel, Image,  operation = allLevels[level]});
-//
-//		}
-//		/*for (auto level : allLevels)
-//		{
-//			engine::ecs::AddComponent(level, LevelSelection{ .upper = previousLevel, .lower = nextLevel, .selectedTexture = resources::menuTextures["UI_Paused.png"], .unselectedTexture = resources::menuTextures["UI_Paused.png"], .operation = PauseSystem::OnResumePressed });
-//			i++;
-//		}
-//		switch (switch_on)
-//		{
-//		default:
-//			break;
-//		}*/
-//	}
-//};
+
+	void Init()
+	{
+
+
+
+
+		engine::ecs::AddComponent(arrowsPivot, engine::Transform{ .position = Vector3(0, 0.85f, 0), .scale = Vector3(1) });
+
+
+		engine::ecs::AddComponent(levelSelectionBackground, engine::Transform{ .position = Vector3(0, 0, -0.5f), .scale = Vector3(1) });
+		engine::ecs::AddComponent(levelSelectionBackground, SpriteRenderer{ .texture = resources::menuTextures["Selection_BG_Var3.png"], .enabled = true,.uiElement = true });
+
+
+
+		engine::ecs::AddComponent(currentSelectedLevel, engine::Transform{ .position = Vector3(0, 0, -0.5f), .scale = Vector3(0.8f) });
+		engine::ecs::AddComponent(currentSelectedLevel, SpriteRenderer{ .texture = resources::menuTextures["UI_Title_Background_1.png"], .enabled = true,.uiElement = true });
+
+
+		engine::ecs::AddComponent(arrowLeft, engine::Transform{ .position = Vector3(arrowX + 0.2f, arrowY, -0.1f), .rotation = Vector3(0, 0, 180), .scale = Vector3(0.04f) });
+		engine::ecs::AddComponent(arrowLeft, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"], .enabled = true, .uiElement = true });
+		engine::ecs::AddComponent(arrowLeft, engine::TextRenderer{ .font = resources::niagaraFont, .text = "<  ", .scale = Vector2(4,4), .color = Vector3(255,0,0),.uiElement = true });
+
+		engine::ecs::AddComponent(arrowRight, engine::Transform{ .position = Vector3(arrowX - 0.2f, arrowY, -0.1f), .rotation = Vector3(0, 0, 0), .scale = Vector3(0.04f) });
+		engine::ecs::AddComponent(arrowRight, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"], .enabled = true, .uiElement = true });
+		engine::ecs::AddComponent(arrowRight, engine::TextRenderer{ .font = resources::niagaraFont, .text = "  >", .scale = Vector2(4,4), .color = Vector3(255,0,0),.uiElement = true });
+
+		engine::TransformSystem::AddParent(arrowRight, arrowsPivot);
+		engine::TransformSystem::AddParent(arrowLeft, arrowsPivot);
+
+	}
+	void LoadThisLevel(int mapIndex)
+	{
+		mapIndex++;
+
+		switch (mapIndex)
+		{
+		case 1:
+		{
+			//LoadLevel1(cam);
+			break;
+		}
+		case 2:
+		{
+			LoadLevel2(cam);
+			break;
+		}
+		case 3:
+		{
+			LoadLevel3(cam);
+			break;
+		}
+		case 4:
+		{
+			LoadLevel4(cam);
+			break;
+		}
+		default:
+		{
+			std::cout << "NO LEVEL ON THAT INDEX" << mapIndex << std::endl;
+		}
+		break;
+		}
+	}
+	void Update()
+	{
+
+		for (int i = 0; i < 4; i++) {
+
+
+			float turnInput = input::GetTotalInputValue("Turn" + to_string(i));
+
+			std::cout << "turnInput:" << turnInput << endl;
+			if (turnInput > 0)
+			{
+				// Throttle up
+				throttleCurrentWaitedTimeUp += engine::deltaTime;
+
+				while (throttleCurrentWaitedTimeUp >= waitTime)
+				{
+					// Next ship
+					throttleCurrentWaitedTimeUp -= waitTime;;
+
+					mapLevelIndex++;
+					if (mapLevelIndex >= allLevels.size())
+					{
+						mapLevelIndex = 0;
+					}
+					allLevels[mapLevelIndex];
+				}
+				TransformSystem::SetScale(arrowRight, Vector3(0.08f));
+				TimerSystem::ScheduleFunction([this]() {TransformSystem::SetScale(arrowRight, Vector3(0.04f)); }, 0.5);
+			}
+			else
+			{
+				// No throttle input up
+				throttleCurrentWaitedTimeUp = 0;
+			}
+			if (turnInput < 0)
+			{
+				// Throttle up
+				throttleCurrentWaitedTimeDown += engine::deltaTime;
+
+				while (throttleCurrentWaitedTimeUp >= waitTime)
+				{
+					// Next ship
+					throttleCurrentWaitedTimeDown -= waitTime;;
+				}
+			}
+		}
+	}
+};
+
+
 
 ECS_REGISTER_COMPONENT(PlayerSelection)
 struct PlayerSelection
@@ -422,7 +509,7 @@ public:
 		engine::ecs::AddComponent(controlScheme, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Controls.png"], .uiElement = true });
 	}
 
-	void StartGameTest()
+	void StartGame()
 	{
 		if (selectedShipsAtTheFrame.size() != 0 && selectedShipsAtTheFrame.size() == playersThatAreReadyAmount)
 		{
@@ -460,11 +547,12 @@ public:
 
 		if (startLevelTimer >= (startLevelTime + startLevelLoadingTime) || input::GetNewPress("StartGame"))
 		{
+			printf("============= GAME STARTING ==========\n");
+
 			// Reached timer end: Load level
 			canStartLoadingMap = true;
 			startLevelTimer = 0;
 
-			printf("============= GAME STARTING ==========\n");
 			playerShips = selectedShipsAtTheFrame;
 			isShipSelectionMenuOn = false;
 			ToggleMenuPlayerSelection();
@@ -508,7 +596,7 @@ public:
 				}
 				else
 				{
-					playerReadyText == "Not Ready" ? "Ready" : "Not Ready";
+					playerReadyText = playerReadyText == "Not Ready" ? "Ready" : "Not Ready";
 					playerSelection.ready = !playerSelection.ready;
 
 					//Select correct player in selectedShipsAtTheFrame and set shipType be playerID in index 
@@ -630,7 +718,7 @@ public:
 			//std::cout << "\n" << "isArrowBig: " << playerSelection.isArrowBig << "time:" << playerSelection.timeArrowBigTime << "\n";
 		}
 
-		StartGameTest();
+		StartGame();
 	}
 
 	void ToggleMenuPlayerSelection()
@@ -716,18 +804,19 @@ namespace MainMenuSystem
 	void Load()
 	{
 		active = true;
+		gameState = menuMainState;
 
 		splashScreen = ecs::NewEntity();
 		ecs::AddComponent(splashScreen, Transform{ .position = {0, 0, -0.5}, .scale = {1, 1, 0} });
 		ecs::AddComponent(splashScreen, SpriteRenderer{ .texture = resources::menuTextures["UI_Title_Background_1.png"], .uiElement = true });
 
-		//resources::menuTextures["UI_PressStart.png"]->SetScalingFilter(GL_LINEAR);
+		resources::menuTextures["UI_PressStart.png"]->SetScalingFilter(GL_LINEAR);
 		startText = ecs::NewEntity();
 		ecs::AddComponent(startText, Transform{ .position = {-0.5, 0.2, -0.1}, .rotation = {0, 0, 15}, .scale = {.45, .1, 0} });
 		ecs::AddComponent(startText, SpriteRenderer{ .texture = resources::menuTextures["UI_PressStart.png"], .uiElement = true });
 
 		creditsText = ecs::NewEntity();
-		ecs::AddComponent(creditsText, Transform{ .position = {0.65, -0.8, -0.1}, .scale = {0.36, 0.07, 0} });
+		ecs::AddComponent(creditsText, Transform{ .position = {0.65, -0.8, -0.1}, .scale = {0.30, 0.06, 0} });
 		ecs::AddComponent(creditsText, SpriteRenderer{ .texture = resources::menuTextures["UI_PressCredits.png"], .uiElement = true });
 	}
 	//Destroy the main menu
@@ -751,6 +840,7 @@ namespace MainMenuSystem
 		{
 			ecs::GetSystem<PlayerSelectSystem>()->Init();
 			ecs::GetSystem<PlayerSelectSystem>()->isShipSelectionMenuOn = true;
+			gameState = selectPlayersState;
 			Unload();
 		}
 		//If special pressed go to credits
