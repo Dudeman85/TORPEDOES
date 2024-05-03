@@ -20,41 +20,45 @@ class PlayerSelectSystem;
 ECS_REGISTER_COMPONENT(Level)
 struct Level
 {
-	engine::ecs::Entity upper;
-	engine::ecs::Entity lower;
-	std::function <void() > operation;
-	vector<std::string> text;
+	//ALEKSI MITEN POISTETAAN TÄÄ REGISTERI COMPONETTI NIIN ETTÄ TÄÄ EI HAJOA
+	
+	//engine::ecs::Entity upper;
+	//engine::ecs::Entity lower;
+	//std::function <void() > operation;
+	//vector<std::string> text;
 };
 ECS_REGISTER_SYSTEM(LevelSelectionSystem, Level)
 class LevelSelectionSystem : public engine::ecs::System
 {
-
-	std::function<void()> selectedLevel;
-	vector <  std::function <void(engine::Camera*)>> allLevelsAndFunc;
-	std::function <void(engine::Camera*) > operation;
 	vector < engine::ecs::Entity> entityList;
 
-
-	float arrowX = 0;
-	float arrowY = 0;
 	engine::ecs::Entity arrowRight = ecs::NewEntity();
 	engine::ecs::Entity levelSelectionBackground = ecs::NewEntity();
 	engine::ecs::Entity currentSelectedLevel = ecs::NewEntity();
 	engine::ecs::Entity arrowsPivot = ecs::NewEntity();
-	float throttleCurrentWaitedTimeUp = 0;
-	float throttleCurrentWaitedTimeDown = 0;
-	
+	engine::ecs::Entity mapName = ecs::NewEntity();
+	engine::ecs::Entity mapSelectText = ecs::NewEntity();
+
+
 	int mapLevelIndex = 0;
 
+	//REFERENCE TO CAMRA TO CALL LEVEL METHOD 
 	engine::Camera* cam;
+
 	vector<Texture*> mapImages;
 
-	double mapChangeTime = 0.5;
-	
+	//DELAY TO CALL INPUT ACTION AGAIN
+	double mapChangeTime = 0.42;
 	bool readyToMoveLeft = true;
 	bool readyToMoveRight = true;
-	bool callDeleyLeft = true;
-	bool callDeleyRight = true;
+
+	//COLORS
+	Vector3 playTextColor = Vector3(255, 205, 0);
+	Vector3 mapTextColor = Vector3(255, 255, 255);
+
+	//ARROWS PLACEMENT
+	float arrowPosHight = 0.88f;
+	float arrowsOffsetX = 0.6f;
 public:
 
 	engine::ecs::Entity arrowLeft = ecs::NewEntity();
@@ -70,8 +74,12 @@ public:
 		mapImages.push_back(resources::menuTextures["level3.png"]);
 		mapImages.push_back(resources::menuTextures["level4.png"]);
 
-		engine::ecs::AddComponent(arrowsPivot, engine::Transform{ .position = Vector3(0, 0.85f, 0), .scale = Vector3(1) });
+		engine::ecs::AddComponent(arrowsPivot, engine::Transform{ .position = Vector3(0, arrowPosHight, 0), .scale = Vector3(1) });
+		engine::ecs::AddComponent(mapName, engine::Transform{ .position = Vector3(0, 0.83f, 0.95), .scale = Vector3(1) });
+		engine::ecs::AddComponent(mapName, engine::TextRenderer{.font=resources::niagaraFont,.text="Level: 1",.offset = Vector3(-0.12f,0,0),.scale = Vector3(0.003f),.color = mapTextColor,.uiElement = true });
 
+		engine::ecs::AddComponent(mapSelectText, engine::Transform{ .position = Vector3(0,  -0.94f, 0.95), .scale = Vector3(1) });
+		engine::ecs::AddComponent(mapSelectText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "Press BOOST {B} to play",.offset = Vector3(-0.39f,0,0), .scale = Vector3(0.003f),.color = playTextColor,.uiElement = true});
 
 		engine::ecs::AddComponent(levelSelectionBackground, engine::Transform{ .position = Vector3(0, 0, -0.5f), .scale = Vector3(1) });
 		engine::ecs::AddComponent(levelSelectionBackground, SpriteRenderer{ .texture = resources::menuTextures["Selection_BG_Var3.png"], .enabled = true,.uiElement = true });
@@ -79,20 +87,21 @@ public:
 
 
 		engine::ecs::AddComponent(currentSelectedLevel, engine::Transform{ .position = Vector3(0, 0, -0.5f), .scale = Vector3(0.8f) });
-		engine::ecs::AddComponent(currentSelectedLevel, SpriteRenderer{ .texture = resources::menuTextures["UI_Title_Background_1.png"], .enabled = true,.uiElement = true });
+		engine::ecs::AddComponent(currentSelectedLevel, SpriteRenderer{ .texture = resources::menuTextures["level1.png"], .enabled = true,.uiElement = true });
 
 
-		engine::ecs::AddComponent(arrowLeft, engine::Transform{ .position = Vector3(arrowX + 0.2f, arrowY, -0.1f), .rotation = Vector3(0, 0, 180), .scale = Vector3(0.04f) });
+		engine::ecs::AddComponent(arrowLeft, engine::Transform{ .position = Vector3(arrowsOffsetX, 0, -0.1f), .rotation = Vector3(0, 0, 180), .scale = Vector3(0.04f) });
 		engine::ecs::AddComponent(arrowLeft, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"], .enabled = true, .uiElement = true });
-		engine::ecs::AddComponent(arrowLeft, engine::TextRenderer{ .font = resources::niagaraFont, .text = "<  ", .scale = Vector2(4,4), .color = Vector3(255,0,0),.uiElement = true });
+	//	engine::ecs::AddComponent(arrowLeft, engine::TextRenderer{ .font = resources::niagaraFont, .text = "<  ", .scale = Vector2(0.004f), .color = Vector3(255,0,0.99),.uiElement = true });
 
-		engine::ecs::AddComponent(arrowRight, engine::Transform{ .position = Vector3(arrowX - 0.2f, arrowY, -0.1f), .rotation = Vector3(0, 0, 0), .scale = Vector3(0.04f) });
+		engine::ecs::AddComponent(arrowRight, engine::Transform{ .position = Vector3(-arrowsOffsetX, 0, -0.1f), .rotation = Vector3(0, 0, 0), .scale = Vector3(0.04f) });
 		engine::ecs::AddComponent(arrowRight, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"], .enabled = true, .uiElement = true });
-		engine::ecs::AddComponent(arrowRight, engine::TextRenderer{ .font = resources::niagaraFont, .text = "  >", .scale = Vector2(4,4), .color = Vector3(255,0,0),.uiElement = true });
+	//	engine::ecs::AddComponent(arrowRight, engine::TextRenderer{ .font = resources::niagaraFont, .text = "  >", .scale = Vector2(0.01f), .color = Vector3(255,0,0.99),.uiElement = true });
 
 		engine::TransformSystem::AddParent(arrowRight, arrowsPivot);
 		engine::TransformSystem::AddParent(arrowLeft, arrowsPivot);
-
+		/*engine::TransformSystem::AddParent(mapName, arrowsPivot);
+		engine::TransformSystem::AddParent(mapSelectText, arrowsPivot);*/
 	}
 	void LoadThisLevel(int mapIndex)
 	{
@@ -131,11 +140,6 @@ public:
 	{
 
 
-
-
-
-
-
 		float turnInput = input::GetTotalInputValue("Turn" + to_string(firstPlayer));
 
 		
@@ -154,7 +158,10 @@ public:
 			}
 			std::cout << "LevelIndex:" << mapLevelIndex << endl;
 
-			ecs::GetComponent<SpriteRenderer>(currentSelectedLevel).texture = mapImages[mapLevelIndex];
+			//TODO: LEVEL NAME HERE
+			ecs::GetComponent<TextRenderer>(mapName).text = "Level: " + to_string((mapLevelIndex+1));
+
+
 			TransformSystem::SetScale(arrowLeft, Vector3(0.08f));
 			TimerSystem::ScheduleFunction([this]() {TransformSystem::SetScale(arrowLeft, Vector3(0.04f)); }, 0.1);
 			ecs::GetComponent<SpriteRenderer>(currentSelectedLevel).texture = mapImages[mapLevelIndex];
@@ -173,8 +180,12 @@ public:
 			{
 				mapLevelIndex = mapImages.size() - 1;
 			}
-			
 			std::cout << "LevelIndex:" << mapLevelIndex << endl;
+
+
+			//TODO: LEVEL NAME HERE			
+			ecs::GetComponent<TextRenderer>(mapName).text = "Level: "+ to_string((mapLevelIndex+1));
+
 			TransformSystem::SetScale(arrowRight, Vector3(0.08f));
 			TimerSystem::ScheduleFunction([this]() {TransformSystem::SetScale(arrowRight, Vector3(0.04f)); }, 0.1);
 			ecs::GetComponent<SpriteRenderer>(currentSelectedLevel).texture = mapImages[mapLevelIndex];
@@ -183,7 +194,7 @@ public:
 
 
 
-		if (input::GetNewPress("StartGame"))
+		if (input::GetNewPress("Boost"+ std::to_string(firstPlayer) ))
 		{
 			
 			LoadThisLevel(mapLevelIndex);
@@ -239,7 +250,7 @@ class PlayerSelectSystem : public engine::ecs::System
 
 	/* Timer */
 	const float startLevelTime = 4.f;			// Time we are counting seconds
-	const float startLevelLoadingTime = 1.f;	// Time we have "loading" text before we start the level
+	const float startLevelLoadingTime = 0.1f;	// Time we have "loading" text before we start the level
 	float startLevelTimer = 0;					// Timer until we start the level
 
 	const float throttleMoveWaitTime = 0.4f;
@@ -551,7 +562,7 @@ public:
 			if (startLevelTimer > startLevelTime)
 			{
 				// Loading time started
-				result = " ";
+				result = "Ships Are Being Loaded...";
 			}
 			else
 			{
