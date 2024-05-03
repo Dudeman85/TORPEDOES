@@ -51,7 +51,8 @@ static void CreateAnimation(engine::ecs::Entity entity)
 	engine::ecs::Entity torpedoAnim = engine::ecs::NewEntity();
 
 	Audio* audio = engine::AddAudio("Gameplay", "audio/glass-hit.mp3", false, 10000);
-	//audio->pause();
+	
+
 	engine::ecs::AddComponent(torpedoAnim, engine::SoundComponent{ .Sounds = {{"GlassHit" ,audio}} });
 
 	engine::ecs::AddComponent(torpedoAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, ((double)rand() / (double)RAND_MAX) + 2), .scale = Vector3(20) });
@@ -63,7 +64,8 @@ static void CreateAnimation(engine::ecs::Entity entity)
 	engine::AnimationSystem::PlayAnimation(torpedoAnim, "hit", false);
 
 	engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(torpedoAnim);
-	//soundComponent.Sounds["GlassHit"]->play();
+	soundComponent.Sounds["GlassHit"]->play();
+	audio->pause();
 
 };
 
