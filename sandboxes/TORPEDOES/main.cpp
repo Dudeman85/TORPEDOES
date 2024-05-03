@@ -286,8 +286,8 @@ static void LoadLevel4(engine::Camera* cam)
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1434.0f, -1520.0f));
 
 	//set this level's tilemap
-	engine::spriteRenderSystem->SetTilemap(resources::level3Map);
-	engine::collisionSystem->SetTilemap(resources::level3Map);
+	engine::spriteRenderSystem->SetTilemap(resources::level4Map);
+	engine::collisionSystem->SetTilemap(resources::level4Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
 	// Make all the checkpoints manually
@@ -453,7 +453,7 @@ static void ReturnToMainMenu()
 
 int main()
 {
-	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window", false);
+	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window", true);
 
 	engine::EngineInit();
 
@@ -613,7 +613,7 @@ int main()
 			isGamePaused = false;
 			canStartLoadingMap = false;
 			playerSelectionSystem->isShipSelectionMenuOn = false;
-			LoadLevel3(&cam);
+			LoadLevel4(&cam);
 			gameState = gamePlayState;
 		}
 
