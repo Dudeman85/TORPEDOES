@@ -78,7 +78,7 @@ static void LoadLevel1(engine::Camera* cam)
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
 	//Create the players
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1225.0f, -420.0f));
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1225.0f, -400.0f));
 
 	////Make all the checkpoints manually
 	CreateCheckpoint(Vector3(1925.000000, -895.000000, 100.000000), Vector3(27.500000, 27.500000, 10.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 110.f);
@@ -88,12 +88,12 @@ static void LoadLevel1(engine::Camera* cam)
 	CreateCheckpoint(Vector3(1770.000000, -1585.000000, 100.000000), Vector3(50.000000, -62.500000, 0.000000), Vector3(18.5f), resources::models["Prop_Buoy.obj"], 20.f);
 	CreateCheckpoint(Vector3(820.000000, -1610.000000, 100.000000), Vector3(47.500000, -77.500000, -5.000000), Vector3(20.5f), resources::models["Prop_Buoy.obj"], 10.f);
 	CreateCheckpoint(Vector3(545.000000, -900.000000, 100.000000), Vector3(35.000000, -22.500000, 0.000000), Vector3(17.5f), resources::models["Prop_Buoy.obj"], 70.f);
-	CreateCheckpoint(Vector3(1475.000000, -460.000000, 100.000000), Vector3(-25.000000, -90.000000, -90.000000), Vector3(24.f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
+	CreateCheckpoint(Vector3(1475.000000, -460.000000, 70.000000), Vector3(-25.000000, -90.000000, -90.000000), Vector3(24.f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
 
 	//crossroad
-	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1075.000000, 0.300000));
-	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1145.000000, 0.300000));
-	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1230.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1075.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1145.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1230.000000, 0.300000));
 
 
 	//center slalom
@@ -114,7 +114,7 @@ static void LoadLevel1(engine::Camera* cam)
 	CreateCrowd({ 1545, -1715, 11 }, resources::crowdAnims1);
 	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims1);
 
-	PlayCountdown(Vector3(1225.0f, -320.0f, 0.0f));
+	PlayCountdown(Vector3(1235.0f, -310.0f, 200.0f));
 	PlayerController::lapCount = 3;
 }
 
