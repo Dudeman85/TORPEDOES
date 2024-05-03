@@ -8,6 +8,7 @@
 
 enum GameState { menuMainState, selectPlayersState, mapSelection, gamePlayState, inGameOptionsState };
 static GameState gameState = menuMainState;
+
 static bool canStartLoadingMap;
 static bool isSceneloaded;
 std::unordered_map<int, ShipType> playerShips;
@@ -817,13 +818,13 @@ namespace MainMenuSystem
 		ecs::AddComponent(splashScreen, Transform{ .position = {0, 0, -0.5}, .scale = {1, 1, 0} });
 		ecs::AddComponent(splashScreen, SpriteRenderer{ .texture = resources::menuTextures["UI_Title_Background_1.png"], .uiElement = true });
 
-		//resources::menuTextures["UI_PressStart.png"]->SetScalingFilter(GL_LINEAR);
+		resources::menuTextures["UI_PressStart.png"]->SetScalingFilter(GL_LINEAR);
 		startText = ecs::NewEntity();
 		ecs::AddComponent(startText, Transform{ .position = {-0.5, 0.2, -0.1}, .rotation = {0, 0, 15}, .scale = {.45, .1, 0} });
 		ecs::AddComponent(startText, SpriteRenderer{ .texture = resources::menuTextures["UI_PressStart.png"], .uiElement = true });
 
 		creditsText = ecs::NewEntity();
-		ecs::AddComponent(creditsText, Transform{ .position = {0.65, -0.8, -0.1}, .scale = {0.36, 0.07, 0} });
+		ecs::AddComponent(creditsText, Transform{ .position = {0.65, -0.8, -0.1}, .scale = {0.30, 0.06, 0} });
 		ecs::AddComponent(creditsText, SpriteRenderer{ .texture = resources::menuTextures["UI_PressCredits.png"], .uiElement = true });
 	}
 	//Destroy the main menu

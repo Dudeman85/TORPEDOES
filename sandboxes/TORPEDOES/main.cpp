@@ -399,6 +399,194 @@ static void PlayersMenu(std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem)
 	std::cout << "is Ship selection open:" << ShipSelectionSystem->isShipSelectionMenuOn;
 }
 
+	switch (currentState)																							   
+	{
+		case menuMainState:
+		{
+			
+			if (previousState != currentState)
+			{
+				pauseSystem->Init(window);
+				previousState = currentState;
+			}
+			break;
+		}
+		case mapSelection:
+		{
+			
+			if (previousState != currentState)
+			{
+				levelSelectionSystem->Init();
+				previousState = currentState;
+			}
+			levelSelectionSystem->Update();
+
+			
+		
+
+			break;
+		}
+		case inGameOptionsState:
+		{
+			
+		/*	if (previousState != currentState)
+			{
+				pauseSystem->Init(window);
+				previousState = currentState;
+			}*/
+
+			pauseSystem->Update();
+
+			break;
+		}
+		case selectPlayersState:
+		{
+			
+
+			if(previousState != currentState)
+			{
+				playerController->Init();
+			}
+
+			playerController->Update(window);
+		
+			previousState = currentState;
+			break;
+		}
+	
+		default:
+			std::cout<< "\n ERROR NO STATE FOUND:"<< currentState<<std::endl;
+		break;
+	}
+}
+//void LoadThisLevel(int mapIndex, engine::Camera *cam)
+//{
+//	mapIndex++;
+//
+//	switch (mapIndex)
+//	{
+//	case 1:
+//	{
+//		//LoadLevel1(cam);
+//		break;
+//	}
+//	case 2:
+//	{
+//		LoadLevel2(cam);
+//		break;
+//	}
+//	case 3:
+//	{
+//		LoadLevel3(cam);
+//		break;
+//	}
+//	case 4:
+//	{
+//		LoadLevel4(cam);
+//		break;
+//	}
+//	default:
+//	{
+//		std::cout << "NO LEVEL ON THAT INDEX" << mapIndex << std::endl;
+//	}
+//	break;
+//	}
+//}
+
+	switch (currentState)																							   
+	{
+		case menuMainState:
+		{
+			
+			if (previousState != currentState)
+			{
+				pauseSystem->Init(window);
+				previousState = currentState;
+			}
+			break;
+		}
+		case mapSelection:
+		{
+			
+
+			if (previousState != currentState)
+			{
+				levelSelectionSystem->Init();
+				previousState = currentState;
+			}
+			levelSelectionSystem->Update();
+
+			
+		
+
+			break;
+		}
+		case inGameOptionsState:
+		{
+			
+		/*	if (previousState != currentState)
+			{
+				pauseSystem->Init(window);
+				previousState = currentState;
+			}*/
+
+			pauseSystem->Update();
+
+			break;
+		}
+		case selectPlayersState:
+		{
+			
+
+			if(previousState != currentState)
+			{
+				playerController->Init();
+			}
+
+			playerController->Update(window);
+		
+			previousState = currentState;
+			break;
+		}
+	
+		default:
+			std::cout<< "\n ERROR NO STATE FOUND:"<< currentState<<std::endl;
+		break;
+	}
+}
+//void LoadThisLevel(int mapIndex, engine::Camera *cam)
+//{
+//	mapIndex++;
+//
+//	switch (mapIndex)
+//	{
+//	case 1:
+//	{
+//		//LoadLevel1(cam);
+//		break;
+//	}
+//	case 2:
+//	{
+//		LoadLevel2(cam);
+//		break;
+//	}
+//	case 3:
+//	{
+//		LoadLevel3(cam);
+//		break;
+//	}
+//	case 4:
+//	{
+//		LoadLevel4(cam);
+//		break;
+//	}
+//	default:
+//	{
+//		std::cout << "NO LEVEL ON THAT INDEX" << mapIndex << std::endl;
+//	}
+//	break;
+//	}
+//}
 
 //Delete all entities and load menu
 static void ReturnToMainMenu() 
@@ -415,7 +603,7 @@ static void ReturnToMainMenu()
 
 int main()
 {
-	GameState currentGameState = menuMainState;
+	GameStates currentGameState = menuMainState;
 	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window", false);
 
 	engine::EngineInit();
@@ -447,7 +635,7 @@ int main()
 
 	std::shared_ptr<LevelSelectionSystem> levelSelectionSystem = engine::ecs::GetSystem<LevelSelectionSystem>();
 	
-	std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem = engine::ecs::GetSystem<PlayerSelectSystem>();
+	std::shared_ptr<PlayerSelectSystem> playerSelectionSystem = engine::ecs::GetSystem<PlayerSelectSystem>();
 	/*
 	ShipSelectionSystem->Init();
 	ShipSelectionSystem->isShipSelectionMenuOn = true;
@@ -537,9 +725,31 @@ int main()
 			ReturnToMainMenu();
 		}
 
-
-
 		input::update();
+
+		//Handle updating of proper systems
+		switch (gameState)
+		{
+		case menuMainState:
+			MainMenuSystem::Update();
+			break;
+		case mapSelection:
+			levelSelectionSystem->Update();
+			break;
+		case inGameOptionsState:
+			pauseSystem->Update();
+			break;
+		case selectPlayersState:
+			playerSelectionSystem->Update();
+			break;
+		case gamePlayState:
+			break;
+		default:
+			std::cout << "\n ERROR NO STATE FOUND:" << gameState << std::endl;
+			break;
+		}
+
+
 
 		if (!isGamePaused)
 		{
@@ -552,7 +762,6 @@ int main()
 
 		engine::Update(&cam);
 
-		MainMenuSystem::Update();
 
 		if (canStartLoadingMap)
 		{
