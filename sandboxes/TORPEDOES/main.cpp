@@ -428,6 +428,7 @@ static void PlayersMenu(std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem)
 	std::cout << "is Ship selection open:" << ShipSelectionSystem->isShipSelectionMenuOn;
 }
 
+
 //Delete all entities and load menu
 static void ReturnToMainMenu()
 {
@@ -443,6 +444,7 @@ static void ReturnToMainMenu()
 
 int main()
 {
+	GameState currentGameState = menuMainState;
 	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window", false);
 
 	engine::EngineInit();
