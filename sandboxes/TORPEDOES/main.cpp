@@ -11,13 +11,14 @@ using namespace engine;
 
 int checkPointNumber = 0;
 bool isGamePaused = false;
+GameStates currentGameState = menuMainState;
 
 static void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine::Model* checkPointModel, float hitboxrotation, bool finishLine = false)
 {
 	engine::ecs::Entity checkpoint = engine::ecs::NewEntity();
 
-	engine::ecs::AddComponent(checkpoint, engine::Transform{ .position = position, .rotation = rotation, .scale = scale });
-	engine::ecs::AddComponent(checkpoint, engine::ModelRenderer{ .model = checkPointModel });
+	engine::ecs::AddComponent(checkpoint, engine::Transform{.position = position, .rotation = rotation, .scale = scale });
+	engine::ecs::AddComponent(checkpoint, engine::ModelRenderer{.model = checkPointModel });
 	engine::ecs::AddComponent(checkpoint, CheckPoint{ .checkPointID = checkPointNumber , .Finish_line = finishLine });
 	std::vector<Vector2> CheckpointcolliderVerts;
 	if (finishLine)
@@ -35,10 +36,10 @@ static void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, 
 static void CreateCrowd(Vector3 pos, engine::Animation& anim)
 {
 	engine::ecs::Entity crowd = engine::ecs::NewEntity();
-	engine::ecs::AddComponent(crowd, engine::Transform{ .position = pos, .scale = Vector3(100, 30, 0) });
+	engine::ecs::AddComponent(crowd, engine::Transform{.position = pos, .scale = Vector3(100, 30, 0) });
 	engine::ecs::AddComponent(crowd, engine::SpriteRenderer{});
 	// C++ random: ((float)rand() / (RAND_MAX)) + 1
-	engine::ecs::AddComponent(crowd, engine::Animator{.playbackSpeed = Random(0.6f, 2.0f)});
+	engine::ecs::AddComponent(crowd, engine::Animator{ .playbackSpeed = Random(0.6f, 2.0f) });
 	engine::AnimationSystem::AddAnimation(crowd, anim, "CrowdCheer");
 	engine::AnimationSystem::PlayAnimation(crowd, "CrowdCheer", true);
 }
@@ -59,19 +60,19 @@ static void PlayCountdown(Vector3 pos)
 	engine::ecs::Entity countdown = engine::ecs::NewEntity();
 	engine::ecs::AddComponent(countdown, engine::Transform{ .position = pos, .scale = Vector3(60, 100, 100) });
 	engine::ecs::AddComponent(countdown, engine::SpriteRenderer{});
-	engine::ecs::AddComponent(countdown, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
+	engine::ecs::AddComponent(countdown, engine::Animator{.onAnimationEnd = engine::ecs::DestroyEntity });
 	engine::AnimationSystem::AddAnimation(countdown, resources::countdownAnim, "CountDown");
 	engine::AnimationSystem::PlayAnimation(countdown, "CountDown", false);
 	engine::ecs::GetSystem<PlayerController>()->countdownTimer = 3;
 }
 
 // Create everything for level 1
-void LoadLevel1(engine::Camera* cam)
+static void LoadLevel1(engine::Camera* cam)
 {
 	engine::collisionSystem->cam = cam;
 
 	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat };
-	
+
 	// Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level1Map);
 	engine::collisionSystem->SetTilemap(resources::level1Map);
@@ -82,7 +83,7 @@ void LoadLevel1(engine::Camera* cam)
 
 	////Make all the checkpoints manually
 	CreateCheckpoint(Vector3(1925.000000, -895.000000, 100.000000), Vector3(27.500000, 27.500000, 10.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 110.f);
-	CreateCheckpoint(Vector3(2590.000000, -1475.000000, 100.000000), Vector3(30.000000, 37.500000, 5.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"],110.f);
+	CreateCheckpoint(Vector3(2590.000000, -1475.000000, 100.000000), Vector3(30.000000, 37.500000, 5.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 110.f);
 	CreateCheckpoint(Vector3(3590.000000, -1425.000000, 100.000000), Vector3(30.000000, 12.500000, -5.000000), Vector3(17.5f), resources::models["Prop_Buoy.obj"], 95.f);
 	CreateCheckpoint(Vector3(3280.000000, -640.000000, 100.000000), Vector3(35.000000, 77.500000, 17.500000), Vector3(17.5f), resources::models["Prop_Buoy.obj"], 160.f);
 	CreateCheckpoint(Vector3(1770.000000, -1585.000000, 100.000000), Vector3(50.000000, -62.500000, 0.000000), Vector3(18.5f), resources::models["Prop_Buoy.obj"], 20.f);
@@ -95,9 +96,6 @@ void LoadLevel1(engine::Camera* cam)
 	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1145.000000, 0.300000));
 	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1230.000000, 0.300000));
 
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2170.000000, -1190.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1085.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2270.000000, -1150.000000, 0.300000));
 
 	//center slalom
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3270.000000, -1125.000000, 0.300000));
@@ -116,23 +114,23 @@ void LoadLevel1(engine::Camera* cam)
 	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims1);
 	CreateCrowd({ 1545, -1715, 11 }, resources::crowdAnims1);
 	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims1);
-	
+
 	PlayCountdown(Vector3(1225.0f, -320.0f, 0.0f));
 	PlayerController::lapCount = 3;
 }
 
 // Create everything for level 2
-void LoadLevel2(engine::Camera* cam)
+static void LoadLevel2(engine::Camera* cam)
 {
 	engine::collisionSystem->cam = cam;
 
-	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat };
+	std::vector<ShipType> ships{ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat};
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1160.0f, -1600.0f));
 
 	// Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level2Map);
 	engine::collisionSystem->SetTilemap(resources::level2Map);
-	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
+	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty { true });
 
 	// Make all the checkpoint's manually
 	CreateCheckpoint(Vector3(1455.000000, -995.000000, 100.000000), Vector3(35.000000, -15.000000, -20.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 65.0f);				// First checkpoint
@@ -158,7 +156,7 @@ void LoadLevel2(engine::Camera* cam)
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2950.000000, -1585.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2885.000000, -1055.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2710.000000, -1790.000000, 0.300000));
-
+	
 	//topright hairpin
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3355.000000, -410.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3355.000000, -375.000000, 0.300000));
@@ -166,7 +164,7 @@ void LoadLevel2(engine::Camera* cam)
 	//before last loop
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2255.000000, -800.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2155.000000, -605.000000, 0.300000));
-
+	
 	//before chicane
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(425.000000, -855.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(480.000000, -855.000000, 0.300000));
@@ -289,9 +287,9 @@ static void LoadLevel4(engine::Camera* cam)
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1434.0f, -1520.0f));
 
 	//set this level's tilemap
-	engine::spriteRenderSystem->SetTilemap(resources::level4Map);
-	engine::collisionSystem->SetTilemap(resources::level4Map);
-	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
+	engine::spriteRenderSystem->SetTilemap(resources::level3Map);
+	engine::collisionSystem->SetTilemap(resources::level3Map);
+	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{true});
 
 	// Make all the checkpoints manually
 	CreateCheckpoint(Vector3(15760.000000, -925.000000, 100.000000), Vector3(-12.500000, -90.000000, -87.500000), Vector3(43.0f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
@@ -357,6 +355,11 @@ static void SetupInput()
 	input::bindDigitalInput(GLFW_KEY_U, { "Menu" });
 	input::ConstructDigitalEvent("StartGame");
 	input::bindDigitalInput(GLFW_KEY_G, { "StartGame" });
+
+	input::bindDigitalInput(GLFW_GAMEPAD_BUTTON_DPAD_LEFT, { "Turn" });
+
+	
+
 	// TODO: add controller pause key
 
 	float AnalogPositiveMinDeadZone = 0;
@@ -364,6 +367,9 @@ static void SetupInput()
 
 	float AnalogNegativeMinDeadZone = -0.2;
 	float AnalogNegativeMaxDeadZone = 0;
+	
+	
+	
 
 	for (size_t i = 0; i < 4; i++)
 	{
@@ -379,10 +385,10 @@ static void SetupInput()
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "Boost" + std::to_string(i) });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_START, { "Pause" });
 
-		input::bindDigitalControllerInput(i,  GLFW_GAMEPAD_BUTTON_DPAD_LEFT , { "Turn" + std::to_string(i) });
-		input::bindDigitalControllerInput(i,  GLFW_GAMEPAD_BUTTON_DPAD_RIGHT , { "Turn" + std::to_string(i) });
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_LEFT, { "Turn" + std::to_string(i) });
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, { "Turn" + std::to_string(i) });
 
-		
+
 
 
 
@@ -396,15 +402,16 @@ static void SetupInput()
 
 		input::bindAnalogControllerInput(i,
 			{
-				{ { input::controllerMixedInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_X } 
+				{ { input::controllerMixedInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_X }
 			},
 			{ "Turn" + std::to_string(i) });
 
-		
+
 	}
 
 	// Keyboard input
 	int KeyboardPlayer = 3;
+
 
 	input::bindAnalogInput(GLFW_KEY_RIGHT, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
 	input::bindAnalogInput(GLFW_KEY_LEFT, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
@@ -416,7 +423,7 @@ static void SetupInput()
 
 	input::bindDigitalInput(GLFW_KEY_N, { "Shoot" + std::to_string(KeyboardPlayer) });
 	input::bindDigitalInput(GLFW_KEY_M, { "Boost" + std::to_string(KeyboardPlayer) });
-	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
+	input::bindDigitalInput(GLFW_KEY_P, { "Pause"  });
 	input::bindDigitalInput(GLFW_KEY_G, { "StartGame" });
 }
 
@@ -432,10 +439,22 @@ static void PlayersMenu(std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem)
 	std::cout << "is Ship selection open:" << ShipSelectionSystem->isShipSelectionMenuOn;
 }
 
+//Delete all entities and load menu
+static void ReturnToMainMenu() 
+{
+	ecs::DestroyAllEntities();
+
+	spriteRenderSystem->SetTilemap(nullptr);
+	isGamePaused = true;
+	canStartLoadingMap = false;
+	ecs::GetSystem<PlayerSelectSystem>()->isShipSelectionMenuOn = false;
+
+	MainMenuSystem::Load();
+}
+
 int main()
 {
-	GameStates currentGameState = menuMainState;
-	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window");
+	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window", false);
 
 	engine::EngineInit();
 
@@ -455,6 +474,7 @@ int main()
 	std::shared_ptr<PlayerController> playerController = engine::ecs::GetSystem<PlayerController>();
 	playerController->Init();
 	std::shared_ptr<HedgehogSystem> hedgehogSystem = engine::ecs::GetSystem<HedgehogSystem>();
+	std::shared_ptr<SubmarineSystem> submarineSystem = ecs::GetSystem<SubmarineSystem>();
 	std::shared_ptr<PickupSystem> pickupSystem = engine::ecs::GetSystem<PickupSystem>();
 
 	std::shared_ptr<engine::SoundSystem> soundSystem = engine::ecs::GetSystem<engine::SoundSystem>();
@@ -463,14 +483,16 @@ int main()
 	soundSystem->AddSoundEngine("Background");
 	soundSystem->AddSoundEngine("Music");
 
-	std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem = engine::ecs::GetSystem<PlayerSelectSystem>();
+	std::shared_ptr<LevelSelectionSystem> levelSelectionSystem = engine::ecs::GetSystem<LevelSelectionSystem>();
+	
+	std::shared_ptr<PlayerSelectSystem> playerSelectionSystem = engine::ecs::GetSystem<PlayerSelectSystem>();
+	/*
 	ShipSelectionSystem->Init();
 	ShipSelectionSystem->isShipSelectionMenuOn = true;
+	*/
 	isGamePaused = true;
-	bool mapLoaded = false;
 
-	//MainMenuSystem mainMenu;
-	//mainMenu.Load();
+	MainMenuSystem::Load();
 
 	//Bind all input actions
 	SetupInput();
@@ -491,8 +513,6 @@ int main()
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
-		//mainMenu.Update();
-
 		glfwPollEvents();
 
 		//Close window when Esc is pressed
@@ -550,13 +570,48 @@ int main()
 			}
 		}
 
+		if (glfwGetKey(window, GLFW_KEY_0))
+		{
+			ReturnToMainMenu();
+		}
+
 		input::update();
 
+		//Handle updating of proper systems
+		switch (gameState)
+		{
+		case menuMainState:
+			MainMenuSystem::Update();
+			break;
+		case mapSelection:
+			levelSelectionSystem->Update();
+			break;
+		case inGameOptionsState:
+			pauseSystem->Update();
+			break;
+		case selectPlayersState:
+			playerSelectionSystem->Update();
+			break;
+		case gamePlayState:
+			break;
+		default:
+			std::cout << "\n ERROR NO STATE FOUND:" << gameState << std::endl;
+			break;
+		}
+
+
+
 		if (!isGamePaused)
+		{
 			UpdateCam(&cam, collisionSystem->tilemap);
-		hedgehogSystem->Update();
-		pickupSystem->Update();
+			playerController->Update(window);
+			submarineSystem->Update();
+			hedgehogSystem->Update();
+			pickupSystem->Update();
+		}
+
 		engine::Update(&cam);
+
 
 		if (canStartLoadingMap)
 		{
@@ -566,6 +621,7 @@ int main()
 			LoadLevel4(&cam);		//==================================Level change=================================================================================
 		}
 
+		
 		// if paused or Pause pressed update PauseSystem
 		if (input::GetNewPress("Pause"))
 		{
@@ -594,25 +650,10 @@ int main()
 		}
 		if (ShipSelectionSystem->isShipSelectionMenuOn)
 		{
-			engine::modelRenderSystem->SetLight(Vector3(0, 0, -200), 255);
+		engine::modelRenderSystem->SetLight(Vector3(0,0,-200), 255);
 			//printf("\nShipSelectionSystem->Update()\n");
 			ShipSelectionSystem->Update();
 		}
-
-		// playerControl Update for frame if not paused
-		//                           XOR gate true when only if out puts are different
-		/*if ((pauseSystem->isGamePause ^ ShipSelectionSystem->isShipSelectionMenuOn))*/
-		if (isGamePaused)
-		{
-			//printf("\nNOT UPDATING playerController \n");
-
-		}
-		else
-		{
-			playerController->Update(window);
-		}
-
-		ecs::GetSystem<SubmarineSystem>()->Update();
 
 		ecs::Update();
 		glfwSwapBuffers(window);
