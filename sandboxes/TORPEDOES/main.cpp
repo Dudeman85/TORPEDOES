@@ -78,7 +78,7 @@ static void LoadLevel1(engine::Camera* cam)
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
 	//Create the players
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1225.0f, -420.0f));
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1225.0f, -400.0f));
 
 	////Make all the checkpoints manually
 	CreateCheckpoint(Vector3(1925.000000, -895.000000, 100.000000), Vector3(27.500000, 27.500000, 10.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 110.f);
@@ -88,12 +88,12 @@ static void LoadLevel1(engine::Camera* cam)
 	CreateCheckpoint(Vector3(1770.000000, -1585.000000, 100.000000), Vector3(50.000000, -62.500000, 0.000000), Vector3(18.5f), resources::models["Prop_Buoy.obj"], 20.f);
 	CreateCheckpoint(Vector3(820.000000, -1610.000000, 100.000000), Vector3(47.500000, -77.500000, -5.000000), Vector3(20.5f), resources::models["Prop_Buoy.obj"], 10.f);
 	CreateCheckpoint(Vector3(545.000000, -900.000000, 100.000000), Vector3(35.000000, -22.500000, 0.000000), Vector3(17.5f), resources::models["Prop_Buoy.obj"], 70.f);
-	CreateCheckpoint(Vector3(1475.000000, -460.000000, 100.000000), Vector3(-25.000000, -90.000000, -90.000000), Vector3(24.f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
+	CreateCheckpoint(Vector3(1475.000000, -460.000000, 70.000000), Vector3(-25.000000, -90.000000, -90.000000), Vector3(24.f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
 
 	//crossroad
-	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1075.000000, 0.300000));
-	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1145.000000, 0.300000));
-	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1230.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1075.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1145.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1230.000000, 0.300000));
 
 
 	//center slalom
@@ -110,11 +110,27 @@ static void LoadLevel1(engine::Camera* cam)
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(615.000000, -1645.000000, 0.300000));
 
 	//Make the crowds manually
-	CreateCrowd({ 1530, -1700, 10 }, resources::crowdAnims1);
-	CreateCrowd({ 1545, -1715, 11 }, resources::crowdAnims1);
-	CreateCrowd({ 1520, -1730, 12 }, resources::crowdAnims1);
+	// Start/Finish line crowd
+	CreateCrowd({ 1090, -665, 167 }, resources::crowdAnims1);	// First row, 1. crowd
+	CreateCrowd({ 1285, -665, 167 }, resources::crowdAnims1);	// First row, 2. crowd
+	CreateCrowd({ 1418, -665, 167 }, resources::crowdAnims1);	// First row 3. crowd
+	CreateCrowd({ 1128, -655, 166 }, resources::crowdAnims1);	// Second row, 1. crowd
+	CreateCrowd({ 1328, -655, 166 }, resources::crowdAnims1);	// Second row, 2. crowd
+	// ********************
+	// Second crowd
+	CreateCrowd({ 2940, -410, 167 }, resources::crowdAnims1);	// First row, 1. crowd
+	CreateCrowd({ 3140, -410, 167 }, resources::crowdAnims1);	// First row, 2. crowd
+	CreateCrowd({ 3200, -410, 167 }, resources::crowdAnims1);	// First row, 3. crowd
+	CreateCrowd({ 2980, -400, 166 }, resources::crowdAnims1);	// Second row, 1. crowd
+	CreateCrowd({ 3175, -400, 166 }, resources::crowdAnims1);	// Second row, 1. crowd
+	// ********************
+	// Small platform crowd
+	CreateSmallCrowd({ 3265, -795,167 }, resources::crowdAnims2);	// 1. crowd
+	CreateSmallCrowd({ 3325, -780,166 }, resources::crowdAnims2);	// 2. crowd
+	CreateSmallCrowd({ 3290, -790,166.5 }, resources::crowdAnims2);	// 3. crowd
+	// ********************
 
-	PlayCountdown(Vector3(1225.0f, -320.0f, 0.0f));
+	PlayCountdown(Vector3(1235.0f, -310.0f, 200.0f));
 	PlayerController::lapCount = 3;
 }
 
@@ -247,30 +263,43 @@ static void LoadLevel3(engine::Camera* cam)
 	// ********************
 	// First checkpoint crowd
 	CreateSmallCrowd({ 3119, -605, 165 }, resources::crowdAnims2);		// Right crowd
-	CreateSmallCrowd({ 2805, -470, 166 }, resources::crowdAnims2);		// Left, First row, 1. crowd
-	CreateSmallCrowd({ 2850, -500, 167 }, resources::crowdAnims2);		// Left, First row, 2. crowd
+	CreateSmallCrowd({ 2811, -470, 166 }, resources::crowdAnims2);		// Left, First row, 1. crowd
+	CreateSmallCrowd({ 2845, -500, 167 }, resources::crowdAnims2);		// Left, First row, 2. crowd
 	CreateSmallCrowd({ 2810, -530, 168 }, resources::crowdAnims2);		// Left, First row, 3. crowd
-	CreateSmallCrowd({ 2870, -560, 169 }, resources::crowdAnims2);		// Left, First row, 4. crowd
-	CreateSmallCrowd({ 2825, -590, 170 }, resources::crowdAnims2);		// Left, First row, 5. crowd
+	CreateSmallCrowd({ 2824.5, -560, 169 }, resources::crowdAnims2);	// Left, First row, 4. crowd
+	CreateSmallCrowd({ 2820.5, -590, 170 }, resources::crowdAnims2);	// Left, First row, 5. crowd
 	CreateSmallCrowd({ 2835, -620, 171 }, resources::crowdAnims2);		// Left, First row, 6. crowd
-	CreateSmallCrowd({ 2835, -650, 172 }, resources::crowdAnims2);		// Left, First row, 7. crowd
-	CreateSmallCrowd({ 2805, -680, 173 }, resources::crowdAnims2);		// Left, First row, 8. crowd
-	CreateSmallCrowd({ 2790, -710, 174 }, resources::crowdAnims2);		// Left, First row, 9. crowd
-	CreateSmallCrowd({ 2800, -740, 175 }, resources::crowdAnims2);		// Left, First row, 10. crowd
-	CreateSmallCrowd({ 2870, -770, 176 }, resources::crowdAnims2);		// Left, First row, 11. crowd
-	CreateSmallCrowd({ 2820, -800, 177 }, resources::crowdAnims2);		// Left, First row, 12. crowd
-	CreateSmallCrowd({ 2815, -835, 178 }, resources::crowdAnims2);		// Left, First row, 13. crowd
-	CreateSmallCrowd({ 2830, -510, 167.5 }, resources::crowdAnims2);	// Left, Second row, 1. crowd
-	CreateSmallCrowd({ 2805, -540, 168.5 }, resources::crowdAnims2);	// Left, Second row, 2. crowd
-	CreateSmallCrowd({ 2865, -570, 169.5 }, resources::crowdAnims2);	// Left, Second row, 3. crowd
-	CreateSmallCrowd({ 2860, -600, 170.5 }, resources::crowdAnims2);	// Left, Second row, 4. crowd
-	CreateSmallCrowd({ 2810, -630, 171.5 }, resources::crowdAnims2);	// Left, Second row, 5. crowd
-	CreateSmallCrowd({ 2865, -660, 172.5 }, resources::crowdAnims2);	// Left, Second row, 6. crowd
-	CreateSmallCrowd({ 2795, -690, 173.5 }, resources::crowdAnims2);	// Left, Second row, 7. crowd
-	CreateSmallCrowd({ 2870, -720, 174.5 }, resources::crowdAnims2);	// Left, Second row, 8. crowd
+	CreateSmallCrowd({ 2835.5, -650, 172 }, resources::crowdAnims2);		// Left, First row, 7. crowd
+	CreateSmallCrowd({ 2811.5, -680, 173 }, resources::crowdAnims2);	// Left, First row, 8. crowd
+	CreateSmallCrowd({ 2816, -710, 174 }, resources::crowdAnims2);		// Left, First row, 9. crowd
+	CreateSmallCrowd({ 2810.6, -740, 175 }, resources::crowdAnims2);	// Left, First row, 10. crowd
+	CreateSmallCrowd({ 2838, -770, 176 }, resources::crowdAnims2);		// Left, First row, 11. crowd
+	CreateSmallCrowd({ 2830, -800, 177 }, resources::crowdAnims2);		// Left, First row, 12. crowd
+	CreateSmallCrowd({ 2816, -835, 178 }, resources::crowdAnims2);		// Left, First row, 13. crowd
+	CreateSmallCrowd({ 2820.5, -510, 167.5 }, resources::crowdAnims2);	// Left, Second row, 1. crowd
+	CreateSmallCrowd({ 2845.5, -540, 168.5 }, resources::crowdAnims2);	// Left, Second row, 2. crowd
+	CreateSmallCrowd({ 2810.5, -570, 169.5 }, resources::crowdAnims2);	// Left, Second row, 3. crowd
+	CreateSmallCrowd({ 2839, -600, 170.5 }, resources::crowdAnims2);	// Left, Second row, 4. crowd
+	CreateSmallCrowd({ 2810.5, -630, 171.5 }, resources::crowdAnims2);	// Left, Second row, 5. crowd
+	CreateSmallCrowd({ 2840.5, -660, 172.5 }, resources::crowdAnims2);	// Left, Second row, 6. crowd
+	CreateSmallCrowd({ 2815, -690, 173.5 }, resources::crowdAnims2);	// Left, Second row, 7. crowd
+	CreateSmallCrowd({ 2835, -720, 174.5 }, resources::crowdAnims2);	// Left, Second row, 8. crowd
 	CreateSmallCrowd({ 2845, -750, 175.5 }, resources::crowdAnims2);	// Left, Second row, 9. crowd
 	CreateSmallCrowd({ 2840, -780, 176.5 }, resources::crowdAnims2);	// Left, Second row, 10. crowd
-	CreateSmallCrowd({ 2790, -810, 177.5 }, resources::crowdAnims2);	// Left, Second row, 11. crowd
+	CreateSmallCrowd({ 2810, -810, 177.5 }, resources::crowdAnims2);	// Left, Second row, 11. crowd
+	// ********************
+	// Middle audience
+	CreateSmallCrowd({ 2014, -720, 166 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 2014, -750, 167 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 2014, -780, 168 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 2014, -810, 169 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 2014, -840, 170 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 2014, -870, 171 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 2014, -900, 172 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 2014, -930, 173 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 2014, -960, 174 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 2014, -990, 175 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 2014, -1020, 176 }, resources::crowdAnims2);
 	// ********************
 
 	PlayCountdown(Vector3(2480.0f, -1460.0f, 200.0f));
@@ -610,7 +639,7 @@ int main()
 			gameState = gamePlayState;
 		}
 
-
+		/*
 		// if paused or Pause pressed update PauseSystem
 		if (input::GetNewPress("Pause"))
 		{
@@ -619,6 +648,7 @@ int main()
 			pauseSystem->ToggleShowUIOptionsMenu();
 			gameState = inGameOptionsState;
 		}
+		*/
 
 		ecs::Update();
 		glfwSwapBuffers(window);

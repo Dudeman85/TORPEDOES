@@ -61,12 +61,22 @@ class LevelSelectionSystem : public engine::ecs::System
 	float arrowsOffsetX = 0.6f;
 public:
 
-	engine::ecs::Entity arrowLeft = ecs::NewEntity();
+	engine::ecs::Entity arrowLeft;
 	int firstPlayer;
 
 
 	void Init()
 	{
+		//Init variables
+		mapLevelIndex = 0;
+		readyToMoveLeft = true;
+		readyToMoveRight = true;
+
+		arrowRight = ecs::NewEntity();
+		levelSelectionBackground = ecs::NewEntity();
+		currentSelectedLevel = ecs::NewEntity();
+		arrowsPivot = ecs::NewEntity();
+		arrowLeft = ecs::NewEntity();
 
 		mapImages.clear();
 		mapImages.push_back(resources::menuTextures["level1.png"]);
@@ -142,7 +152,7 @@ public:
 
 		float turnInput = input::GetTotalInputValue("Turn" + to_string(firstPlayer));
 
-		
+
 		if (turnInput > 0 && readyToMoveLeft)
 		{
 			readyToMoveLeft = false;
@@ -196,15 +206,13 @@ public:
 
 		if (input::GetNewPress("Boost"+ std::to_string(firstPlayer) ))
 		{
-			
+
 			LoadThisLevel(mapLevelIndex);
 
 		}
 
 	}
 };
-
-
 
 ECS_REGISTER_COMPONENT(PlayerSelection)
 struct PlayerSelection
@@ -855,12 +863,15 @@ namespace MainMenuSystem
 	ecs::Entity splashScreen;
 	ecs::Entity startText;
 	ecs::Entity creditsText;
-	bool active = false;
+	ecs::Entity creditsScreen;
+	bool active;
+	bool inCredits;
 
 	//Make and show the main menu
 	void Load()
 	{
 		active = true;
+		inCredits = false;
 		gameState = menuMainState;
 
 		splashScreen = ecs::NewEntity();
@@ -875,6 +886,10 @@ namespace MainMenuSystem
 		creditsText = ecs::NewEntity();
 		ecs::AddComponent(creditsText, Transform{ .position = {0.65, -0.8, -0.1}, .scale = {0.30, 0.06, 0} });
 		ecs::AddComponent(creditsText, SpriteRenderer{ .texture = resources::menuTextures["UI_PressCredits.png"], .uiElement = true });
+
+		creditsScreen = ecs::NewEntity();
+		ecs::AddComponent(creditsScreen, Transform{ .position = {0, -0, 0.5}, .scale = {1, 1, 0} });
+		ecs::AddComponent(creditsScreen, SpriteRenderer{ .texture = resources::menuTextures["UI_Credits_Screen.png"], .enabled = false, .uiElement = true });
 	}
 	//Destroy the main menu
 	void Unload()
@@ -883,6 +898,7 @@ namespace MainMenuSystem
 		ecs::DestroyEntity(splashScreen);
 		ecs::DestroyEntity(startText);
 		ecs::DestroyEntity(creditsText);
+		ecs::DestroyEntity(creditsScreen);
 	}
 	//Handle animations and input
 	void Update()
@@ -893,17 +909,30 @@ namespace MainMenuSystem
 		TransformSystem::Scale(startText, Vector3((std::sin(programTime * 4) / 700), (std::sin(programTime * 4) / 3150), 0));
 
 		//If start pressed go to player select
-		if (input::GetNewPress("Pause") || input::GetNewPress("StartGame"))
+		if (input::GetNewPress("Pause") || input::GetNewPress("StartGame") || input::GetNewPress("Shoot0") || input::GetNewPress("Shoot1") || input::GetNewPress("Shoot2") || input::GetNewPress("Shoot3"))
 		{
-			ecs::GetSystem<PlayerSelectSystem>()->Init();
-			ecs::GetSystem<PlayerSelectSystem>()->isShipSelectionMenuOn = true;
-			gameState = selectPlayersState;
-			Unload();
+			//If in credits return to splash screen
+			if (inCredits)
+			{
+				SpriteRenderer& sr = ecs::GetComponent<SpriteRenderer>(creditsScreen);
+				inCredits = false;
+				sr.enabled = false;
+			}
+			//Otherwise go to ship select menu
+			else
+			{
+				ecs::GetSystem<PlayerSelectSystem>()->Init();
+				ecs::GetSystem<PlayerSelectSystem>()->isShipSelectionMenuOn = true;
+				gameState = selectPlayersState;
+				Unload();
+			}
 		}
 		//If special pressed go to credits
 		if (input::GetNewPress("Boost0") || input::GetNewPress("Boost1") || input::GetNewPress("Boost2") || input::GetNewPress("Boost3"))
 		{
-			std::cout << "To credits\n";
+			SpriteRenderer& sr = ecs::GetComponent<SpriteRenderer>(creditsScreen);
+			inCredits = !inCredits;
+			sr.enabled = !sr.enabled;
 		}
 	}
 };
