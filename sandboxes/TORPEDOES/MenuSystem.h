@@ -28,41 +28,48 @@ struct Level
 ECS_REGISTER_SYSTEM(LevelSelectionSystem, Level)
 class LevelSelectionSystem : public engine::ecs::System
 {
-
-	std::function<void()> selectedLevel;
-	vector <  std::function <void(engine::Camera*)>> allLevelsAndFunc;
-	std::function <void(engine::Camera*) > operation;
-	vector < engine::ecs::Entity> entityList;
-
-
-	float arrowX = 0;
-	float arrowY = 0;
-	engine::ecs::Entity arrowRight = ecs::NewEntity();
-	engine::ecs::Entity levelSelectionBackground = ecs::NewEntity();
-	engine::ecs::Entity currentSelectedLevel = ecs::NewEntity();
-	engine::ecs::Entity arrowsPivot = ecs::NewEntity();
+	const float arrowX = 0;
+	const float arrowY = 0;
+	engine::ecs::Entity arrowRight;
+	engine::ecs::Entity levelSelectionBackground;
+	engine::ecs::Entity currentSelectedLevel;
+	engine::ecs::Entity arrowsPivot;
 	float throttleCurrentWaitedTimeUp = 0;
 	float throttleCurrentWaitedTimeDown = 0;
-	
+
 	int mapLevelIndex = 0;
 
 	engine::Camera* cam;
 	vector<Texture*> mapImages;
 
-	double mapChangeTime = 0.5;
-	
+	const double mapChangeTime = 0.5;
+
 	bool readyToMoveLeft = true;
 	bool readyToMoveRight = true;
 	bool callDeleyLeft = true;
 	bool callDeleyRight = true;
 public:
 
-	engine::ecs::Entity arrowLeft = ecs::NewEntity();
+	engine::ecs::Entity arrowLeft;
 	int firstPlayer;
 
 
 	void Init()
 	{
+		//Init variables
+		mapLevelIndex = 0;
+		readyToMoveLeft = true;
+		readyToMoveRight = true;
+		callDeleyLeft = true;
+		callDeleyRight = true;
+		throttleCurrentWaitedTimeUp = 0;
+		throttleCurrentWaitedTimeDown = 0;
+
+		arrowRight = ecs::NewEntity();
+		levelSelectionBackground = ecs::NewEntity();
+		currentSelectedLevel = ecs::NewEntity();
+		arrowsPivot = ecs::NewEntity();
+		arrowLeft = ecs::NewEntity();
 
 		mapImages.clear();
 		mapImages.push_back(resources::menuTextures["level1.png"]);
@@ -138,7 +145,7 @@ public:
 
 		float turnInput = input::GetTotalInputValue("Turn" + to_string(firstPlayer));
 
-		
+
 		if (turnInput > 0 && readyToMoveLeft)
 		{
 			readyToMoveLeft = false;
@@ -173,7 +180,7 @@ public:
 			{
 				mapLevelIndex = mapImages.size() - 1;
 			}
-			
+
 			std::cout << "LevelIndex:" << mapLevelIndex << endl;
 			TransformSystem::SetScale(arrowRight, Vector3(0.08f));
 			TimerSystem::ScheduleFunction([this]() {TransformSystem::SetScale(arrowRight, Vector3(0.04f)); }, 0.1);
@@ -183,9 +190,9 @@ public:
 
 
 
-		if (input::GetNewPress("StartGame"))
+		if (input::GetNewPress("StartGame") || input::GetNewPress("Shoot" + std::to_string(firstPlayer)))
 		{
-			
+
 			LoadThisLevel(mapLevelIndex);
 
 		}
@@ -882,7 +889,7 @@ namespace MainMenuSystem
 		TransformSystem::Scale(startText, Vector3((std::sin(programTime * 4) / 700), (std::sin(programTime * 4) / 3150), 0));
 
 		//If start pressed go to player select
-		if (input::GetNewPress("Pause") || input::GetNewPress("StartGame"))
+		if (input::GetNewPress("Pause") || input::GetNewPress("StartGame") || input::GetNewPress("Shoot0") || input::GetNewPress("Shoot1") || input::GetNewPress("Shoot2") || input::GetNewPress("Shoot3"))
 		{
 			ecs::GetSystem<PlayerSelectSystem>()->Init();
 			ecs::GetSystem<PlayerSelectSystem>()->isShipSelectionMenuOn = true;

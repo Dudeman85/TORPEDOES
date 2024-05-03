@@ -445,7 +445,7 @@ static void ReturnToMainMenu()
 int main()
 {
 	GameState currentGameState = menuMainState;
-	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window", true);
+	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window", false);
 
 	engine::EngineInit();
 
@@ -610,7 +610,7 @@ int main()
 			gameState = gamePlayState;
 		}
 
-
+		/*
 		// if paused or Pause pressed update PauseSystem
 		if (input::GetNewPress("Pause"))
 		{
@@ -619,6 +619,7 @@ int main()
 			pauseSystem->ToggleShowUIOptionsMenu();
 			gameState = inGameOptionsState;
 		}
+		*/
 
 		ecs::Update();
 		glfwSwapBuffers(window);
