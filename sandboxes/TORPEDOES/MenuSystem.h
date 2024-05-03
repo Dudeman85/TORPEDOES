@@ -12,6 +12,7 @@ static bool canStartLoadingMap;
 static bool isSceneloaded;
 std::unordered_map<int, ShipType> playerShips;
 
+
 //ECS_REGISTER_COMPONENT(Level)
 //struct Level
 //{
@@ -266,6 +267,13 @@ public:
 
 	void Init()
 	{
+		startGameTimer = false;
+		isPlayersReady = false;
+		selectedShipsAtTheFrame.clear();
+		playersThatAreReadyAmount = 0;
+		shipModels.clear();
+		shipModelsReady.clear();
+
 		shipModels.push_back({ resources::models["Ship_PT_109_Wireframe.obj"] });
 		shipModels.push_back({ resources::models["Ship_U_99_Wireframe.obj"] });
 		shipModels.push_back({ resources::models["Ship_Yamato_Wireframe.obj"] });
@@ -713,14 +721,14 @@ namespace MainMenuSystem
 		ecs::AddComponent(splashScreen, Transform{ .position = {0, 0, -0.5}, .scale = {1, 1, 0} });
 		ecs::AddComponent(splashScreen, SpriteRenderer{ .texture = resources::menuTextures["UI_Title_Background_1.png"], .uiElement = true });
 
-		resources::menuTextures["UI_PressStart.png"]->SetScalingFilter(GL_LINEAR_MIPMAP_LINEAR);
+		//resources::menuTextures["UI_PressStart.png"]->SetScalingFilter(GL_LINEAR);
 		startText = ecs::NewEntity();
-		ecs::AddComponent(startText, Transform{ .position = {-0.5, 0.2, -0.1}, .rotation = {0, 0, 15}, .scale = {.5, .05, 0} });
+		ecs::AddComponent(startText, Transform{ .position = {-0.5, 0.2, -0.1}, .rotation = {0, 0, 15}, .scale = {.45, .1, 0} });
 		ecs::AddComponent(startText, SpriteRenderer{ .texture = resources::menuTextures["UI_PressStart.png"], .uiElement = true });
 
 		creditsText = ecs::NewEntity();
-		ecs::AddComponent(creditsText, Transform{ .position = {0.65, -0.75, -0.1}, .scale = {0.3, 0.2, 0} });
-		ecs::AddComponent(creditsText, SpriteRenderer{ .texture = resources::menuTextures["UI_Credits_N.png"], .uiElement = true });
+		ecs::AddComponent(creditsText, Transform{ .position = {0.65, -0.8, -0.1}, .scale = {0.36, 0.07, 0} });
+		ecs::AddComponent(creditsText, SpriteRenderer{ .texture = resources::menuTextures["UI_PressCredits.png"], .uiElement = true });
 	}
 	//Destroy the main menu
 	void Unload()
@@ -736,7 +744,7 @@ namespace MainMenuSystem
 		if (!active)
 			return;
 
-		TransformSystem::Scale(startText, Vector3((std::sin(programTime * 4) / 700), (std::sin(programTime * 4) / 5000), 0));
+		TransformSystem::Scale(startText, Vector3((std::sin(programTime * 4) / 700), (std::sin(programTime * 4) / 3150), 0));
 
 		//If start pressed go to player select
 		if (input::GetNewPress("StartGame"))

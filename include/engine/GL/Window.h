@@ -47,6 +47,10 @@ namespace engine
 			glfwSetWindowMonitor(window, primaryMonitor, x, y, w, h, 60);
 		}
 
+		//Enable 4xMSAA
+		glfwWindowHint(GLFW_SAMPLES, 4);
+		glEnable(GL_MULTISAMPLE);
+
 		OPENGL_INITIALIZED = true;
 
 		return window;
