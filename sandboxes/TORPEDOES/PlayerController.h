@@ -111,6 +111,7 @@ void CreateTorpedo(engine::ecs::Entity entity)
 	Player& player = ecs::GetComponent<Player>(entity);
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
+	PolygonCollider& playerCollider = ecs::GetComponent<PolygonCollider>(entity);
 
 	float speed = 800;
 
@@ -127,7 +128,7 @@ void CreateTorpedo(engine::ecs::Entity entity)
 	ecs::AddComponent(torpedo, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(15) });
 	ecs::AddComponent(torpedo, Rigidbody{ .velocity = player.forwardDirection * torpedoProjectile.speed });
 	std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
-	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .layer = 4, .visualise = false,  .rotationOverride = std::abs(modelTransform.rotation.y) });
+	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .layer = 4, .visualise = true,  .rotationOverride = playerCollider.rotationOverride });
 	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models[torpedoProjectile.model] });
 	// sound effect 
 	engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(torpedo);
@@ -498,6 +499,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 
 		//Start submerging and slow down
 		playerComponent._boostScale -= 0.1;
+		playerComponent.forwardSpeed *= 0.80;
 
 		TransformSystem::Translate(playerEntity, { 0, 0, -20 });
 
@@ -554,6 +556,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 
 		//Start surfacing and speed up
 		playerComponent._boostScale += 0.1;
+		playerComponent.forwardSpeed /= 0.80;
 		playerComponent.specialEnabled = false;
 		TransformSystem::Translate(playerEntity, { 0, 0, 20 });
 
@@ -1198,7 +1201,7 @@ public:
 			engine::ecs::AddComponent(playerEntity, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .layer = 1, .visualise = true });
 
 			//Create the player's name tag
-			engine::ecs::AddComponent(playerNameText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "P" + to_string(playerShip.first + 1), .color = Vector3(0.5, 0.8, 0.2) });
+			engine::ecs::AddComponent(playerNameText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .color = Vector3(0.5, 0.8, 0.2)});
 			engine::ecs::AddComponent(playerNameText, engine::Transform{ .position = Vector3(-2, 2, 20), .scale = Vector3(0.1) });
 			engine::TransformSystem::AddParent(playerNameText, playerEntity);
 
