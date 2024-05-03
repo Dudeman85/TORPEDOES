@@ -9,7 +9,7 @@ namespace engine
 	bool OPENGL_INITIALIZED = false;
 
 	///Create OpenGL window and context
-	GLFWwindow* CreateGLWindow(int width, int height, const char* name)
+	GLFWwindow* CreateGLWindow(int width, int height, const char* name, bool fullscreen = false)
 	{
 		//Initialize GLFW and set it to require OpenGL 3
 		glfwInit();
@@ -38,7 +38,14 @@ namespace engine
 			}
 		);
 
-		//glEnable(GL_MULTISAMPLE);
+		//If specified set the window to fullsreen and monitors resolution
+		if (fullscreen) 
+		{
+			GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
+			int x, y, w, h;
+			glfwGetMonitorWorkarea(primaryMonitor, &x, &y, &w, &h);
+			glfwSetWindowMonitor(window, primaryMonitor, x, y, w, h, 60);
+		}
 
 		OPENGL_INITIALIZED = true;
 

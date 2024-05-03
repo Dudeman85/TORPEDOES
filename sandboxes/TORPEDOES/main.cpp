@@ -66,7 +66,7 @@ static void PlayCountdown(Vector3 pos)
 }
 
 // Create everything for level 1
-void LoadLevel1(engine::Camera* cam)
+static void LoadLevel1(engine::Camera* cam)
 {
 	engine::collisionSystem->cam = cam;
 
@@ -122,7 +122,7 @@ void LoadLevel1(engine::Camera* cam)
 }
 
 // Create everything for level 2
-void LoadLevel2(engine::Camera* cam)
+static void LoadLevel2(engine::Camera* cam)
 {
 	engine::collisionSystem->cam = cam;
 
@@ -395,7 +395,7 @@ static void PlayersMenu(std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem)
 int main()
 {
 	GameStates currentGameState = menuMainState;
-	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window");
+	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window", false);
 
 	engine::EngineInit();
 
@@ -424,13 +424,13 @@ int main()
 	soundSystem->AddSoundEngine("Music");
 
 	std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem = engine::ecs::GetSystem<PlayerSelectSystem>();
+	/*
 	ShipSelectionSystem->Init();
 	ShipSelectionSystem->isShipSelectionMenuOn = true;
+	*/
 	isGamePaused = true;
-	bool mapLoaded = false;
-
-	//MainMenuSystem mainMenu;
-	//mainMenu.Load();
+	
+	MainMenuSystem::Load();
 
 	//Bind all input actions
 	SetupInput();
@@ -451,8 +451,6 @@ int main()
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
-		//mainMenu.Update();
-
 		glfwPollEvents();
 
 		//Close window when Esc is pressed
@@ -517,6 +515,8 @@ int main()
 		hedgehogSystem->Update();
 		pickupSystem->Update();
 		engine::Update(&cam);
+
+		MainMenuSystem::Update();
 
 		if (canStartLoadingMap)
 		{
