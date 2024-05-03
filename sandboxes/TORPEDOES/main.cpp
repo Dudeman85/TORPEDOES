@@ -445,7 +445,7 @@ static void ReturnToMainMenu()
 int main()
 {
 	GameState currentGameState = menuMainState;
-	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window", false);
+	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window", true);
 
 	engine::EngineInit();
 
