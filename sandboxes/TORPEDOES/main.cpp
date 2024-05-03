@@ -314,8 +314,8 @@ static void LoadLevel4(engine::Camera* cam)
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1434.0f, -1520.0f));
 
 	//set this level's tilemap
-	engine::spriteRenderSystem->SetTilemap(resources::level3Map);
-	engine::collisionSystem->SetTilemap(resources::level3Map);
+	engine::spriteRenderSystem->SetTilemap(resources::level4Map);
+	engine::collisionSystem->SetTilemap(resources::level4Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
 	// Make all the checkpoints manually
@@ -385,8 +385,6 @@ static void SetupInput()
 
 	input::bindDigitalInput(GLFW_GAMEPAD_BUTTON_DPAD_LEFT, { "Turn" });
 
-
-
 	// TODO: add controller pause key
 
 	float AnalogPositiveMinDeadZone = 0;
@@ -394,9 +392,6 @@ static void SetupInput()
 
 	float AnalogNegativeMinDeadZone = -0.2;
 	float AnalogNegativeMaxDeadZone = 0;
-
-
-
 
 	for (size_t i = 0; i < 4; i++)
 	{
@@ -416,9 +411,6 @@ static void SetupInput()
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, { "Turn" + std::to_string(i) });
 
 
-
-
-
 		input::bindAnalogControllerInput(i,
 			{
 				{ { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER ,  },
@@ -432,8 +424,6 @@ static void SetupInput()
 				{ { input::controllerMixedInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_X }
 			},
 			{ "Turn" + std::to_string(i) });
-
-
 	}
 
 	// Keyboard input
@@ -638,12 +628,13 @@ int main()
 		engine::Update(&cam);
 
 
+		//TODO: This will be moved to level select system
 		if (canStartLoadingMap)
 		{
 			isGamePaused = false;
 			canStartLoadingMap = false;
 			playerSelectionSystem->isShipSelectionMenuOn = false;
-			LoadLevel1(&cam);
+			LoadLevel4(&cam);
 			gameState = gamePlayState;
 		}
 
@@ -651,30 +642,10 @@ int main()
 		// if paused or Pause pressed update PauseSystem
 		if (input::GetNewPress("Pause"))
 		{
-			pauseSystem->isGamePause = true;// !(pauseSystem->isGamePause);
+			pauseSystem->isGamePause = true;
 			isGamePaused = !isGamePaused;
-			//printf("\nGamePause pressed\n");
 			pauseSystem->ToggleShowUIOptionsMenu();
-
-		}
-		if (pauseSystem->isGamePause)
-		{
-			printf("\nGamePaused \n");
-			pauseSystem->Update();
-		}
-
-
-
-		if (input::GetNewPress("Menu"))
-		{
-			playerSelectionSystem->isShipSelectionMenuOn = !playerSelectionSystem->isShipSelectionMenuOn;
-			isGamePaused = !isGamePaused;
-
-
-			playerSelectionSystem->ToggleMenuPlayerSelection();
-
-
-			std::cout << "is Ship selection open:" << playerSelectionSystem->isShipSelectionMenuOn;
+			gameState = inGameOptionsState;
 		}
 
 		ecs::Update();
