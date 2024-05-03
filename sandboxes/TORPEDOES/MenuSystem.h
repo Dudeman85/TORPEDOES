@@ -15,6 +15,8 @@ std::unordered_map<int, ShipType> playerShips;
 static void LoadLevel4(engine::Camera* cam);
 static void LoadLevel3(engine::Camera* cam);
 static void LoadLevel2(engine::Camera* cam);
+static void LoadLevel1(engine::Camera* cam);
+class PlayerSelectSystem;
 ECS_REGISTER_COMPONENT(Level)
 struct Level
 {
@@ -41,15 +43,22 @@ class LevelSelectionSystem : public engine::ecs::System
 	engine::ecs::Entity arrowsPivot = ecs::NewEntity();
 	float throttleCurrentWaitedTimeUp = 0;
 	float throttleCurrentWaitedTimeDown = 0;
-	float waitTime = 1.2f;
+	
 	int mapLevelIndex = 0;
 
 	engine::Camera* cam;
 	vector<Texture*> mapImages;
-public:	
+
+	double mapChangeTime = 0.5;
+	
+	bool readyToMoveLeft = true;
+	bool readyToMoveRight = true;
+	bool callDeleyLeft = true;
+	bool callDeleyRight = true;
+public:
 
 	engine::ecs::Entity arrowLeft = ecs::NewEntity();
-
+	int firstPlayer;
 
 
 	void Init()
@@ -87,26 +96,26 @@ public:
 	}
 	void LoadThisLevel(int mapIndex)
 	{
-		mapIndex++;
-
+		ecs::DestroyAllEntities();
+		gameState = gamePlayState;
 		switch (mapIndex)
 		{
-		case 1:
+		case 0:
 		{
-			//LoadLevel1(cam);
+			LoadLevel1(cam);
 			break;
 		}
-		case 2:
+		case 1:
 		{
 			LoadLevel2(cam);
 			break;
 		}
-		case 3:
+		case 2:
 		{
 			LoadLevel3(cam);
 			break;
 		}
-		case 4:
+		case 3:
 		{
 			LoadLevel4(cam);
 			break;
@@ -121,69 +130,66 @@ public:
 	void Update()
 	{
 
-		for (int i = 0; i < 4; i++) {
 
 
-			float turnInput = input::GetTotalInputValue("Turn" + to_string(i));
 
-			std::cout << "turnInput:" << turnInput << endl;
-			if (turnInput > 0)
+
+
+
+		float turnInput = input::GetTotalInputValue("Turn" + to_string(firstPlayer));
+
+		
+		if (turnInput > 0 && readyToMoveLeft)
+		{
+			readyToMoveLeft = false;
+
+
+			TimerSystem::ScheduleFunction([this]() { readyToMoveLeft = true; }, mapChangeTime);
+
+
+			mapLevelIndex++;
+			if (mapLevelIndex >= mapImages.size())
 			{
-				// Throttle up
-				throttleCurrentWaitedTimeUp += engine::deltaTime;
-
-				while (throttleCurrentWaitedTimeUp >= waitTime)
-				{
-					// Next ship
-					throttleCurrentWaitedTimeUp -= waitTime;
-
-					mapLevelIndex++;
-					if (mapLevelIndex >= mapImages.size())
-					{
-						mapLevelIndex = 0;
-					}
-					
-				}
-				ecs::GetComponent<SpriteRenderer>(currentSelectedLevel).texture = mapImages[mapLevelIndex];
-				TransformSystem::SetScale(arrowLeft, Vector3(0.08f));
-				TimerSystem::ScheduleFunction([this]() {TransformSystem::SetScale(arrowLeft, Vector3(0.04f)); }, 0.1);
-				ecs::GetComponent<SpriteRenderer>(currentSelectedLevel).texture = mapImages[mapLevelIndex];
-				std::cout << "\n mapImages[mapLevelIndex]: " << mapImages[mapLevelIndex] << std::endl;
+				mapLevelIndex = 0;
 			}
-			else
-			{
-				// No throttle input up
-				throttleCurrentWaitedTimeUp = 0;
-			}
-			if (turnInput < 0)
-			{
-				// Throttle up
-				throttleCurrentWaitedTimeDown += engine::deltaTime;
+			std::cout << "LevelIndex:" << mapLevelIndex << endl;
 
-				while (throttleCurrentWaitedTimeUp >= waitTime)
-				{
-					mapLevelIndex--;
-					// Next ship
-					throttleCurrentWaitedTimeDown -= waitTime;
-					if (mapLevelIndex <=0)
-					{
-						mapLevelIndex = mapImages.size()-1;
-					}
-				}
-				TransformSystem::SetScale(arrowRight, Vector3(0.08f));
-				TimerSystem::ScheduleFunction([this]() {TransformSystem::SetScale(arrowRight, Vector3(0.04f)); }, 0.1);
-				ecs::GetComponent<SpriteRenderer>(currentSelectedLevel).texture = mapImages[mapLevelIndex];
-				std::cout << "\nDOWN mapImages[mapLevelIndex]: " << mapImages[mapLevelIndex] << std::endl;
-			}
-			
-			
-
-			if(input::GetNewPress("StartGame"))
-			{
-				LoadThisLevel(mapLevelIndex);
-			
-			}
+			ecs::GetComponent<SpriteRenderer>(currentSelectedLevel).texture = mapImages[mapLevelIndex];
+			TransformSystem::SetScale(arrowLeft, Vector3(0.08f));
+			TimerSystem::ScheduleFunction([this]() {TransformSystem::SetScale(arrowLeft, Vector3(0.04f)); }, 0.1);
+			ecs::GetComponent<SpriteRenderer>(currentSelectedLevel).texture = mapImages[mapLevelIndex];
+			std::cout << "\n mapImages[mapLevelIndex]: " << mapImages[mapLevelIndex] << std::endl;
 		}
+
+		if (turnInput < 0 && readyToMoveRight)
+		{
+
+			readyToMoveRight = false;
+			TimerSystem::ScheduleFunction([this]() { readyToMoveRight = true; }, mapChangeTime);
+
+			mapLevelIndex--;
+
+			if (mapLevelIndex < 0)
+			{
+				mapLevelIndex = mapImages.size() - 1;
+			}
+			
+			std::cout << "LevelIndex:" << mapLevelIndex << endl;
+			TransformSystem::SetScale(arrowRight, Vector3(0.08f));
+			TimerSystem::ScheduleFunction([this]() {TransformSystem::SetScale(arrowRight, Vector3(0.04f)); }, 0.1);
+			ecs::GetComponent<SpriteRenderer>(currentSelectedLevel).texture = mapImages[mapLevelIndex];
+			std::cout << "\nDOWN mapImages[mapLevelIndex]: " << mapImages[mapLevelIndex] << std::endl;
+		}
+
+
+
+		if (input::GetNewPress("StartGame"))
+		{
+			
+			LoadThisLevel(mapLevelIndex);
+
+		}
+
 	}
 };
 
@@ -239,7 +245,6 @@ class PlayerSelectSystem : public engine::ecs::System
 	const float throttleMoveWaitTime = 0.4f;
 	engine::ecs::Entity selectionWindow;
 
-	std::unordered_map<int, ShipType>selectedShipsAtTheFrame;
 
 	int playersThatAreReadyAmount = 0;
 
@@ -247,6 +252,7 @@ class PlayerSelectSystem : public engine::ecs::System
 	engine::ecs::Entity controlScheme;
 
 public:
+	std::unordered_map<int, ShipType>selectedShipsAtTheFrame;
 	//std::vector<ShipType> playerShips;
 	//static bool canStartLoadingMap;
 
@@ -571,6 +577,17 @@ public:
 
 		if (startLevelTimer >= (startLevelTime + startLevelLoadingTime) || input::GetNewPress("StartGame"))
 		{
+			auto& firstPlayer = ecs::GetSystem<LevelSelectionSystem>()->firstPlayer;
+			firstPlayer = 5;
+			for (auto player : selectedShipsAtTheFrame)
+			{
+
+				if (player.first < firstPlayer)
+				{
+					firstPlayer = player.first;
+
+				}
+			}
 			printf("============= GAME STARTING ==========\n");
 
 			// Reached timer end: Load level
@@ -582,7 +599,9 @@ public:
 			ToggleMenuPlayerSelection();
 			std::shared_ptr<LevelSelectionSystem> levelSelectionSystem = engine::ecs::GetSystem<LevelSelectionSystem>();
 			levelSelectionSystem->Init();
+
 			gameState = mapSelection;
+
 		}
 	}
 
