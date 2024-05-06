@@ -28,7 +28,6 @@ struct Projectile
 
 	std::string hitAnimation = "explosion";
 	std::string model = "Weapon_Torpedo.obj";
-	Audio* explosionSound;
 };
 
 ECS_REGISTER_COMPONENT(Hedgehog)
@@ -38,7 +37,6 @@ struct Hedgehog
 	float targetDistance = 0;	// Distance until explosion
 
 	engine::ecs::Entity aimingGuide;
-	Audio* explosionSound;
 };
 
 static void CreateAnimation(engine::ecs::Entity entity)
@@ -50,23 +48,15 @@ static void CreateAnimation(engine::ecs::Entity entity)
 
 	engine::ecs::Entity torpedoAnim = engine::ecs::NewEntity();
 
-	Audio* audio = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 1000);
-
-
-	engine::ecs::AddComponent(torpedoAnim, engine::SoundComponent{ .Sounds = {{"EplosionHit" ,audio}} });
+	//Audio* audio = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 1);
+	//engine::ecs::AddComponent(torpedoAnim, engine::SoundComponent{ .Sounds = {{"Explosion", audio}} });
 
 	engine::ecs::AddComponent(torpedoAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, ((double)rand() / (double)RAND_MAX) + 2), .scale = Vector3(20) });
 	engine::ecs::AddComponent(torpedoAnim, engine::SpriteRenderer{ });
 	engine::ecs::AddComponent(torpedoAnim, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
 
-	// MIKA ME MUUTATIN COSNT STRING MISSÄ LUKKE "HIT" ÄLÄ MUOKATA SIKSI C++ EI OSA LUUKE OIKEA JOS IE CONST STRING
 	engine::AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, "hit");
 	engine::AnimationSystem::PlayAnimation(torpedoAnim, "hit", false);
-
-	engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(torpedoAnim);
-	soundComponent.Sounds["EplosionHit"]->play();
-	
-
 };
 
 void CreateHedgehogExplosion(engine::ecs::Entity entity)
@@ -91,10 +81,10 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 	//create audio Explosion tilemap ID
 	Audio* audio = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 100);
 	Audio* audio1 = engine::AddAudio("Gameplay", "audio/dink.wav", false, 100);
+	audio->pause();
+	audio1->pause();
 
-
-	engine::ecs::AddComponent(hedgehogExplosion, engine::SoundComponent{ .Sounds = {{"Explosion" ,audio},{"Dink"  , audio1}} });
-
+	engine::ecs::AddComponent(hedgehogExplosion, engine::SoundComponent{ .Sounds = {{"Explosion" ,audio},{"WaterExplosion", audio1}} });
 
 	//Disable the hedgehog collider after .5 seconds
 	engine::TimerSystem::ScheduleFunction([hedgehogExplosion]()
@@ -113,7 +103,6 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 		// Wall collision effect suond nime Explosion
 		engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(hedgehogExplosion);
 		soundComponent.Sounds["Explosion"]->play();
-		
 	}
 	else
 	{
@@ -122,9 +111,7 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 
 		// water collison tile sound effect nime Dink
 		engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(hedgehogExplosion);
-		soundComponent.Sounds["Dink"]->play();
-		
-
+		soundComponent.Sounds["WaterExplosion"]->play();
 	}
 };
 

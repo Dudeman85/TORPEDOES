@@ -39,7 +39,6 @@ class LevelSelectionSystem : public engine::ecs::System
 	engine::ecs::Entity mapName = ecs::NewEntity();
 	engine::ecs::Entity mapSelectText = ecs::NewEntity();
 
-
 	int mapLevelIndex = 0;
 
 	//REFERENCE TO CAMRA TO CALL LEVEL METHOD 
@@ -59,11 +58,10 @@ class LevelSelectionSystem : public engine::ecs::System
 	//ARROWS PLACEMENT
 	float arrowPosHight = 0.88f;
 	float arrowsOffsetX = 0.6f;
-public:
 
+public:
 	engine::ecs::Entity arrowLeft;
 	int firstPlayer;
-
 
 	void Init()
 	{
@@ -89,16 +87,17 @@ public:
 		engine::ecs::AddComponent(mapName, engine::TextRenderer{.font=resources::niagaraFont,.text="Level: 1",.offset = Vector3(-0.12f,0,0),.scale = Vector3(0.003f),.color = mapTextColor,.uiElement = true });
 
 		engine::ecs::AddComponent(mapSelectText, engine::Transform{ .position = Vector3(0,  -0.94f, 0.95), .scale = Vector3(1) });
-		engine::ecs::AddComponent(mapSelectText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "Press BOOST {B} to play",.offset = Vector3(-0.39f,0,0), .scale = Vector3(0.003f),.color = playTextColor,.uiElement = true});
+		engine::ecs::AddComponent(mapSelectText, engine::TextRenderer
+		{ 
+			.font = resources::niagaraFont, 
+			.text = "{B} to play",.offset = Vector3(-0.39f,0,0), .scale = Vector3(0.003f),.color = playTextColor,.uiElement = true}
+		);
 
 		engine::ecs::AddComponent(levelSelectionBackground, engine::Transform{ .position = Vector3(0, 0, -0.5f), .scale = Vector3(1) });
 		engine::ecs::AddComponent(levelSelectionBackground, SpriteRenderer{ .texture = resources::menuTextures["Selection_BG_Var3.png"], .enabled = true,.uiElement = true });
 
-
-
 		engine::ecs::AddComponent(currentSelectedLevel, engine::Transform{ .position = Vector3(0, 0, -0.5f), .scale = Vector3(0.8f) });
 		engine::ecs::AddComponent(currentSelectedLevel, SpriteRenderer{ .texture = resources::menuTextures["level1.png"], .enabled = true,.uiElement = true });
-
 
 		engine::ecs::AddComponent(arrowLeft, engine::Transform{ .position = Vector3(arrowsOffsetX, 0, -0.1f), .rotation = Vector3(0, 0, 180), .scale = Vector3(0.04f) });
 		engine::ecs::AddComponent(arrowLeft, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"], .enabled = true, .uiElement = true });
@@ -119,47 +118,32 @@ public:
 		gameState = gamePlayState;
 		switch (mapIndex)
 		{
-		case 0:
-		{
-			LoadLevel1(cam);
-			break;
-		}
-		case 1:
-		{
-			LoadLevel2(cam);
-			break;
-		}
-		case 2:
-		{
-			LoadLevel3(cam);
-			break;
-		}
-		case 3:
-		{
-			LoadLevel4(cam);
-			break;
-		}
-		default:
-		{
-			std::cout << "NO LEVEL ON THAT INDEX" << mapIndex << std::endl;
-		}
-		break;
+			case 0:
+				LoadLevel1(cam);
+				break;
+			case 1:
+				LoadLevel2(cam);
+				break;
+			case 2:
+				LoadLevel3(cam);
+				break;
+			case 3:
+				LoadLevel4(cam);
+				break;
+			default:
+				std::cout << "NO LEVEL ON THAT INDEX" << mapIndex << std::endl;
+				break;
 		}
 	}
 	void Update()
 	{
-
-
 		float turnInput = input::GetTotalInputValue("Turn" + to_string(firstPlayer));
-
 
 		if (turnInput > 0 && readyToMoveLeft)
 		{
 			readyToMoveLeft = false;
 
-
 			TimerSystem::ScheduleFunction([this]() { readyToMoveLeft = true; }, mapChangeTime);
-
 
 			mapLevelIndex++;
 			if (mapLevelIndex >= mapImages.size())
@@ -171,7 +155,6 @@ public:
 			//TODO: LEVEL NAME HERE
 			ecs::GetComponent<TextRenderer>(mapName).text = "Level: " + to_string((mapLevelIndex+1));
 
-
 			TransformSystem::SetScale(arrowLeft, Vector3(0.08f));
 			TimerSystem::ScheduleFunction([this]() {TransformSystem::SetScale(arrowLeft, Vector3(0.04f)); }, 0.1);
 			ecs::GetComponent<SpriteRenderer>(currentSelectedLevel).texture = mapImages[mapLevelIndex];
@@ -180,7 +163,6 @@ public:
 
 		if (turnInput < 0 && readyToMoveRight)
 		{
-
 			readyToMoveRight = false;
 			TimerSystem::ScheduleFunction([this]() { readyToMoveRight = true; }, mapChangeTime);
 
@@ -190,10 +172,7 @@ public:
 			{
 				mapLevelIndex = mapImages.size() - 1;
 			}
-			std::cout << "LevelIndex:" << mapLevelIndex << endl;
-
-
-			//TODO: LEVEL NAME HERE			
+			std::cout << "LevelIndex:" << mapLevelIndex << endl;		
 			ecs::GetComponent<TextRenderer>(mapName).text = "Level: "+ to_string((mapLevelIndex+1));
 
 			TransformSystem::SetScale(arrowRight, Vector3(0.08f));
@@ -202,15 +181,14 @@ public:
 			std::cout << "\nDOWN mapImages[mapLevelIndex]: " << mapImages[mapLevelIndex] << std::endl;
 		}
 
-
-
-		if (input::GetNewPress("Boost"+ std::to_string(firstPlayer) ))
+		for(int i = 0; i < 4; i++)
 		{
-
-			LoadThisLevel(mapLevelIndex);
-
+			if (input::GetNewPress("Boost" + std::to_string(i)))
+			{
+				LoadThisLevel(mapLevelIndex);
+				break;
+			}
 		}
-
 	}
 };
 
@@ -264,7 +242,6 @@ class PlayerSelectSystem : public engine::ecs::System
 	const float throttleMoveWaitTime = 0.4f;
 	engine::ecs::Entity selectionWindow;
 
-
 	int playersThatAreReadyAmount = 0;
 
 	//This is a temporary constol scheme display for playtesting
@@ -311,83 +288,62 @@ public:
 		//TODO: Get reference to stats and add them here
 		switch (shipType)
 		{
-
-		case ShipType::torpedoBoat:
-		{
-			shipName = "Torpedo Boat";
-			baseSpeed = "Medium";
-			maneuverability = "Medium";
-			mainAttack = "Torpedo";
-			special = "Boost";
-			break;
-		}
-		case ShipType::submarine:
-		{
-			shipName = "Submarine";
-			baseSpeed = "Medium";
-			maneuverability = "Medium";
-			mainAttack = "Torpedo";
-			special = "Submerge";
-			break;
-		}
-		case ShipType::cannonBoat:
-		{
-			shipName = "Battleship";
-			baseSpeed = "Medium";
-			maneuverability = "Medium";
-			mainAttack = "Cannon";
-			special = "Boost";
-			break;
-		}
-		case ShipType::hedgehogBoat:
-		{
-			shipName = "Destroyer";
-			baseSpeed = "Medium";
-			maneuverability = "Medium";
-			mainAttack = "Hedghehog Mortar";
-			special = "Boost";
-			break;
-		}
-		case ShipType::pirateShip:
-		{
-			shipName = "PirateShip";
-			baseSpeed = "Medium";
-			maneuverability = "Medium";
-			mainAttack = "Cannonballs";
-			special = "Reload";
-			break;
-		}
-		default:
-			break;
+			case ShipType::torpedoBoat:
+				shipName = "Torpedo Boat";
+				baseSpeed = "Medium";
+				maneuverability = "Medium";
+				mainAttack = "Torpedo";
+				special = "Boost";
+				break;
+			case ShipType::submarine:
+				shipName = "Submarine";
+				baseSpeed = "Medium";
+				maneuverability = "Medium";
+				mainAttack = "Torpedo";
+				special = "Submerge";
+				break;
+			case ShipType::cannonBoat:
+				shipName = "Battleship";
+				baseSpeed = "Medium";
+				maneuverability = "Medium";
+				mainAttack = "Cannon";
+				special = "Boost";
+				break;
+			case ShipType::hedgehogBoat:
+				shipName = "Destroyer";
+				baseSpeed = "Medium";
+				maneuverability = "Medium";
+				mainAttack = "Hedghehog Mortar";
+				special = "Boost";
+				break;
+			case ShipType::pirateShip:
+				shipName = "PirateShip";
+				baseSpeed = "Medium";
+				maneuverability = "Medium";
+				mainAttack = "Cannonballs";
+				special = "Reload";
+				break;
+			default:
+				break;
 		}
 
 		//NameColoring
 		switch (playerSelection.playerID)
 		{
-		case 0:
-		{
-			nameColor = nameColor = Vector3(109, 0, 255);
-			break;
-		}
-		case 1:
-		{
-
-			nameColor = nameColor = Vector3(0, 255, 0);
-			break;
-		}
-		case 2:
-		{
-			nameColor = Vector3(0, 230, 255);
-			break;
-		}
-		case 3:
-		{
-			nameColor = Vector3(255, 248, 0);
-
-			break;
-		}
-		default:
-			break;
+			case 0:
+				nameColor = nameColor = Vector3(109, 0, 255);
+				break;
+			case 1:
+				nameColor = nameColor = Vector3(0, 255, 0);
+				break;
+			case 2:
+				nameColor = Vector3(0, 230, 255);
+				break;
+			case 3:
+				nameColor = Vector3(255, 248, 0);
+				break;
+			default:
+				break;
 		}
 
 		std::string playerNumStats = "Player " + to_string(playerSelection.playerID + 1);
@@ -504,26 +460,20 @@ public:
 			Vector3 offsetPlayerWindows;
 			switch (i)
 			{
-			case 0:
-			{
-				offsetPlayerWindows = Vector3(-offsetX, offsetY, 0);
-				break;
-			}
-			case 1:
-			{
-				offsetPlayerWindows = Vector3(offsetX, offsetY, 0);
-				break;
-			}
-			case 2:
-			{
-				offsetPlayerWindows = Vector3(-offsetX, -offsetY, 0);
-				break;
-			}
-			case 3:
-			{
-				offsetPlayerWindows = Vector3(offsetX, -offsetY, 0);
-				break;
-			}
+				case 0:
+					offsetPlayerWindows = Vector3(-offsetX, offsetY, 0);
+					break;
+				case 1:
+					offsetPlayerWindows = Vector3(offsetX, offsetY, 0);
+					break;
+				case 2:
+					offsetPlayerWindows = Vector3(-offsetX, -offsetY, 0);
+					break;
+				case 3:
+					offsetPlayerWindows = Vector3(offsetX, -offsetY, 0);
+					break;
+				default:
+					break;
 			}
 
 			engine::ecs::AddComponent(selectionWindow, engine::Transform{ .position = offsetPlayerWindows, .scale = Vector3(0.5, 0.5, -0.1f) });
@@ -620,7 +570,6 @@ public:
 			levelSelectionSystem->Init();
 
 			gameState = mapSelection;
-
 		}
 	}
 
@@ -850,20 +799,20 @@ public:
 
 			printf("Out MenuPlayerSelection\n\n\n");
 		}
-	};
+	}
+
 	static void BackToUIMenu()
 	{
 		engine::ecs::GetSystem<PlayerSelectSystem>()->ToggleMenuPlayerSelection();
 	}
 };
 
-using namespace engine;
 namespace MainMenuSystem
 {
-	ecs::Entity splashScreen;
-	ecs::Entity startText;
-	ecs::Entity creditsText;
-	ecs::Entity creditsScreen;
+	engine::ecs::Entity splashScreen;
+	engine::ecs::Entity startText;
+	engine::ecs::Entity creditsText;
+	engine::ecs::Entity creditsScreen;
 	bool active;
 	bool inCredits;
 
@@ -875,68 +824,86 @@ namespace MainMenuSystem
 		gameState = menuMainState;
 
 		splashScreen = ecs::NewEntity();
-		ecs::AddComponent(splashScreen, Transform{ .position = {0, 0, -0.5}, .scale = {1, 1, 0} });
-		ecs::AddComponent(splashScreen, SpriteRenderer{ .texture = resources::menuTextures["UI_Title_Background_1.png"], .uiElement = true });
+		engine::ecs::AddComponent(splashScreen, Transform{ .position = {0, 0, -0.5}, .scale = {1, 1, 0} });
+		engine::ecs::AddComponent(splashScreen, SpriteRenderer{ .texture = resources::menuTextures["UI_Title_Background_1.png"], .uiElement = true });
 
 		resources::menuTextures["UI_PressStart.png"]->SetScalingFilter(GL_LINEAR);
-		startText = ecs::NewEntity();
-		ecs::AddComponent(startText, Transform{ .position = {-0.5, 0.2, -0.1}, .rotation = {0, 0, 15}, .scale = {.45, .1, 0} });
-		ecs::AddComponent(startText, SpriteRenderer{ .texture = resources::menuTextures["UI_PressStart.png"], .uiElement = true });
+		startText = engine::ecs::NewEntity();
+		engine::ecs::AddComponent(startText, engine::Transform{ .position = {-0.5, 0.2, -0.1}, .rotation = {0, 0, 15}, .scale = {.45, .1, 0} });
+		engine::ecs::AddComponent(startText, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_PressStart.png"], .uiElement = true });
 
-		creditsText = ecs::NewEntity();
-		ecs::AddComponent(creditsText, Transform{ .position = {0.65, -0.8, -0.1}, .scale = {0.30, 0.06, 0} });
-		ecs::AddComponent(creditsText, SpriteRenderer{ .texture = resources::menuTextures["UI_PressCredits.png"], .uiElement = true });
+		creditsText = engine::ecs::NewEntity();
+		engine::ecs::AddComponent(creditsText, engine::Transform{ .position = {0.65, -0.8, -0.1}, .scale = {0.30, 0.06, 0} });
+		engine::ecs::AddComponent(creditsText, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_PressCredits.png"], .uiElement = true });
 
-		creditsScreen = ecs::NewEntity();
-		ecs::AddComponent(creditsScreen, Transform{ .position = {0, -0, 0.5}, .scale = {1, 1, 0} });
-		ecs::AddComponent(creditsScreen, SpriteRenderer{ .texture = resources::menuTextures["UI_Credits_Screen.png"], .enabled = false, .uiElement = true });
+		creditsScreen = engine::ecs::NewEntity();
+		engine::ecs::AddComponent(creditsScreen, engine::Transform{ .position = {0, -0, 0.5}, .scale = {1, 1, 0} });
+		engine::ecs::AddComponent(creditsScreen, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Credits_Screen.png"], .enabled = false, .uiElement = true });
 	}
 	//Destroy the main menu
 	void Unload()
 	{
 		active = false;
-		ecs::DestroyEntity(splashScreen);
-		ecs::DestroyEntity(startText);
-		ecs::DestroyEntity(creditsText);
-		ecs::DestroyEntity(creditsScreen);
+		engine::ecs::DestroyEntity(splashScreen);
+		engine::ecs::DestroyEntity(startText);
+		engine::ecs::DestroyEntity(creditsText);
+		engine::ecs::DestroyEntity(creditsScreen);
 	}
 	//Handle animations and input
 	void Update()
 	{
 		if (!active)
+		{
 			return;
+		}
 
 		TransformSystem::Scale(startText, Vector3((std::sin(programTime * 4) / 700), (std::sin(programTime * 4) / 3150), 0));
 
-		//If start pressed go to player select
-		if (input::GetNewPress("Pause") || input::GetNewPress("StartGame") || input::GetNewPress("Shoot0") || input::GetNewPress("Shoot1") || input::GetNewPress("Shoot2") || input::GetNewPress("Shoot3"))
+		bool goPlayerSelect = false;
+		if (input::GetNewPress("Pause") || input::GetNewPress("StartGame"))
 		{
-			//If in credits return to splash screen
+			goPlayerSelect = true;
+		}
+		for (int i = 0; i < 4; i++)
+		{
+			if (input::GetNewPress("Shoot" + to_string(i)))
+			{
+				goPlayerSelect = true;
+				break;
+			}
+		}
+		if (goPlayerSelect)
+		{
 			if (inCredits)
 			{
+				// Return to splash screen
 				SpriteRenderer& sr = ecs::GetComponent<SpriteRenderer>(creditsScreen);
 				inCredits = false;
 				sr.enabled = false;
 			}
-			//Otherwise go to ship select menu
 			else
 			{
+				// Go to ship select menu
 				ecs::GetSystem<PlayerSelectSystem>()->Init();
 				ecs::GetSystem<PlayerSelectSystem>()->isShipSelectionMenuOn = true;
 				gameState = selectPlayersState;
 				Unload();
 			}
 		}
-		//If special pressed go to credits
-		if (input::GetNewPress("Boost0") || input::GetNewPress("Boost1") || input::GetNewPress("Boost2") || input::GetNewPress("Boost3"))
+
+		for (int i = 0; i < 4; i++)
 		{
-			SpriteRenderer& sr = ecs::GetComponent<SpriteRenderer>(creditsScreen);
-			inCredits = !inCredits;
-			sr.enabled = !sr.enabled;
+			if (input::GetNewPress("Boost" + to_string(i)))
+			{
+				// Go to credits
+				SpriteRenderer& sr = ecs::GetComponent<SpriteRenderer>(creditsScreen);
+				inCredits = !inCredits;
+				sr.enabled = !sr.enabled;
+				break;
+			}
 		}
 	}
-};
-
+}
 
 ECS_REGISTER_COMPONENT(PauseComponent)
 struct PauseComponent
