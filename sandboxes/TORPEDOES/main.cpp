@@ -301,6 +301,15 @@ static void LoadLevel3(engine::Camera* cam)
 	CreateSmallCrowd({ 2014, -990, 175 }, resources::crowdAnims2);
 	CreateSmallCrowd({ 2014, -1020, 176 }, resources::crowdAnims2);
 	// ********************
+	// Dock audience
+	CreateCrowd({ 500.000000, -810.000000, 166 }, resources::crowdAnims1);			// First crowd from top.
+	CreateCrowd({ 480.000000, -825.000000, 167}, resources::crowdAnims1);			// Second crowd
+	CreateSmallCrowd({ 445.000000, -910.000000, 166 }, resources::crowdAnims2);		// Third crowd
+	CreateSmallCrowd({ 445.000000, -935.000000, 167 }, resources::crowdAnims2);		// Fourth crowd
+	CreateSmallCrowd({ 445.000000, -1000.000000, 166 }, resources::crowdAnims2);	// Fifth crowd
+	CreateSmallCrowd({ 445.000000, -1070.000000, 166 }, resources::crowdAnims2);	// Sixth crowd
+	CreateSmallCrowd({ 445.000000, -1100.000000, 167 }, resources::crowdAnims2);	// Seventh crowd
+	CreateSmallCrowd({ 445.000000, -1130.000000, 168 }, resources::crowdAnims2);	// Eighth crowd
 
 	PlayCountdown(Vector3(2480.0f, -1460.0f, 200.0f));
 	PlayerController::lapCount = 3;
