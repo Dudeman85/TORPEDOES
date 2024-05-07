@@ -521,6 +521,7 @@ int main()
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 166), .scale = 20 });
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
+	ecs::AddTag(placementEditor, "persistent");
 
 	//Collision layer matrix setup
 	//Currently 0 = default, 1 = surface players, 2 = underwater, 3 = bridges, 4 = projectiles
