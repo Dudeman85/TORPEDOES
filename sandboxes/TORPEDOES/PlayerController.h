@@ -1145,7 +1145,6 @@ public:
 
 			ecs::GetComponent<Animator>(player.wakeAnimationEntity).playbackSpeed = std::lerp(0.1, 2, rigidbody.velocity.Length() / 900);
 			TransformSystem::SetPosition(player.wakeAnimationEntity, transform.position/* - Vector3(player.forwardDirection.Normalize(), -10)*/);
-			std::cout << player.forwardDirection.Normalize().ToString();
 
 			// Obtener el objeto de sonido "EngineMono"
 			auto* engineSound = soundComponent.Sounds["EngineMono"+ to_string(player.id)];
