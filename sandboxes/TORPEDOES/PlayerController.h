@@ -594,10 +594,11 @@ void CannonIndicatorUpdate(engine::ecs::Entity entity)
 	{
 		sprite.texture = it.textures[1];
 	}
-
+	/*
 	Vector2 baseScale = {1, 1};
 
 	transform.scale = { baseScale.x * camHeight * 0.001f, baseScale.y * (camHeight * aspectRatio) * 0.001f, 0 };
+	*/
 }
 
 void HedgehogIndicatorUpdate(engine::ecs::Entity entity)
@@ -889,8 +890,8 @@ public:
 
 				CreateAnimation(collision.b);
 
-				engine::SoundComponent& sound = ecs::GetComponent<engine::SoundComponent>(collision.b);
-				sound.Sounds["Explosion"]->play();
+				//engine::SoundComponent& sound = ecs::GetComponent<engine::SoundComponent>(collision.b);
+				//sound.Sounds["Explosion"]->play();
 
 				//Destroy projectile at end of frame
 				engine::ecs::DestroyEntity(collision.b);
