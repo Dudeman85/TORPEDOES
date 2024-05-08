@@ -119,7 +119,7 @@ void CreateTorpedo(engine::ecs::Entity entity)
 	ecs::Entity torpedo = ecs::NewEntity();
 
 	// Torpedo shoot sound 
-	Audio* audio = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 1);
+	Audio* audio = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 100);
 	engine::ecs::AddComponent(torpedo, engine::SoundComponent{ .Sounds = {{"TorpedoShoot", audio}}});
 
 	ecs::AddComponent(torpedo, Projectile{ .ownerID = player.id, .speed = speed, .hitType = HitStates::Stop, .hitTime = 0.8 });

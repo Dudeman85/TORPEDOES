@@ -100,14 +100,11 @@ static void LoadLevel1(engine::Camera* cam)
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3270.000000, -1125.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3270.000000, -1045.000000, 0.300000));
 
-	////hairpin top
-	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1305.000000, -995.000000, 0.300000));
-	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1170.000000, -995.000000, 0.300000));
-	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1020.000000, -995.000000, 0.300000));
 
 	//second last corner
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(700.000000, -1710.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(615.000000, -1645.000000, 0.300000));
+
 
 	//Make the crowds manually
 	// Start/Finish line crowd
@@ -159,8 +156,10 @@ static void LoadLevel2(engine::Camera* cam)
 	CreateCheckpoint(Vector3(1245.000000, -1680.000000, 100.000000), Vector3(75.000000, -90.000000, 7.500000), Vector3(22), resources::models["Prop_Goal_Ver2.obj"], 0.0f, true);	// Finish line
 
 	//first loop
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1495.000000, -1240.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1665.000000, -995.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1710.000000, -995.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1660.000000, -995.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1610.000000, -995.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1560.000000, -995.000000, 0.300000));
 
 	//second loop triple
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3365.000000, -1060.000000, 0.300000));
@@ -169,16 +168,18 @@ static void LoadLevel2(engine::Camera* cam)
 
 	//second loop, between stones
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2950.000000, -1585.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2885.000000, -1055.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2710.000000, -1790.000000, 0.300000));
+	
 
 	//topright hairpin
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3355.000000, -410.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3355.000000, -375.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3355.000000, -440.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3355.000000, -400.000000, 0.300000));
 
 	//before last loop
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2255.000000, -800.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2155.000000, -605.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2210.000000, -620.000000, 0.350000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2160.000000, -620.000000, 0.350000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2110.000000, -620.000000, 0.350000));
+
+
 
 	//before chicane
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(425.000000, -855.000000, 0.300000));
@@ -208,7 +209,7 @@ static void LoadLevel2(engine::Camera* cam)
 	CreateCrowd({ 1850.000000, -860.000000, 166 }, resources::crowdAnims1); // Second row, fourth crowd
 	// ********************
 
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1455.000000, -1295.000000, 0.300000));
+	
 
 	PlayCountdown(Vector3(1150.0f, -1500.0f, 0.0f));
 	PlayerController::lapCount = 3;
@@ -302,14 +303,22 @@ static void LoadLevel3(engine::Camera* cam)
 	CreateSmallCrowd({ 2014, -1020, 176 }, resources::crowdAnims2);
 	// ********************
 	// Dock audience
-	CreateCrowd({ 500.000000, -810.000000, 166 }, resources::crowdAnims1);			// First crowd from top.
-	CreateCrowd({ 480.000000, -825.000000, 167}, resources::crowdAnims1);			// Second crowd
-	CreateSmallCrowd({ 445.000000, -910.000000, 166 }, resources::crowdAnims2);		// Third crowd
-	CreateSmallCrowd({ 445.000000, -935.000000, 167 }, resources::crowdAnims2);		// Fourth crowd
-	CreateSmallCrowd({ 445.000000, -1000.000000, 166 }, resources::crowdAnims2);	// Fifth crowd
-	CreateSmallCrowd({ 445.000000, -1070.000000, 166 }, resources::crowdAnims2);	// Sixth crowd
-	CreateSmallCrowd({ 445.000000, -1100.000000, 167 }, resources::crowdAnims2);	// Seventh crowd
-	CreateSmallCrowd({ 445.000000, -1130.000000, 168 }, resources::crowdAnims2);	// Eighth crowd
+	CreateCrowd({ 500.000000, -810.000000, 166 }, resources::crowdAnims1);			// 1. crowd from top.
+	CreateCrowd({ 480.000000, -825.000000, 167}, resources::crowdAnims1);			// 2. crowd
+	CreateSmallCrowd({ 445.000000, -910.000000, 166 }, resources::crowdAnims2);		// 3. crowd
+	CreateSmallCrowd({ 445.000000, -935.000000, 167 }, resources::crowdAnims2);		// 4. crowd
+	CreateSmallCrowd({ 445.000000, -1000.000000, 166 }, resources::crowdAnims2);	// 5. crowd
+	CreateSmallCrowd({ 445.000000, -1070.000000, 166 }, resources::crowdAnims2);	// 6. crowd
+	CreateSmallCrowd({ 445.000000, -1100.000000, 167 }, resources::crowdAnims2);	// 7. crowd
+	CreateSmallCrowd({ 445.000000, -1130.000000, 168 }, resources::crowdAnims2);	// 8. crowd
+	CreateCrowd({ 890.000000, -1220.000000, 166}, resources::crowdAnims1);			// 9. crowd
+	CreateCrowd({ 870.5, -1235.000000, 167 }, resources::crowdAnims1);				// 10. crowd
+	CreateCrowd({ 840, -1245.000000, 168 }, resources::crowdAnims1);				// 11. crowd
+	CreateCrowd({ 890, -1265.000000, 169 }, resources::crowdAnims1);				// 12. crowd
+	CreateCrowd({ 650.000000, -1220.000000, 166}, resources::crowdAnims1);
+	CreateCrowd({ 560.5, -1235.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 650, -1245.000000, 168 }, resources::crowdAnims1);
+	//CreateCrowd({ 560, -1265.000000, 169 }, resources::crowdAnims1);
 
 	PlayCountdown(Vector3(2480.0f, -1460.0f, 200.0f));
 	PlayerController::lapCount = 3;
@@ -637,7 +646,7 @@ int main()
 
 		//Update engine systems
 		engine::Update(&cam);
-
+		
 
 		//TODO: This will be moved to level select system
 		if (canStartLoadingMap)

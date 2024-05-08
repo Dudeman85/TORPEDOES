@@ -290,43 +290,43 @@ public:
 		//TODO: Get reference to stats and add them here
 		switch (shipType)
 		{
-		case ShipType::torpedoBoat:
-			shipName = "Torpedo Boat";
-			baseSpeed = "Medium";
-			maneuverability = "Medium";
-			mainAttack = "Torpedo";
-			special = "Boost";
-			break;
-		case ShipType::submarine:
-			shipName = "Submarine";
-			baseSpeed = "Medium";
-			maneuverability = "Medium";
-			mainAttack = "Torpedo";
-			special = "Submerge";
-			break;
-		case ShipType::cannonBoat:
-			shipName = "Battleship";
-			baseSpeed = "Medium";
-			maneuverability = "Medium";
-			mainAttack = "Cannon";
-			special = "Boost";
-			break;
-		case ShipType::hedgehogBoat:
-			shipName = "Destroyer";
-			baseSpeed = "Medium";
-			maneuverability = "Medium";
-			mainAttack = "Hedghehog Mortar";
-			special = "Boost";
-			break;
-		case ShipType::pirateShip:
-			shipName = "PirateShip";
-			baseSpeed = "Medium";
-			maneuverability = "Medium";
-			mainAttack = "Cannonballs";
-			special = "Reload";
-			break;
-		default:
-			break;
+			case ShipType::torpedoBoat:
+				shipName = "Torpedo Boat";
+				baseSpeed = "Fast";
+				maneuverability = "Low";
+				mainAttack = "Torpedo";
+				special = "Boost";
+				break;
+			case ShipType::submarine:
+				shipName = "Submarine";
+				baseSpeed = "Medium";
+				maneuverability = "Medium";
+				mainAttack = "Torpedo";
+				special = "Submerge";
+				break;
+			case ShipType::cannonBoat:
+				shipName = "Battleship";
+				baseSpeed = "Slow";
+				maneuverability = "Fast";
+				mainAttack = "Cannon";
+				special = "Boost";
+				break;
+			case ShipType::hedgehogBoat:
+				shipName = "Destroyer";
+				baseSpeed = "Medium";
+				maneuverability = "Medium";
+				mainAttack = "Hedghehog Mortar";
+				special = "Boost";
+				break;
+			case ShipType::pirateShip:
+				shipName = "PirateShip";
+				baseSpeed = "Medium";
+				maneuverability = "Medium";
+				mainAttack = "Cannonballs";
+				special = "Reload";
+				break;
+			default:
+				break;
 		}
 
 		//NameColoring
