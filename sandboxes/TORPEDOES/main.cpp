@@ -129,7 +129,7 @@ static void LoadLevel1(engine::Camera* cam)
 	// ********************
 
 	PlayCountdown(Vector3(1235.0f, -310.0f, 200.0f));
-	PlayerController::lapCount = 3;
+	PlayerController::lapCount = 1;
 }
 
 // Create everything for level 2
@@ -324,7 +324,7 @@ static void LoadLevel3(engine::Camera* cam)
 	CreateCrowd({ 600, -1265.000000, 169 }, resources::crowdAnims1);
 
 	PlayCountdown(Vector3(2480.0f, -1460.0f, 200.0f));
-	PlayerController::lapCount = 3;
+	PlayerController::lapCount = 1;
 }
 
 // Create everything for level 4
@@ -496,7 +496,7 @@ static void ReturnToMainMenu()
 int main()
 {
 	GameState currentGameState = menuMainState;
-	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window", true);
+	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window", false);
 
 	engine::EngineInit();
 
