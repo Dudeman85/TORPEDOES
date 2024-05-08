@@ -302,14 +302,22 @@ static void LoadLevel3(engine::Camera* cam)
 	CreateSmallCrowd({ 2014, -1020, 176 }, resources::crowdAnims2);
 	// ********************
 	// Dock audience
-	CreateCrowd({ 500.000000, -810.000000, 166 }, resources::crowdAnims1);			// First crowd from top.
-	CreateCrowd({ 480.000000, -825.000000, 167}, resources::crowdAnims1);			// Second crowd
-	CreateSmallCrowd({ 445.000000, -910.000000, 166 }, resources::crowdAnims2);		// Third crowd
-	CreateSmallCrowd({ 445.000000, -935.000000, 167 }, resources::crowdAnims2);		// Fourth crowd
-	CreateSmallCrowd({ 445.000000, -1000.000000, 166 }, resources::crowdAnims2);	// Fifth crowd
-	CreateSmallCrowd({ 445.000000, -1070.000000, 166 }, resources::crowdAnims2);	// Sixth crowd
-	CreateSmallCrowd({ 445.000000, -1100.000000, 167 }, resources::crowdAnims2);	// Seventh crowd
-	CreateSmallCrowd({ 445.000000, -1130.000000, 168 }, resources::crowdAnims2);	// Eighth crowd
+	CreateCrowd({ 500.000000, -810.000000, 166 }, resources::crowdAnims1);			// 1. crowd from top.
+	CreateCrowd({ 480.000000, -825.000000, 167}, resources::crowdAnims1);			// 2. crowd
+	CreateSmallCrowd({ 445.000000, -910.000000, 166 }, resources::crowdAnims2);		// 3. crowd
+	CreateSmallCrowd({ 445.000000, -935.000000, 167 }, resources::crowdAnims2);		// 4. crowd
+	CreateSmallCrowd({ 445.000000, -1000.000000, 166 }, resources::crowdAnims2);	// 5. crowd
+	CreateSmallCrowd({ 445.000000, -1070.000000, 166 }, resources::crowdAnims2);	// 6. crowd
+	CreateSmallCrowd({ 445.000000, -1100.000000, 167 }, resources::crowdAnims2);	// 7. crowd
+	CreateSmallCrowd({ 445.000000, -1130.000000, 168 }, resources::crowdAnims2);	// 8. crowd
+	CreateCrowd({ 890.000000, -1220.000000, 166}, resources::crowdAnims1);			// 9. crowd
+	CreateCrowd({ 870.5, -1235.000000, 167 }, resources::crowdAnims1);				// 10. crowd
+	CreateCrowd({ 840, -1245.000000, 168 }, resources::crowdAnims1);				// 11. crowd
+	CreateCrowd({ 890, -1265.000000, 169 }, resources::crowdAnims1);				// 12. crowd
+	CreateCrowd({ 650.000000, -1220.000000, 166}, resources::crowdAnims1);
+	CreateCrowd({ 560.5, -1235.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 650, -1245.000000, 168 }, resources::crowdAnims1);
+	//CreateCrowd({ 560, -1265.000000, 169 }, resources::crowdAnims1);
 
 	PlayCountdown(Vector3(2480.0f, -1460.0f, 200.0f));
 	PlayerController::lapCount = 3;
