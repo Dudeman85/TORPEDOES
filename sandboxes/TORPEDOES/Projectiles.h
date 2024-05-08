@@ -48,8 +48,8 @@ static void CreateAnimation(engine::ecs::Entity entity)
 
 	engine::ecs::Entity torpedoAnim = engine::ecs::NewEntity();
 
-	//Audio* audio = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 1);
-	//engine::ecs::AddComponent(torpedoAnim, engine::SoundComponent{ .Sounds = {{"Explosion", audio}} });
+	Audio* audio = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 100);
+	engine::ecs::AddComponent(torpedoAnim, engine::SoundComponent{ .Sounds = {{"Explosion", audio}} });
 
 	engine::ecs::AddComponent(torpedoAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, ((double)rand() / (double)RAND_MAX) + 2), .scale = Vector3(20) });
 	engine::ecs::AddComponent(torpedoAnim, engine::SpriteRenderer{ });
