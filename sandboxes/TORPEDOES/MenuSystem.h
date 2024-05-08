@@ -290,8 +290,8 @@ public:
 		{
 			case ShipType::torpedoBoat:
 				shipName = "Torpedo Boat";
-				baseSpeed = "Medium";
-				maneuverability = "Medium";
+				baseSpeed = "Fast";
+				maneuverability = "Low";
 				mainAttack = "Torpedo";
 				special = "Boost";
 				break;
@@ -304,8 +304,8 @@ public:
 				break;
 			case ShipType::cannonBoat:
 				shipName = "Battleship";
-				baseSpeed = "Medium";
-				maneuverability = "Medium";
+				baseSpeed = "Slow";
+				maneuverability = "Fast";
 				mainAttack = "Cannon";
 				special = "Boost";
 				break;
