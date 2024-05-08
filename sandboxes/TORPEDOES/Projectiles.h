@@ -94,7 +94,7 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 		engine::AnimationSystem::PlayAnimation(hedgehogExplosion, "explosion", false);
 
 		// Wall collision effect suond nime Explosion
-		engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(hedgehogExplosion);
+		//engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(hedgehogExplosion);
 		//soundComponent.Sounds["Explosion"]->play();
 	}
 	else
@@ -103,7 +103,7 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 		engine::AnimationSystem::PlayAnimation(hedgehogExplosion, "Hedgehog_Explosion.png", false);
 
 		// water collison tile sound effect nime Dink
-		engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(hedgehogExplosion);
+		//engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(hedgehogExplosion);
 		//soundComponent.Sounds["WaterExplosion"]->play();
 	}
 };
