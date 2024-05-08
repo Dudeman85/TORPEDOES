@@ -446,6 +446,8 @@ static void BoostEnd(engine::ecs::Entity entity, float boostStrenght)
 	player._boostScale -= boostStrenght;
 
 	player.specialEnabled = false;
+
+	AnimationSystem::PlayAnimation(player.wakeAnimationEntity, "normal", true);
 }
 
 // Increases player speed for a short while
@@ -457,6 +459,8 @@ void Boost(engine::ecs::Entity entity)
 	Player& player = engine::ecs::GetComponent<Player>(entity);
 
 	player._boostScale += boostStrenght;
+
+	AnimationSystem::PlayAnimation(player.wakeAnimationEntity, "boost", true);	
 
 	engine::timerSystem->ScheduleFunction(&BoostEnd, boostTime, false, engine::ScheduledFunction::Type::seconds, entity, boostStrenght);
 }
@@ -1136,21 +1140,20 @@ public:
 			// Obtener el componente de sonido de la entidad
 			engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(entity);
 
-			/*
-			if (rigidbody.velocity.Length() > 250)
+			//Wake animation stuff
+			if (rigidbody.velocity.Length() > 100)
 				ecs::GetComponent<SpriteRenderer>(player.wakeAnimationEntity).enabled = true;
-			else if (rigidbody.velocity.Length() < 150)
+			else if (rigidbody.velocity.Length() < 50)
 				ecs::GetComponent<SpriteRenderer>(player.wakeAnimationEntity).enabled = false;
-			*/
-
+			
 			ecs::GetComponent<Animator>(player.wakeAnimationEntity).playbackSpeed = std::lerp(0.1, 2, rigidbody.velocity.Length() / 900);
-			TransformSystem::SetPosition(player.wakeAnimationEntity, transform.position/* - Vector3(player.forwardDirection.Normalize(), -10)*/);
+			Vector3 wakeOffset = player.forwardDirection.Normalize() * 20;
+			wakeOffset += Vector3(0, 0, 40);
+			TransformSystem::SetPosition(player.wakeAnimationEntity, transform.position - wakeOffset );
 
 			// Obtener el objeto de sonido "EngineMono"
 			auto* engineSound = soundComponent.Sounds["EngineMono"+ to_string(player.id)];
 			engineSound->setPitch(rigidbody.velocity.Length() /(166.0f * 4) + player.forwardDirection.Length() + forwardImpulse.Length() /(166.0f * 16) );
-
-			
 		}
 	}
 
@@ -1218,12 +1221,11 @@ public:
 			engine::TransformSystem::AddParent(playerRender, playerEntity);
 
 			//Create the player's rendered entity
-			engine::ecs::AddComponent(wakeAnimation, engine::Transform{ .position = Vector3(0, 0, -20), .rotation = Vector3(0, 0, 0), .scale = Vector3(20, 60, 0) });
+			engine::ecs::AddComponent(wakeAnimation, engine::Transform{ .position = Vector3(0, 0, 0), .rotation = Vector3(0, 0, 0), .scale = Vector3(12, 25, 0) });
 			engine::ecs::AddComponent(wakeAnimation, engine::SpriteRenderer{ .enabled = true });
 			engine::ecs::AddComponent(wakeAnimation, engine::Animator{  });
-			AnimationSystem::AddAnimations(wakeAnimation, resources::wakeAnims, {"normal", "boost"});
+			AnimationSystem::AddAnimations(wakeAnimation, resources::wakeAnims, {"boost", "normal"});
 			AnimationSystem::PlayAnimation(wakeAnimation, "normal", true);
-			//engine::TransformSystem::AddParent(wakeAnimation, playerEntity);
 
 			Player& player = engine::ecs::GetComponent<Player>(playerEntity);
 
