@@ -646,7 +646,6 @@ int main()
 
 		//Update engine systems
 		engine::Update(&cam);
-		
 
 		//TODO: This will be moved to level select system
 		if (canStartLoadingMap)

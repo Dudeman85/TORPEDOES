@@ -59,6 +59,8 @@ class LevelSelectionSystem : public engine::ecs::System
 	float arrowPosHight = 0.88f;
 	float arrowsOffsetX = 0.6f;
 
+	std::vector<std::string> mapNames = {"Lake", "Caves", "Beach", "River"};
+
 public:
 	engine::ecs::Entity arrowLeft;
 	int firstPlayer;
@@ -84,29 +86,29 @@ public:
 		mapImages.push_back(resources::menuTextures["level3.png"]);
 		mapImages.push_back(resources::menuTextures["level4.png"]);
 
-		engine::ecs::AddComponent(arrowsPivot, engine::Transform{.position = Vector3(0, arrowPosHight, 0), .scale = Vector3(1) });
-		engine::ecs::AddComponent(mapName, engine::Transform{.position = Vector3(0, 0.83f, 0.95), .scale = Vector3(1) });
-		engine::ecs::AddComponent(mapName, engine::TextRenderer{.font = resources::niagaraFont, .text = "Level: 1", .offset = Vector3(-0.12f, 0, 0), .scale = Vector3(0.003f), .color = mapTextColor, .uiElement = true });
+		engine::ecs::AddComponent(arrowsPivot, engine::Transform{ .position = Vector3(0, arrowPosHight, 0), .scale = Vector3(1) });
+		engine::ecs::AddComponent(mapName, engine::Transform{ .position = Vector3(0, 0.83f, 0.95), .scale = Vector3(1) });
+		engine::ecs::AddComponent(mapName, engine::TextRenderer{ .font = resources::niagaraFont, .text = mapNames[0], .offset = Vector3(-0.12f, 0, 0), .scale = Vector3(0.003f), .color = mapTextColor, .uiElement = true});
 
-		engine::ecs::AddComponent(mapSelectText, engine::Transform{.position = Vector3(0, -0.94f, 0.95), .scale = Vector3(1) });
+		engine::ecs::AddComponent(mapSelectText, engine::Transform{ .position = Vector3(0, -0.94f, 0.95), .scale = Vector3(1) });
 		engine::ecs::AddComponent(mapSelectText, engine::TextRenderer
-		{
-			.font = resources::niagaraFont,
-				.text = "{B} to play", .offset = Vector3(-0.39f, 0, 0), .scale = Vector3(0.003f), .color = playTextColor, .uiElement = true}
+			{
+				.font = resources::niagaraFont,
+					.text = "Press Start to Play!", .offset = Vector3(-0.36f, 0, 0), .scale = Vector3(0.003f), .color = playTextColor, .uiElement = true }
 		);
 
-		engine::ecs::AddComponent(levelSelectionBackground, engine::Transform{.position = Vector3(0, 0, -0.5f), .scale = Vector3(1) });
+		engine::ecs::AddComponent(levelSelectionBackground, engine::Transform{ .position = Vector3(0, 0, -0.5f), .scale = Vector3(1) });
 		engine::ecs::AddComponent(levelSelectionBackground, SpriteRenderer{ .texture = resources::menuTextures["Selection_BG_Var3.png"], .enabled = true,.uiElement = true });
 
-		engine::ecs::AddComponent(currentSelectedLevel, engine::Transform{.position = Vector3(0, 0, -0.5f), .scale = Vector3(0.8f) });
+		engine::ecs::AddComponent(currentSelectedLevel, engine::Transform{ .position = Vector3(0, 0, -0.5f), .scale = Vector3(0.8f) });
 		engine::ecs::AddComponent(currentSelectedLevel, SpriteRenderer{ .texture = resources::menuTextures["level1.png"], .enabled = true,.uiElement = true });
 
-		engine::ecs::AddComponent(arrowLeft, engine::Transform{.position = Vector3(arrowsOffsetX, 0, -0.1f), .rotation = Vector3(0, 0, 180), .scale = Vector3(0.04f) });
-		engine::ecs::AddComponent(arrowLeft, engine::SpriteRenderer{.texture = resources::menuTextures["UI_Arrow.png"], .enabled = true, .uiElement = true });
+		engine::ecs::AddComponent(arrowLeft, engine::Transform{ .position = Vector3(arrowsOffsetX, 0, -0.1f), .rotation = Vector3(0, 0, 180), .scale = Vector3(0.04f) });
+		engine::ecs::AddComponent(arrowLeft, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"], .enabled = true, .uiElement = true });
 		//	engine::ecs::AddComponent(arrowLeft, engine::TextRenderer{ .font = resources::niagaraFont, .text = "<  ", .scale = Vector2(0.004f), .color = Vector3(255,0,0.99),.uiElement = true });
 
-		engine::ecs::AddComponent(arrowRight, engine::Transform{.position = Vector3(-arrowsOffsetX, 0, -0.1f), .rotation = Vector3(0, 0, 0), .scale = Vector3(0.04f) });
-		engine::ecs::AddComponent(arrowRight, engine::SpriteRenderer{.texture = resources::menuTextures["UI_Arrow.png"], .enabled = true, .uiElement = true });
+		engine::ecs::AddComponent(arrowRight, engine::Transform{ .position = Vector3(-arrowsOffsetX, 0, -0.1f), .rotation = Vector3(0, 0, 0), .scale = Vector3(0.04f) });
+		engine::ecs::AddComponent(arrowRight, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"], .enabled = true, .uiElement = true });
 		//	engine::ecs::AddComponent(arrowRight, engine::TextRenderer{ .font = resources::niagaraFont, .text = "  >", .scale = Vector2(0.01f), .color = Vector3(255,0,0.99),.uiElement = true });
 
 		engine::TransformSystem::AddParent(arrowRight, arrowsPivot);
@@ -152,15 +154,13 @@ public:
 			{
 				mapLevelIndex = 0;
 			}
-			std::cout << "LevelIndex:" << mapLevelIndex << endl;
 
 			//TODO: LEVEL NAME HERE
-			ecs::GetComponent<TextRenderer>(mapName).text = "Level: " + to_string((mapLevelIndex + 1));
+			ecs::GetComponent<TextRenderer>(mapName).text = mapNames[mapLevelIndex];
 
 			TransformSystem::SetScale(arrowLeft, Vector3(0.08f));
 			TimerSystem::ScheduleFunction([this]() { TransformSystem::SetScale(arrowLeft, Vector3(0.04f)); }, 0.1);
 			ecs::GetComponent<SpriteRenderer>(currentSelectedLevel).texture = mapImages[mapLevelIndex];
-			std::cout << "\n mapImages[mapLevelIndex]: " << mapImages[mapLevelIndex] << std::endl;
 		}
 
 		if (turnInput < 0 && readyToMoveRight)
@@ -174,22 +174,16 @@ public:
 			{
 				mapLevelIndex = mapImages.size() - 1;
 			}
-			std::cout << "LevelIndex:" << mapLevelIndex << endl;
-			ecs::GetComponent<TextRenderer>(mapName).text = "Level: " + to_string((mapLevelIndex + 1));
+			ecs::GetComponent<TextRenderer>(mapName).text = mapNames[mapLevelIndex];
 
 			TransformSystem::SetScale(arrowRight, Vector3(0.08f));
 			TimerSystem::ScheduleFunction([this]() { TransformSystem::SetScale(arrowRight, Vector3(0.04f)); }, 0.1);
 			ecs::GetComponent<SpriteRenderer>(currentSelectedLevel).texture = mapImages[mapLevelIndex];
-			std::cout << "\nDOWN mapImages[mapLevelIndex]: " << mapImages[mapLevelIndex] << std::endl;
 		}
 
-		for (int i = 0; i < 4; i++)
+		if (input::GetNewPress("Boost" + std::to_string(firstPlayer)) || input::GetNewPress("Shoot" + std::to_string(firstPlayer)) || input::GetNewPress("Pause") || input::GetNewPress("StartGame"))
 		{
-			if (input::GetNewPress("Boost" + std::to_string(i)))
-			{
-				LoadThisLevel(mapLevelIndex);
-				break;
-			}
+			LoadThisLevel(mapLevelIndex);
 		}
 	}
 };
@@ -290,43 +284,43 @@ public:
 		//TODO: Get reference to stats and add them here
 		switch (shipType)
 		{
-			case ShipType::torpedoBoat:
-				shipName = "Torpedo Boat";
-				baseSpeed = "Fast";
-				maneuverability = "Low";
-				mainAttack = "Torpedo";
-				special = "Boost";
-				break;
-			case ShipType::submarine:
-				shipName = "Submarine";
-				baseSpeed = "Medium";
-				maneuverability = "Medium";
-				mainAttack = "Torpedo";
-				special = "Submerge";
-				break;
-			case ShipType::cannonBoat:
-				shipName = "Battleship";
-				baseSpeed = "Slow";
-				maneuverability = "Fast";
-				mainAttack = "Cannon";
-				special = "Boost";
-				break;
-			case ShipType::hedgehogBoat:
-				shipName = "Destroyer";
-				baseSpeed = "Medium";
-				maneuverability = "Medium";
-				mainAttack = "Hedghehog Mortar";
-				special = "Boost";
-				break;
-			case ShipType::pirateShip:
-				shipName = "PirateShip";
-				baseSpeed = "Medium";
-				maneuverability = "Medium";
-				mainAttack = "Cannonballs";
-				special = "Reload";
-				break;
-			default:
-				break;
+		case ShipType::torpedoBoat:
+			shipName = "Torpedo Boat";
+			baseSpeed = "Fast";
+			maneuverability = "Low";
+			mainAttack = "Torpedo";
+			special = "Boost";
+			break;
+		case ShipType::submarine:
+			shipName = "Submarine";
+			baseSpeed = "Medium";
+			maneuverability = "Medium";
+			mainAttack = "Torpedo";
+			special = "Submerge";
+			break;
+		case ShipType::cannonBoat:
+			shipName = "Battleship";
+			baseSpeed = "Slow";
+			maneuverability = "Fast";
+			mainAttack = "Cannon";
+			special = "Boost";
+			break;
+		case ShipType::hedgehogBoat:
+			shipName = "Destroyer";
+			baseSpeed = "Medium";
+			maneuverability = "Medium";
+			mainAttack = "Hedghehog Mortar";
+			special = "Boost";
+			break;
+		case ShipType::pirateShip:
+			shipName = "PirateShip";
+			baseSpeed = "Medium";
+			maneuverability = "Medium";
+			mainAttack = "Cannonballs";
+			special = "Reload";
+			break;
+		default:
+			break;
 		}
 
 		//NameColoring
@@ -379,13 +373,13 @@ public:
 		shipModelsReady.push_back({ resources::models["Ship_HMCS_Sackville_Variation.obj"] });
 
 		sceneParent = engine::ecs::NewEntity();
-		engine::ecs::AddComponent(sceneParent, engine::Transform{.position = Vector3(0, 0, 0), .rotation = Vector3(0, 0, 0), .scale = 0.7f });
-		engine::ecs::AddComponent(sceneParent, engine::TextRenderer{.font = resources::niagaraFont, .text = "", .scale = 0.005f, .color = Vector3(0, 0, 250), .uiElement = true });
+		engine::ecs::AddComponent(sceneParent, engine::Transform{ .position = Vector3(0, 0, 0), .rotation = Vector3(0, 0, 0), .scale = 0.7f });
+		engine::ecs::AddComponent(sceneParent, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .scale = 0.005f, .color = Vector3(0, 0, 250), .uiElement = true });
 
 		startGameTimerEntity = engine::ecs::NewEntity();
-		engine::ecs::AddComponent(startGameTimerEntity, engine::Transform{.position = Vector3(-0.1, 0.08, -0.5), .rotation = Vector3(0, 0, 0), .scale = Vector3(0.04f) });
+		engine::ecs::AddComponent(startGameTimerEntity, engine::Transform{ .position = Vector3(-0.1, 0.08, -0.5), .rotation = Vector3(0, 0, 0), .scale = Vector3(0.04f) });
 		//engine::ecs::AddComponent(startGameTimerEntity, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"], .enabled = false, .uiElement = true });
-		engine::ecs::AddComponent(startGameTimerEntity, engine::TextRenderer{.font = resources::niagaraFont, .text = "&", .scale = 0.05f, .color = Vector3(200, 140, 50), .uiElement = true });
+		engine::ecs::AddComponent(startGameTimerEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "&", .scale = 0.05f, .color = Vector3(200, 140, 50), .uiElement = true });
 
 		float statsOffset = -0.1f;
 		float statsOffsetY = 90.0f;
@@ -421,41 +415,41 @@ public:
 			//engine::ecs::AddComponent(pausedImage, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Paused.png"],  .enabled = false, .uiElement = true });
 			//engine::ecs::AddComponent(pausedImage, PauseComponent{ .upper = pausedImage, .lower = optionsButton, .selectedTexture = resources::menuTextures["UI_Paused.png"], .unselectedTexture = resources::menuTextures["UI_Paused.png"], .operation = PauseSystem::OnResumePressed });
 
-			engine::ecs::AddComponent(arrowUp, engine::Transform{.position = Vector3(arrowsPosX + 0.2f, arrowUPposY, -0.1f), .rotation = Vector3(0, 0, 180), .scale = Vector3(0.04f) });
-			engine::ecs::AddComponent(arrowUp, engine::SpriteRenderer{.texture = resources::menuTextures["UI_Arrow.png"], .enabled = false, .uiElement = true });
+			engine::ecs::AddComponent(arrowUp, engine::Transform{ .position = Vector3(arrowsPosX + 0.2f, arrowUPposY, -0.1f), .rotation = Vector3(0, 0, 180), .scale = Vector3(0.04f) });
+			engine::ecs::AddComponent(arrowUp, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"], .enabled = false, .uiElement = true });
 
-			engine::ecs::AddComponent(arrowDown, engine::Transform{.position = Vector3(arrowsPosX, arrowUPposY, -0.1f), .rotation = Vector3(0, 0, 0), .scale = Vector3(0.04f) });
-			engine::ecs::AddComponent(arrowDown, engine::SpriteRenderer{.texture = resources::menuTextures["UI_Arrow.png"], .enabled = false, .uiElement = true });
+			engine::ecs::AddComponent(arrowDown, engine::Transform{ .position = Vector3(arrowsPosX, arrowUPposY, -0.1f), .rotation = Vector3(0, 0, 0), .scale = Vector3(0.04f) });
+			engine::ecs::AddComponent(arrowDown, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"], .enabled = false, .uiElement = true });
 
-			engine::ecs::AddComponent(shipModel, engine::Transform{.position = Vector3(0.7f, -0.2f, -0.1f), .scale = 0 });
-			engine::ecs::AddComponent(shipModel, engine::ModelRenderer{.model = shipModels[0], .uiElement = true, .textures = { resources::playerIdToTexture[i] } });
+			engine::ecs::AddComponent(shipModel, engine::Transform{ .position = Vector3(0.7f, -0.2f, -0.1f), .scale = 0 });
+			engine::ecs::AddComponent(shipModel, engine::ModelRenderer{ .model = shipModels[0], .uiElement = true, .textures = { resources::playerIdToTexture[i] } });
 
-			engine::ecs::AddComponent(backgroundImage, engine::Transform{.position = Vector3(0.06f, 0, -0.9f), .rotation = Vector3(0, 0, 0), .scale = Vector3(1.2) });
-			engine::ecs::AddComponent(backgroundImage, engine::SpriteRenderer{.texture = resources::menuTextures["Selection_BG_Var3.png"], .enabled = false, .uiElement = true });
+			engine::ecs::AddComponent(backgroundImage, engine::Transform{ .position = Vector3(0.06f, 0, -0.9f), .rotation = Vector3(0, 0, 0), .scale = Vector3(1.2) });
+			engine::ecs::AddComponent(backgroundImage, engine::SpriteRenderer{ .texture = resources::menuTextures["Selection_BG_Var3.png"], .enabled = false, .uiElement = true });
 
-			engine::ecs::AddComponent(readyText, engine::Transform{.position = Vector3(arrowsPosX - 0.1f, arrowDownposY + 0.25f, 0.4f), .scale = 0.004f });
-			engine::ecs::AddComponent(readyText, engine::TextRenderer{.font = resources::niagaraFont, .text = "Not Ready", .uiElement = true });
+			engine::ecs::AddComponent(readyText, engine::Transform{ .position = Vector3(arrowsPosX - 0.1f, arrowDownposY + 0.25f, 0.4f), .scale = 0.004f });
+			engine::ecs::AddComponent(readyText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "Not Ready", .uiElement = true });
 
 			//shipInfo Entity
-			engine::ecs::AddComponent(shipInfo, engine::Transform{.position = Vector3(-1, .75f, -0.1f), .scale = statsParentScale });
-			engine::ecs::AddComponent(shipInfo, engine::TextRenderer{.font = resources::niagaraFont, .text = "PRESS SHOOT TO JOIN!", .color = Vector3(57, 150, 54), .uiElement = true });
+			engine::ecs::AddComponent(shipInfo, engine::Transform{ .position = Vector3(-1, .75f, -0.1f), .scale = statsParentScale });
+			engine::ecs::AddComponent(shipInfo, engine::TextRenderer{ .font = resources::niagaraFont, .text = "PRESS SHOOT TO JOIN!", .color = Vector3(57, 150, 54), .uiElement = true });
 
 			//shipNameEntity
-			engine::ecs::AddComponent(shipNameEntity, engine::Transform{.position = Vector3(-statsOffset, 0 * statsOffsetEatch - statsOffsetY, -0.1f), .scale = scaleForStatsChilds * 1.5f });
-			engine::ecs::AddComponent(shipNameEntity, engine::TextRenderer{.font = resources::niagaraFont, .text = "", .color = Vector3(57, 150, 54), .uiElement = true });
+			engine::ecs::AddComponent(shipNameEntity, engine::Transform{ .position = Vector3(-statsOffset, 0 * statsOffsetEatch - statsOffsetY, -0.1f), .scale = scaleForStatsChilds * 1.5f });
+			engine::ecs::AddComponent(shipNameEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .color = Vector3(57, 150, 54), .uiElement = true });
 
 			//baseSpeedEntity
-			engine::ecs::AddComponent(baseSpeedEntity, engine::Transform{.position = Vector3(-statsOffset, 1 * statsOffsetEatch - statsOffsetY, -0.1f), .scale = scaleForStatsChilds });
-			engine::ecs::AddComponent(baseSpeedEntity, engine::TextRenderer{.font = resources::niagaraFont, .text = "", .color = Vector3(57, 150, 54), .uiElement = true });
+			engine::ecs::AddComponent(baseSpeedEntity, engine::Transform{ .position = Vector3(-statsOffset, 1 * statsOffsetEatch - statsOffsetY, -0.1f), .scale = scaleForStatsChilds });
+			engine::ecs::AddComponent(baseSpeedEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .color = Vector3(57, 150, 54), .uiElement = true });
 			//Rotation speed text
-			engine::ecs::AddComponent(maneuvarabilityEntity, engine::Transform{.position = Vector3(-statsOffset, 2 * statsOffsetEatch - statsOffsetY, -0.1f), .scale = scaleForStatsChilds });
-			engine::ecs::AddComponent(maneuvarabilityEntity, engine::TextRenderer{.font = resources::niagaraFont, .text = "", .color = Vector3(57, 150, 54), .uiElement = true });
+			engine::ecs::AddComponent(maneuvarabilityEntity, engine::Transform{ .position = Vector3(-statsOffset, 2 * statsOffsetEatch - statsOffsetY, -0.1f), .scale = scaleForStatsChilds });
+			engine::ecs::AddComponent(maneuvarabilityEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .color = Vector3(57, 150, 54), .uiElement = true });
 			//boostEntity
-			engine::ecs::AddComponent(boostEntity, engine::Transform{.position = Vector3(-statsOffset, 3 * statsOffsetEatch - statsOffsetY, -0.1f), .scale = scaleForStatsChilds });
-			engine::ecs::AddComponent(boostEntity, engine::TextRenderer{.font = resources::niagaraFont, .text = "", .color = Vector3(57, 150, 54), .uiElement = true });
+			engine::ecs::AddComponent(boostEntity, engine::Transform{ .position = Vector3(-statsOffset, 3 * statsOffsetEatch - statsOffsetY, -0.1f), .scale = scaleForStatsChilds });
+			engine::ecs::AddComponent(boostEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .color = Vector3(57, 150, 54), .uiElement = true });
 			//specialEntity
-			engine::ecs::AddComponent(specialEntity, engine::Transform{.position = Vector3(-statsOffset, 4 * statsOffsetEatch - statsOffsetY, -0.1f), .scale = scaleForStatsChilds });
-			engine::ecs::AddComponent(specialEntity, engine::TextRenderer{.font = resources::niagaraFont, .text = "", .color = Vector3(57, 150, 54), .uiElement = true });
+			engine::ecs::AddComponent(specialEntity, engine::Transform{ .position = Vector3(-statsOffset, 4 * statsOffsetEatch - statsOffsetY, -0.1f), .scale = scaleForStatsChilds });
+			engine::ecs::AddComponent(specialEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .color = Vector3(57, 150, 54), .uiElement = true });
 
 			float offsetY = 0.85f;
 			float offsetX = 0.80f;
@@ -478,10 +472,10 @@ public:
 				break;
 			}
 
-			engine::ecs::AddComponent(selectionWindow, engine::Transform{.position = offsetPlayerWindows, .scale = Vector3(0.5, 0.5, -0.1f) });
+			engine::ecs::AddComponent(selectionWindow, engine::Transform{ .position = offsetPlayerWindows, .scale = Vector3(0.5, 0.5, -0.1f) });
 			engine::ecs::AddComponent(selectionWindow, PlayerSelection{ .playerID = i, .arrowUp = arrowUp, .arrowDown = arrowDown, .shipModel = shipModel, .readyText = readyText, .playerWindow = selectionWindow, .shipInfo = shipInfo,.shipNameEntity = shipNameEntity,.baseSpeedEntity = baseSpeedEntity,.maneuvarabilityEntity = maneuvarabilityEntity,.boostEntity = boostEntity ,.specialEntity = specialEntity, .backgroundImage = backgroundImage });
 
-			engine::ecs::AddComponent(selectionWindow, engine::TextRenderer{.font = resources::niagaraFont, .text = "", .offset = Vector3(0, 0.15f, 0), .uiElement = true });
+			engine::ecs::AddComponent(selectionWindow, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(0, 0.15f, 0), .uiElement = true });
 
 			engine::TextRenderer& selectWin = engine::ecs::GetComponent<engine::TextRenderer>(selectionWindow);
 			selectWin.scale = 0.001f;
@@ -505,9 +499,9 @@ public:
 
 		//Temporary control scheme display for playtesting
 		controlScheme = ecs::NewEntity();
-		engine::ecs::AddComponent(controlScheme, engine::Transform{.position = Vector3(-0.08, -0.1, 0.5), .scale = Vector3(1.8, 1, 0) * 0.2 });
+		engine::ecs::AddComponent(controlScheme, engine::Transform{ .position = Vector3(-0.08, -0.1, 0.5), .scale = Vector3(1.8, 1, 0) * 0.2 });
 		resources::menuTextures["UI_Controls.png"]->SetScalingFilter(GL_LINEAR);
-		engine::ecs::AddComponent(controlScheme, engine::SpriteRenderer{.texture = resources::menuTextures["UI_Controls.png"], .uiElement = true });
+		engine::ecs::AddComponent(controlScheme, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Controls.png"], .uiElement = true });
 	}
 
 	void StartGame()
@@ -831,16 +825,16 @@ namespace MainMenuSystem
 
 		resources::menuTextures["UI_PressStart.png"]->SetScalingFilter(GL_LINEAR);
 		startText = engine::ecs::NewEntity();
-		engine::ecs::AddComponent(startText, engine::Transform{.position = { -0.5, 0.2, -0.1 }, .rotation = { 0, 0, 15 }, .scale = { .45, .1, 0 } });
-		engine::ecs::AddComponent(startText, engine::SpriteRenderer{.texture = resources::menuTextures["UI_PressStart.png"], .uiElement = true });
+		engine::ecs::AddComponent(startText, engine::Transform{ .position = { -0.5, 0.2, -0.1 }, .rotation = { 0, 0, 15 }, .scale = { .45, .1, 0 } });
+		engine::ecs::AddComponent(startText, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_PressStart.png"], .uiElement = true });
 
 		creditsText = engine::ecs::NewEntity();
-		engine::ecs::AddComponent(creditsText, engine::Transform{.position = { 0.65, -0.8, -0.1 }, .scale = { 0.30, 0.06, 0 } });
-		engine::ecs::AddComponent(creditsText, engine::SpriteRenderer{.texture = resources::menuTextures["UI_PressCredits.png"], .uiElement = true });
+		engine::ecs::AddComponent(creditsText, engine::Transform{ .position = { 0.65, -0.8, -0.1 }, .scale = { 0.30, 0.06, 0 } });
+		engine::ecs::AddComponent(creditsText, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_PressCredits.png"], .uiElement = true });
 
 		creditsScreen = engine::ecs::NewEntity();
-		engine::ecs::AddComponent(creditsScreen, engine::Transform{.position = { 0, -0, 0.5 }, .scale = { 1, 1, 0 } });
-		engine::ecs::AddComponent(creditsScreen, engine::SpriteRenderer{.texture = resources::menuTextures["UI_Credits_Screen.png"], .enabled = false, .uiElement = true });
+		engine::ecs::AddComponent(creditsScreen, engine::Transform{ .position = { 0, -0, 0.5 }, .scale = { 1, 1, 0 } });
+		engine::ecs::AddComponent(creditsScreen, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Credits_Screen.png"], .enabled = false, .uiElement = true });
 	}
 	//Destroy the main menu
 	void Unload()
@@ -1003,42 +997,42 @@ public:
 		pausedImage = engine::ecs::NewEntity();
 
 		//                      ---------  PAUSE BUTTONS init-------
-		engine::ecs::AddComponent(pausedImage, engine::Transform{.position = Vector3(0, .8f, -0.1f), .scale = Vector3(0.35f) });
-		engine::ecs::AddComponent(pausedImage, engine::SpriteRenderer{.texture = resources::menuTextures["UI_Paused.png"], .enabled = false, .uiElement = true });
+		engine::ecs::AddComponent(pausedImage, engine::Transform{ .position = Vector3(0, .8f, -0.1f), .scale = Vector3(0.35f) });
+		engine::ecs::AddComponent(pausedImage, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Paused.png"], .enabled = false, .uiElement = true });
 		engine::ecs::AddComponent(pausedImage, PauseComponent{ .upper = pausedImage, .lower = optionsButton, .selectedTexture = resources::menuTextures["UI_Paused.png"], .unselectedTexture = resources::menuTextures["UI_Paused.png"], .operation = PauseSystem::OnResumePressed });
 
-		engine::ecs::AddComponent(resumeButton, engine::Transform{.position = Vector3(0, .5f, -0.1f), .scale = Vector3(0.25f) });
-		engine::ecs::AddComponent(resumeButton, engine::SpriteRenderer{.texture = resources::menuTextures["UI_Resume_N.png"], .enabled = false, .uiElement = true });
+		engine::ecs::AddComponent(resumeButton, engine::Transform{ .position = Vector3(0, .5f, -0.1f), .scale = Vector3(0.25f) });
+		engine::ecs::AddComponent(resumeButton, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Resume_N.png"], .enabled = false, .uiElement = true });
 		engine::ecs::AddComponent(resumeButton, PauseComponent{ .upper = quitGameButton, .lower = optionsButton, .selectedTexture = resources::menuTextures["UI_Resume.png"], .unselectedTexture = resources::menuTextures["UI_Resume_N.png"], .operation = PauseSystem::OnResumePressed });
 
-		engine::ecs::AddComponent(optionsButton, engine::Transform{.position = Vector3(0, .3f, -0.1f), .scale = Vector3(.25f) });
-		engine::ecs::AddComponent(optionsButton, engine::SpriteRenderer{.texture = resources::menuTextures["UI_Options_N.png"], .enabled = false, .uiElement = true });
+		engine::ecs::AddComponent(optionsButton, engine::Transform{ .position = Vector3(0, .3f, -0.1f), .scale = Vector3(.25f) });
+		engine::ecs::AddComponent(optionsButton, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Options_N.png"], .enabled = false, .uiElement = true });
 		engine::ecs::AddComponent(optionsButton, PauseComponent{ .upper = resumeButton, .lower = mainMenuButton, .selectedTexture = resources::menuTextures["UI_Options.png"], .unselectedTexture = resources::menuTextures["UI_Options_N.png"], .operation = PauseSystem::OnOptionsPressed });
 
-		engine::ecs::AddComponent(mainMenuButton, engine::Transform{.position = Vector3(0, .1f, -0.1f), .scale = Vector3(0.25f) });
-		engine::ecs::AddComponent(mainMenuButton, engine::SpriteRenderer{.texture = resources::menuTextures["UI_BackToMenu_N.png"], .enabled = false, .uiElement = true });
+		engine::ecs::AddComponent(mainMenuButton, engine::Transform{ .position = Vector3(0, .1f, -0.1f), .scale = Vector3(0.25f) });
+		engine::ecs::AddComponent(mainMenuButton, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_BackToMenu_N.png"], .enabled = false, .uiElement = true });
 		engine::ecs::AddComponent(mainMenuButton, PauseComponent{ .upper = optionsButton, .lower = quitGameButton, .selectedTexture = resources::menuTextures["UI_BackToMenu.png"], .unselectedTexture = resources::menuTextures["UI_BackToMenu_N.png"], .operation = PauseSystem::OnMainMenuPressed });
 
-		engine::ecs::AddComponent(quitGameButton, engine::Transform{.position = Vector3(0, -0.7f, -0.1f), .scale = Vector3(0.25f) });
-		engine::ecs::AddComponent(quitGameButton, engine::SpriteRenderer{.texture = resources::menuTextures["UI_QuitGame_N.png"], .enabled = false, .uiElement = true });
+		engine::ecs::AddComponent(quitGameButton, engine::Transform{ .position = Vector3(0, -0.7f, -0.1f), .scale = Vector3(0.25f) });
+		engine::ecs::AddComponent(quitGameButton, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_QuitGame_N.png"], .enabled = false, .uiElement = true });
 		engine::ecs::AddComponent(quitGameButton, PauseComponent{ .upper = mainMenuButton, .lower = resumeButton, .selectedTexture = resources::menuTextures["UI_QuitGame.png"], .unselectedTexture = resources::menuTextures["UI_QuitGame_N.png"], .operation = PauseSystem::OnQuitGamePressed });
 
 		////                      ---------  OPTIONS BUTTONS init --------
 		//optionsResumeButton
-		engine::ecs::AddComponent(optionsResumeButton, engine::Transform{.position = Vector3(0, .3f, -0.1f), .scale = Vector3(.25f) });
-		engine::ecs::AddComponent(optionsResumeButton, engine::SpriteRenderer{.texture = resources::menuTextures["UI_Resume.png"], .enabled = false, .uiElement = true });
+		engine::ecs::AddComponent(optionsResumeButton, engine::Transform{ .position = Vector3(0, .3f, -0.1f), .scale = Vector3(.25f) });
+		engine::ecs::AddComponent(optionsResumeButton, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Resume.png"], .enabled = false, .uiElement = true });
 		engine::ecs::AddComponent(optionsResumeButton, PauseComponent{ .upper = fullscreenEntity, .lower = musicSliderEntity, .selectedTexture = resources::menuTextures["UI_Resume.png"], .unselectedTexture = resources::menuTextures["UI_Resume_N.png"], .operation = BackToUIMenu, .isOptionsMenu = true });
 		//musicSliderEntity
-		engine::ecs::AddComponent(musicSliderEntity, engine::Transform{.position = Vector3(0, .1f, -0.1f), .scale = Vector3(0.25f) });
-		engine::ecs::AddComponent(musicSliderEntity, engine::SpriteRenderer{.texture = resources::menuTextures["UI_Music_Slider.png"], .enabled = false, .uiElement = true });
+		engine::ecs::AddComponent(musicSliderEntity, engine::Transform{ .position = Vector3(0, .1f, -0.1f), .scale = Vector3(0.25f) });
+		engine::ecs::AddComponent(musicSliderEntity, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Music_Slider.png"], .enabled = false, .uiElement = true });
 		engine::ecs::AddComponent(musicSliderEntity, PauseComponent{ .upper = optionsResumeButton, .lower = fullscreenEntity, .selectedTexture = resources::menuTextures["UI_Music_Slider.png"], .unselectedTexture = resources::menuTextures["UI_Music_Slider_N.png"], .operation = PauseSystem::OnMainMenuPressed, .isOptionsMenu = true,.isSlider = true });
 		//fullscreenEntity
-		engine::ecs::AddComponent(fullscreenEntity, engine::Transform{.position = Vector3(0, -0.7f, -0.1f), .scale = Vector3(0.25f) });
-		engine::ecs::AddComponent(fullscreenEntity, engine::SpriteRenderer{.texture = resources::menuTextures["UI_Fullscreen.png"], .enabled = false, .uiElement = true });
+		engine::ecs::AddComponent(fullscreenEntity, engine::Transform{ .position = Vector3(0, -0.7f, -0.1f), .scale = Vector3(0.25f) });
+		engine::ecs::AddComponent(fullscreenEntity, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Fullscreen.png"], .enabled = false, .uiElement = true });
 		engine::ecs::AddComponent(fullscreenEntity, PauseComponent{ .upper = musicSliderEntity, .lower = optionsResumeButton, .selectedTexture = resources::menuTextures["UI_Fullscreen.png"], .unselectedTexture = resources::menuTextures["UI_Fullscreen_N.png"], .operation = PauseSystem::OnQuitGamePressed, .isOptionsMenu = true });
 		//musicSliderNub
-		engine::ecs::AddComponent(musicSliderNub, engine::Transform{.position = engine::ecs::GetComponent<engine::Transform>(musicSliderEntity).position + Vector3(0, -0.2f, -0.1), .scale = Vector3(0.15f) });
-		engine::ecs::AddComponent(musicSliderNub, engine::SpriteRenderer{.texture = resources::menuTextures["UI_Slider_Button.png"], .enabled = false, .uiElement = true });
+		engine::ecs::AddComponent(musicSliderNub, engine::Transform{ .position = engine::ecs::GetComponent<engine::Transform>(musicSliderEntity).position + Vector3(0, -0.2f, -0.1), .scale = Vector3(0.15f) });
+		engine::ecs::AddComponent(musicSliderNub, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Slider_Button.png"], .enabled = false, .uiElement = true });
 		engine::ecs::AddComponent(musicSliderNub, PauseComponent{ .selectedTexture = resources::menuTextures["UI_Slider_Button.png"], .unselectedTexture = resources::menuTextures["UI_Slider_Button.png"], .isOptionsMenu = true,.isSlider = true });
 	}
 
@@ -1119,8 +1113,8 @@ public:
 
 	void AddButton(engine::ecs::Entity entity, Vector3 pos, engine::Texture selectedTexture, engine::Texture unselectedTexture, Vector3 scaleNormal, Vector3 scaleSelected)
 	{
-		engine::ecs::AddComponent(fullscreenEntity, engine::Transform{.position = Vector3(0.7, -0.7f, -0.1f), .scale = Vector3(0.25f) });
-		engine::ecs::AddComponent(fullscreenEntity, engine::SpriteRenderer{.texture = resources::menuTextures["UI_Fullscreen_N.png"], .enabled = false, .uiElement = true });
+		engine::ecs::AddComponent(fullscreenEntity, engine::Transform{ .position = Vector3(0.7, -0.7f, -0.1f), .scale = Vector3(0.25f) });
+		engine::ecs::AddComponent(fullscreenEntity, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Fullscreen_N.png"], .enabled = false, .uiElement = true });
 		engine::ecs::AddComponent(fullscreenEntity, PauseComponent{ .upper = mainMenuButton, .lower = resumeButton, .selectedTexture = resources::menuTextures["UI_Fullscreen_N.png"], .unselectedTexture = resources::menuTextures["UI_Fullscreen.png"], .operation = PauseSystem::OnQuitGamePressed });
 	}
 	void MoveUpper()
