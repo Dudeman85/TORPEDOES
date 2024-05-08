@@ -87,6 +87,7 @@ struct Player
 	engine::ecs::Entity renderedEntity;
 	engine::ecs::Entity nameText;
 	engine::ecs::Entity animationEntity;
+	engine::ecs::Entity wakeAnimationEntity;
 };
 
 ECS_REGISTER_COMPONENT(CheckPoint)
@@ -1130,9 +1131,21 @@ public:
 			{
 				TransformSystem::SetRotation(player.animationEntity, { 0, 0, modelTransform.rotation.y });
 			}
-
+			TransformSystem::SetRotation(player.wakeAnimationEntity, { 0, 0, modelTransform.rotation.y - 90 });
+			
 			// Obtener el componente de sonido de la entidad
 			engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(entity);
+
+			/*
+			if (rigidbody.velocity.Length() > 250)
+				ecs::GetComponent<SpriteRenderer>(player.wakeAnimationEntity).enabled = true;
+			else if (rigidbody.velocity.Length() < 150)
+				ecs::GetComponent<SpriteRenderer>(player.wakeAnimationEntity).enabled = false;
+			*/
+
+			ecs::GetComponent<Animator>(player.wakeAnimationEntity).playbackSpeed = std::lerp(0.1, 2, rigidbody.velocity.Length() / 900);
+			TransformSystem::SetPosition(player.wakeAnimationEntity, transform.position/* - Vector3(player.forwardDirection.Normalize(), -10)*/);
+			std::cout << player.forwardDirection.Normalize().ToString();
 
 			// Obtener el objeto de sonido "EngineMono"
 			auto* engineSound = soundComponent.Sounds["EngineMono"+ to_string(player.id)];
@@ -1179,6 +1192,7 @@ public:
 			engine::ecs::Entity playerEntity = engine::ecs::NewEntity();
 			engine::ecs::Entity playerNameText = engine::ecs::NewEntity();
 			engine::ecs::Entity playerRender = engine::ecs::NewEntity();
+			engine::ecs::Entity wakeAnimation = engine::ecs::NewEntity();
 
 			//Create the player entity which contains everything but rendering
 			//Player component is a bit special
@@ -1187,6 +1201,7 @@ public:
 			playerComponent.id = playerShip.first;
 			playerComponent.renderedEntity = playerRender;
 			playerComponent.nameText = playerNameText;
+			playerComponent.wakeAnimationEntity = wakeAnimation;
 
 			engine::ecs::AddComponent(playerEntity, engine::Transform{ .position = Vector3(startPos - offset * playerShip.first, 150), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			engine::ecs::AddComponent(playerEntity, engine::Rigidbody{ .drag = 1.5 });
@@ -1202,6 +1217,14 @@ public:
 			engine::ecs::AddComponent(playerRender, engine::Transform{ .rotation = Vector3(45, 0, 0), .scale = Vector3(1.5) });
 			engine::ecs::AddComponent(playerRender, engine::ModelRenderer{ .model = shipModels[playerShip.second], .textures = {resources::playerIdToTexture[playerShip.first]} });
 			engine::TransformSystem::AddParent(playerRender, playerEntity);
+
+			//Create the player's rendered entity
+			engine::ecs::AddComponent(wakeAnimation, engine::Transform{ .position = Vector3(0, 0, -20), .rotation = Vector3(0, 0, 0), .scale = Vector3(20, 60, 0) });
+			engine::ecs::AddComponent(wakeAnimation, engine::SpriteRenderer{ .enabled = true });
+			engine::ecs::AddComponent(wakeAnimation, engine::Animator{  });
+			AnimationSystem::AddAnimations(wakeAnimation, resources::wakeAnims, {"normal", "boost"});
+			AnimationSystem::PlayAnimation(wakeAnimation, "normal", true);
+			//engine::TransformSystem::AddParent(wakeAnimation, playerEntity);
 
 			Player& player = engine::ecs::GetComponent<Player>(playerEntity);
 
