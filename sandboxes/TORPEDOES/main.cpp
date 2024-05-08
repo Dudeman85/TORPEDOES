@@ -81,6 +81,7 @@ static void LoadLevel1(engine::Camera* cam)
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1225.0f, -400.0f));
 
 	////Make all the checkpoints manually
+	checkPointNumber = 0;
 	CreateCheckpoint(Vector3(1925.000000, -895.000000, 100.000000), Vector3(27.500000, 27.500000, 10.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 110.f);
 	CreateCheckpoint(Vector3(2590.000000, -1475.000000, 100.000000), Vector3(30.000000, 37.500000, 5.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 110.f);
 	CreateCheckpoint(Vector3(3590.000000, -1425.000000, 100.000000), Vector3(30.000000, 12.500000, -5.000000), Vector3(17.5f), resources::models["Prop_Buoy.obj"], 95.f);
@@ -145,6 +146,7 @@ static void LoadLevel2(engine::Camera* cam)
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
 	// Make all the checkpoint's manually
+	checkPointNumber = 0;
 	CreateCheckpoint(Vector3(1455.000000, -995.000000, 100.000000), Vector3(35.000000, -15.000000, -20.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 65.0f);				// First checkpoint
 	CreateCheckpoint(Vector3(2430.000000, -1630.000000, 100.000000), Vector3(7.500000, 92.500000, 90.000000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 0.0f);			// Second checkpoint
 	CreateCheckpoint(Vector3(3595.000000, -1095.000000, 100.000000), Vector3(40.000000, 0.000000, 47.500000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 130.0f);		// Third checkpoint
@@ -229,6 +231,7 @@ static void LoadLevel3(engine::Camera* cam)
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(2480.0f, -1520.0f));
 
 	//Make all the checkpoints manually
+	checkPointNumber = 0;
 	CreateCheckpoint(Vector3(3015.000000, -760.000000, 100.000000), Vector3(27.500000, 47.500000, 7.500000), Vector3(19), resources::models["Prop_Buoy.obj"], 37.5f + 90.f);
 	CreateCheckpoint(Vector3(2645.000000, -975.000000, 100.000000), Vector3(27.500000, -40.000000, -7.500000), Vector3(19), resources::models["Prop_Buoy.obj"], -20.0f + 90.f);
 	CreateCheckpoint(Vector3(2140.000000, -635.000000, 100.000000), Vector3(27.500000, 0.000000, 12.500000), Vector3(15.f), resources::models["Prop_Buoy.obj"], -2.5f + 90.f);
@@ -338,6 +341,7 @@ static void LoadLevel4(engine::Camera* cam)
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
 	// Make all the checkpoints manually
+	checkPointNumber = 0;
 	CreateCheckpoint(Vector3(15760.000000, -925.000000, 100.000000), Vector3(-12.500000, -90.000000, -87.500000), Vector3(43.0f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
 
 	//Collectibles
@@ -514,6 +518,7 @@ int main()
 	std::shared_ptr<HedgehogSystem> hedgehogSystem = engine::ecs::GetSystem<HedgehogSystem>();
 	std::shared_ptr<SubmarineSystem> submarineSystem = ecs::GetSystem<SubmarineSystem>();
 	std::shared_ptr<PickupSystem> pickupSystem = engine::ecs::GetSystem<PickupSystem>();
+	TimerSystem::ScheduleFunction([pickupSystem]() {pickupSystem->Update(); }, 0.016, true);
 
 	std::shared_ptr<engine::SoundSystem> soundSystem = engine::ecs::GetSystem<engine::SoundSystem>();
 	soundSystem->AddSoundEngine("Gameplay");
@@ -637,7 +642,6 @@ int main()
 			playerController->Update(window);
 			submarineSystem->Update();
 			hedgehogSystem->Update();
-			pickupSystem->Update();
 			break;
 		default:
 			std::cout << "\n ERROR NO STATE FOUND:" << gameState << std::endl;

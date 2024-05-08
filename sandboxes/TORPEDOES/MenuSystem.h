@@ -853,7 +853,7 @@ namespace MainMenuSystem
 			return;
 		}
 
-		TransformSystem::Scale(startText, Vector3((std::sin(programTime * 4) / 700), (std::sin(programTime * 4) / 3150), 0));
+		TransformSystem::SetScale(startText, Vector3(.45, .1, 0) + Vector3((std::sin(programTime * 4) / 700), (std::sin(programTime * 4) / 3150), 0) * 35);
 
 		bool goPlayerSelect = false;
 		if (input::GetNewPress("Pause") || input::GetNewPress("StartGame"))

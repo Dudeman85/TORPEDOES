@@ -729,6 +729,7 @@ public:
 
 	void Init()
 	{
+		shipComponents.clear();
 		//Initialize each ship type's stats
 		shipComponents.insert(
 			{
