@@ -118,9 +118,10 @@ void CreateTorpedo(engine::ecs::Entity entity)
 
 	ecs::Entity torpedo = ecs::NewEntity();
 
+	engine::SoundComponent& sound = ecs::GetComponent<engine::SoundComponent>(entity);
+	sound.Sounds["ShootTorpedo"]->play();
+
 	// Torpedo shoot sound 
-	Audio* audio = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 100);
-	engine::ecs::AddComponent(torpedo, engine::SoundComponent{ .Sounds = {{"TorpedoShoot", audio}}});
 
 	ecs::AddComponent(torpedo, Projectile{ .ownerID = player.id, .speed = speed, .hitType = HitStates::Stop, .hitTime = 0.8 });
 	Projectile& torpedoProjectile = ecs::GetComponent<Projectile>(torpedo);
@@ -142,9 +143,10 @@ void CreateShell(engine::ecs::Entity entity)
 	float speed = 1200;
 
 	ecs::Entity shell = ecs::NewEntity();
-	// Add & loanding Shell effect sound 
-	Audio* audio = engine::AddAudio("Gameplay", "audio/bang_09.wav", false, 1000);
-	engine::ecs::AddComponent(shell, engine::SoundComponent{ .Sounds = {{"Shoot" + to_string(player.id) ,audio}} });
+
+	// Play shell shoot
+	engine::SoundComponent& sound = ecs::GetComponent<engine::SoundComponent>(entity);
+	sound.Sounds["ShootShell"]->play();
 
 	ecs::AddComponent(shell, Projectile{ .ownerID = player.id, .speed = speed, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
 	Projectile& shellProjectile = ecs::GetComponent<Projectile>(shell);
@@ -254,7 +256,6 @@ void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide,
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
 	engine::ecs::Entity hedgehog = engine::ecs::NewEntity();
-
 	
 	engine::ecs::AddComponent(hedgehog, Transform{ .position = transform.position + Vector3(0, 0, 100), .rotation = modelTransform.rotation });
 	Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * ecs::GetSystem<HedgehogSystem>()->speed;
@@ -263,9 +264,9 @@ void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide,
 	std::vector<Vector2> Hedgehogverts{ Vector2(0.4, 0.5), Vector2(0.4, -0.5), Vector2(-0.4, -0.5), Vector2(-0.4, 0.5) };
 	ecs::AddComponent(hedgehog, Projectile{ .ownerID = player.id });
 
-	// Add & loanding hedgehog sound effect 
-	Audio* audio = engine::AddAudio("Gameplay", "audio/bang_05.wav", false, 500);
-	engine::ecs::AddComponent(hedgehog, engine::SoundComponent{ .Sounds = {{"Bang", audio}} });
+	// Play shell shoot
+	engine::SoundComponent& sound = ecs::GetComponent<engine::SoundComponent>(entity);
+	sound.Sounds["ShootShell"]->play();
 
 	auto& hedgehogTransform = engine::ecs::GetComponent<engine::Transform>(hedgehog);
 	auto& aimingGuideTransform = engine::ecs::GetComponent<engine::Transform>(aimingGuide);
@@ -887,8 +888,8 @@ public:
 
 				CreateAnimation(collision.b);
 
-				
-
+				engine::SoundComponent& sound = ecs::GetComponent<engine::SoundComponent>(collision.b);
+				sound.Sounds["Explosion"]->play();
 
 				//Destroy projectile at end of frame
 				engine::ecs::DestroyEntity(collision.b);
@@ -1152,8 +1153,7 @@ public:
 			TransformSystem::SetPosition(player.wakeAnimationEntity, transform.position - wakeOffset );
 
 			// Obtener el objeto de sonido "EngineMono"
-			auto* engineSound = soundComponent.Sounds["EngineMono"+ to_string(player.id)];
-			engineSound->setPitch(rigidbody.velocity.Length() /(166.0f * 4) + player.forwardDirection.Length() + forwardImpulse.Length() /(166.0f * 16) );
+			//soundComponent.Sounds["EngineMono" + to_string(player.id)]->setPitch(rigidbody.velocity.Length() /(166.0f * 4) + player.forwardDirection.Length() + forwardImpulse.Length() /(166.0f * 16) );
 		}
 	}
 
@@ -1279,8 +1279,24 @@ public:
 				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Surface_Icon.png", "UI_Red_Surface_Icon.png", "UI_Green_Submerge_Icon.png", "UI_Red_Submerge_Icon.png" }));
 			}
 
-			Audio* audio = engine::AddAudio("Boat", "audio/enginemono.wav", true, 500);
-			engine::ecs::AddComponent(playerEntity, engine::SoundComponent{ .Sounds = {{"EngineMono" + to_string(player.id), audio}}});
+			Audio* engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", true, 5000);
+			Audio* shootShell = engine::AddAudio("Gameplay", "audio/bang_09.wav", false, 1000);
+			shootShell->pause();
+			Audio* shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 1000);
+			shootTorpedo->pause();
+			Audio* explosion = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 5000);
+			explosion->pause();
+			Audio* explosionWater = engine::AddAudio("Gameplay", "audio/dink.wav", false, 5000);
+			explosionWater->pause();
+
+			engine::ecs::AddComponent(playerEntity, engine::SoundComponent{ .Sounds = 
+			{
+				{"Engine", engineAudio},
+				{"ShootShell", shootShell},
+				{"ShootTorpedo", shootTorpedo},
+				{"Explosion", explosion},
+				{"ExplosionWater", explosionWater}
+			}});
 		}
 	}
 };
