@@ -20,12 +20,7 @@ class PlayerSelectSystem;
 ECS_REGISTER_COMPONENT(Level)
 struct Level
 {
-	//ALEKSI MITEN POISTETAAN TÄÄ REGISTERI COMPONETTI NIIN ETTÄ TÄÄ EI HAJOA
-	
-	//engine::ecs::Entity upper;
-	//engine::ecs::Entity lower;
-	//std::function <void() > operation;
-	//vector<std::string> text;
+// PASS
 };
 ECS_REGISTER_SYSTEM(LevelSelectionSystem, Level)
 class LevelSelectionSystem : public engine::ecs::System
