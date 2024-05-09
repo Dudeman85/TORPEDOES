@@ -655,7 +655,7 @@ void TorpedoIndicatorUpdate(engine::ecs::Entity entity)
 			sprite.texture = it.textures[1];
 		}
 
-		Vector2 baseScale = { 1, 0.2 };
+		Vector2 baseScale = { 1.8, 0.4 };
 		engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
 		transform.scale = { baseScale.x * camHeight * 0.001f, baseScale.y * (camHeight * aspectRatio) * 0.001f, 0 };
 	}
