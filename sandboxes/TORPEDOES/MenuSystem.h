@@ -321,17 +321,19 @@ public:
 		//NameColoring
 		switch (playerSelection.playerID)
 		{
-		case 0:
-			nameColor = nameColor = Vector3(109, 0, 255);
-			break;
-		case 1:
+		case 0:			//green		
 			nameColor = nameColor = Vector3(0, 255, 0);
 			break;
-		case 2:
-			nameColor = Vector3(0, 230, 255);
+		case 1:			  //orange
+			nameColor = nameColor = Vector3(255, 162, 0);
 			break;
-		case 3:
-			nameColor = Vector3(255, 248, 0);
+		case 2:			//red	
+			nameColor = Vector3(255, 0, 0);
+			break;
+		case 3:			   //purple
+
+			nameColor = Vector3(196, 0, 255);
+	
 			break;
 		default:
 			break;
@@ -511,7 +513,7 @@ public:
 			if (startLevelTimer > startLevelTime)
 			{
 				// Loading time started
-				result = "Ships Are Being Loaded...";
+				result = "";
 			}
 			else
 			{
