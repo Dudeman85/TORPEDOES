@@ -603,9 +603,11 @@ void CannonIndicatorUpdate(engine::ecs::Entity entity)
 		sprite.texture = it.textures[1];
 	}
 
+	/*
 	Vector2 baseScale = { 0.9, 0.8 };
 	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
 	transform.scale = { baseScale.x * camHeight * 0.001f, baseScale.y * (camHeight * aspectRatio) * 0.001f, 0 };
+	*/
 }
 
 void HedgehogIndicatorUpdate(engine::ecs::Entity entity)
@@ -629,9 +631,11 @@ void HedgehogIndicatorUpdate(engine::ecs::Entity entity)
 		sprite.texture = it.textures[1];
 	}
 
+	/*
 	Vector2 baseScale = { 1, 0.8 };
 	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
 	transform.scale = { baseScale.x * camHeight * 0.001f, baseScale.y * (camHeight * aspectRatio) * 0.001f, 0 };
+	*/
 }
 
 void TorpedoIndicatorUpdate(engine::ecs::Entity entity)
@@ -657,9 +661,11 @@ void TorpedoIndicatorUpdate(engine::ecs::Entity entity)
 			sprite.texture = it.textures[1];
 		}
 
+		/*
 		Vector2 baseScale = { 1.8, 0.4 };
 		engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
 		transform.scale = { baseScale.x * camHeight * 0.001f, baseScale.y * (camHeight * aspectRatio) * 0.001f, 0 };
+		*/
 	}
 }
 
@@ -694,9 +700,11 @@ void BoostIndicatorUpdate(engine::ecs::Entity entity)
 		sprite.texture = it.textures[2];
 	}
 
+	/*
 	Vector2 baseScale = { 0.9, 0.8 };
 	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
 	transform.scale = { baseScale.x * camHeight * 0.001f, baseScale.y * (camHeight * aspectRatio) * 0.001f, 0 };
+	*/
 }
 
 void SubmergeIndicatorUpdate(engine::ecs::Entity entity)
@@ -730,9 +738,11 @@ void SubmergeIndicatorUpdate(engine::ecs::Entity entity)
 		}
 	}
 
+	/*
 	Vector2 baseScale = { 0.9, 0.8 };
 	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
 	transform.scale = { baseScale.x * camHeight * 0.001f, baseScale.y * (camHeight * aspectRatio) * 0.001f, 0 };
+	*/
 }
 
 // Player controller System. Requires Player , Tranform , Rigidbody , PolygonCollider

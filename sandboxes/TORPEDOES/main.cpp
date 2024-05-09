@@ -500,13 +500,12 @@ static void ReturnToMainMenu()
 
 int main()
 {
-	GameState currentGameState = menuMainState;
-	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window", false);
+	GLFWwindow* window = engine::CreateGLWindow(1920, 1080, "Window", true);
 
 	engine::EngineInit();
 
 	//Make the camera
-	engine::Camera cam = engine::Camera(1120, 630);
+	engine::Camera cam = engine::Camera(1920, 1080);
 	cam.SetPosition(Vector3(0, 0, 1500));
 	cam.SetRotation(Vector3(0, 0, 0));
 
@@ -525,19 +524,17 @@ int main()
 	std::shared_ptr<PickupSystem> pickupSystem = engine::ecs::GetSystem<PickupSystem>();
 	TimerSystem::ScheduleFunction([pickupSystem]() {pickupSystem->Update(); }, 0.016, true);
 
+	std::shared_ptr<LevelSelectionSystem> levelSelectionSystem = engine::ecs::GetSystem<LevelSelectionSystem>();
+	std::shared_ptr<PlayerSelectSystem> playerSelectionSystem = engine::ecs::GetSystem<PlayerSelectSystem>();
+
 	std::shared_ptr<engine::SoundSystem> soundSystem = engine::ecs::GetSystem<engine::SoundSystem>();
 	soundSystem->AddSoundEngine("Gameplay");
 	soundSystem->AddSoundEngine("Boat");
 	soundSystem->AddSoundEngine("Background");
 	soundSystem->AddSoundEngine("Music");
 
-	std::shared_ptr<LevelSelectionSystem> levelSelectionSystem = engine::ecs::GetSystem<LevelSelectionSystem>();
 
-	std::shared_ptr<PlayerSelectSystem> playerSelectionSystem = engine::ecs::GetSystem<PlayerSelectSystem>();
-	/*
-	ShipSelectionSystem->Init();
-	ShipSelectionSystem->isShipSelectionMenuOn = true;
-	*/
+	GameState currentGameState = menuMainState;
 	isGamePaused = true;
 
 	MainMenuSystem::Load();
@@ -545,11 +542,13 @@ int main()
 	//Bind all input actions
 	SetupInput();
 
+	/*
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 166), .scale = 20 });
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
 	ecs::AddTag(placementEditor, "persistent");
+	*/
 
 	//Collision layer matrix setup
 	//Currently 0 = default, 1 = surface players, 2 = underwater, 3 = bridges, 4 = projectiles
@@ -557,7 +556,6 @@ int main()
 	collisionSystem->SetLayerInteraction(2, 3, CollisionSystem::LayerInteraction::none);
 	collisionSystem->SetLayerInteraction(2, 1, CollisionSystem::LayerInteraction::none);
 	collisionSystem->SetLayerInteraction(4, 3, CollisionSystem::LayerInteraction::none);
-
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -568,56 +566,58 @@ int main()
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
-		////Object editor
-		//{
-		//	const float editorSpeed = 0.5;
-		//	//Hold numpad 0 to toggle rotate
-		//	if (glfwGetKey(window, GLFW_KEY_KP_0))
-		//	{
-		//		//Numpad 8456 move
-		//		if (glfwGetKey(window, GLFW_KEY_KP_4))
-		//			TransformSystem::Rotate(placementEditor, Vector3(0, 0, 5) * editorSpeed);
-		//		if (glfwGetKey(window, GLFW_KEY_KP_6))
-		//			TransformSystem::Rotate(placementEditor, Vector3(0, 0, -5) * editorSpeed);
-		//		if (glfwGetKey(window, GLFW_KEY_KP_8))
-		//			TransformSystem::Rotate(placementEditor, Vector3(-5, 0, 0) * editorSpeed);
-		//		if (glfwGetKey(window, GLFW_KEY_KP_5))
-		//			TransformSystem::Rotate(placementEditor, Vector3(5, 0, 0) * editorSpeed);
-		//		if (glfwGetKey(window, GLFW_KEY_KP_7))
-		//			TransformSystem::Rotate(placementEditor, Vector3(0, 5, 0) * editorSpeed);
-		//		if (glfwGetKey(window, GLFW_KEY_KP_9))
-		//			TransformSystem::Rotate(placementEditor, Vector3(0, -5, 0) * editorSpeed);
-		//	}
-		//	else
-		//	{
-		//		//Numpad 8456 move
-		//		if (glfwGetKey(window, GLFW_KEY_KP_8))
-		//			TransformSystem::Translate(placementEditor, Vector3(0, 10, 0) * editorSpeed);
-		//		if (glfwGetKey(window, GLFW_KEY_KP_4))
-		//			TransformSystem::Translate(placementEditor, Vector3(-10, 0, 0) * editorSpeed);
-		//		if (glfwGetKey(window, GLFW_KEY_KP_5))
-		//			TransformSystem::Translate(placementEditor, Vector3(0, -10, 0) * editorSpeed);
-		//		if (glfwGetKey(window, GLFW_KEY_KP_6))
-		//			TransformSystem::Translate(placementEditor, Vector3(10, 0, 0) * editorSpeed);
-		//	}
-		//	//+- scale
-		//	if (glfwGetKey(window, GLFW_KEY_KP_ADD))
-		//		TransformSystem::Scale(placementEditor, 1 * editorSpeed);
-		//	if (glfwGetKey(window, GLFW_KEY_KP_SUBTRACT))
-		//		TransformSystem::Scale(placementEditor, -1 * editorSpeed);
-		//	//Print spawn Function
-		//	if (glfwGetKey(window, GLFW_KEY_KP_ENTER))
-		//	{
-		//		auto& et = ecs::GetComponent<Transform>(placementEditor);
-		//		std::cout << et.position.ToString() << ", " << et.rotation.ToString() << ", " << et.scale.ToString() << std::endl;
-		//	}
-		//	//Reset Transforms
-		//	if (glfwGetKey(window, GLFW_KEY_KP_DECIMAL))
-		//	{
-		//		TransformSystem::SetRotation(placementEditor, 0);
-		//		TransformSystem::SetScale(placementEditor, 20);
-		//	}
-		//}
+		/*
+		//Object editor
+		{
+			const float editorSpeed = 0.5;
+			//Hold numpad 0 to toggle rotate
+			if (glfwGetKey(window, GLFW_KEY_KP_0))
+			{
+				//Numpad 8456 move
+				if (glfwGetKey(window, GLFW_KEY_KP_4))
+					TransformSystem::Rotate(placementEditor, Vector3(0, 0, 5) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_6))
+					TransformSystem::Rotate(placementEditor, Vector3(0, 0, -5) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_8))
+					TransformSystem::Rotate(placementEditor, Vector3(-5, 0, 0) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_5))
+					TransformSystem::Rotate(placementEditor, Vector3(5, 0, 0) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_7))
+					TransformSystem::Rotate(placementEditor, Vector3(0, 5, 0) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_9))
+					TransformSystem::Rotate(placementEditor, Vector3(0, -5, 0) * editorSpeed);
+			}
+			else
+			{
+				//Numpad 8456 move
+				if (glfwGetKey(window, GLFW_KEY_KP_8))
+					TransformSystem::Translate(placementEditor, Vector3(0, 10, 0) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_4))
+					TransformSystem::Translate(placementEditor, Vector3(-10, 0, 0) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_5))
+					TransformSystem::Translate(placementEditor, Vector3(0, -10, 0) * editorSpeed);
+				if (glfwGetKey(window, GLFW_KEY_KP_6))
+					TransformSystem::Translate(placementEditor, Vector3(10, 0, 0) * editorSpeed);
+			}
+			//+- scale
+			if (glfwGetKey(window, GLFW_KEY_KP_ADD))
+				TransformSystem::Scale(placementEditor, 1 * editorSpeed);
+			if (glfwGetKey(window, GLFW_KEY_KP_SUBTRACT))
+				TransformSystem::Scale(placementEditor, -1 * editorSpeed);
+			//Print spawn Function
+			if (glfwGetKey(window, GLFW_KEY_KP_ENTER))
+			{
+				auto& et = ecs::GetComponent<Transform>(placementEditor);
+				std::cout << et.position.ToString() << ", " << et.rotation.ToString() << ", " << et.scale.ToString() << std::endl;
+			}
+			//Reset Transforms
+			if (glfwGetKey(window, GLFW_KEY_KP_DECIMAL))
+			{
+				TransformSystem::SetRotation(placementEditor, 0);
+				TransformSystem::SetScale(placementEditor, 20);
+			}
+		}
+		*/
 
 		if (glfwGetKey(window, GLFW_KEY_0))
 		{
@@ -655,27 +655,6 @@ int main()
 
 		//Update engine systems
 		engine::Update(&cam);
-
-		//TODO: This will be moved to level select system
-		if (canStartLoadingMap)
-		{
-			isGamePaused = false;
-			canStartLoadingMap = false;
-			playerSelectionSystem->isShipSelectionMenuOn = false;
-			LoadLevel4(&cam);
-			gameState = gamePlayState;
-		}
-
-		/*
-		// if paused or Pause pressed update PauseSystem
-		if (input::GetNewPress("Pause"))
-		{
-			pauseSystem->isGamePause = true;
-			isGamePaused = !isGamePaused;
-			pauseSystem->ToggleShowUIOptionsMenu();
-			gameState = inGameOptionsState;
-		}
-		*/
 
 		ecs::Update();
 		glfwSwapBuffers(window);
