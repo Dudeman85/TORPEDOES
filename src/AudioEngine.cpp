@@ -141,6 +141,9 @@ void Audio::setAbsoluteDirection(Vector3 Location)
 	ma_sound_set_pinned_listener_index(audioSound, 1);
 	ma_sound_set_positioning(audioSound, ma_positioning_relative);
 	ma_sound_set_position(audioSound, Location.x, Location.y, Location.z);
+
+	ma_sound_set_min_distance(audioSound, 0);
+	ma_sound_set_max_distance(audioSound, 0);
 }
 const Vector3 Audio::getAbsoluteDirection()
 {
