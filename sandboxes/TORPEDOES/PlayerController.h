@@ -283,6 +283,8 @@ void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide,
 
 	Projectile& hedgehogProjectile = ecs::GetComponent<Projectile>(hedgehog);
 	hedgehogProjectile.ownerEntity = entity;
+
+	std::cout << "hello!";
 }
 
 struct aimingGuideStruct
@@ -655,7 +657,7 @@ void TorpedoIndicatorUpdate(engine::ecs::Entity entity)
 			sprite.texture = it.textures[1];
 		}
 
-		Vector2 baseScale = { 1, 0.2 };
+		Vector2 baseScale = { 1.8, 0.4 };
 		engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
 		transform.scale = { baseScale.x * camHeight * 0.001f, baseScale.y * (camHeight * aspectRatio) * 0.001f, 0 };
 	}
@@ -1179,6 +1181,11 @@ public:
 
 			engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(entity);
 			soundComponent.Sounds["Engine"]->setPitch(rigidbody.velocity.Length() / (166.0f * 4) + player.forwardDirection.Length() + forwardImpulse.Length() / (166.0f * 16));
+			
+			if (soundComponent.Sounds["Engine"]->getAtEnd())
+			{
+				soundComponent.Sounds["Engine"]->play();
+			}
 		}
 	}
 
@@ -1304,14 +1311,15 @@ public:
 				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Surface_Icon.png", "UI_Red_Surface_Icon.png", "UI_Green_Submerge_Icon.png", "UI_Red_Submerge_Icon.png" }));
 			}
 
-			Audio* engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", true, 1000);
-			Audio* shootShell = engine::AddAudio("Gameplay", "audio/bang_09.wav", false, 500);
+			Audio* engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", false, 1);
+			engineAudio->play();
+			Audio* shootShell = engine::AddAudio("Gameplay", "audio/bang_09.wav", false, 1);
 			shootShell->pause();
-			Audio* shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 500);
+			Audio* shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 1);
 			shootTorpedo->pause();
-			Audio* explosion = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 500);
+			Audio* explosion = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 1);
 			explosion->pause();
-			Audio* explosionWater = engine::AddAudio("Gameplay", "audio/dink.wav", false, 500);
+			Audio* explosionWater = engine::AddAudio("Gameplay", "audio/dink.wav", false, 1);
 			explosionWater->pause();
 
 			engine::ecs::AddComponent(playerEntity, engine::SoundComponent{ .Sounds =
