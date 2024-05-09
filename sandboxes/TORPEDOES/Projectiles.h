@@ -14,6 +14,7 @@ ECS_REGISTER_COMPONENT(Projectile)
 struct Projectile
 {
 	int ownerID = 0;
+	engine::ecs::Entity ownerEntity;
 
 	float speed = 500;
 
@@ -54,6 +55,9 @@ static void CreateAnimation(engine::ecs::Entity entity)
 
 	engine::AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, "hit");
 	engine::AnimationSystem::PlayAnimation(torpedoAnim, "hit", false);
+
+	engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(projectile.ownerEntity);
+	soundComponent.Sounds["Explosion"]->play();
 };
 
 void CreateHedgehogExplosion(engine::ecs::Entity entity)
@@ -75,9 +79,7 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 	engine::ecs::AddComponent(hedgehogExplosion, engine::PolygonCollider{ .vertices = explosionverts, .trigger = true, .visualise = true });
 	engine::ecs::AddComponent(hedgehogExplosion, Projectile{ .ownerID = projectile.ownerID, .hitType = HitStates::Stop, .hitSpeedFactor = 0.5, .hitTime = 1, .canHitSubmerged = true, .hitAnimation = "" });
 
-	// Play explosion
-	//engine::SoundComponent& sound = ecs::GetComponent<engine::SoundComponent>(entity);
-	//sound.Sounds["Shoot" + to_string(player.id)]->play();
+	engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(projectile.ownerEntity);
 
 	//Disable the hedgehog collider after .5 seconds
 	engine::TimerSystem::ScheduleFunction([hedgehogExplosion]()
@@ -93,18 +95,14 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 		engine::AnimationSystem::AddAnimation(hedgehogExplosion, resources::explosionAnimation, "explosion");
 		engine::AnimationSystem::PlayAnimation(hedgehogExplosion, "explosion", false);
 
-		// Wall collision effect suond nime Explosion
-		//engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(hedgehogExplosion);
-		//soundComponent.Sounds["Explosion"]->play();
+		soundComponent.Sounds["Explosion"]->play();
 	}
 	else
 	{
 		engine::AnimationSystem::AddAnimation(hedgehogExplosion, resources::WaterexplosionAnimation, "Hedgehog_Explosion.png");
 		engine::AnimationSystem::PlayAnimation(hedgehogExplosion, "Hedgehog_Explosion.png", false);
 
-		// water collison tile sound effect nime Dink
-		//engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(hedgehogExplosion);
-		//soundComponent.Sounds["WaterExplosion"]->play();
+		soundComponent.Sounds["ExplosionWater"]->play();
 	}
 };
 

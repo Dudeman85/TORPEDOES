@@ -130,6 +130,8 @@ void CreateTorpedo(engine::ecs::Entity entity)
 	std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
 	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .layer = 4, .visualise = true,  .rotationOverride = playerCollider.rotationOverride });
 	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models[torpedoProjectile.model] });
+
+	torpedoProjectile.ownerEntity = entity;
 }
 
 /* SHELL */
@@ -156,6 +158,8 @@ void CreateShell(engine::ecs::Entity entity)
 	float shellSize = 0.1;
 	std::vector<Vector2> shellverts{ Vector2(shellSize, shellSize), Vector2(shellSize, -shellSize), Vector2(-shellSize, -shellSize), Vector2(-shellSize, shellSize) };
 	ecs::AddComponent(shell, PolygonCollider{ .vertices = shellverts, .callback = OnProjectileCollision, .trigger = true, .layer = 4, .visualise = true,  .rotationOverride = std::abs(modelTransform.rotation.y) });
+
+	shellProjectile.ownerEntity = entity;
 }
 
 void ShootShell(engine::ecs::Entity entity)
@@ -271,11 +275,14 @@ void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide,
 	auto& hedgehogTransform = engine::ecs::GetComponent<engine::Transform>(hedgehog);
 	auto& aimingGuideTransform = engine::ecs::GetComponent<engine::Transform>(aimingGuide);
 	ecs::AddComponent(hedgehog,
-		Hedgehog
-		{
-			.targetDistance = (hedgehogTransform.position - aimingGuideTransform.position).Length(),
-			.aimingGuide = aimingGuide
-		});
+	Hedgehog
+	{
+		.targetDistance = (hedgehogTransform.position - aimingGuideTransform.position).Length(),
+		.aimingGuide = aimingGuide
+	});
+
+	Projectile& hedgehogProjectile = ecs::GetComponent<Projectile>(hedgehog);
+	hedgehogProjectile.ownerEntity = entity;
 }
 
 struct aimingGuideStruct
@@ -1286,9 +1293,9 @@ public:
 			shootShell->pause();
 			Audio* shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 1000);
 			shootTorpedo->pause();
-			Audio* explosion = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 5000);
+			Audio* explosion = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 1000);
 			explosion->pause();
-			Audio* explosionWater = engine::AddAudio("Gameplay", "audio/dink.wav", false, 5000);
+			Audio* explosionWater = engine::AddAudio("Gameplay", "audio/dink.wav", false, 1000);
 			explosionWater->pause();
 
 			engine::ecs::AddComponent(playerEntity, engine::SoundComponent{ .Sounds = 
