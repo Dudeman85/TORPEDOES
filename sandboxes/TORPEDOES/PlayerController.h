@@ -283,6 +283,8 @@ void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide,
 
 	Projectile& hedgehogProjectile = ecs::GetComponent<Projectile>(hedgehog);
 	hedgehogProjectile.ownerEntity = entity;
+
+	std::cout << "hello!";
 }
 
 struct aimingGuideStruct
@@ -1179,6 +1181,11 @@ public:
 
 			engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(entity);
 			soundComponent.Sounds["Engine"]->setPitch(rigidbody.velocity.Length() / (166.0f * 4) + player.forwardDirection.Length() + forwardImpulse.Length() / (166.0f * 16));
+			
+			if (soundComponent.Sounds["Engine"]->getAtEnd())
+			{
+				soundComponent.Sounds["Engine"]->play();
+			}
 		}
 	}
 
@@ -1304,7 +1311,7 @@ public:
 				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Surface_Icon.png", "UI_Red_Surface_Icon.png", "UI_Green_Submerge_Icon.png", "UI_Red_Submerge_Icon.png" }));
 			}
 
-			Audio* engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", true, 1);
+			Audio* engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", false, 1);
 			engineAudio->play();
 			Audio* shootShell = engine::AddAudio("Gameplay", "audio/bang_09.wav", false, 1);
 			shootShell->pause();
