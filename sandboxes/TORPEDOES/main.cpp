@@ -430,10 +430,6 @@ static void SetupInput()
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "Boost" + std::to_string(i) });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_START, { "Pause" });
 
-		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_LEFT, { "Turn" + std::to_string(i) });
-		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, { "Turn" + std::to_string(i) });
-
-
 		input::bindAnalogControllerInput(i,
 			{
 				{ { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER ,  },
@@ -505,7 +501,7 @@ static void ReturnToMainMenu()
 int main()
 {
 	GameState currentGameState = menuMainState;
-	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window", true);
+	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window", false);
 
 	engine::EngineInit();
 

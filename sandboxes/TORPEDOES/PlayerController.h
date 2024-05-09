@@ -260,7 +260,7 @@ void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide,
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
 	engine::ecs::Entity hedgehog = engine::ecs::NewEntity();
-	
+
 	engine::ecs::AddComponent(hedgehog, Transform{ .position = transform.position + Vector3(0, 0, 100), .rotation = modelTransform.rotation });
 	Vector3 finalVelocity = Vector3(direction.x, direction.y, 0.0f) * ecs::GetSystem<HedgehogSystem>()->speed;
 	engine::ecs::AddComponent(hedgehog, engine::Rigidbody{ .velocity = finalVelocity });
@@ -275,11 +275,11 @@ void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide,
 	auto& hedgehogTransform = engine::ecs::GetComponent<engine::Transform>(hedgehog);
 	auto& aimingGuideTransform = engine::ecs::GetComponent<engine::Transform>(aimingGuide);
 	ecs::AddComponent(hedgehog,
-	Hedgehog
-	{
-		.targetDistance = (hedgehogTransform.position - aimingGuideTransform.position).Length(),
-		.aimingGuide = aimingGuide
-	});
+		Hedgehog
+		{
+			.targetDistance = (hedgehogTransform.position - aimingGuideTransform.position).Length(),
+			.aimingGuide = aimingGuide
+		});
 
 	Projectile& hedgehogProjectile = ecs::GetComponent<Projectile>(hedgehog);
 	hedgehogProjectile.ownerEntity = entity;
@@ -468,7 +468,7 @@ void Boost(engine::ecs::Entity entity)
 
 	player._boostScale += boostStrenght;
 
-	AnimationSystem::PlayAnimation(player.wakeAnimationEntity, "boost", true);	
+	AnimationSystem::PlayAnimation(player.wakeAnimationEntity, "boost", true);
 
 	engine::timerSystem->ScheduleFunction(&BoostEnd, boostTime, false, engine::ScheduledFunction::Type::seconds, entity, boostStrenght);
 }
@@ -492,7 +492,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 		AnimationSystem::AddAnimation(playerComponent.animationEntity, resources::continuousDivingAnim, "diving");
 		AnimationSystem::PlayAnimation(playerComponent.animationEntity, "diving", true);
 		TransformSystem::AddParent(playerComponent.animationEntity, playerEntity);
-		
+
 		//Start submerging and slow down
 		playerComponent._boostScale -= 0.1;
 		playerComponent.forwardSpeed *= 0.80;
@@ -600,7 +600,7 @@ void CannonIndicatorUpdate(engine::ecs::Entity entity)
 	{
 		sprite.texture = it.textures[1];
 	}
-	
+
 	Vector2 baseScale = { 0.9, 0.8 };
 	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
 	transform.scale = { baseScale.x * camHeight * 0.001f, baseScale.y * (camHeight * aspectRatio) * 0.001f, 0 };
@@ -805,7 +805,7 @@ public:
 		shipModels.insert({ ShipType::hedgehogBoat, resources::models["Ship_HMCS_Sackville_Hedgehog.obj"] });
 	}
 
-	static void MakeWinEntity() 
+	static void MakeWinEntity()
 	{
 		//Create the entity to be shown at a win
 		winScreen = engine::ecs::NewEntity();
@@ -847,74 +847,76 @@ public:
 			player._offroadThisFrame = true;
 			//engine::ecs::GetComponent<engine::Rigidbody>(collision.a).velocity *= player.offtrackSpeedScale;
 		}
-
-		// Check if the collision involves a checkpoint
-		if (engine::ecs::HasComponent<CheckPoint>(collision.b))
+		else
 		{
-			CheckPoint& checkpoint = engine::ecs::GetComponent<CheckPoint>(collision.b);	// Get checkpoint component
-			if (player.previousCheckpoint + 1 == checkpoint.checkPointID)			// Check whether player collided with next checkpoint
+			// Check if the collision involves a checkpoint
+			if (engine::ecs::HasComponent<CheckPoint>(collision.b))
 			{
-				player.previousCheckpoint = checkpoint.checkPointID;				// Set as previous checkpoint
-				if (checkpoint.Finish_line)
+				CheckPoint& checkpoint = engine::ecs::GetComponent<CheckPoint>(collision.b);	// Get checkpoint component
+				if (player.previousCheckpoint + 1 == checkpoint.checkPointID)			// Check whether player collided with next checkpoint
 				{
-					if (player.lap == lapCount)
+					player.previousCheckpoint = checkpoint.checkPointID;				// Set as previous checkpoint
+					if (checkpoint.Finish_line)
 					{
-						if (!hasWon)
+						if (player.lap == lapCount)
 						{
-							//Display the win screen
-							hasWon = true; 
-							MakeWinEntity();
-							engine::ecs::GetComponent<engine::TextRenderer>(winScreen).text = "Player " + std::to_string(player.id + 1);
-							engine::ecs::GetComponent<engine::SpriteRenderer>(winScreen).enabled = true;
+							if (!hasWon)
+							{
+								//Display the win screen
+								hasWon = true;
+								MakeWinEntity();
+								engine::ecs::GetComponent<engine::TextRenderer>(winScreen).text = "Player " + std::to_string(player.id + 1);
+								engine::ecs::GetComponent<engine::SpriteRenderer>(winScreen).enabled = true;
 
-							TimerSystem::ScheduleFunction(ReturnToMainMenu, 10);
+								TimerSystem::ScheduleFunction(ReturnToMainMenu, 10);
+							}
+						}
+						else
+						{
+							player.previousCheckpoint = -1;
+							player.lap++;
 						}
 					}
-					else
-					{
-						player.previousCheckpoint = -1;
-						player.lap++;
-					}
 				}
 			}
-		}
-		// Check if the collision involves a projectile
-		else if (engine::ecs::HasComponent<Projectile>(collision.b))
-		{
-			Projectile& projectile = engine::ecs::GetComponent<Projectile>(collision.b); // projectile is collision.b 
-
-			if (player.submerged && !projectile.canHitSubmerged)
+			// Check if the collision involves a projectile
+			else if (engine::ecs::HasComponent<Projectile>(collision.b))
 			{
-				// Submerged hit: Ignore
-				return;
-			}
+				Projectile& projectile = engine::ecs::GetComponent<Projectile>(collision.b); // projectile is collision.b 
 
-			if (player.id != projectile.ownerID)
-			{
-				for (auto& hitProjectile : player.hitProjectiles)
+				if (player.submerged && !projectile.canHitSubmerged)
 				{
-					// If player has been hit by stop, do not add current hit
-					if (hitProjectile.first.hitType == HitStates::Stop)
+					// Submerged hit: Ignore
+					return;
+				}
+
+				if (player.id != projectile.ownerID)
+				{
+					for (auto& hitProjectile : player.hitProjectiles)
 					{
-						goto SkipAddingHit;
+						// If player has been hit by stop, do not add current hit
+						if (hitProjectile.first.hitType == HitStates::Stop)
+						{
+							goto SkipAddingHit;
+						}
 					}
+					// If the new hit is stop, clear all other hits
+					if (projectile.hitType == HitStates::Stop)
+					{
+						player.hitProjectiles.clear();
+					}
+					// Add the new hit
+					player.hitProjectiles.push_back({ projectile, 0.f });
+				SkipAddingHit:
+
+					CreateAnimation(collision.b);
+
+					//engine::SoundComponent& sound = ecs::GetComponent<engine::SoundComponent>(collision.b);
+					//sound.Sounds["Explosion"]->play();
+
+					//Destroy projectile at end of frame
+					engine::ecs::DestroyEntity(collision.b);
 				}
-				// If the new hit is stop, clear all other hits
-				if (projectile.hitType == HitStates::Stop)
-				{
-					player.hitProjectiles.clear();
-				}
-				// Add the new hit
-				player.hitProjectiles.push_back({ projectile, 0.f });
-			SkipAddingHit:
-
-				CreateAnimation(collision.b);
-
-				//engine::SoundComponent& sound = ecs::GetComponent<engine::SoundComponent>(collision.b);
-				//sound.Sounds["Explosion"]->play();
-
-				//Destroy projectile at end of frame
-				engine::ecs::DestroyEntity(collision.b);
 			}
 		}
 	}
@@ -1159,7 +1161,7 @@ public:
 				TransformSystem::SetRotation(player.animationEntity, { 0, 0, modelTransform.rotation.y });
 			}
 			TransformSystem::SetRotation(player.wakeAnimationEntity, { 0, 0, modelTransform.rotation.y - 90 });
-			
+
 			//Wake animation stuff
 			if (rigidbody.velocity.Length() > 100)
 			{
@@ -1169,14 +1171,14 @@ public:
 			{
 				ecs::GetComponent<SpriteRenderer>(player.wakeAnimationEntity).enabled = false;
 			}
-			
+
 			ecs::GetComponent<Animator>(player.wakeAnimationEntity).playbackSpeed = std::lerp(0.1, 2, rigidbody.velocity.Length() / 900);
 			Vector3 wakeOffset = player.forwardDirection.Normalize() * 20;
 			wakeOffset += Vector3(0, 0, 40);
-			TransformSystem::SetPosition(player.wakeAnimationEntity, transform.position - wakeOffset );
+			TransformSystem::SetPosition(player.wakeAnimationEntity, transform.position - wakeOffset);
 
 			engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(entity);
-			soundComponent.Sounds["Engine"]->setPitch(rigidbody.velocity.Length() /(166.0f * 4) + player.forwardDirection.Length() + forwardImpulse.Length() /(166.0f * 16) );
+			soundComponent.Sounds["Engine"]->setPitch(rigidbody.velocity.Length() / (166.0f * 4) + player.forwardDirection.Length() + forwardImpulse.Length() / (166.0f * 16));
 		}
 	}
 
@@ -1234,7 +1236,7 @@ public:
 			engine::ecs::AddComponent(playerEntity, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .layer = 1, .visualise = true });
 
 			//Create the player's name tag
-			engine::ecs::AddComponent(playerNameText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .color = Vector3(0.5, 0.8, 0.2)});
+			engine::ecs::AddComponent(playerNameText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .color = Vector3(0.5, 0.8, 0.2) });
 			engine::ecs::AddComponent(playerNameText, engine::Transform{ .position = Vector3(-2, 2, 20), .scale = Vector3(0.1) });
 			engine::TransformSystem::AddParent(playerNameText, playerEntity);
 
@@ -1247,7 +1249,7 @@ public:
 			engine::ecs::AddComponent(wakeAnimation, engine::Transform{ .position = Vector3(0, 0, 0), .rotation = Vector3(0, 0, 0), .scale = Vector3(12, 25, 0) });
 			engine::ecs::AddComponent(wakeAnimation, engine::SpriteRenderer{ .enabled = true });
 			engine::ecs::AddComponent(wakeAnimation, engine::Animator{  });
-			AnimationSystem::AddAnimations(wakeAnimation, resources::wakeAnims, {"boost", "normal"});
+			AnimationSystem::AddAnimations(wakeAnimation, resources::wakeAnims, { "boost", "normal" });
 			AnimationSystem::PlayAnimation(wakeAnimation, "normal", true);
 
 			Player& player = engine::ecs::GetComponent<Player>(playerEntity);
@@ -1312,14 +1314,14 @@ public:
 			Audio* explosionWater = engine::AddAudio("Gameplay", "audio/dink.wav", false, 500);
 			explosionWater->pause();
 
-			engine::ecs::AddComponent(playerEntity, engine::SoundComponent{ .Sounds = 
+			engine::ecs::AddComponent(playerEntity, engine::SoundComponent{ .Sounds =
 			{
 				{"Engine", engineAudio},
 				{"ShootShell", shootShell},
 				{"ShootTorpedo", shootTorpedo},
 				{"Explosion", explosion},
 				{"ExplosionWater", explosionWater}
-			}});
+			} });
 		}
 	}
 };

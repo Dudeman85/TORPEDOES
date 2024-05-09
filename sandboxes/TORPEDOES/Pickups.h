@@ -52,8 +52,11 @@ public:
 		TimerSystem::ScheduleFunction(
 			[pickup]()
 			{
-				ecs::GetComponent<ModelRenderer>(pickup).enabled = true;
-				ecs::GetComponent<PickupComponent>(pickup).active = true;
+				if (ecs::EntityExists(pickup))
+				{
+					ecs::GetComponent<ModelRenderer>(pickup).enabled = true;
+					ecs::GetComponent<PickupComponent>(pickup).active = true;
+				}
 			}, respawnTime);
 	}
 
@@ -61,6 +64,9 @@ public:
 	{
 		//Don't do anything if not active
 		if (!ecs::GetComponent<PickupComponent>(collision.a).active)
+			return;
+		//Ignore tilemap collision to prevent weird false hit issue
+		if (collision.type == Collision::Type::tilemapCollision || collision.type == Collision::Type::tilemapTrigger)
 			return;
 
 		//Only pickable by player
