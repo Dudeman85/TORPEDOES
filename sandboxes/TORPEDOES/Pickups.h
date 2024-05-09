@@ -89,7 +89,7 @@ public:
 
 			//Make an explosion animation
 			ecs::Entity explosion = ecs::NewEntity();
-			ecs::AddComponent(explosion, Transform{ .position = transform.position, .scale = Vector3(20) });
+			ecs::AddComponent(explosion, Transform{ .position = transform.position + Vector3(0, 0, 50), .scale = Vector3(20)});
 			ecs::AddComponent(explosion, SpriteRenderer{ });
 			ecs::AddComponent(explosion, Animator{ .onAnimationEnd = ecs::DestroyEntity });
 			engine::AnimationSystem::AddAnimation(explosion, resources::explosionAnimation, "hit");
