@@ -26,6 +26,7 @@ namespace resources
 	Animation countdownAnim;
 	Animation divingAnim;
 	Animation continuousDivingAnim;
+	std::vector<Animation> wakeAnims;
 
 	std::vector<Texture*> playerIdToTexture;
 
@@ -63,6 +64,7 @@ namespace resources
 		countdownAnim = AnimationsFromSpritesheet("/spritesheets/UI_Countdown_Ver2.png", 5, 1, vector<int>(5, 1000))[0];
 		divingAnim = AnimationsFromSpritesheet("/spritesheets/Diving_Sheet_Ver2.png", 8, 1, vector<int>(8, 100))[0];
 		continuousDivingAnim = AnimationsFromSpritesheet("/spritesheets/Underwater_Sheet_Ver2.png", 4, 1, vector<int>(4, 50))[0];
+		wakeAnims = AnimationsFromSpritesheet("/spritesheets/Booster_Sheet.png", 4, 2, vector<int>(8, 70));
 	}
 
 	void UnloadResources()

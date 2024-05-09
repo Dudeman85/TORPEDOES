@@ -6,8 +6,6 @@
 #include <engine/Timing.h>
 #include "Resources.h"
 
-using namespace engine;
-
 ECS_REGISTER_COMPONENT(PickupComponent)
 struct PickupComponent
 {

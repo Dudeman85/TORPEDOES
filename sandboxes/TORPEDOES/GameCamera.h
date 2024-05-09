@@ -87,4 +87,5 @@ static void UpdateCam(engine::Camera* cam, Tilemap* map)
 	cam->SetPosition(position);
 	cam->SetDimensions(std::floor(camHeight * aspectRatio), camHeight);
 	engine::modelRenderSystem->SetLight(Vector3(cam->position.x, cam->position.y, cam->position.z + 10000), Vector3(255));
+	
 }

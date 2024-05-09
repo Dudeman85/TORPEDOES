@@ -81,6 +81,7 @@ static void LoadLevel1(engine::Camera* cam)
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1225.0f, -400.0f));
 
 	////Make all the checkpoints manually
+	checkPointNumber = 0;
 	CreateCheckpoint(Vector3(1925.000000, -895.000000, 100.000000), Vector3(27.500000, 27.500000, 10.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 110.f);
 	CreateCheckpoint(Vector3(2590.000000, -1475.000000, 100.000000), Vector3(30.000000, 37.500000, 5.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 110.f);
 	CreateCheckpoint(Vector3(3590.000000, -1425.000000, 100.000000), Vector3(30.000000, 12.500000, -5.000000), Vector3(17.5f), resources::models["Prop_Buoy.obj"], 95.f);
@@ -100,14 +101,11 @@ static void LoadLevel1(engine::Camera* cam)
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3270.000000, -1125.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3270.000000, -1045.000000, 0.300000));
 
-	////hairpin top
-	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1305.000000, -995.000000, 0.300000));
-	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1170.000000, -995.000000, 0.300000));
-	//engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1020.000000, -995.000000, 0.300000));
 
 	//second last corner
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(700.000000, -1710.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(615.000000, -1645.000000, 0.300000));
+
 
 	//Make the crowds manually
 	// Start/Finish line crowd
@@ -148,6 +146,7 @@ static void LoadLevel2(engine::Camera* cam)
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
 	// Make all the checkpoint's manually
+	checkPointNumber = 0;
 	CreateCheckpoint(Vector3(1455.000000, -995.000000, 100.000000), Vector3(35.000000, -15.000000, -20.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 65.0f);				// First checkpoint
 	CreateCheckpoint(Vector3(2430.000000, -1630.000000, 100.000000), Vector3(7.500000, 92.500000, 90.000000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 0.0f);			// Second checkpoint
 	CreateCheckpoint(Vector3(3595.000000, -1095.000000, 100.000000), Vector3(40.000000, 0.000000, 47.500000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 130.0f);		// Third checkpoint
@@ -159,8 +158,10 @@ static void LoadLevel2(engine::Camera* cam)
 	CreateCheckpoint(Vector3(1245.000000, -1680.000000, 100.000000), Vector3(75.000000, -90.000000, 7.500000), Vector3(22), resources::models["Prop_Goal_Ver2.obj"], 0.0f, true);	// Finish line
 
 	//first loop
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1495.000000, -1240.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1665.000000, -995.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1710.000000, -995.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1660.000000, -995.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1610.000000, -995.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1560.000000, -995.000000, 0.300000));
 
 	//second loop triple
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3365.000000, -1060.000000, 0.300000));
@@ -169,16 +170,18 @@ static void LoadLevel2(engine::Camera* cam)
 
 	//second loop, between stones
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2950.000000, -1585.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2885.000000, -1055.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2710.000000, -1790.000000, 0.300000));
+	
 
 	//topright hairpin
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3355.000000, -410.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3355.000000, -375.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3355.000000, -440.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3355.000000, -400.000000, 0.300000));
 
 	//before last loop
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2255.000000, -800.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2155.000000, -605.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2210.000000, -620.000000, 0.350000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2160.000000, -620.000000, 0.350000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2110.000000, -620.000000, 0.350000));
+
+
 
 	//before chicane
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(425.000000, -855.000000, 0.300000));
@@ -208,7 +211,7 @@ static void LoadLevel2(engine::Camera* cam)
 	CreateCrowd({ 1850.000000, -860.000000, 166 }, resources::crowdAnims1); // Second row, fourth crowd
 	// ********************
 
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1455.000000, -1295.000000, 0.300000));
+	
 
 	PlayCountdown(Vector3(1150.0f, -1500.0f, 0.0f));
 	PlayerController::lapCount = 3;
@@ -228,6 +231,7 @@ static void LoadLevel3(engine::Camera* cam)
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(2480.0f, -1520.0f));
 
 	//Make all the checkpoints manually
+	checkPointNumber = 0;
 	CreateCheckpoint(Vector3(3015.000000, -760.000000, 100.000000), Vector3(27.500000, 47.500000, 7.500000), Vector3(19), resources::models["Prop_Buoy.obj"], 37.5f + 90.f);
 	CreateCheckpoint(Vector3(2645.000000, -975.000000, 100.000000), Vector3(27.500000, -40.000000, -7.500000), Vector3(19), resources::models["Prop_Buoy.obj"], -20.0f + 90.f);
 	CreateCheckpoint(Vector3(2140.000000, -635.000000, 100.000000), Vector3(27.500000, 0.000000, 12.500000), Vector3(15.f), resources::models["Prop_Buoy.obj"], -2.5f + 90.f);
@@ -301,6 +305,23 @@ static void LoadLevel3(engine::Camera* cam)
 	CreateSmallCrowd({ 2014, -990, 175 }, resources::crowdAnims2);
 	CreateSmallCrowd({ 2014, -1020, 176 }, resources::crowdAnims2);
 	// ********************
+	// Dock audience
+	CreateCrowd({ 500.000000, -810.000000, 166 }, resources::crowdAnims1);			// 1. crowd from top.
+	CreateCrowd({ 480.000000, -825.000000, 167}, resources::crowdAnims1);			// 2. crowd
+	CreateSmallCrowd({ 445.000000, -910.000000, 166 }, resources::crowdAnims2);		// 3. crowd
+	CreateSmallCrowd({ 445.000000, -935.000000, 167 }, resources::crowdAnims2);		// 4. crowd
+	CreateSmallCrowd({ 445.000000, -1000.000000, 166 }, resources::crowdAnims2);	// 5. crowd
+	CreateSmallCrowd({ 445.000000, -1070.000000, 166 }, resources::crowdAnims2);	// 6. crowd
+	CreateSmallCrowd({ 445.000000, -1100.000000, 167 }, resources::crowdAnims2);	// 7. crowd
+	CreateSmallCrowd({ 445.000000, -1130.000000, 168 }, resources::crowdAnims2);	// 8. crowd
+	CreateCrowd({ 890.000000, -1220.000000, 166}, resources::crowdAnims1);			// 9. crowd
+	CreateCrowd({ 870.5, -1235.000000, 167 }, resources::crowdAnims1);				// 10. crowd
+	CreateCrowd({ 840, -1245.000000, 168 }, resources::crowdAnims1);				// 11. crowd
+	CreateCrowd({ 890, -1265.000000, 169 }, resources::crowdAnims1);				// 12. crowd
+	CreateCrowd({ 610.000000, -1220.000000, 166}, resources::crowdAnims1);
+	CreateCrowd({ 560.5, -1235.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 650, -1245.000000, 168 }, resources::crowdAnims1);
+	CreateCrowd({ 600, -1265.000000, 169 }, resources::crowdAnims1);
 
 	PlayCountdown(Vector3(2480.0f, -1460.0f, 200.0f));
 	PlayerController::lapCount = 3;
@@ -320,6 +341,7 @@ static void LoadLevel4(engine::Camera* cam)
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
 
 	// Make all the checkpoints manually
+	checkPointNumber = 0;
 	CreateCheckpoint(Vector3(15760.000000, -925.000000, 100.000000), Vector3(-12.500000, -90.000000, -87.500000), Vector3(43.0f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
 
 	//Collectibles
@@ -429,21 +451,30 @@ static void SetupInput()
 
 	// Keyboard input
 	int KeyboardPlayer = 3;
-
-
 	input::bindAnalogInput(GLFW_KEY_RIGHT, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
 	input::bindAnalogInput(GLFW_KEY_LEFT, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
 
-	input::bindAnalogInput(GLFW_KEY_A, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
+	input::bindAnalogInput(GLFW_KEY_X, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
 	input::bindAnalogInput(GLFW_KEY_Z, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
 	input::bindAnalogInput(GLFW_KEY_UP, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
 	input::bindAnalogInput(GLFW_KEY_DOWN, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
-
+	
 	input::bindDigitalInput(GLFW_KEY_N, { "Shoot" + std::to_string(KeyboardPlayer) });
 	input::bindDigitalInput(GLFW_KEY_B, { "Boost" + std::to_string(KeyboardPlayer) });
+
+	int KeyboardPlayer2 = 1;
+	input::bindAnalogInput(GLFW_KEY_D, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer2) });
+	input::bindAnalogInput(GLFW_KEY_A, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer2) });
+
+	input::bindAnalogInput(GLFW_KEY_W, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer2) });
+	input::bindAnalogInput(GLFW_KEY_S, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer2) });
+
+	input::bindDigitalInput(GLFW_KEY_H, { "Shoot" + std::to_string(KeyboardPlayer2) });
+	input::bindDigitalInput(GLFW_KEY_J, { "Boost" + std::to_string(KeyboardPlayer2) });
+
 	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
 	input::bindDigitalInput(GLFW_KEY_G, { "StartGame" });
-}
+} 
 
 static void PlayersMenu(std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem)
 {
@@ -474,7 +505,7 @@ static void ReturnToMainMenu()
 int main()
 {
 	GameState currentGameState = menuMainState;
-	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window", false);
+	GLFWwindow* window = engine::CreateGLWindow(1600, 900, "Window", true);
 
 	engine::EngineInit();
 
@@ -496,6 +527,7 @@ int main()
 	std::shared_ptr<HedgehogSystem> hedgehogSystem = engine::ecs::GetSystem<HedgehogSystem>();
 	std::shared_ptr<SubmarineSystem> submarineSystem = ecs::GetSystem<SubmarineSystem>();
 	std::shared_ptr<PickupSystem> pickupSystem = engine::ecs::GetSystem<PickupSystem>();
+	TimerSystem::ScheduleFunction([pickupSystem]() {pickupSystem->Update(); }, 0.016, true);
 
 	std::shared_ptr<engine::SoundSystem> soundSystem = engine::ecs::GetSystem<engine::SoundSystem>();
 	soundSystem->AddSoundEngine("Gameplay");
@@ -521,6 +553,7 @@ int main()
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 166), .scale = 20 });
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
+	ecs::AddTag(placementEditor, "persistent");
 
 	//Collision layer matrix setup
 	//Currently 0 = default, 1 = surface players, 2 = underwater, 3 = bridges, 4 = projectiles
@@ -539,56 +572,56 @@ int main()
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
-		//Object editor
-		{
-			const float editorSpeed = 0.5;
-			//Hold numpad 0 to toggle rotate
-			if (glfwGetKey(window, GLFW_KEY_KP_0))
-			{
-				//Numpad 8456 move
-				if (glfwGetKey(window, GLFW_KEY_KP_4))
-					TransformSystem::Rotate(placementEditor, Vector3(0, 0, 5) * editorSpeed);
-				if (glfwGetKey(window, GLFW_KEY_KP_6))
-					TransformSystem::Rotate(placementEditor, Vector3(0, 0, -5) * editorSpeed);
-				if (glfwGetKey(window, GLFW_KEY_KP_8))
-					TransformSystem::Rotate(placementEditor, Vector3(-5, 0, 0) * editorSpeed);
-				if (glfwGetKey(window, GLFW_KEY_KP_5))
-					TransformSystem::Rotate(placementEditor, Vector3(5, 0, 0) * editorSpeed);
-				if (glfwGetKey(window, GLFW_KEY_KP_7))
-					TransformSystem::Rotate(placementEditor, Vector3(0, 5, 0) * editorSpeed);
-				if (glfwGetKey(window, GLFW_KEY_KP_9))
-					TransformSystem::Rotate(placementEditor, Vector3(0, -5, 0) * editorSpeed);
-			}
-			else
-			{
-				//Numpad 8456 move
-				if (glfwGetKey(window, GLFW_KEY_KP_8))
-					TransformSystem::Translate(placementEditor, Vector3(0, 10, 0) * editorSpeed);
-				if (glfwGetKey(window, GLFW_KEY_KP_4))
-					TransformSystem::Translate(placementEditor, Vector3(-10, 0, 0) * editorSpeed);
-				if (glfwGetKey(window, GLFW_KEY_KP_5))
-					TransformSystem::Translate(placementEditor, Vector3(0, -10, 0) * editorSpeed);
-				if (glfwGetKey(window, GLFW_KEY_KP_6))
-					TransformSystem::Translate(placementEditor, Vector3(10, 0, 0) * editorSpeed);
-			}
-			//+- scale
-			if (glfwGetKey(window, GLFW_KEY_KP_ADD))
-				TransformSystem::Scale(placementEditor, 1 * editorSpeed);
-			if (glfwGetKey(window, GLFW_KEY_KP_SUBTRACT))
-				TransformSystem::Scale(placementEditor, -1 * editorSpeed);
-			//Print spawn Function
-			if (glfwGetKey(window, GLFW_KEY_KP_ENTER))
-			{
-				auto& et = ecs::GetComponent<Transform>(placementEditor);
-				std::cout << et.position.ToString() << ", " << et.rotation.ToString() << ", " << et.scale.ToString() << std::endl;
-			}
-			//Reset Transforms
-			if (glfwGetKey(window, GLFW_KEY_KP_DECIMAL))
-			{
-				TransformSystem::SetRotation(placementEditor, 0);
-				TransformSystem::SetScale(placementEditor, 20);
-			}
-		}
+		////Object editor
+		//{
+		//	const float editorSpeed = 0.5;
+		//	//Hold numpad 0 to toggle rotate
+		//	if (glfwGetKey(window, GLFW_KEY_KP_0))
+		//	{
+		//		//Numpad 8456 move
+		//		if (glfwGetKey(window, GLFW_KEY_KP_4))
+		//			TransformSystem::Rotate(placementEditor, Vector3(0, 0, 5) * editorSpeed);
+		//		if (glfwGetKey(window, GLFW_KEY_KP_6))
+		//			TransformSystem::Rotate(placementEditor, Vector3(0, 0, -5) * editorSpeed);
+		//		if (glfwGetKey(window, GLFW_KEY_KP_8))
+		//			TransformSystem::Rotate(placementEditor, Vector3(-5, 0, 0) * editorSpeed);
+		//		if (glfwGetKey(window, GLFW_KEY_KP_5))
+		//			TransformSystem::Rotate(placementEditor, Vector3(5, 0, 0) * editorSpeed);
+		//		if (glfwGetKey(window, GLFW_KEY_KP_7))
+		//			TransformSystem::Rotate(placementEditor, Vector3(0, 5, 0) * editorSpeed);
+		//		if (glfwGetKey(window, GLFW_KEY_KP_9))
+		//			TransformSystem::Rotate(placementEditor, Vector3(0, -5, 0) * editorSpeed);
+		//	}
+		//	else
+		//	{
+		//		//Numpad 8456 move
+		//		if (glfwGetKey(window, GLFW_KEY_KP_8))
+		//			TransformSystem::Translate(placementEditor, Vector3(0, 10, 0) * editorSpeed);
+		//		if (glfwGetKey(window, GLFW_KEY_KP_4))
+		//			TransformSystem::Translate(placementEditor, Vector3(-10, 0, 0) * editorSpeed);
+		//		if (glfwGetKey(window, GLFW_KEY_KP_5))
+		//			TransformSystem::Translate(placementEditor, Vector3(0, -10, 0) * editorSpeed);
+		//		if (glfwGetKey(window, GLFW_KEY_KP_6))
+		//			TransformSystem::Translate(placementEditor, Vector3(10, 0, 0) * editorSpeed);
+		//	}
+		//	//+- scale
+		//	if (glfwGetKey(window, GLFW_KEY_KP_ADD))
+		//		TransformSystem::Scale(placementEditor, 1 * editorSpeed);
+		//	if (glfwGetKey(window, GLFW_KEY_KP_SUBTRACT))
+		//		TransformSystem::Scale(placementEditor, -1 * editorSpeed);
+		//	//Print spawn Function
+		//	if (glfwGetKey(window, GLFW_KEY_KP_ENTER))
+		//	{
+		//		auto& et = ecs::GetComponent<Transform>(placementEditor);
+		//		std::cout << et.position.ToString() << ", " << et.rotation.ToString() << ", " << et.scale.ToString() << std::endl;
+		//	}
+		//	//Reset Transforms
+		//	if (glfwGetKey(window, GLFW_KEY_KP_DECIMAL))
+		//	{
+		//		TransformSystem::SetRotation(placementEditor, 0);
+		//		TransformSystem::SetScale(placementEditor, 20);
+		//	}
+		//}
 
 		if (glfwGetKey(window, GLFW_KEY_0))
 		{
@@ -618,7 +651,6 @@ int main()
 			playerController->Update(window);
 			submarineSystem->Update();
 			hedgehogSystem->Update();
-			pickupSystem->Update();
 			break;
 		default:
 			std::cout << "\n ERROR NO STATE FOUND:" << gameState << std::endl;
@@ -627,7 +659,6 @@ int main()
 
 		//Update engine systems
 		engine::Update(&cam);
-
 
 		//TODO: This will be moved to level select system
 		if (canStartLoadingMap)

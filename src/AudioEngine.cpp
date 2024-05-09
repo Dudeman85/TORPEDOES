@@ -147,8 +147,7 @@ const Vector3 Audio::getAbsoluteDirection()
 	ma_vec3f direction = ma_sound_get_position(audioSound);
 	return Vector3(direction.x, direction.y, direction.z);
 }
-void Audio::setPitch(float factor)
+void Audio::setPitch(float newPitch)
 {
-	ma_sound_set_pitch(audioSound, factor);
+	ma_sound_set_pitch(audioSound, newPitch);
 }
-
