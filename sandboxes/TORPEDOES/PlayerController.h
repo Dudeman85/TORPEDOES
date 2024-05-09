@@ -591,7 +591,6 @@ void CannonIndicatorUpdate(engine::ecs::Entity entity)
 	indicatorStruct& it = player.shootIndicators.back();
 
 	engine::SpriteRenderer& sprite = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
-	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
 
 	if (!player.reloading || (player.ammo >= player.maxAmmo))
 	{
@@ -601,11 +600,10 @@ void CannonIndicatorUpdate(engine::ecs::Entity entity)
 	{
 		sprite.texture = it.textures[1];
 	}
-	/*
-	Vector2 baseScale = {1, 1};
-
+	
+	Vector2 baseScale = { 0.9, 0.8 };
+	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
 	transform.scale = { baseScale.x * camHeight * 0.001f, baseScale.y * (camHeight * aspectRatio) * 0.001f, 0 };
-	*/
 }
 
 void HedgehogIndicatorUpdate(engine::ecs::Entity entity)
@@ -628,6 +626,10 @@ void HedgehogIndicatorUpdate(engine::ecs::Entity entity)
 	{
 		sprite.texture = it.textures[1];
 	}
+
+	Vector2 baseScale = { 1, 0.8 };
+	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
+	transform.scale = { baseScale.x * camHeight * 0.001f, baseScale.y * (camHeight * aspectRatio) * 0.001f, 0 };
 }
 
 void TorpedoIndicatorUpdate(engine::ecs::Entity entity)
@@ -652,6 +654,10 @@ void TorpedoIndicatorUpdate(engine::ecs::Entity entity)
 		{
 			sprite.texture = it.textures[1];
 		}
+
+		Vector2 baseScale = { 1, 0.2 };
+		engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
+		transform.scale = { baseScale.x * camHeight * 0.001f, baseScale.y * (camHeight * aspectRatio) * 0.001f, 0 };
 	}
 }
 
@@ -685,6 +691,10 @@ void BoostIndicatorUpdate(engine::ecs::Entity entity)
 		// Not available
 		sprite.texture = it.textures[2];
 	}
+
+	Vector2 baseScale = { 0.9, 0.8 };
+	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
+	transform.scale = { baseScale.x * camHeight * 0.001f, baseScale.y * (camHeight * aspectRatio) * 0.001f, 0 };
 }
 
 void SubmergeIndicatorUpdate(engine::ecs::Entity entity)
@@ -717,6 +727,10 @@ void SubmergeIndicatorUpdate(engine::ecs::Entity entity)
 			sprite.texture = it.textures[3];
 		}
 	}
+
+	Vector2 baseScale = { 0.9, 0.8 };
+	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
+	transform.scale = { baseScale.x * camHeight * 0.001f, baseScale.y * (camHeight * aspectRatio) * 0.001f, 0 };
 }
 
 // Player controller System. Requires Player , Tranform , Rigidbody , PolygonCollider
@@ -725,7 +739,6 @@ class PlayerController : public engine::ecs::System
 {
 	static engine::ecs::Entity winScreen;
 	static bool hasWon;
-
 
 	//A map from a ship type to a pre-initialized Player component with the proper stats
 	std::unordered_map<ShipType, Player> shipComponents;
@@ -1147,22 +1160,23 @@ public:
 			}
 			TransformSystem::SetRotation(player.wakeAnimationEntity, { 0, 0, modelTransform.rotation.y - 90 });
 			
-			// Obtener el componente de sonido de la entidad
-			engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(entity);
-
 			//Wake animation stuff
 			if (rigidbody.velocity.Length() > 100)
+			{
 				ecs::GetComponent<SpriteRenderer>(player.wakeAnimationEntity).enabled = true;
+			}
 			else if (rigidbody.velocity.Length() < 50)
+			{
 				ecs::GetComponent<SpriteRenderer>(player.wakeAnimationEntity).enabled = false;
+			}
 			
 			ecs::GetComponent<Animator>(player.wakeAnimationEntity).playbackSpeed = std::lerp(0.1, 2, rigidbody.velocity.Length() / 900);
 			Vector3 wakeOffset = player.forwardDirection.Normalize() * 20;
 			wakeOffset += Vector3(0, 0, 40);
 			TransformSystem::SetPosition(player.wakeAnimationEntity, transform.position - wakeOffset );
 
-			// Obtener el objeto de sonido "EngineMono"
-			//soundComponent.Sounds["EngineMono" + to_string(player.id)]->setPitch(rigidbody.velocity.Length() /(166.0f * 4) + player.forwardDirection.Length() + forwardImpulse.Length() /(166.0f * 16) );
+			engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(entity);
+			soundComponent.Sounds["Engine"]->setPitch(rigidbody.velocity.Length() /(166.0f * 4) + player.forwardDirection.Length() + forwardImpulse.Length() /(166.0f * 16) );
 		}
 	}
 
@@ -1288,14 +1302,14 @@ public:
 				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Surface_Icon.png", "UI_Red_Surface_Icon.png", "UI_Green_Submerge_Icon.png", "UI_Red_Submerge_Icon.png" }));
 			}
 
-			Audio* engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", true, 5000);
-			Audio* shootShell = engine::AddAudio("Gameplay", "audio/bang_09.wav", false, 1000);
+			Audio* engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", true, 1000);
+			Audio* shootShell = engine::AddAudio("Gameplay", "audio/bang_09.wav", false, 500);
 			shootShell->pause();
-			Audio* shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 1000);
+			Audio* shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 500);
 			shootTorpedo->pause();
-			Audio* explosion = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 1000);
+			Audio* explosion = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 500);
 			explosion->pause();
-			Audio* explosionWater = engine::AddAudio("Gameplay", "audio/dink.wav", false, 1000);
+			Audio* explosionWater = engine::AddAudio("Gameplay", "audio/dink.wav", false, 500);
 			explosionWater->pause();
 
 			engine::ecs::AddComponent(playerEntity, engine::SoundComponent{ .Sounds = 

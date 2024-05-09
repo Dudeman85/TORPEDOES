@@ -40,8 +40,8 @@ public:
 	void setAbsoluteDirection(Vector3 Location);	
 	///Gets the absolute direction the sound is coming from headphone's perspective, distance lowers volume
 	const Vector3 getAbsoluteDirection();	
-	//
-	void setPitch(float factor);
+	/// Sets the pitch the sound is played in
+	void setPitch(float pitch);
 
 private:
 	AudioEngine* owner;								// AudioEngine which owns this audio TODO: Remove
