@@ -14,7 +14,7 @@ ECS_REGISTER_COMPONENT(Projectile)
 struct Projectile
 {
 	int ownerID = 0;
-	engine::ecs::Entity ownerEntity;
+	engine::ecs::Entity ownerEntity = 0;
 
 	float speed = 500;
 
@@ -56,8 +56,11 @@ static void CreateAnimation(engine::ecs::Entity entity)
 	engine::AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, "hit");
 	engine::AnimationSystem::PlayAnimation(torpedoAnim, "hit", false);
 
-	engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(projectile.ownerEntity);
-	soundComponent.Sounds["Explosion"]->play();
+	if (projectile.ownerEntity != 0)
+	{
+		engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(projectile.ownerEntity);
+		soundComponent.Sounds["Explosion"]->play();
+	}
 };
 
 void CreateHedgehogExplosion(engine::ecs::Entity entity)
