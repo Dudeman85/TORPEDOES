@@ -1321,15 +1321,15 @@ public:
 				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Surface_Icon.png", "UI_Red_Surface_Icon.png", "UI_Green_Submerge_Icon.png", "UI_Red_Submerge_Icon.png" }));
 			}
 
-			Audio* engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", false, 1);
+			Audio* engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", false, 0.3f);
 			engineAudio->play();
-			Audio* shootShell = engine::AddAudio("Gameplay", "audio/bang_09.wav", false, 1);
+			Audio* shootShell = engine::AddAudio("Gameplay", "audio/bang_05.wav", false, 0.3f);
 			shootShell->pause();
-			Audio* shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 1);
+			Audio* shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.3f);
 			shootTorpedo->pause();
-			Audio* explosion = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 1);
+			Audio* explosion = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 0.2f);
 			explosion->pause();
-			Audio* explosionWater = engine::AddAudio("Gameplay", "audio/dink.wav", false, 1);
+			Audio* explosionWater = engine::AddAudio("Gameplay", "audio/dink.wav", false, 0.3f);
 			explosionWater->pause();
 
 			engine::ecs::AddComponent(playerEntity, engine::SoundComponent{ .Sounds =
