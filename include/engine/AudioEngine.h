@@ -61,6 +61,8 @@ public:
 	void setAmbientVolume(float newVolume);
 	///Gets the ambient volume
 	const float getAmbientVolume();
+	
+	void setListenerPosition(Vector3 Location);
 
 	///miniaudio engine
 	ma_engine soundEngine;

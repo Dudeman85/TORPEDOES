@@ -154,3 +154,8 @@ void Audio::setPitch(float newPitch)
 {
 	ma_sound_set_pitch(audioSound, newPitch);
 }
+
+void AudioEngine::setListenerPosition(Vector3 position)
+{
+	ma_engine_listener_set_position(&soundEngine, 0, position.x, position.y, position.z);
+}

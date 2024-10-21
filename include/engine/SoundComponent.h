@@ -29,7 +29,7 @@ namespace engine
 		std::map<std::string, AudioEngine*> AudioEngines;
 
 	public:
-		Vector2 ListeningPosition;
+		Vector3 ListeningPosition;
 
 		void Update()
 		{
@@ -72,9 +72,14 @@ namespace engine
 			return it->second;
 		}
 
-		void SetListeningPosition(Vector2 listeningPosition)
+		void SetListeningPosition(Vector3 listeningPosition)
 		{
 			ListeningPosition = listeningPosition;
+		}
+
+		void UpdateListenerPositionInEngine(AudioEngine* audioEngine)
+		{
+			audioEngine->setListenerPosition(ListeningPosition);
 		}
 
 		// Free up memory

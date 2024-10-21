@@ -533,6 +533,9 @@ int main()
 	soundSystem->AddSoundEngine("Background");
 	soundSystem->AddSoundEngine("Music");
 
+	Vector3 newListenerPosition(2200.000000, -1075.000000, 0.00000);
+	soundSystem->SetListeningPosition(newListenerPosition);
+
 
 	GameState currentGameState = menuMainState;
 	isGamePaused = true;
