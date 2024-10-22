@@ -509,6 +509,13 @@ int main()
 	cam.SetPosition(Vector3(0, 0, 1500));
 	cam.SetRotation(Vector3(0, 0, 0));
 
+	//Init sound engine
+	std::shared_ptr<engine::SoundSystem> soundSystem = engine::ecs::GetSystem<engine::SoundSystem>();
+	soundSystem->AddSoundEngine("Gameplay");
+	soundSystem->AddSoundEngine("Boat");
+	soundSystem->AddSoundEngine("Background");
+	soundSystem->AddSoundEngine("Music");
+
 	//Loads all globally used resources
 	resources::LoadResources(&cam);
 
@@ -527,11 +534,6 @@ int main()
 	std::shared_ptr<LevelSelectionSystem> levelSelectionSystem = engine::ecs::GetSystem<LevelSelectionSystem>();
 	std::shared_ptr<PlayerSelectSystem> playerSelectionSystem = engine::ecs::GetSystem<PlayerSelectSystem>();
 
-	std::shared_ptr<engine::SoundSystem> soundSystem = engine::ecs::GetSystem<engine::SoundSystem>();
-	soundSystem->AddSoundEngine("Gameplay");
-	soundSystem->AddSoundEngine("Boat");
-	soundSystem->AddSoundEngine("Background");
-	soundSystem->AddSoundEngine("Music");
 
 	Vector3 newListenerPosition(2200.000000, -1075.000000, 0.00000);
 	soundSystem->SetListeningPosition(newListenerPosition);
@@ -647,6 +649,7 @@ int main()
 			break;
 		case gamePlayState:
 			UpdateCam(&cam, collisionSystem->tilemap);
+			soundSystem->SetListeningPosition(Vector3(cam.position.x, cam.position.y, 500));
 			playerController->Update(window);
 			submarineSystem->Update();
 			hedgehogSystem->Update();

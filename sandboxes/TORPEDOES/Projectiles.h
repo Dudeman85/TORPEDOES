@@ -52,15 +52,15 @@ static void CreateAnimation(engine::ecs::Entity entity)
 	engine::ecs::AddComponent(torpedoAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, ((double)rand() / (double)RAND_MAX) + 2), .scale = Vector3(20) });
 	engine::ecs::AddComponent(torpedoAnim, engine::SpriteRenderer{ });
 	engine::ecs::AddComponent(torpedoAnim, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
+	engine::ecs::AddComponent(torpedoAnim, engine::SoundComponent{ .Sounds = {{"Explosion", resources::explosion}} });
 
+	//Play explosion animation
 	engine::AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, "hit");
 	engine::AnimationSystem::PlayAnimation(torpedoAnim, "hit", false);
 
-	if (projectile.ownerEntity != 0)
-	{
-		engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(projectile.ownerEntity);
-		soundComponent.Sounds["Explosion"]->play();
-	}
+	//Play explosion sound
+	engine::SoundComponent& sc = engine::ecs::GetComponent<engine::SoundComponent>(torpedoAnim);
+	sc.Sounds["Explosion"]->play();
 };
 
 void CreateHedgehogExplosion(engine::ecs::Entity entity)

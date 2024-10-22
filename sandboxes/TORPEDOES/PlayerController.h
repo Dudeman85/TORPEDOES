@@ -1191,7 +1191,7 @@ public:
 
 			engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(entity);
 			soundComponent.Sounds["Engine"]->setPitch(rigidbody.velocity.Length() / (166.0f * 4) + player.forwardDirection.Length() + forwardImpulse.Length() / (166.0f * 16));
-			
+
 			if (soundComponent.Sounds["Engine"]->getAtEnd())
 			{
 				soundComponent.Sounds["Engine"]->play();
@@ -1321,24 +1321,14 @@ public:
 				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Surface_Icon.png", "UI_Red_Surface_Icon.png", "UI_Green_Submerge_Icon.png", "UI_Red_Submerge_Icon.png" }));
 			}
 
-			Audio* engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", false, 0.3f);
-			engineAudio->play();
-			Audio* shootShell = engine::AddAudio("Gameplay", "audio/bang_05.wav", false, 0.3f);
-			shootShell->pause();
-			Audio* shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.3f);
-			shootTorpedo->pause();
-			Audio* explosion = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 0.2f);
-			explosion->pause();
-			Audio* explosionWater = engine::AddAudio("Gameplay", "audio/dink.wav", false, 0.3f);
-			explosionWater->pause();
-
+			//Add sounds
 			engine::ecs::AddComponent(playerEntity, engine::SoundComponent{ .Sounds =
 			{
-				{"Engine", engineAudio},
-				{"ShootShell", shootShell},
-				{"ShootTorpedo", shootTorpedo},
-				{"Explosion", explosion},
-				{"ExplosionWater", explosionWater}
+				{"Engine", resources::engineAudio},
+				{"ShootShell", resources::shootShell},
+				{"ShootTorpedo", resources::shootTorpedo},
+				{"Explosion", resources::explosion},
+				{"ExplosionWater", resources::explosionWater}
 			} });
 		}
 	}
