@@ -42,7 +42,7 @@ namespace engine
 
 				for (auto& sound : soundComponent.Sounds)
 				{
-					sound.second->setAbsoluteDirection(ListeningPosition - soundTransform.position);
+					sound.second->setAbsoluteDirection(soundTransform.position - ListeningPosition);
 				}
 			}
 		}

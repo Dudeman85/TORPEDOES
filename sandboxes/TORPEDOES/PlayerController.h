@@ -1321,6 +1321,8 @@ public:
 				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Surface_Icon.png", "UI_Red_Surface_Icon.png", "UI_Green_Submerge_Icon.png", "UI_Red_Submerge_Icon.png" }));
 			}
 
+			resources::engineAudio->play();
+
 			//Add sounds
 			engine::ecs::AddComponent(playerEntity, engine::SoundComponent{ .Sounds =
 			{

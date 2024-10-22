@@ -74,7 +74,7 @@ namespace resources
 		wakeAnims = AnimationsFromSpritesheet("/spritesheets/Booster_Sheet.png", 4, 2, vector<int>(8, 70));
 
 		//Load Sounds
-		engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", false, 0.3f);
+		engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", false, 0.1f);
 		engineAudio->pause();
 		shootShell = engine::AddAudio("Gameplay", "audio/bang_05.wav", false, 0.3f);
 		shootShell->pause();

@@ -649,7 +649,7 @@ int main()
 			break;
 		case gamePlayState:
 			UpdateCam(&cam, collisionSystem->tilemap);
-			soundSystem->SetListeningPosition(Vector3(cam.position.x, cam.position.y, 500));
+			soundSystem->SetListeningPosition(Vector3(cam.position.x, cam.position.y, -500));
 			playerController->Update(window);
 			submarineSystem->Update();
 			hedgehogSystem->Update();
