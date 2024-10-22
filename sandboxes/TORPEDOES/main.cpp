@@ -649,7 +649,8 @@ int main()
 			break;
 		case gamePlayState:
 			UpdateCam(&cam, collisionSystem->tilemap);
-			soundSystem->SetListeningPosition(Vector3(cam.position.x, cam.position.y, -500));
+			//Camera position must be divided by 2 because of a known camera bug
+			soundSystem->SetListeningPosition(Vector3(cam.position.x * 2, cam.position.y * 2, 0));
 			playerController->Update(window);
 			submarineSystem->Update();
 			hedgehogSystem->Update();
