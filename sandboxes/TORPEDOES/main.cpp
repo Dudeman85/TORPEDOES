@@ -132,7 +132,7 @@ static void LoadLevel1(engine::Camera* cam)
 	// ********************
 
 	PlayCountdown(Vector3(1235.0f, -310.0f, 200.0f));
-	PlayerController::lapCount = 3;
+	PlayerController::lapCount = 1;
 }
 
 // Create everything for level 2
