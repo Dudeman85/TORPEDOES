@@ -771,7 +771,7 @@ public:
 			{
 				ShipType::torpedoBoat, Player
 				{
-					.forwardSpeed = 550, .rotationSpeed = 100,
+					.forwardSpeed = 550, .rotationSpeed = 120,
 					.shootCooldown = 0.2, .specialCooldown = 5, .ammoRechargeCooldown = 2,
 					.holdShoot = false, .maxAmmo = 2,
 					.shootAction = CreateTorpedo, .specialAction = Boost,
@@ -829,7 +829,7 @@ public:
 
 		winTimer = engine::ecs::NewEntity();				
 		engine::ecs::AddComponent(winTimer, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.5, -2, 1), .scale = Vector3(0.013f), .color = Vector3(1.f, 1.f, 1.f), .uiElement = true });
-		engine::ecs::AddComponent(winTimer, engine::Transform{ .position = Vector3(-0.2, -0.15, 0), .scale = Vector3(0.3f) });
+		engine::ecs::AddComponent(winTimer, engine::Transform{ .position = Vector3(-0.05, -0.15, 0), .scale = Vector3(0.3f) });
 	}
 
 	//Kill the players who fell behind on the river map
@@ -1274,7 +1274,7 @@ public:
 			engine::ecs::AddComponent(playerEntity, engine::Transform{ .position = Vector3(startPos - offset * playerShip.first, 150), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			engine::ecs::AddComponent(playerEntity, engine::Rigidbody{ .drag = 1.5 });
 			vector<Vector2> colliderVerts{ Vector2(3, 1), Vector2(3, -1), Vector2(-3, -1), Vector2(-3, 1) };
-			engine::ecs::AddComponent(playerEntity, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .layer = 1, .visualise = true });
+			engine::ecs::AddComponent(playerEntity, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .trigger = true, .layer = 1, .visualise = true });
 
 			//Create the player's name tag
 			engine::ecs::AddComponent(playerNameText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .color = Vector3(0.5, 0.8, 0.2) });

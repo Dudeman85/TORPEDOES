@@ -132,7 +132,7 @@ static void LoadLevel1(engine::Camera* cam)
 	// ********************
 
 	PlayCountdown(Vector3(1235.0f, -310.0f, 200.0f));
-	PlayerController::lapCount = 1;
+	PlayerController::lapCount = 3;
 }
 
 // Create everything for level 2
@@ -490,6 +490,7 @@ static void PlayersMenu(std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem)
 	std::cout << "is Ship selection open:" << ShipSelectionSystem->isShipSelectionMenuOn;
 }
 
+engine::Camera* cam;
 
 //Delete all entities and load menu
 static void ReturnToMainMenu()
@@ -500,6 +501,7 @@ static void ReturnToMainMenu()
 	isGamePaused = true;
 	canStartLoadingMap = false;
 	ecs::GetSystem<PlayerSelectSystem>()->isShipSelectionMenuOn = false;
+	cam->SetPosition(0);
 
 	MainMenuSystem::Load();
 }
@@ -518,9 +520,9 @@ int main()
 	engine::EngineInit();
 
 	//Make the camera
-	engine::Camera cam = engine::Camera(1920, 1080);
-	cam.SetPosition(Vector3(0, 0, 1500));
-	cam.SetRotation(Vector3(0, 0, 0));
+	cam = new engine::Camera(1920, 1080);
+	cam->SetPosition(Vector3(0, 0, 1500));
+	cam->SetRotation(Vector3(0, 0, 0));
 
 	//Init sound engine
 	std::shared_ptr<engine::SoundSystem> soundSystem = engine::ecs::GetSystem<engine::SoundSystem>();
@@ -530,7 +532,7 @@ int main()
 	soundSystem->AddSoundEngine("Music");
 
 	//Loads all globally used resources
-	resources::LoadResources(&cam);
+	resources::LoadResources(cam);
 
 	input::initialize(window);
 
@@ -661,9 +663,9 @@ int main()
 			playerSelectionSystem->Update();
 			break;
 		case gamePlayState:
-			UpdateCam(&cam, collisionSystem->tilemap, currentLevel == 4);
+			UpdateCam(cam, collisionSystem->tilemap, currentLevel == 4);
 			//Camera position must be divided by 2 because of a known camera bug
-			soundSystem->SetListeningPosition(Vector3(cam.position.x * 2, cam.position.y * 2, 0));
+			soundSystem->SetListeningPosition(Vector3(cam->position.x * 2, cam->position.y * 2, 0));
 			playerController->Update(window);
 			submarineSystem->Update();
 			hedgehogSystem->Update();
@@ -674,7 +676,7 @@ int main()
 		}
 
 		//Update engine systems
-		engine::Update(&cam);
+		engine::Update(cam);
 
 		ecs::Update();
 		glfwSwapBuffers(window);

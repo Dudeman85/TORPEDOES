@@ -5,6 +5,9 @@
 
 static void UpdateCam(engine::Camera* cam, Tilemap* map, bool isRiver = false)
 {
+	const float maxZoomSpeed = 30;
+	const float maxMoveSpeed = 70;
+
 	using namespace engine;
 
 #ifdef _DEBUG
@@ -44,7 +47,7 @@ static void UpdateCam(engine::Camera* cam, Tilemap* map, bool isRiver = false)
 	if (minDiff < zoomOutThreshold)
 	{
 		//Zoom out just enough to keep everything in bounds
-		camHeight += zoomOutThreshold - minDiff;
+		camHeight += std::min(zoomOutThreshold - minDiff, maxZoomSpeed);
 	}
 	//Zoom in when all players are far enough from the camera's edge
 	else if (minDiff >= zoomInThreshold)
@@ -64,7 +67,7 @@ static void UpdateCam(engine::Camera* cam, Tilemap* map, bool isRiver = false)
 		}
 
 		//Zoom in just enough to keep everything in bounds
-		camHeight -= minDiff - zoomInThreshold;
+		camHeight -= std::min(minDiff - zoomInThreshold, maxZoomSpeed);
 	}
 
 	//Restrict camera to size of tilemap
@@ -80,16 +83,16 @@ static void UpdateCam(engine::Camera* cam, Tilemap* map, bool isRiver = false)
 	//Special case for river map
 	if (isRiver)
 	{
-		float rightEdgeDistance = camBounds[1] - playersCenter.x;
+		float rightEdgeDistance = cam->width / 2;
 		float rightPlayerDistance = playerBounds[1] - playersCenter.x;
 
 		//If fully zoomed out
-		if (camHeight == map->bounds.height)
+		if (camHeight == map->bounds.height && rightPlayerDistance + zoomOutThreshold - rightEdgeDistance > 0)
 		{
 			//Move the camera center so that it never lets the first player out of screen
 			playersCenter.x += rightPlayerDistance + zoomOutThreshold - rightEdgeDistance;
 
-			playerController->PurgeSlowPlayers(camBounds[3] - 300);
+			playerController->PurgeSlowPlayers(camBounds[3] - 50);
 		}
 	}
 
@@ -99,8 +102,18 @@ static void UpdateCam(engine::Camera* cam, Tilemap* map, bool isRiver = false)
 	position.y = std::clamp(playersCenter.y, positionYMin, positionYMax);
 	position.z = 1500;
 
+	//Clamp the maximum translation of camera
+	Vector3 diff = position - Vector3(cam->position) * 2;
+	diff.x = std::clamp(diff.x, -maxMoveSpeed, maxMoveSpeed);
+	diff.y = std::clamp(diff.y, -maxMoveSpeed, maxMoveSpeed);
+	diff.z = 0;
+
 	//Apply camera position and scale
-	cam->SetPosition(position);
+	if (cam->position.x == 0)
+		cam->SetPosition(position);
+	else
+		cam->Translate(diff);
+
 	cam->SetDimensions(std::floor(camHeight * aspectRatio), camHeight);
 	engine::modelRenderSystem->SetLight(Vector3(cam->position.x, cam->position.y, cam->position.z + 10000), Vector3(255));
 }
