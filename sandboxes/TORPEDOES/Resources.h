@@ -74,15 +74,15 @@ namespace resources
 		wakeAnims = AnimationsFromSpritesheet("/spritesheets/Booster_Sheet.png", 4, 2, vector<int>(8, 70));
 
 		//Load Sounds
-		engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", false, 0.1f);
+		engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", false, 0.1f, DistanceModel::LINEAR);
 		engineAudio->pause();
-		shootShell = engine::AddAudio("Gameplay", "audio/bang_05.wav", false, 0.3f);
+		shootShell = engine::AddAudio("Gameplay", "audio/bang_05.wav", false, 0.3f, DistanceModel::LINEAR);
 		shootShell->pause();
-		shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.3f);
+		shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.3f, DistanceModel::LINEAR);
 		shootTorpedo->pause();
-		explosion = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 0.2f);
+		explosion = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 1.0f, DistanceModel::LINEAR);
 		explosion->pause();
-		explosionWater = engine::AddAudio("Gameplay", "audio/dink.wav", false, 0.3f);
+		explosionWater = engine::AddAudio("Gameplay", "audio/dink.wav", false, 0.3f, DistanceModel::LINEAR);
 		explosionWater->pause();
 	}
 
