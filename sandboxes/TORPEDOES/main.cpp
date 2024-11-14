@@ -506,11 +506,12 @@ static void ReturnToMainMenu()
 
 int main()
 {
-	/*
-#ifndef _DEBUG
+#ifdef _DEBUG
+	ShowWindow(GetConsoleWindow(), SW_SHOW);
+#else
+	//Disable console in release mode
 	ShowWindow(GetConsoleWindow(), SW_HIDE);
 #endif
-*/
 
 	GLFWwindow* window = engine::CreateGLWindow(1920, 1080, "Window", true);
 
