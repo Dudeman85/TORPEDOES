@@ -750,7 +750,9 @@ ECS_REGISTER_SYSTEM(PlayerController, Player, engine::Transform, engine::Rigidbo
 class PlayerController : public engine::ecs::System
 {
 	static engine::ecs::Entity winScreen;
-	static bool hasWon;
+	static engine::ecs::Entity winTimer;
+	//Timer to return to main menu
+	static float hasWon;
 
 	//A map from a ship type to a pre-initialized Player component with the proper stats
 	std::unordered_map<ShipType, Player> shipComponents;
@@ -769,7 +771,7 @@ public:
 			{
 				ShipType::torpedoBoat, Player
 				{
-					.forwardSpeed = 550, .rotationSpeed = 100,
+					.forwardSpeed = 550, .rotationSpeed = 120,
 					.shootCooldown = 0.2, .specialCooldown = 5, .ammoRechargeCooldown = 2,
 					.holdShoot = false, .maxAmmo = 2,
 					.shootAction = CreateTorpedo, .specialAction = Boost,
@@ -822,8 +824,24 @@ public:
 		//Create the entity to be shown at a win
 		winScreen = engine::ecs::NewEntity();
 		engine::ecs::AddComponent(winScreen, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.5, 2, 1), .scale = Vector3(0.03f), .color = Vector3(1.f, 1.f, 1.f), .uiElement = true });
-		engine::ecs::AddComponent(winScreen, engine::SpriteRenderer{ .texture = resources::uiTextures["winner.png"], .enabled = false, .uiElement = true });
+		engine::ecs::AddComponent(winScreen, engine::SpriteRenderer{ .texture = resources::uiTextures["winner.png"], .enabled = true, .uiElement = true });
 		engine::ecs::AddComponent(winScreen, engine::Transform{ .position = Vector3(0, 0, 0.5f), .scale = Vector3(0.3f) });
+
+		winTimer = engine::ecs::NewEntity();				
+		engine::ecs::AddComponent(winTimer, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.5, -2, 1), .scale = Vector3(0.013f), .color = Vector3(1.f, 1.f, 1.f), .uiElement = true });
+		engine::ecs::AddComponent(winTimer, engine::Transform{ .position = Vector3(-0.05, -0.15, 0), .scale = Vector3(0.3f) });
+	}
+
+	//Kill the players who fell behind on the river map
+	void PurgeSlowPlayers(float killZone)
+	{
+		for (engine::ecs::Entity entity : entities)
+		{
+			engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(entity);
+
+			if (transform.position.x < killZone)
+				ecs::DestroyEntity(entity);
+		}
 	}
 
 	//Get the min and max bounds of every player
@@ -872,15 +890,15 @@ public:
 					{
 						if (player.lap == lapCount)
 						{
-							if (!hasWon)
+							if (hasWon <= 0)
 							{
 								//Display the win screen
-								hasWon = true;
+								hasWon = 7; 
 								MakeWinEntity();
 								engine::ecs::GetComponent<engine::TextRenderer>(winScreen).text = "Player " + std::to_string(player.id + 1);
 								engine::ecs::GetComponent<engine::SpriteRenderer>(winScreen).enabled = true;
 
-								TimerSystem::ScheduleFunction(ReturnToMainMenu, 10);
+								TimerSystem::ScheduleFunction(ReturnToMainMenu, hasWon);
 							}
 						}
 						else
@@ -941,6 +959,12 @@ public:
 		{
 			countdownTimer -= engine::deltaTime;
 			return;
+		}
+		//Countdown to return to menu
+		if (hasWon > 0) 
+		{
+			hasWon -= engine::deltaTime;
+			engine::ecs::GetComponent<engine::TextRenderer>(winTimer).text = "Returning to menu in " + std::to_string((int)round(hasWon));
 		}
 
 		// Iterate through entities in the system
@@ -1228,7 +1252,7 @@ public:
 	//Spawn 1-4 players, all in a line from top to bottom
 	void CreatePlayers(std::unordered_map<int, ShipType> playerShips, Vector2 startPos)
 	{
-		hasWon = false;
+		hasWon = 0;
 		Vector2 offset(0, 60);
 		for (const auto& playerShip : playerShips)
 		{
@@ -1250,7 +1274,7 @@ public:
 			engine::ecs::AddComponent(playerEntity, engine::Transform{ .position = Vector3(startPos - offset * playerShip.first, 150), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			engine::ecs::AddComponent(playerEntity, engine::Rigidbody{ .drag = 1.5 });
 			vector<Vector2> colliderVerts{ Vector2(3, 1), Vector2(3, -1), Vector2(-3, -1), Vector2(-3, 1) };
-			engine::ecs::AddComponent(playerEntity, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .layer = 1, .visualise = true });
+			engine::ecs::AddComponent(playerEntity, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .trigger = true, .layer = 1, .visualise = true });
 
 			//Create the player's name tag
 			engine::ecs::AddComponent(playerNameText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .color = Vector3(0.5, 0.8, 0.2) });
@@ -1366,5 +1390,6 @@ public:
 
 //Static member definitions
 engine::ecs::Entity PlayerController::winScreen = winScreen;
-bool PlayerController::hasWon = false;
+engine::ecs::Entity PlayerController::winTimer = winTimer;
+float PlayerController::hasWon = hasWon;
 int PlayerController::lapCount = lapCount;

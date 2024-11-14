@@ -6,10 +6,12 @@
 #include "engine/SoundComponent.h"
 #include "Pickups.h"
 #include "engine/Random.h"
+#include <Windows.h>
 
 using namespace engine;
 
 int checkPointNumber = 0;
+int currentLevel = 0;
 bool isGamePaused = false;
 
 static void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine::Model* checkPointModel, float hitboxrotation, bool finishLine = false)
@@ -68,6 +70,7 @@ static void PlayCountdown(Vector3 pos)
 // Create everything for level 1
 static void LoadLevel1(engine::Camera* cam)
 {
+	currentLevel = 1;
 	engine::collisionSystem->cam = cam;
 
 	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat };
@@ -135,6 +138,7 @@ static void LoadLevel1(engine::Camera* cam)
 // Create everything for level 2
 static void LoadLevel2(engine::Camera* cam)
 {
+	currentLevel = 2;
 	engine::collisionSystem->cam = cam;
 
 	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat };
@@ -220,6 +224,7 @@ static void LoadLevel2(engine::Camera* cam)
 //Create everything for level 3
 static void LoadLevel3(engine::Camera* cam)
 {
+	currentLevel = 3;
 	engine::collisionSystem->cam = cam;
 
 	//Set this level's tilemap
@@ -330,6 +335,7 @@ static void LoadLevel3(engine::Camera* cam)
 // Create everything for level 4
 static void LoadLevel4(engine::Camera* cam)
 {
+	currentLevel = 4;
 	engine::collisionSystem->cam = cam;
 
 	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat };
@@ -484,6 +490,7 @@ static void PlayersMenu(std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem)
 	std::cout << "is Ship selection open:" << ShipSelectionSystem->isShipSelectionMenuOn;
 }
 
+engine::Camera* cam;
 
 //Delete all entities and load menu
 static void ReturnToMainMenu()
@@ -494,20 +501,28 @@ static void ReturnToMainMenu()
 	isGamePaused = true;
 	canStartLoadingMap = false;
 	ecs::GetSystem<PlayerSelectSystem>()->isShipSelectionMenuOn = false;
+	cam->SetPosition(0);
 
 	MainMenuSystem::Load();
 }
 
 int main()
 {
+#ifdef _DEBUG
+	ShowWindow(GetConsoleWindow(), SW_SHOW);
+#else
+	//Disable console in release mode
+	ShowWindow(GetConsoleWindow(), SW_HIDE);
+#endif
+
 	GLFWwindow* window = engine::CreateGLWindow(1920, 1080, "Window", true);
 
 	engine::EngineInit();
 
 	//Make the camera
-	engine::Camera cam = engine::Camera(1920, 1080);
-	cam.SetPosition(Vector3(0, 0, 1500));
-	cam.SetRotation(Vector3(0, 0, 0));
+	cam = new engine::Camera(1920, 1080);
+	cam->SetPosition(Vector3(0, 0, 1500));
+	cam->SetRotation(Vector3(0, 0, 0));
 
 	//Init sound engine
 	std::shared_ptr<engine::SoundSystem> soundSystem = engine::ecs::GetSystem<engine::SoundSystem>();
@@ -517,7 +532,7 @@ int main()
 	soundSystem->AddSoundEngine("Music");
 
 	//Loads all globally used resources
-	resources::LoadResources(&cam);
+	resources::LoadResources(cam);
 
 	input::initialize(window);
 
@@ -648,9 +663,9 @@ int main()
 			playerSelectionSystem->Update();
 			break;
 		case gamePlayState:
-			UpdateCam(&cam, collisionSystem->tilemap);
+			UpdateCam(cam, collisionSystem->tilemap, currentLevel == 4);
 			//Camera position must be divided by 2 because of a known camera bug
-			soundSystem->SetListeningPosition(Vector3(cam.position.x * 2, cam.position.y * 2, 0));
+			soundSystem->SetListeningPosition(Vector3(cam->position.x * 2, cam->position.y * 2, 0));
 			playerController->Update(window);
 			submarineSystem->Update();
 			hedgehogSystem->Update();
@@ -661,7 +676,7 @@ int main()
 		}
 
 		//Update engine systems
-		engine::Update(&cam);
+		engine::Update(cam);
 
 		ecs::Update();
 		glfwSwapBuffers(window);
