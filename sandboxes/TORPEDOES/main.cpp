@@ -6,10 +6,12 @@
 #include "engine/SoundComponent.h"
 #include "Pickups.h"
 #include "engine/Random.h"
+#include <Windows.h>
 
 using namespace engine;
 
 int checkPointNumber = 0;
+int currentLevel = 0;
 bool isGamePaused = false;
 
 static void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine::Model* checkPointModel, float hitboxrotation, bool finishLine = false)
@@ -68,6 +70,7 @@ static void PlayCountdown(Vector3 pos)
 // Create everything for level 1
 static void LoadLevel1(engine::Camera* cam)
 {
+	currentLevel = 1;
 	engine::collisionSystem->cam = cam;
 
 	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat };
@@ -135,6 +138,7 @@ static void LoadLevel1(engine::Camera* cam)
 // Create everything for level 2
 static void LoadLevel2(engine::Camera* cam)
 {
+	currentLevel = 2;
 	engine::collisionSystem->cam = cam;
 
 	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat };
@@ -220,6 +224,7 @@ static void LoadLevel2(engine::Camera* cam)
 //Create everything for level 3
 static void LoadLevel3(engine::Camera* cam)
 {
+	currentLevel = 3;
 	engine::collisionSystem->cam = cam;
 
 	//Set this level's tilemap
@@ -330,6 +335,7 @@ static void LoadLevel3(engine::Camera* cam)
 // Create everything for level 4
 static void LoadLevel4(engine::Camera* cam)
 {
+	currentLevel = 4;
 	engine::collisionSystem->cam = cam;
 
 	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat };
@@ -500,6 +506,12 @@ static void ReturnToMainMenu()
 
 int main()
 {
+	/*
+#ifndef _DEBUG
+	ShowWindow(GetConsoleWindow(), SW_HIDE);
+#endif
+*/
+
 	GLFWwindow* window = engine::CreateGLWindow(1920, 1080, "Window", true);
 
 	engine::EngineInit();
@@ -648,7 +660,7 @@ int main()
 			playerSelectionSystem->Update();
 			break;
 		case gamePlayState:
-			UpdateCam(&cam, collisionSystem->tilemap);
+			UpdateCam(&cam, collisionSystem->tilemap, currentLevel == 4);
 			//Camera position must be divided by 2 because of a known camera bug
 			soundSystem->SetListeningPosition(Vector3(cam.position.x * 2, cam.position.y * 2, 0));
 			playerController->Update(window);

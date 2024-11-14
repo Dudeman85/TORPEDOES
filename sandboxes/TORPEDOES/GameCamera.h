@@ -3,7 +3,7 @@
 #include "PlayerController.h"
 #include "Globals.h"
 
-static void UpdateCam(engine::Camera* cam, Tilemap* map)
+static void UpdateCam(engine::Camera* cam, Tilemap* map, bool isRiver = false)
 {
 	using namespace engine;
 
@@ -50,7 +50,7 @@ static void UpdateCam(engine::Camera* cam, Tilemap* map)
 	else if (minDiff >= zoomInThreshold)
 	{
 		//Special case for when one player is too close to the tilemap's edge
-		if (minDiff == zoomInThreshold) 
+		if (minDiff == zoomInThreshold)
 		{
 			//Find a player which is not at the tilemap's edge
 			if (topDiff > zoomInThreshold)
@@ -77,6 +77,22 @@ static void UpdateCam(engine::Camera* cam, Tilemap* map)
 	const float positionYMax = map->position.y - camHeight / 2;
 	const float positionYMin = map->position.y - map->bounds.height + camHeight / 2;
 
+	//Special case for river map
+	if (isRiver)
+	{
+		float rightEdgeDistance = camBounds[1] - playersCenter.x;
+		float rightPlayerDistance = playerBounds[1] - playersCenter.x;
+
+		//If fully zoomed out
+		if (camHeight == map->bounds.height)
+		{
+			//Move the camera center so that it never lets the first player out of screen
+			playersCenter.x += rightPlayerDistance + zoomOutThreshold - rightEdgeDistance;
+
+			playerController->PurgeSlowPlayers(camBounds[3] - 300);
+		}
+	}
+
 	//Set the camera to the center of the player box
 	Vector3 position;
 	position.x = std::clamp(playersCenter.x, positionXMin, positionXMax);
@@ -87,5 +103,4 @@ static void UpdateCam(engine::Camera* cam, Tilemap* map)
 	cam->SetPosition(position);
 	cam->SetDimensions(std::floor(camHeight * aspectRatio), camHeight);
 	engine::modelRenderSystem->SetLight(Vector3(cam->position.x, cam->position.y, cam->position.z + 10000), Vector3(255));
-	
 }

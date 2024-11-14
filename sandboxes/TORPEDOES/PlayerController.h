@@ -826,6 +826,18 @@ public:
 		engine::ecs::AddComponent(winScreen, engine::Transform{ .position = Vector3(0, 0, 0.5f), .scale = Vector3(0.3f) });
 	}
 
+	//Kill the players who fell behind on the river map
+	void PurgeSlowPlayers(float killZone)
+	{
+		for (engine::ecs::Entity entity : entities)
+		{
+			engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(entity);
+
+			if (transform.position.x < killZone)
+				ecs::DestroyEntity(entity);
+		}
+	}
+
 	//Get the min and max bounds of every player
 	std::array<float, 4> GetPlayerBounds()
 	{
