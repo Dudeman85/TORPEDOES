@@ -5,6 +5,13 @@
 
 class AudioEngine;
 
+enum class DistanceModel
+{
+	LINEAR,
+	INVERSE,
+	EXPONENTIAL
+};
+
 ///Class to create and store audio data
 class Audio
 {
@@ -25,7 +32,9 @@ public:
 	///Sets audio file to play
 	void setSound(const std::string& fileName);		
 	///Sets audio volume
-	void setVolume(float NewVolume);	
+	void setVolume(float NewVolume);
+
+	void absoluteVolume(float absVolume);
 	///Returns audio volume
 	const float getVolume();	
 	///Adds audio volume
@@ -43,9 +52,18 @@ public:
 	/// Sets the pitch the sound is played in
 	void setPitch(float pitch);
 
+	void setDistanceModel(DistanceModel model);
+
+	void setMaxDistance(float maxDist);
+
+	void setReferenceDistance(float refDist);
+
+	void setRolloffFactor(float rolloff);
+	float Volume = 1.f;
 private:
 	AudioEngine* owner;								// AudioEngine which owns this audio TODO: Remove
 	ma_sound* audioSound = nullptr;
+
 };
 
 ///Class to store audio engine data
