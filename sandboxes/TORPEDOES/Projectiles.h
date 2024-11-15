@@ -49,17 +49,15 @@ static void CreateAnimation(engine::ecs::Entity entity)
 
 
 	engine::ecs::Entity torpedoAnim = engine::ecs::NewEntity();	
-	Audio* explosion = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 0.5f, DistanceModel::LINEAR);
-	//explosion->pause();
+	Audio* explosion = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 0.2f, DistanceModel::LINEAR);
+	
 	explosion->play();
 	auto remover = [explosion, torpedoAnim](engine::ecs::Entity) mutable { delete explosion;
 	engine::ecs::DestroyEntity(torpedoAnim); };
 	engine::ecs::AddComponent(torpedoAnim, engine::Animator{ .onAnimationEnd = remover });
 	engine::ecs::AddComponent(torpedoAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, ((double)rand() / (double)RAND_MAX) + 2), .scale = Vector3(20) });
 	engine::ecs::AddComponent(torpedoAnim, engine::SpriteRenderer{ });
-	engine::ecs::AddComponent(torpedoAnim, engine::SoundComponent{ .Sounds = {{"Explosion", resources::explosion}} });
-	
-	//engine::SoundComponent& sc = engine::ecs::GetComponent<engine::SoundComponent>(torpedoAnim);
+	engine::ecs::AddComponent(torpedoAnim, engine::SoundComponent{ .Sounds = {{"Explosion", explosion}} });
 	
 	//Play explosion animation
 	engine::AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, "hit");
@@ -87,8 +85,7 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 	engine::ecs::AddComponent(hedgehogExplosion, Projectile{ .ownerID = projectile.ownerID, .hitType = HitStates::Stop, .hitSpeedFactor = 0.5, .hitTime = 1, .canHitSubmerged = true, .hitAnimation = "" });
 
 	// Crashes for some reason
-	//engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(projectile.ownerEntity);
-
+	
 	//Disable the hedgehog collider after .5 seconds
 	engine::TimerSystem::ScheduleFunction([hedgehogExplosion]()
 		{
@@ -101,7 +98,7 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 			}
 		}, 0.5);
 
-	// aqui verifica si el id del tilecolare y activa la otra animacion 
+	// check tilemap collision and activate explosion animation
 	if (engine::collisionSystem->tilemap->checkCollision(transform.position.x, transform.position.y) > 1)
 	{
 		engine::AnimationSystem::AddAnimation(hedgehogExplosion, resources::explosionAnimation, "explosion");

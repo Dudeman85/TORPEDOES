@@ -1358,9 +1358,7 @@ public:
 			{
 				{"Engine", engineAudio},
 				{"ShootShell", shootShell},
-				{"ShootTorpedo", shootTorpedo},
-				/*{"Explosion", resources::explosion},
-				{"ExplosionWater", resources::explosionWater}*/
+				{"ShootTorpedo", shootTorpedo}
 			} , .maxDistance = 1500 });
 		}
 	}
