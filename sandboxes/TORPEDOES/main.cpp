@@ -32,6 +32,8 @@ static void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, 
 	engine::ecs::AddComponent(checkpoint, engine::PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = true, .rotationOverride = hitboxrotation }));
 
 	checkPointNumber++;
+
+	checkpointEntities.push_back(checkpoint);
 };
 
 static void CreateCrowd(Vector3 pos, engine::Animation& anim)
@@ -73,15 +75,10 @@ static void LoadLevel1(engine::Camera* cam)
 	currentLevel = 1;
 	engine::collisionSystem->cam = cam;
 
-	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat };
-
 	// Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level1Map);
 	engine::collisionSystem->SetTilemap(resources::level1Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
-
-	//Create the players
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1225.0f, -400.0f));
 
 	////Make all the checkpoints manually
 	checkPointNumber = 0;
@@ -133,6 +130,8 @@ static void LoadLevel1(engine::Camera* cam)
 
 	PlayCountdown(Vector3(1235.0f, -310.0f, 200.0f));
 	PlayerController::lapCount = 3;
+	//Create the players
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1225.0f, -400.0f));
 }
 
 // Create everything for level 2
@@ -140,9 +139,6 @@ static void LoadLevel2(engine::Camera* cam)
 {
 	currentLevel = 2;
 	engine::collisionSystem->cam = cam;
-
-	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat };
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1160.0f, -1600.0f));
 
 	// Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level2Map);
@@ -214,11 +210,12 @@ static void LoadLevel2(engine::Camera* cam)
 	CreateCrowd({ 1650.000000, -860.000000, 166 }, resources::crowdAnims1); // Second row, third crowd
 	CreateCrowd({ 1850.000000, -860.000000, 166 }, resources::crowdAnims1); // Second row, fourth crowd
 	// ********************
-
 	
 
 	PlayCountdown(Vector3(1150.0f, -1500.0f, 0.0f));
 	PlayerController::lapCount = 3;
+
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1160.0f, -1600.0f));
 }
 
 //Create everything for level 3
@@ -231,9 +228,6 @@ static void LoadLevel3(engine::Camera* cam)
 	engine::spriteRenderSystem->SetTilemap(resources::level3Map);
 	engine::collisionSystem->SetTilemap(resources::level3Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
-
-	//Create the players
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(2480.0f, -1520.0f));
 
 	//Make all the checkpoints manually
 	checkPointNumber = 0;
@@ -330,6 +324,8 @@ static void LoadLevel3(engine::Camera* cam)
 
 	PlayCountdown(Vector3(2480.0f, -1460.0f, 200.0f));
 	PlayerController::lapCount = 3;
+	//Create the players
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(2480.0f, -1520.0f));
 }
 
 // Create everything for level 4
@@ -337,9 +333,6 @@ static void LoadLevel4(engine::Camera* cam)
 {
 	currentLevel = 4;
 	engine::collisionSystem->cam = cam;
-
-	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat };
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1434.0f, -1520.0f));
 
 	//set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level4Map);
@@ -401,6 +394,7 @@ static void LoadLevel4(engine::Camera* cam)
 
 	PlayCountdown(Vector3(1434.0f, -1470.0f, 200.0f));
 	PlayerController::lapCount = 1;
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1434.0f, -1520.0f));
 }
 
 //Bind all input events here
@@ -502,6 +496,7 @@ static void ReturnToMainMenu()
 	canStartLoadingMap = false;
 	ecs::GetSystem<PlayerSelectSystem>()->isShipSelectionMenuOn = false;
 	cam->SetPosition(0);
+	checkpointEntities.clear();
 
 	MainMenuSystem::Load();
 }
