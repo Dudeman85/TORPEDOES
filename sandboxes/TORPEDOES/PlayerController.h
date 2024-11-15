@@ -1345,12 +1345,13 @@ public:
 				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Surface_Icon.png", "UI_Red_Surface_Icon.png", "UI_Green_Submerge_Icon.png", "UI_Red_Submerge_Icon.png" }));
 			}
 
-			Audio* engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", false, 0.3f, DistanceModel::LINEAR);
+			Audio* engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", false, 0.1f, DistanceModel::LINEAR);
 			engineAudio->play();
-			Audio* shootShell = engine::AddAudio("Gameplay", "audio/bang_05.wav", false, 0.8f, DistanceModel::LINEAR);
+			Audio* shootShell = engine::AddAudio("Gameplay", "audio/bang_05.wav", false, 0.3f, DistanceModel::LINEAR);
 			shootShell->pause();
-			Audio* shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.8f, DistanceModel::LINEAR);
+			Audio* shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.3f, DistanceModel::LINEAR);
 			shootTorpedo->pause();
+
 
 			//Add sounds
 			engine::ecs::AddComponent(playerEntity, engine::SoundComponent{ .Sounds =
@@ -1358,9 +1359,9 @@ public:
 				{"Engine", engineAudio},
 				{"ShootShell", shootShell},
 				{"ShootTorpedo", shootTorpedo},
-				{"Explosion", resources::explosion},
-				{"ExplosionWater", resources::explosionWater}
-			} });
+				/*{"Explosion", resources::explosion},
+				{"ExplosionWater", resources::explosionWater}*/
+			} , .maxDistance = 1500 });
 		}
 	}
 };

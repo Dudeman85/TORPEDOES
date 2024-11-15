@@ -14,14 +14,14 @@ namespace engine
 	struct SoundComponent
 	{
 		std::map<std::string, Audio*> Sounds;
-		DistanceModel distanceModel = DistanceModel::INVERSE; // default
+		DistanceModel distanceModel = DistanceModel::LINEAR; // default
 		float maxDistance = 1500.0f;
-		float referenceDistance = 100.0f;
+		float referenceDistance = 200.0f;
 		float rolloffFactor = 1.0f;
-		float baseVolume = 5.0f;
+		float baseVolume = 1.0f;
 	};
 
-	// Can't be arsed to implement this, we only have 1 position to listen from anyway
+	// we only have 1 position to listen from
 	ECS_REGISTER_COMPONENT(ListeningComponent)
 	struct ListeningComponent
 	{
@@ -60,7 +60,7 @@ namespace engine
 
 					float attenuation = 1.0f;
 
-					if (distance < soundComponent.referenceDistance) {
+					if (distance <= soundComponent.referenceDistance) {
 						attenuation = 1.0f;
 					}
 					else {
@@ -80,7 +80,8 @@ namespace engine
 						}
 					}
 					// Set the audio volume based on the calculated attenuation
-					sound.second->absoluteVolume(soundComponent.baseVolume * sound.second->Volume * attenuation);
+					float attenuatedVolume = (soundComponent.baseVolume * sound.second->Volume * attenuation);
+					sound.second->absoluteVolume(std::clamp(attenuatedVolume, 0.0f, soundComponent.baseVolume));
 
 					sound.second->setAbsoluteDirection(soundTransform.position - ListeningPosition);
 
