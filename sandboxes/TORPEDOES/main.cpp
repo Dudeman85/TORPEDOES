@@ -531,6 +531,7 @@ int main()
 	Texture loadingTexture(assetPath + "menuUI/Loading.png");
 	engine::ecs::AddComponent(loadingScreen, engine::SpriteRenderer{ .texture = &loadingTexture, .enabled = true, .uiElement = true });
 	engine::ecs::AddComponent(loadingScreen, engine::Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(1) });
+	//Display the loading screen
 	engine::Update(cam);
 	glfwSwapBuffers(window);
 
