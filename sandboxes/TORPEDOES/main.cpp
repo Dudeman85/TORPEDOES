@@ -524,6 +524,17 @@ int main()
 	cam->SetPosition(Vector3(0, 0, 1500));
 	cam->SetRotation(Vector3(0, 0, 0));
 
+	//Display the loading screen
+
+	//Create the loading screen entity
+	ecs::Entity loadingScreen = engine::ecs::NewEntity();
+	Texture loadingTexture(assetPath + "menuUI/Loading.png");
+	engine::ecs::AddComponent(loadingScreen, engine::SpriteRenderer{ .texture = &loadingTexture, .enabled = true, .uiElement = true });
+	engine::ecs::AddComponent(loadingScreen, engine::Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(1) });
+	engine::Update(cam);
+	glfwSwapBuffers(window);
+
+
 	//Init sound engine
 	std::shared_ptr<engine::SoundSystem> soundSystem = engine::ecs::GetSystem<engine::SoundSystem>();
 	soundSystem->AddSoundEngine("Gameplay");
@@ -576,6 +587,9 @@ int main()
 	collisionSystem->SetLayerInteraction(2, 3, CollisionSystem::LayerInteraction::none);
 	collisionSystem->SetLayerInteraction(2, 1, CollisionSystem::LayerInteraction::none);
 	collisionSystem->SetLayerInteraction(4, 3, CollisionSystem::LayerInteraction::none);
+
+	//Delete loading screen
+	ecs::DestroyEntity(loadingScreen);
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
