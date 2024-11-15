@@ -47,20 +47,24 @@ static void CreateAnimation(engine::ecs::Entity entity)
 	Vector3 animPosition = transform.position;
 	animPosition.z += 500;
 
-	engine::ecs::Entity torpedoAnim = engine::ecs::NewEntity();
 
+	engine::ecs::Entity torpedoAnim = engine::ecs::NewEntity();	
+	Audio* explosion = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 0.5f, DistanceModel::LINEAR);
+	//explosion->pause();
+	explosion->play();
+	auto remover = [explosion, torpedoAnim](engine::ecs::Entity) mutable { delete explosion;
+	engine::ecs::DestroyEntity(torpedoAnim); };
+	engine::ecs::AddComponent(torpedoAnim, engine::Animator{ .onAnimationEnd = remover });
 	engine::ecs::AddComponent(torpedoAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, ((double)rand() / (double)RAND_MAX) + 2), .scale = Vector3(20) });
 	engine::ecs::AddComponent(torpedoAnim, engine::SpriteRenderer{ });
-	engine::ecs::AddComponent(torpedoAnim, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
 	engine::ecs::AddComponent(torpedoAnim, engine::SoundComponent{ .Sounds = {{"Explosion", resources::explosion}} });
-
+	
+	//engine::SoundComponent& sc = engine::ecs::GetComponent<engine::SoundComponent>(torpedoAnim);
+	
 	//Play explosion animation
 	engine::AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, "hit");
 	engine::AnimationSystem::PlayAnimation(torpedoAnim, "hit", false);
 
-	//Play explosion sound
-	engine::SoundComponent& sc = engine::ecs::GetComponent<engine::SoundComponent>(torpedoAnim);
-	sc.Sounds["Explosion"]->play();
 };
 
 void CreateHedgehogExplosion(engine::ecs::Entity entity)
