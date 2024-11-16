@@ -1314,11 +1314,13 @@ public:
 			if (*func == Boost)
 			{
 				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Booster_Icon.png", "UI_Booster_Icon.png", "UI_Red_Booster_Icon.png" }));
+				BoostIndicatorUpdate(playerEntity);
 			}
 			else if (*func == ToggleSubmerge)
 			{
 				ecs::AddComponent(playerEntity, SubmarineComponent{});
 				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Surface_Icon.png", "UI_Red_Surface_Icon.png", "UI_Green_Submerge_Icon.png", "UI_Red_Submerge_Icon.png" }));
+				SubmergeIndicatorUpdate(playerEntity);
 			}
 
 			Audio* engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", false, 0.1f);
