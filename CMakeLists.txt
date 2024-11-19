@@ -31,7 +31,7 @@ option(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
 add_subdirectory("ext/assimp-5.0.1")
 
 # OpenGL
-add_subdirectory("ext/glfw-3.3.2")
+add_subdirectory("ext/glfw-3.4")
 add_subdirectory("ext/glm-0.9.9.7")
 include_directories("${GLFW_SOURCE_DIR}/deps")
 set(GLAD_GL "${GLFW_SOURCE_DIR}/deps/glad/gl.h" "${GLFW_SOURCE_DIR}/deps/glad_gl.c")

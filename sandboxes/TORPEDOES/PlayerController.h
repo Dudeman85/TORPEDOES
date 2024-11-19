@@ -14,6 +14,8 @@ using namespace engine;
 
 enum ShipType { torpedoBoat, submarine, cannonBoat, hedgehogBoat, pirateShip };
 
+static std::vector<engine::ecs::Entity> checkpointEntities;
+
 static void ReturnToMainMenu();
 
 struct indicatorStruct
@@ -84,10 +86,15 @@ struct Player
 	std::function<void(engine::ecs::Entity)> shootIndicatorUpdate;
 	std::function<void(engine::ecs::Entity)> specialIndicatorUpdate;
 
+	//Children
 	engine::ecs::Entity renderedEntity;
 	engine::ecs::Entity nameText;
 	engine::ecs::Entity animationEntity;
 	engine::ecs::Entity wakeAnimationEntity;
+	engine::ecs::Entity checkpointIndicatorEntity;
+
+	//Next checkpoint object
+	engine::ecs::Entity nextCheckpoint;
 };
 
 ECS_REGISTER_COMPONENT(CheckPoint)
@@ -750,7 +757,9 @@ ECS_REGISTER_SYSTEM(PlayerController, Player, engine::Transform, engine::Rigidbo
 class PlayerController : public engine::ecs::System
 {
 	static engine::ecs::Entity winScreen;
-	static bool hasWon;
+	static engine::ecs::Entity winTimer;
+	//Timer to return to main menu
+	static float hasWon;
 
 	//A map from a ship type to a pre-initialized Player component with the proper stats
 	std::unordered_map<ShipType, Player> shipComponents;
@@ -769,7 +778,7 @@ public:
 			{
 				ShipType::torpedoBoat, Player
 				{
-					.forwardSpeed = 550, .rotationSpeed = 100,
+					.forwardSpeed = 550, .rotationSpeed = 120,
 					.shootCooldown = 0.2, .specialCooldown = 5, .ammoRechargeCooldown = 2,
 					.holdShoot = false, .maxAmmo = 2,
 					.shootAction = CreateTorpedo, .specialAction = Boost,
@@ -822,8 +831,24 @@ public:
 		//Create the entity to be shown at a win
 		winScreen = engine::ecs::NewEntity();
 		engine::ecs::AddComponent(winScreen, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.5, 2, 1), .scale = Vector3(0.03f), .color = Vector3(1.f, 1.f, 1.f), .uiElement = true });
-		engine::ecs::AddComponent(winScreen, engine::SpriteRenderer{ .texture = resources::uiTextures["winner.png"], .enabled = false, .uiElement = true });
+		engine::ecs::AddComponent(winScreen, engine::SpriteRenderer{ .texture = resources::uiTextures["winner.png"], .enabled = true, .uiElement = true });
 		engine::ecs::AddComponent(winScreen, engine::Transform{ .position = Vector3(0, 0, 0.5f), .scale = Vector3(0.3f) });
+
+		winTimer = engine::ecs::NewEntity();
+		engine::ecs::AddComponent(winTimer, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(-1.5, -2, 1), .scale = Vector3(0.013f), .color = Vector3(1.f, 1.f, 1.f), .uiElement = true });
+		engine::ecs::AddComponent(winTimer, engine::Transform{ .position = Vector3(-0.05, -0.15, 0), .scale = Vector3(0.3f) });
+	}
+
+	//Kill the players who fell behind on the river map
+	void PurgeSlowPlayers(float killZone)
+	{
+		for (engine::ecs::Entity entity : entities)
+		{
+			engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(entity);
+
+			if (transform.position.x < killZone)
+				ecs::DestroyEntity(entity);
+		}
 	}
 
 	//Get the min and max bounds of every player
@@ -868,26 +893,32 @@ public:
 				if (player.previousCheckpoint + 1 == checkpoint.checkPointID)			// Check whether player collided with next checkpoint
 				{
 					player.previousCheckpoint = checkpoint.checkPointID;				// Set as previous checkpoint
+
 					if (checkpoint.Finish_line)
 					{
 						if (player.lap == lapCount)
 						{
-							if (!hasWon)
+							if (hasWon <= 0)
 							{
 								//Display the win screen
-								hasWon = true;
+								hasWon = 7;
 								MakeWinEntity();
 								engine::ecs::GetComponent<engine::TextRenderer>(winScreen).text = "Player " + std::to_string(player.id + 1);
 								engine::ecs::GetComponent<engine::SpriteRenderer>(winScreen).enabled = true;
 
-								TimerSystem::ScheduleFunction(ReturnToMainMenu, 10);
+								TimerSystem::ScheduleFunction(ReturnToMainMenu, hasWon);
 							}
 						}
 						else
 						{
+							player.nextCheckpoint = checkpointEntities[0];
 							player.previousCheckpoint = -1;
 							player.lap++;
 						}
+					}
+					else
+					{
+						player.nextCheckpoint = checkpointEntities[player.previousCheckpoint + 1];
 					}
 				}
 			}
@@ -941,6 +972,12 @@ public:
 		{
 			countdownTimer -= engine::deltaTime;
 			return;
+		}
+		//Countdown to return to menu
+		if (hasWon > 0)
+		{
+			hasWon -= engine::deltaTime;
+			engine::ecs::GetComponent<engine::TextRenderer>(winTimer).text = "Returning to menu in " + std::to_string((int)round(hasWon));
 		}
 
 		// Iterate through entities in the system
@@ -1196,6 +1233,11 @@ public:
 			{
 				soundComponent.Sounds["Engine"]->play();
 			}
+
+			//Rotate the checkpoint indicator
+			Vector3 nextCheckpointPosition = ecs::GetComponent<Transform>(player.nextCheckpoint).position - transform.position;
+			float nextCheckpointAngle = atan2(nextCheckpointPosition.y, nextCheckpointPosition.x);
+			TransformSystem::SetRotation(player.checkpointIndicatorEntity, Vector3(0, 0, Degrees(nextCheckpointAngle) - 90));
 		}
 	}
 
@@ -1228,7 +1270,7 @@ public:
 	//Spawn 1-4 players, all in a line from top to bottom
 	void CreatePlayers(std::unordered_map<int, ShipType> playerShips, Vector2 startPos)
 	{
-		hasWon = false;
+		hasWon = 0;
 		Vector2 offset(0, 60);
 		for (const auto& playerShip : playerShips)
 		{
@@ -1237,6 +1279,7 @@ public:
 			engine::ecs::Entity playerNameText = engine::ecs::NewEntity();
 			engine::ecs::Entity playerRender = engine::ecs::NewEntity();
 			engine::ecs::Entity wakeAnimation = engine::ecs::NewEntity();
+			engine::ecs::Entity checkpointIndicator = engine::ecs::NewEntity();
 
 			//Create the player entity which contains everything but rendering
 			//Player component is a bit special
@@ -1246,11 +1289,12 @@ public:
 			playerComponent.renderedEntity = playerRender;
 			playerComponent.nameText = playerNameText;
 			playerComponent.wakeAnimationEntity = wakeAnimation;
+			playerComponent.checkpointIndicatorEntity = checkpointIndicator;
 
 			engine::ecs::AddComponent(playerEntity, engine::Transform{ .position = Vector3(startPos - offset * playerShip.first, 150), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			engine::ecs::AddComponent(playerEntity, engine::Rigidbody{ .drag = 1.5 });
 			vector<Vector2> colliderVerts{ Vector2(3, 1), Vector2(3, -1), Vector2(-3, -1), Vector2(-3, 1) };
-			engine::ecs::AddComponent(playerEntity, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .layer = 1, .visualise = true });
+			engine::ecs::AddComponent(playerEntity, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .trigger = true, .layer = 1, .visualise = true });
 
 			//Create the player's name tag
 			engine::ecs::AddComponent(playerNameText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .color = Vector3(0.5, 0.8, 0.2) });
@@ -1262,46 +1306,54 @@ public:
 			engine::ecs::AddComponent(playerRender, engine::ModelRenderer{ .model = shipModels[playerShip.second], .textures = {resources::playerIdToTexture[playerShip.first]} });
 			engine::TransformSystem::AddParent(playerRender, playerEntity);
 
-			//Create the player's rendered entity
+			//Create the wake rendered entity
 			engine::ecs::AddComponent(wakeAnimation, engine::Transform{ .position = Vector3(0, 0, 0), .rotation = Vector3(0, 0, 0), .scale = Vector3(12, 25, 0) });
 			engine::ecs::AddComponent(wakeAnimation, engine::SpriteRenderer{ .enabled = true });
 			engine::ecs::AddComponent(wakeAnimation, engine::Animator{  });
 			AnimationSystem::AddAnimations(wakeAnimation, resources::wakeAnims, { "boost", "normal" });
 			AnimationSystem::PlayAnimation(wakeAnimation, "normal", true);
 
-			Player& player = engine::ecs::GetComponent<Player>(playerEntity);
+			engine::ecs::AddComponent(checkpointIndicator, engine::Transform{ .position = Vector3(0, 0, -15), .rotation = Vector3(0), .scale = Vector3(2, 5, 0) });
+			engine::ecs::AddComponent(checkpointIndicator, engine::SpriteRenderer{ .texture = resources::uiTextures["Checkpoint_Arrow.png"], .enabled = true });
+			engine::TransformSystem::AddParent(checkpointIndicator, playerEntity);
+			playerComponent.nextCheckpoint = checkpointEntities[0];
+			//Rotate the checkpoint indicator
+			Vector3 nextCheckpointPosition = ecs::GetComponent<Transform>(playerComponent.nextCheckpoint).position - ecs::GetComponent<Transform>(playerEntity).position;
+			float nextCheckpointAngle = atan2(nextCheckpointPosition.y, nextCheckpointPosition.x);
+			TransformSystem::SetRotation(playerComponent.checkpointIndicatorEntity, Vector3(0, 0, Degrees(nextCheckpointAngle) - 90));
+
 
 			// Create shoot indicators
 			float rangeEnd = 2;
 			float rangeStart = -2;
 			Vector3 offset = Vector3(-2, -2, 10);
 			Vector3 scale = Vector3(2, 2, 1);
-			auto func = *player.shootAction.target<void(*)(engine::ecs::Entity)>();
+			auto func = *playerComponent.shootAction.target<void(*)(engine::ecs::Entity)>();
 
 			if (*func == CreateTorpedo)
 			{
 				scale = Vector3(2, 0.5, 1);
 
 				// Add max ammo's number of indicators
-				for (int i = 0; i < player.maxAmmo; i++)
+				for (int i = 0; i < playerComponent.maxAmmo; i++)
 				{
 					// Place indicators equidistant along the range
-					offset.x = generateEquidistantPoint(rangeStart, rangeEnd, player.maxAmmo, i);
+					offset.x = generateEquidistantPoint(rangeStart, rangeEnd, playerComponent.maxAmmo, i);
 
-					player.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Torpedo_Icon.png", "UI_Red_Torpedo_Icon.png" }));
+					playerComponent.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Torpedo_Icon.png", "UI_Red_Torpedo_Icon.png" }));
 				}
 			}
 			else if (*func == ShootHedgehog)
 			{
 				scale = Vector3(1, 1, 1);
 
-				player.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Hedgehog_Icon.png", "UI_Red_Hedgehog_Icon.png" }));
+				playerComponent.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Hedgehog_Icon.png", "UI_Red_Hedgehog_Icon.png" }));
 			}
 			else if (*func == ShootShell)
 			{
 				scale = Vector3(1, 1, 1);
 
-				player.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Cannon_Icon.png", "UI_Red_Cannon_Icon.png" }));
+				playerComponent.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Cannon_Icon.png", "UI_Red_Cannon_Icon.png" }));
 			}
 
 			// Create special indicators
@@ -1309,36 +1361,35 @@ public:
 			rangeStart = -2;
 			offset = Vector3(-2, -4, 10);
 			scale = Vector3(1.25, 1.25, 1);
-			func = *player.specialAction.target<void(*)(engine::ecs::Entity)>();
+			func = *playerComponent.specialAction.target<void(*)(engine::ecs::Entity)>();
 
 			if (*func == Boost)
 			{
-				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Booster_Icon.png", "UI_Booster_Icon.png", "UI_Red_Booster_Icon.png" }));
+				playerComponent.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Booster_Icon.png", "UI_Booster_Icon.png", "UI_Red_Booster_Icon.png" }));
 				BoostIndicatorUpdate(playerEntity);
 			}
 			else if (*func == ToggleSubmerge)
 			{
 				ecs::AddComponent(playerEntity, SubmarineComponent{});
-				player.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Surface_Icon.png", "UI_Red_Surface_Icon.png", "UI_Green_Submerge_Icon.png", "UI_Red_Submerge_Icon.png" }));
+				playerComponent.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Surface_Icon.png", "UI_Red_Surface_Icon.png", "UI_Green_Submerge_Icon.png", "UI_Red_Submerge_Icon.png" }));
 				SubmergeIndicatorUpdate(playerEntity);
 			}
 
-			Audio* engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", false, 0.1f);
+			Audio* engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", false, 0.1f, DistanceModel::LINEAR);
 			engineAudio->play();
-			Audio* shootShell = engine::AddAudio("Gameplay", "audio/bang_05.wav", false, 0.3f);
+			Audio* shootShell = engine::AddAudio("Gameplay", "audio/bang_05.wav", false, 0.3f, DistanceModel::LINEAR);
 			shootShell->pause();
-			Audio* shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.3f);
+			Audio* shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.3f, DistanceModel::LINEAR);
 			shootTorpedo->pause();
+
 
 			//Add sounds
 			engine::ecs::AddComponent(playerEntity, engine::SoundComponent{ .Sounds =
 			{
 				{"Engine", engineAudio},
 				{"ShootShell", shootShell},
-				{"ShootTorpedo", shootTorpedo},
-				{"Explosion", resources::explosion},
-				{"ExplosionWater", resources::explosionWater}
-			} });
+				{"ShootTorpedo", shootTorpedo}
+			} , .maxDistance = 1500 });
 		}
 	}
 };
@@ -1368,5 +1419,6 @@ public:
 
 //Static member definitions
 engine::ecs::Entity PlayerController::winScreen = winScreen;
-bool PlayerController::hasWon = false;
+engine::ecs::Entity PlayerController::winTimer = winTimer;
+float PlayerController::hasWon = hasWon;
 int PlayerController::lapCount = lapCount;

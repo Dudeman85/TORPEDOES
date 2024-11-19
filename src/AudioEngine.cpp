@@ -5,6 +5,7 @@
 
 #include <engine/Constants.h>
 #include "engine/AudioEngine.h"
+#include <cmath>
 
 using namespace std::filesystem;
 
@@ -111,8 +112,13 @@ void Audio::setSound(const std::string& fileName)
 
 void Audio::setVolume(float newVolume)
 {
-	if (newVolume < 0) { newVolume = 0; }
-	ma_sound_set_volume(audioSound, newVolume);
+	Volume = std::max(newVolume, 0.f);
+
+
+}
+void Audio::absoluteVolume(float absVolume)
+{
+	ma_sound_set_volume(audioSound, std::max(absVolume, 0.f));
 }
 const float Audio::getVolume()
 {
@@ -158,4 +164,38 @@ void Audio::setPitch(float newPitch)
 void AudioEngine::setListenerPosition(Vector3 position)
 {
 	ma_engine_listener_set_position(&soundEngine, 0, position.x, position.y, position.z);
+}
+
+void Audio::setDistanceModel(DistanceModel model)
+{
+	switch (model)
+	{
+	case DistanceModel::LINEAR:
+		ma_sound_set_attenuation_model(audioSound, ma_attenuation_model_linear);
+		break;
+	case DistanceModel::INVERSE:
+		ma_sound_set_attenuation_model(audioSound, ma_attenuation_model_inverse);
+		break;
+	case DistanceModel::EXPONENTIAL:
+		ma_sound_set_attenuation_model(audioSound, ma_attenuation_model_exponential);
+		break;
+	}
+}
+
+void Audio::setMaxDistance(float maxDist)
+{
+	ma_sound_set_max_distance(audioSound, maxDist);
+}
+
+void Audio::setReferenceDistance(float refDist)
+{
+	ma_sound_set_min_distance(audioSound, refDist);
+}
+
+void Audio::setRolloffFactor(float rolloff)
+{
+	// Setting rolloff factor would vary based on the exact implementation, 
+	// as miniaudio doesn’t directly expose this. 
+	// You might need to customize the attenuation equations or use a library function if available.
+	float rolloffFactor = rolloff; // Store for any custom calculations.
 }

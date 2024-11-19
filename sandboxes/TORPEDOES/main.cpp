@@ -6,10 +6,12 @@
 #include "engine/SoundComponent.h"
 #include "Pickups.h"
 #include "engine/Random.h"
+#include <Windows.h>
 
 using namespace engine;
 
 int checkPointNumber = 0;
+int currentLevel = 0;
 bool isGamePaused = false;
 
 static void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine::Model* checkPointModel, float hitboxrotation, bool finishLine = false)
@@ -30,6 +32,8 @@ static void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, 
 	engine::ecs::AddComponent(checkpoint, engine::PolygonCollider({ .vertices = CheckpointcolliderVerts, .trigger = true, .visualise = true, .rotationOverride = hitboxrotation }));
 
 	checkPointNumber++;
+
+	checkpointEntities.push_back(checkpoint);
 };
 
 static void CreateCrowd(Vector3 pos, engine::Animation& anim)
@@ -68,17 +72,13 @@ static void PlayCountdown(Vector3 pos)
 // Create everything for level 1
 static void LoadLevel1(engine::Camera* cam)
 {
+	currentLevel = 1;
 	engine::collisionSystem->cam = cam;
-
-	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat };
 
 	// Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level1Map);
 	engine::collisionSystem->SetTilemap(resources::level1Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
-
-	//Create the players
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1225.0f, -400.0f));
 
 	////Make all the checkpoints manually
 	checkPointNumber = 0;
@@ -130,15 +130,15 @@ static void LoadLevel1(engine::Camera* cam)
 
 	PlayCountdown(Vector3(1235.0f, -310.0f, 200.0f));
 	PlayerController::lapCount = 3;
+	//Create the players
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1225.0f, -400.0f));
 }
 
 // Create everything for level 2
 static void LoadLevel2(engine::Camera* cam)
 {
+	currentLevel = 2;
 	engine::collisionSystem->cam = cam;
-
-	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat };
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1160.0f, -1600.0f));
 
 	// Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level2Map);
@@ -210,25 +210,24 @@ static void LoadLevel2(engine::Camera* cam)
 	CreateCrowd({ 1650.000000, -860.000000, 166 }, resources::crowdAnims1); // Second row, third crowd
 	CreateCrowd({ 1850.000000, -860.000000, 166 }, resources::crowdAnims1); // Second row, fourth crowd
 	// ********************
-
 	
 
 	PlayCountdown(Vector3(1150.0f, -1500.0f, 0.0f));
 	PlayerController::lapCount = 3;
+
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1160.0f, -1600.0f));
 }
 
 //Create everything for level 3
 static void LoadLevel3(engine::Camera* cam)
 {
+	currentLevel = 3;
 	engine::collisionSystem->cam = cam;
 
 	//Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level3Map);
 	engine::collisionSystem->SetTilemap(resources::level3Map);
 	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
-
-	//Create the players
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(2480.0f, -1520.0f));
 
 	//Make all the checkpoints manually
 	checkPointNumber = 0;
@@ -325,15 +324,15 @@ static void LoadLevel3(engine::Camera* cam)
 
 	PlayCountdown(Vector3(2480.0f, -1460.0f, 200.0f));
 	PlayerController::lapCount = 3;
+	//Create the players
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(2480.0f, -1520.0f));
 }
 
 // Create everything for level 4
 static void LoadLevel4(engine::Camera* cam)
 {
+	currentLevel = 4;
 	engine::collisionSystem->cam = cam;
-
-	std::vector<ShipType> ships{ ShipType::torpedoBoat, ShipType::submarine, ShipType::hedgehogBoat, ShipType::cannonBoat };
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1434.0f, -1520.0f));
 
 	//set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level4Map);
@@ -395,6 +394,7 @@ static void LoadLevel4(engine::Camera* cam)
 
 	PlayCountdown(Vector3(1434.0f, -1470.0f, 200.0f));
 	PlayerController::lapCount = 1;
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1434.0f, -1520.0f));
 }
 
 //Bind all input events here
@@ -484,6 +484,7 @@ static void PlayersMenu(std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem)
 	std::cout << "is Ship selection open:" << ShipSelectionSystem->isShipSelectionMenuOn;
 }
 
+engine::Camera* cam;
 
 //Delete all entities and load menu
 static void ReturnToMainMenu()
@@ -494,20 +495,41 @@ static void ReturnToMainMenu()
 	isGamePaused = true;
 	canStartLoadingMap = false;
 	ecs::GetSystem<PlayerSelectSystem>()->isShipSelectionMenuOn = false;
+	cam->SetPosition(0);
+	checkpointEntities.clear();
 
 	MainMenuSystem::Load();
 }
 
 int main()
 {
+#ifdef _DEBUG
+	ShowWindow(GetConsoleWindow(), SW_SHOW);
+#else
+	//Disable console in release mode
+	ShowWindow(GetConsoleWindow(), SW_HIDE);
+#endif
+
 	GLFWwindow* window = engine::CreateGLWindow(1920, 1080, "Window", true);
 
 	engine::EngineInit();
 
 	//Make the camera
-	engine::Camera cam = engine::Camera(1920, 1080);
-	cam.SetPosition(Vector3(0, 0, 1500));
-	cam.SetRotation(Vector3(0, 0, 0));
+	cam = new engine::Camera(1920, 1080);
+	cam->SetPosition(Vector3(0, 0, 1500));
+	cam->SetRotation(Vector3(0, 0, 0));
+
+	//Display the loading screen
+
+	//Create the loading screen entity
+	ecs::Entity loadingScreen = engine::ecs::NewEntity();
+	Texture loadingTexture(assetPath + "menuUI/Loading.png");
+	engine::ecs::AddComponent(loadingScreen, engine::SpriteRenderer{ .texture = &loadingTexture, .enabled = true, .uiElement = true });
+	engine::ecs::AddComponent(loadingScreen, engine::Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(1) });
+	//Display the loading screen
+	engine::Update(cam);
+	glfwSwapBuffers(window);
+
 
 	//Init sound engine
 	std::shared_ptr<engine::SoundSystem> soundSystem = engine::ecs::GetSystem<engine::SoundSystem>();
@@ -517,7 +539,7 @@ int main()
 	soundSystem->AddSoundEngine("Music");
 
 	//Loads all globally used resources
-	resources::LoadResources(&cam);
+	resources::LoadResources(cam);
 
 	input::initialize(window);
 
@@ -561,6 +583,9 @@ int main()
 	collisionSystem->SetLayerInteraction(2, 3, CollisionSystem::LayerInteraction::none);
 	collisionSystem->SetLayerInteraction(2, 1, CollisionSystem::LayerInteraction::none);
 	collisionSystem->SetLayerInteraction(4, 3, CollisionSystem::LayerInteraction::none);
+
+	//Delete loading screen
+	ecs::DestroyEntity(loadingScreen);
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -648,9 +673,9 @@ int main()
 			playerSelectionSystem->Update();
 			break;
 		case gamePlayState:
-			UpdateCam(&cam, collisionSystem->tilemap);
+			UpdateCam(cam, collisionSystem->tilemap, currentLevel == 4);
 			//Camera position must be divided by 2 because of a known camera bug
-			soundSystem->SetListeningPosition(Vector3(cam.position.x * 2, cam.position.y * 2, 0));
+			soundSystem->SetListeningPosition(Vector3(cam->position.x * 2, cam->position.y * 2, 30));
 			playerController->Update(window);
 			submarineSystem->Update();
 			hedgehogSystem->Update();
@@ -661,7 +686,7 @@ int main()
 		}
 
 		//Update engine systems
-		engine::Update(&cam);
+		engine::Update(cam);
 
 		ecs::Update();
 		glfwSwapBuffers(window);

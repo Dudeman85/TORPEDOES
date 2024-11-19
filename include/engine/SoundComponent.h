@@ -8,18 +8,26 @@
 
 namespace engine
 {
+	
+
 	ECS_REGISTER_COMPONENT(SoundComponent)
 	struct SoundComponent
 	{
 		std::map<std::string, Audio*> Sounds;
+		DistanceModel distanceModel = DistanceModel::LINEAR; // default
+		float maxDistance = 1500.0f;
+		float referenceDistance = 200.0f;
+		float rolloffFactor = 1.0f;
+		float baseVolume = 1.0f;
 	};
 
-	// Can't be arsed to implement this, we only have 1 position to listen from anyway
+	// we only have 1 position to listen from
 	ECS_REGISTER_COMPONENT(ListeningComponent)
 	struct ListeningComponent
 	{
 
 	};
+
 
 	// Player controller System
 	ECS_REGISTER_SYSTEM(SoundSystem, SoundComponent, engine::Transform)
@@ -30,6 +38,7 @@ namespace engine
 
 	public:
 		Vector3 ListeningPosition;
+
 
 		void Update()
 		{
@@ -42,7 +51,41 @@ namespace engine
 
 				for (auto& sound : soundComponent.Sounds)
 				{
+					
+
+					//calculate distance between listener and audio source
+					float distance = (ListeningPosition - soundTransform.position).Length();
+
+					DistanceModel model = soundComponent.distanceModel;
+
+					float attenuation = 1.0f;
+
+					if (distance <= soundComponent.referenceDistance) {
+						attenuation = 1.0f;
+					}
+					else {
+						switch (model)
+						{
+						case DistanceModel::LINEAR:
+							attenuation = std::max(0.0f, 1.0f - (distance / soundComponent.maxDistance));  // Linear attenuation
+							break;
+
+						case DistanceModel::INVERSE:
+							attenuation = 1.0f / (1.0f + soundComponent.rolloffFactor * (distance - soundComponent.referenceDistance));  // Inverse attenuation
+							break;
+
+						case DistanceModel::EXPONENTIAL:
+							attenuation = pow(0.5f, (distance - soundComponent.referenceDistance) / soundComponent.rolloffFactor);  // Exponential attenuation
+							break;
+						}
+					}
+					// Set the audio volume based on the calculated attenuation
+					float attenuatedVolume = (soundComponent.baseVolume * sound.second->Volume * attenuation);
+					sound.second->absoluteVolume(std::clamp(attenuatedVolume, 0.0f, soundComponent.baseVolume));
+
 					sound.second->setAbsoluteDirection(soundTransform.position - ListeningPosition);
+
+
 				}
 			}
 		}
@@ -92,8 +135,19 @@ namespace engine
 		}
 	};
 
-	Audio* AddAudio(std::string AudioEngineName, std::string AudioFile, bool loop, float volume)
+	Audio* AddAudio(std::string AudioEngineName, std::string AudioFile, bool loop, float volume, DistanceModel model, float maxDist = 1000.0f, float refDist = 1.0f, float rolloff = 1.0f)
 	{
-		return engine::ecs::GetSystem<engine::SoundSystem>()->FindAudioEngine(AudioEngineName)->createAudio(AudioFile, loop, volume);
+		auto* audio = engine::ecs::GetSystem<engine::SoundSystem>()->FindAudioEngine(AudioEngineName)->createAudio(AudioFile, loop, volume);
+
+		if (audio) 
+		{
+			audio->setVolume(volume);
+			audio->setDistanceModel(model);
+			audio->setMaxDistance(maxDist);
+			audio->setReferenceDistance(refDist);
+			audio->setRolloffFactor(rolloff);
+		}
+		return audio;
 	}
+
 };

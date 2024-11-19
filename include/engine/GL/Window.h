@@ -26,7 +26,7 @@ namespace engine
 			glfwTerminate();
 		}
 		glfwMakeContextCurrent(window);
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+		if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress))
 		{
 			std::cout << "Failed to initialize GLAD" << std::endl;
 		}
