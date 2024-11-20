@@ -69,6 +69,19 @@ static void PlayCountdown(Vector3 pos)
 	engine::ecs::GetSystem<PlayerController>()->countdownTimer = 3;
 }
 
+std::vector<Vector3> cheeringSoundPos;
+
+void SetupCheeringSounds(const std::vector<Vector3>& positions) {
+	for (const auto& pos : positions) {
+		Audio* cheerSound = engine::AddAudio("Gameplay", "audio/cheering.wav", true, 0.3f, DistanceModel::LINEAR, 1000.f, 200.f, 1.f);
+		cheerSound->setAbsoluteDirection(pos);
+		cheerSound->setMaxDistance(1500.0f);      // Maximum audible distance
+		cheerSound->setReferenceDistance(200.0f); // Distance at which volume is max
+		cheerSound->setRolloffFactor(1.0f);
+		cheerSound->play();
+	}
+}
+
 // Create everything for level 1
 static void LoadLevel1(engine::Camera* cam)
 {
@@ -127,6 +140,14 @@ static void LoadLevel1(engine::Camera* cam)
 	CreateSmallCrowd({ 3325, -780,166 }, resources::crowdAnims2);	// 2. crowd
 	CreateSmallCrowd({ 3290, -790,166.5 }, resources::crowdAnims2);	// 3. crowd
 	// ********************
+
+	//Adding cheering audio to crowd locations
+	cheeringSoundPos = {
+		{ 1285, -665, 0 },
+		{ 3140, -410, 0 },
+		{ 3325, -780, 0 }
+	};
+	SetupCheeringSounds(cheeringSoundPos);
 
 	PlayCountdown(Vector3(1235.0f, -310.0f, 200.0f));
 	PlayerController::lapCount = 3;

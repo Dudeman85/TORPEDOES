@@ -35,7 +35,7 @@ namespace resources
 	Audio* shootShell;
 	Audio* shootTorpedo; 
 	Audio* explosion;
-	Audio* explosionWater;*/
+	Audio* crowdCheer;*/
 
 	//Load all the global resources here
 	//Stuff that is only used in one system can be loaded there 
@@ -75,8 +75,8 @@ namespace resources
 
 		//Load Sounds
 
-		/*explosionWater = engine::AddAudio("Gameplay", "audio/dink.wav", false, 0.3f, DistanceModel::LINEAR);
-		explosionWater->pause();*/
+		//crowdCheer = engine::AddAudio("Gameplay", "audio/cheering.wav", true, 0.3f, DistanceModel::LINEAR);
+		//crowdCheer->play();
 	}
 
 	void UnloadResources()
