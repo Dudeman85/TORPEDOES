@@ -231,7 +231,15 @@ static void LoadLevel2(engine::Camera* cam)
 	CreateCrowd({ 1650.000000, -860.000000, 166 }, resources::crowdAnims1); // Second row, third crowd
 	CreateCrowd({ 1850.000000, -860.000000, 166 }, resources::crowdAnims1); // Second row, fourth crowd
 	// ********************
-	
+
+	//Adding cheering audio to crowd locations
+	cheeringSoundPos = {
+		{ 1230, -1850, 0 },
+		{ 3165, -480, 0 },
+		{ 1210, -850, 0 },
+		{ 1830, -860, 0 }
+	};
+	SetupCheeringSounds(cheeringSoundPos);
 
 	PlayCountdown(Vector3(1150.0f, -1500.0f, 0.0f));
 	PlayerController::lapCount = 3;
@@ -697,9 +705,14 @@ int main()
 			UpdateCam(cam, collisionSystem->tilemap, currentLevel == 4);
 			//Camera position must be divided by 2 because of a known camera bug
 			soundSystem->SetListeningPosition(Vector3(cam->position.x * 2, cam->position.y * 2, 30));
+			std::cout << "x: " << newListenerPosition.x << " y: " << newListenerPosition.y << " z: " << newListenerPosition.z << std::endl;
+			std::cout << "cam x: " << cam->position.x * 2 << " y: " << cam->position.y * 2 << std::endl;
+
 			playerController->Update(window);
 			submarineSystem->Update();
 			hedgehogSystem->Update();
+			soundSystem->Update();
+
 			break;
 		default:
 			std::cout << "\n ERROR NO STATE FOUND:" << gameState << std::endl;

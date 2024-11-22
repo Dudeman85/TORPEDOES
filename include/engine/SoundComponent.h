@@ -42,6 +42,8 @@ namespace engine
 
 		void Update()
 		{
+			SetListeningPosition(ListeningPosition);
+
 			// Iterate through entities in the system
 			for (engine::ecs::Entity entity : entities)
 			{
@@ -87,6 +89,7 @@ namespace engine
 
 
 				}
+				
 			}
 		}
 
@@ -118,12 +121,17 @@ namespace engine
 		void SetListeningPosition(Vector3 listeningPosition)
 		{
 			ListeningPosition = listeningPosition;
+
+			for (auto& audioEngine : AudioEngines)
+			{
+				audioEngine.second->setListenerPosition(ListeningPosition);
+			}
 		}
 
-		void UpdateListenerPositionInEngine(AudioEngine* audioEngine)
-		{
-			audioEngine->setListenerPosition(ListeningPosition);
-		}
+		//void UpdateListenerPositionInEngine(AudioEngine* audioEngine)
+		//{
+		//	audioEngine->setListenerPosition(ListeningPosition);
+		//}
 
 		// Free up memory
 		void Uninitialize()
