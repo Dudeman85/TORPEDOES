@@ -7,7 +7,7 @@
 #include "Projectiles.h"
 #include "engine/Input.h"
 #include "engine/Timing.h"
-
+#include "engine/Random.h"
 #include "engine/SoundComponent.h"
 
 using namespace engine;
@@ -1392,7 +1392,8 @@ public:
 			shootShell->pause();
 			Audio* shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.3f, DistanceModel::LINEAR);
 			shootTorpedo->pause();
-
+			float startDelay = Random(0.0f, 100.0f); // Start delay between 0-100ms
+			engineAudio->setStartTimeMilliseconds(startDelay);
 
 			//Add sounds
 			engine::ecs::AddComponent(playerEntity, engine::SoundComponent{ .Sounds =

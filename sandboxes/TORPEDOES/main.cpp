@@ -71,13 +71,24 @@ static void PlayCountdown(Vector3 pos)
 
 std::vector<Vector3> cheeringSoundPos;
 
-void SetupCheeringSounds(const std::vector<Vector3>& positions) {
+void SetupCheeringSounds(const std::vector<Vector3>& positions)
+{
 	for (const auto& pos : positions) {
 
 		engine::ecs::Entity cheerEntity = engine::ecs::NewEntity(); 
 		engine::ecs::AddComponent(cheerEntity, engine::Transform{ .position = pos });
-		Audio* cheerSound = engine::AddAudio("Gameplay", "audio/cheering.wav", true, 0.3f, DistanceModel::LINEAR, 1000.f, 200.f, 1.f);
+
+		Audio* cheerSound = engine::AddAudio("Gameplay", "audio/cheering.wav", true, 0.3f, DistanceModel::LINEAR);
+
 		cheerSound->setAbsoluteDirection(pos);
+
+		// Randomize start and stop delays
+		float startDelay = Random(0.0f, 500.0f); // Start delay between 0-50ms
+		//float stopDelay = startDelay + Random(1000.0f, 5000.0f); // Stop after 1-5 seconds
+
+		cheerSound->setStartTimeMilliseconds(startDelay);
+		//cheerSound->setStopTimeMilliseconds(stopDelay);
+
 		engine::ecs::AddComponent(cheerEntity, engine::SoundComponent{ .Sounds =
 			{
 				{"CrowdCheer", cheerSound}
@@ -148,6 +159,9 @@ static void LoadLevel1(engine::Camera* cam)
 	//Adding cheering audio to crowd locations
 	cheeringSoundPos = {
 		{ 1285, -665, 0 },
+		{ 1205, -665, 0 },
+		{ 1285, -365, 0 },
+		{ 1205, -265, 0 },
 		{ 3140, -410, 0 },
 		{ 3325, -780, 0 }
 	};
