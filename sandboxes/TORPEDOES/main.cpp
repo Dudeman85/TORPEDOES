@@ -73,11 +73,15 @@ std::vector<Vector3> cheeringSoundPos;
 
 void SetupCheeringSounds(const std::vector<Vector3>& positions) {
 	for (const auto& pos : positions) {
+
+		engine::ecs::Entity cheerEntity = engine::ecs::NewEntity(); 
+		engine::ecs::AddComponent(cheerEntity, engine::Transform{ .position = pos });
 		Audio* cheerSound = engine::AddAudio("Gameplay", "audio/cheering.wav", true, 0.3f, DistanceModel::LINEAR, 1000.f, 200.f, 1.f);
 		cheerSound->setAbsoluteDirection(pos);
-		cheerSound->setMaxDistance(1500.0f);      // Maximum audible distance
-		cheerSound->setReferenceDistance(200.0f); // Distance at which volume is max
-		cheerSound->setRolloffFactor(1.0f);
+		engine::ecs::AddComponent(cheerEntity, engine::SoundComponent{ .Sounds =
+			{
+				{"CrowdCheer", cheerSound}
+			} , .maxDistance = 1500, .referenceDistance = 200, .rolloffFactor = 1 });
 		cheerSound->play();
 	}
 }
@@ -705,8 +709,7 @@ int main()
 			UpdateCam(cam, collisionSystem->tilemap, currentLevel == 4);
 			//Camera position must be divided by 2 because of a known camera bug
 			soundSystem->SetListeningPosition(Vector3(cam->position.x * 2, cam->position.y * 2, 30));
-			std::cout << "x: " << newListenerPosition.x << " y: " << newListenerPosition.y << " z: " << newListenerPosition.z << std::endl;
-			std::cout << "cam x: " << cam->position.x * 2 << " y: " << cam->position.y * 2 << std::endl;
+			newListenerPosition = (Vector3(cam->position.x * 2, cam->position.y * 2, 30));
 
 			playerController->Update(window);
 			submarineSystem->Update();
