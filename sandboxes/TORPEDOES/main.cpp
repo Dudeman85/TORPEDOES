@@ -117,7 +117,7 @@ static void LoadLevel1(engine::Camera* cam)
 	CreateCheckpoint(Vector3(1770.000000, -1585.000000, 100.000000), Vector3(50.000000, -62.500000, 0.000000), Vector3(18.5f), resources::models["Prop_Buoy.obj"], 20.f);
 	CreateCheckpoint(Vector3(820.000000, -1610.000000, 100.000000), Vector3(47.500000, -77.500000, -5.000000), Vector3(20.5f), resources::models["Prop_Buoy.obj"], 10.f);
 	CreateCheckpoint(Vector3(545.000000, -900.000000, 100.000000), Vector3(35.000000, -22.500000, 0.000000), Vector3(17.5f), resources::models["Prop_Buoy.obj"], 70.f);
-	CreateCheckpoint(Vector3(1475.000000, -460.000000, 70.000000), Vector3(-25.000000, -90.000000, -90.000000), Vector3(24.f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
+	CreateCheckpoint(Vector3(1475.000000, -460.000000, 70.000000), Vector3(-25.000000, -90.000000, -90.000000), Vector3(24.f), resources::models["Prop_Goal.obj"], 360.f, true);
 
 	//crossroad
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1075.000000, 0.300000));
@@ -194,7 +194,7 @@ static void LoadLevel2(engine::Camera* cam)
 	CreateCheckpoint(Vector3(1505.000000, -335.000000, 100.000000), Vector3(52.500000, -32.500000, -5.000000), Vector3(17), resources::models["Prop_Buoy.obj"], 60.0f);					// Sixth checkpoint
 	CreateCheckpoint(Vector3(600.000000, -665.000000, 100.000000), Vector3(40.000000, -25.000000, -17.500000), Vector3(17), resources::models["Prop_Buoy.obj"], 60.0f);					// Seventh checkpoint
 	CreateCheckpoint(Vector3(530.000000, -1675.000000, 100.000000), Vector3(45.000000, 32.500000, 47.500000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 145.0f);		// Eight checkpoint
-	CreateCheckpoint(Vector3(1245.000000, -1680.000000, 100.000000), Vector3(75.000000, -90.000000, 7.500000), Vector3(22), resources::models["Prop_Goal_Ver2.obj"], 0.0f, true);	// Finish line
+	CreateCheckpoint(Vector3(1245.000000, -1680.000000, 100.000000), Vector3(75.000000, -90.000000, 7.500000), Vector3(22), resources::models["Prop_Goal.obj"], 0.0f, true);	// Finish line
 
 	//first loop
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1710.000000, -995.000000, 0.300000));
@@ -283,7 +283,7 @@ static void LoadLevel3(engine::Camera* cam)
 	CreateCheckpoint(Vector3(2140.000000, -635.000000, 100.000000), Vector3(27.500000, 0.000000, 12.500000), Vector3(15.f), resources::models["Prop_Buoy.obj"], -2.5f + 90.f);
 	CreateCheckpoint(Vector3(875.000000, -465.000000, 100.000000), Vector3(37.500000, -15.000000, 0.000000), Vector3(12.5f), resources::models["Prop_Buoy.obj"], 15.0f + 90.f);
 	CreateCheckpoint(Vector3(1170.000000, -1250.000000, 100.000000), Vector3(37.500000, 0.000000, 0.000000), Vector3(13), resources::models["Prop_Buoy.obj"], 13.0f + 80.f);
-	CreateCheckpoint(Vector3(2555.000000, -1600.000000, 100.000000), Vector3(-17.500000, -87.500000, -90.000000), Vector3(20.5f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
+	CreateCheckpoint(Vector3(2555.000000, -1600.000000, 100.000000), Vector3(-17.500000, -87.500000, -90.000000), Vector3(20.5f), resources::models["Prop_Goal.obj"], 360.f, true);
 
 	//Pickups
 	//first corner
@@ -388,7 +388,7 @@ static void LoadLevel4(engine::Camera* cam)
 
 	// Make all the checkpoints manually
 	checkPointNumber = 0;
-	CreateCheckpoint(Vector3(15760.000000, -925.000000, 100.000000), Vector3(-12.500000, -90.000000, -87.500000), Vector3(43.0f), resources::models["Prop_Goal_Ver2.obj"], 360.f, true);
+	CreateCheckpoint(Vector3(15760.000000, -925.000000, 100.000000), Vector3(-12.500000, -90.000000, -87.500000), Vector3(43.0f), resources::models["Prop_Goal.obj"], 360.f, true);
 
 	//Collectibles
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1190.000000, -1325.000000, 0.300000));
@@ -557,7 +557,7 @@ int main()
 	ShowWindow(GetConsoleWindow(), SW_HIDE);
 #endif
 
-	GLFWwindow* window = engine::CreateGLWindow(1920, 1080, "Window", true);
+	GLFWwindow* window = engine::CreateGLWindow(1920, 1080, "Window", false);
 
 	engine::EngineInit();
 
@@ -570,8 +570,8 @@ int main()
 
 	//Create the loading screen entity
 	ecs::Entity loadingScreen = engine::ecs::NewEntity();
-	Texture loadingTexture(assetPath + "menuUI/Loading.png");
-	engine::ecs::AddComponent(loadingScreen, engine::SpriteRenderer{ .texture = &loadingTexture, .enabled = true, .uiElement = true });
+	Texture* loadingTexture = new Texture(assetPath + "menuUI/Loading.png");
+	engine::ecs::AddComponent(loadingScreen, engine::SpriteRenderer{ .texture = loadingTexture, .enabled = true, .uiElement = true });
 	engine::ecs::AddComponent(loadingScreen, engine::Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(1) });
 	//Display the loading screen
 	engine::Update(cam);
@@ -633,6 +633,7 @@ int main()
 
 	//Delete loading screen
 	ecs::DestroyEntity(loadingScreen);
+	delete loadingTexture;
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
