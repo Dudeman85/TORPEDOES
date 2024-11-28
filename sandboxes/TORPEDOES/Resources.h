@@ -8,7 +8,7 @@ namespace resources
 
 	std::unordered_map<std::string, Texture*> uiTextures;
 	std::unordered_map<std::string, Texture*> menuTextures;
-	std::unordered_map<std::string, Texture*> modelTextures;
+	Texture* subUnderwaterTexture;
 
 	std::unordered_map<std::string, Model*> models;
 
@@ -36,10 +36,15 @@ namespace resources
 	{
 		uiTextures = engine::PreloadTextures("GUI");
 		menuTextures = engine::PreloadTextures("menuUI", true, GL_LINEAR_MIPMAP_NEAREST);
-		modelTextures = engine::PreloadTextures("3dmodels");
 
 		//Set the player textures
-		playerIdToTexture = { modelTextures["Player_Green.png"], modelTextures["Player_Orange.png"], modelTextures["Player_Red.png"], modelTextures["Player_Purple.png"] };
+		playerIdToTexture = {
+			new Texture(assetPath + "3dmodels/Player_Green.png"),
+			new Texture(assetPath + "3dmodels/Player_Orange.png"),
+			new Texture(assetPath + "3dmodels/Player_Red.png"),
+			new Texture(assetPath + "3dmodels/Player_Purple.png"),
+		};
+		subUnderwaterTexture = new Texture(assetPath + "3dmodels/Player_Underwater.png");
 
 		models = engine::PreloadModels("3dmodels");
 
@@ -58,9 +63,9 @@ namespace resources
 		WaterexplosionAnimation = AnimationsFromSpritesheet("/spritesheets/Hedgehog_Explosion.png", 14, 1, vector<int>(14, 70))[0];
 		crowdAnims1 = AnimationsFromSpritesheet("/spritesheets/CrowdCheer14.png", 3, 1, vector<int>(3, 150))[0];
 		crowdAnims2 = AnimationsFromSpritesheet("/spritesheets/CrowdCheer15.png", 4, 1, vector<int>(4, 196))[0];
-		countdownAnim = AnimationsFromSpritesheet("/spritesheets/UI_Countdown_Ver2.png", 5, 1, vector<int>(5, 1000))[0];
-		divingAnim = AnimationsFromSpritesheet("/spritesheets/Diving_Sheet_Ver2.png", 8, 1, vector<int>(8, 100))[0];
-		continuousDivingAnim = AnimationsFromSpritesheet("/spritesheets/Underwater_Sheet_Ver2.png", 4, 1, vector<int>(4, 50))[0];
+		countdownAnim = AnimationsFromSpritesheet("/spritesheets/UI_Countdown.png", 5, 1, vector<int>(5, 1000))[0];
+		divingAnim = AnimationsFromSpritesheet("/spritesheets/Diving_Sheet.png", 8, 1, vector<int>(8, 100))[0];
+		continuousDivingAnim = AnimationsFromSpritesheet("/spritesheets/Underwater_Sheet.png", 4, 1, vector<int>(4, 50))[0];
 		wakeAnims = AnimationsFromSpritesheet("/spritesheets/Booster_Sheet.png", 4, 2, vector<int>(8, 70));
 	}
 
