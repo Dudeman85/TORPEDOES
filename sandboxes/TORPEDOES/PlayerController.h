@@ -905,6 +905,7 @@ public:
 								MakeWinEntity();
 								engine::ecs::GetComponent<engine::TextRenderer>(winScreen).text = "Player " + std::to_string(player.id + 1);
 								engine::ecs::GetComponent<engine::SpriteRenderer>(winScreen).enabled = true;
+								ecs::GetComponent<SpriteRenderer>(player.checkpointIndicatorEntity).enabled = false;
 
 								TimerSystem::ScheduleFunction(ReturnToMainMenu, hasWon);
 							}
@@ -1236,8 +1237,19 @@ public:
 
 			//Rotate the checkpoint indicator
 			Vector3 nextCheckpointPosition = ecs::GetComponent<Transform>(player.nextCheckpoint).position - transform.position;
-			float nextCheckpointAngle = atan2(nextCheckpointPosition.y, nextCheckpointPosition.x);
-			TransformSystem::SetRotation(player.checkpointIndicatorEntity, Vector3(0, 0, Degrees(nextCheckpointAngle) - 90));
+			float nextCheckpointAngle = Degrees(atan2(nextCheckpointPosition.y, nextCheckpointPosition.x)) - 90;
+			if (nextCheckpointAngle < 0)
+				nextCheckpointAngle += 360;
+			float currentAngle = ecs::GetComponent<Transform>(player.checkpointIndicatorEntity).rotation.z;
+			//Forgive me father for i have sinned
+			while (currentAngle < 0)
+				currentAngle += 360;
+
+			//Rotate ccw if it is closer
+			float rotationDirection = abs(nextCheckpointAngle - currentAngle) > 180 ? -1 : 1;
+
+			//Apply rotation with a maximum speed
+			TransformSystem::Rotate(player.checkpointIndicatorEntity, Vector3(0, 0, rotationDirection * clamp(nextCheckpointAngle - currentAngle, -2.f, 2.f)));
 		}
 	}
 
