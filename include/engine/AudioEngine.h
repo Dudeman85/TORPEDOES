@@ -60,6 +60,10 @@ public:
 
 	void setRolloffFactor(float rolloff);
 	float Volume = 1.f;
+
+	void setStartTimeMilliseconds(float milliseconds);
+
+	void setStopTimeMilliseconds(float milliseconds);
 private:
 	AudioEngine* owner;								// AudioEngine which owns this audio TODO: Remove
 	ma_sound* audioSound = nullptr;

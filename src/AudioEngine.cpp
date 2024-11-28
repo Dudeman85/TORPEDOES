@@ -199,3 +199,13 @@ void Audio::setRolloffFactor(float rolloff)
 	// You might need to customize the attenuation equations or use a library function if available.
 	float rolloffFactor = rolloff; // Store for any custom calculations.
 }
+
+void Audio::setStartTimeMilliseconds(float milliseconds)
+{
+	ma_sound_set_start_time_in_milliseconds(audioSound, milliseconds);
+}
+
+void Audio::setStopTimeMilliseconds(float milliseconds)
+{
+	ma_sound_set_stop_time_in_milliseconds(audioSound, milliseconds);
+}

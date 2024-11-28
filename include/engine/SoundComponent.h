@@ -19,6 +19,9 @@ namespace engine
 		float referenceDistance = 200.0f;
 		float rolloffFactor = 1.0f;
 		float baseVolume = 1.0f;
+
+		std::unordered_map<std::string, float> startDelays; // Delay in milliseconds for each sound
+		std::unordered_map<std::string, float> stopDelays;  // Stop time in milliseconds for each sound
 	};
 
 	// we only have 1 position to listen from
