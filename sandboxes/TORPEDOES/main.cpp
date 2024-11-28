@@ -565,7 +565,7 @@ int main()
 
 	//Create the loading screen entity
 	ecs::Entity loadingScreen = engine::ecs::NewEntity();
-	Texture* loadingTexture = new Texture(assetPath + "menuUI/Loading.png");
+	Texture* loadingTexture = new Texture(assetPath + "misc/Loading.png");
 	engine::ecs::AddComponent(loadingScreen, engine::SpriteRenderer{ .texture = loadingTexture, .enabled = true, .uiElement = true });
 	engine::ecs::AddComponent(loadingScreen, engine::Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(1) });
 	//Display the loading screen
