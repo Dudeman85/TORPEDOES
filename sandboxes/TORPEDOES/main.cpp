@@ -92,7 +92,7 @@ void SetupCheeringSounds(const std::vector<Vector3>& positions)
 		engine::ecs::AddComponent(cheerEntity, engine::SoundComponent{ .Sounds =
 			{
 				{"CrowdCheer", cheerSound}
-			} , .maxDistance = 1500, .referenceDistance = 200, .rolloffFactor = 1 });
+			} , .maxDistance = 700, .referenceDistance = 200, .rolloffFactor = 1 });
 		cheerSound->play();
 	}
 }
@@ -119,16 +119,15 @@ static void LoadLevel1(engine::Camera* cam)
 	CreateCheckpoint(Vector3(545.000000, -900.000000, 100.000000), Vector3(35.000000, -22.500000, 0.000000), Vector3(17.5f), resources::models["Prop_Buoy.obj"], 70.f);
 	CreateCheckpoint(Vector3(1475.000000, -460.000000, 70.000000), Vector3(-25.000000, -90.000000, -90.000000), Vector3(24.f), resources::models["Prop_Goal.obj"], 360.f, true);
 
+	//Pickups
 	//crossroad
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1075.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1145.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2200.000000, -1230.000000, 0.300000));
 
-
 	//center slalom
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3270.000000, -1125.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3270.000000, -1045.000000, 0.300000));
-
 
 	//second last corner
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(700.000000, -1710.000000, 0.300000));
@@ -158,10 +157,8 @@ static void LoadLevel1(engine::Camera* cam)
 
 	//Adding cheering audio to crowd locations
 	cheeringSoundPos = {
-		{ 1285, -665, 0 },
-		{ 1205, -665, 0 },
-		{ 1285, -365, 0 },
-		{ 1205, -265, 0 },
+		{ 1100, -665, 0 },
+		{ 1400, -665, 0 },
 		{ 3140, -410, 0 },
 		{ 3325, -780, 0 }
 	};
@@ -196,6 +193,7 @@ static void LoadLevel2(engine::Camera* cam)
 	CreateCheckpoint(Vector3(530.000000, -1675.000000, 100.000000), Vector3(45.000000, 32.500000, 47.500000), Vector3(17), resources::models["Prop_Buoy_Vertical.obj"], 145.0f);		// Eight checkpoint
 	CreateCheckpoint(Vector3(1245.000000, -1680.000000, 100.000000), Vector3(75.000000, -90.000000, 7.500000), Vector3(22), resources::models["Prop_Goal.obj"], 0.0f, true);	// Finish line
 
+	//Pickups
 	//first loop
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1710.000000, -995.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1660.000000, -995.000000, 0.300000));
@@ -210,7 +208,6 @@ static void LoadLevel2(engine::Camera* cam)
 	//second loop, between stones
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2950.000000, -1585.000000, 0.300000));
 	
-
 	//topright hairpin
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3355.000000, -440.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3355.000000, -400.000000, 0.300000));
@@ -219,8 +216,6 @@ static void LoadLevel2(engine::Camera* cam)
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2210.000000, -620.000000, 0.350000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2160.000000, -620.000000, 0.350000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2110.000000, -620.000000, 0.350000));
-
-
 
 	//before chicane
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(425.000000, -855.000000, 0.300000));
