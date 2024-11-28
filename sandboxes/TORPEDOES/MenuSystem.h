@@ -367,7 +367,7 @@ public:
 		shipModelsReady.push_back({ resources::models["Ship_PT_109_Torpedo.obj"] });
 		shipModelsReady.push_back({ resources::models["Ship_U_99_Submarine.obj"] });
 		shipModelsReady.push_back({ resources::models["Ship_Yamato_Cannon.obj"] });
-		shipModelsReady.push_back({ resources::models["Ship_HMCS_Sackville_Variation.obj"] });
+		shipModelsReady.push_back({ resources::models["Ship_HMCS_Sackville_Hedgehog.obj"] });
 
 		sceneParent = engine::ecs::NewEntity();
 		engine::ecs::AddComponent(sceneParent, engine::Transform{ .position = Vector3(0, 0, 0), .rotation = Vector3(0, 0, 0), .scale = 0.7f });

@@ -1247,7 +1247,6 @@ public:
 
 			//Rotate ccw if it is closer
 			float rotationDirection = abs(nextCheckpointAngle - currentAngle) > 180 ? -1 : 1;
-
 			//Apply rotation with a maximum speed
 			TransformSystem::Rotate(player.checkpointIndicatorEntity, Vector3(0, 0, rotationDirection * clamp(nextCheckpointAngle - currentAngle, -2.f, 2.f)));
 		}

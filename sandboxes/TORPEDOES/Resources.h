@@ -30,13 +30,6 @@ namespace resources
 
 	std::vector<Texture*> playerIdToTexture;
 
-	//Sounds
-	/*Audio* engineAudio;
-	Audio* shootShell;
-	Audio* shootTorpedo; 
-	Audio* explosion;
-	Audio* crowdCheer;*/
-
 	//Load all the global resources here
 	//Stuff that is only used in one system can be loaded there 
 	void LoadResources(Camera* cam)
@@ -54,13 +47,10 @@ namespace resources
 
 		level1Map = new Tilemap(cam);
 		level1Map->loadMap("/levels/level1.tmx");
-
 		level2Map = new Tilemap(cam);
 		level2Map->loadMap("/levels/level2.tmx");
-
 		level3Map = new Tilemap(cam);
 		level3Map->loadMap("levels/level3.tmx");
-
 		level4Map = new Tilemap(cam);
 		level4Map->loadMap("/levels/level4.tmx");
 
@@ -72,11 +62,6 @@ namespace resources
 		divingAnim = AnimationsFromSpritesheet("/spritesheets/Diving_Sheet_Ver2.png", 8, 1, vector<int>(8, 100))[0];
 		continuousDivingAnim = AnimationsFromSpritesheet("/spritesheets/Underwater_Sheet_Ver2.png", 4, 1, vector<int>(4, 50))[0];
 		wakeAnims = AnimationsFromSpritesheet("/spritesheets/Booster_Sheet.png", 4, 2, vector<int>(8, 70));
-
-		//Load Sounds
-
-		//crowdCheer = engine::AddAudio("Gameplay", "audio/cheering.wav", true, 0.3f, DistanceModel::LINEAR);
-		//crowdCheer->play();
 	}
 
 	void UnloadResources()
