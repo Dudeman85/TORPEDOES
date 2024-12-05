@@ -363,6 +363,18 @@ static void LoadLevel3(engine::Camera* cam)
 	CreateCrowd({ 560.5, -1235.000000, 167 }, resources::crowdAnims1);
 	CreateCrowd({ 650, -1245.000000, 168 }, resources::crowdAnims1);
 	CreateCrowd({ 600, -1265.000000, 169 }, resources::crowdAnims1);
+	// ********************
+
+	cheeringSoundPos = {
+		{ 2350, -1410, 0 },
+		{ 3119, -605, 0 },
+		{ 2811, -470, 0 },
+		{ 2014, -870, 0 },
+		{ 480, -825, 0 },
+		{ 650, -1245, 0 }
+	};
+	SetupCheeringSounds(cheeringSoundPos);
+
 
 	PlayCountdown(Vector3(2480.0f, -1460.0f, 200.0f));
 	PlayerController::lapCount = 3;
