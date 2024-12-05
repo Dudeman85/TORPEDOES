@@ -446,6 +446,102 @@ static void LoadLevel4(engine::Camera* cam)
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(13870.000000, -265.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(14000.000000, -1305.000000, 0.300000));
 
+	//Make the crowds manually
+	// Starting point crowd
+	CreateCrowd({ 1255.000000, -1445.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 1277.000000, -1430.000000, 166 }, resources::crowdAnims1);
+	CreateCrowd({ 1250.000000, -1410.000000, 165 }, resources::crowdAnims1);
+	CreateCrowd({ 1260.000000, -1390.000000, 164 }, resources::crowdAnims1);
+
+	// Small plateau
+	CreateCrowd({ 3350.000000, -1350.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 3340.000000, -1320.000000, 166 }, resources::crowdAnims1);
+	CreateCrowd({ 3365.000000, -1300.000000, 165 }, resources::crowdAnims1);
+	CreateCrowd({ 3345.000000, -1270.000000, 164.5 }, resources::crowdAnims1);
+	CreateCrowd({ 3325.000000, -1250.000000, 164 }, resources::crowdAnims1);
+	CreateCrowd({ 3375.000000, -1210.000000, 163 }, resources::crowdAnims1);
+	CreateCrowd({ 3350.000000, -1185.000000, 162 }, resources::crowdAnims1);
+
+	// U-turn
+	CreateCrowd({ 4655.000000, -1625.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 4765.000000, -1610.000000, 165 }, resources::crowdAnims1);
+	CreateCrowd({ 4885.000000, -1620.000000, 166 }, resources::crowdAnims1);
+
+	//Long pier
+	CreateSmallCrowd({ 6870, -930, 160 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6845, -950, 161 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6805, -960, 162 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6788, -970, 163 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6862, -980, 164 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6855, -1000, 165 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6810, -1010, 166 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6799, -1025, 167 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6847, -1030, 168 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6803, -1040, 169 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6825, -1050, 170 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6811, -1060, 171 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6833, -1070, 172 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6787, -1085, 173 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6868, -1095, 174 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6842, -1105, 175 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6850, -1115, 176 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6792, -1125, 177 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6830, -1135, 178 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6860, -1145, 179 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6800, -1155, 180 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6789, -1165, 181 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6815, -1175, 182 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6855, -1185, 183 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6820, -1195, 184 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6849, -1205, 185 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6807, -1215, 186 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6785, -1225, 187 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6875, -1235, 188 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6833, -1245, 189 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6810, -1255, 190 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6842, -1265, 191 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6809, -1275, 192 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6858, -1285, 193 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6830, -1295, 194 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6797, -1305, 195 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6825, -1315, 196 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6786, -1325, 197 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6872, -1335, 198 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6865, -1345, 199 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6790, -1355, 200 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6812, -1365, 201 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6840, -1375, 202 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6789, -1385, 203 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6821, -1395, 204 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6862, -1405, 205 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6807, -1415, 206 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6846, -1425, 207 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6788, -1435, 208 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6873, -1445, 209 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 6810, -1455, 210 }, resources::crowdAnims2);
+
+	//shortcut
+	CreateCrowd({ 6185.000000, -565.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 6200.000000, -540.000000, 165 }, resources::crowdAnims1);
+
+	//Beach
+	CreateCrowd({ 9200.000000, -725.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 9180.000000, -710.000000, 166 }, resources::crowdAnims1);
+	CreateCrowd({ 9205.000000, -698.000000, 164 }, resources::crowdAnims1);
+
+	//Small pier
+	CreateSmallCrowd({ 10880.000000, -440.000000, 206 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 10900.000000, -434.000000, 205 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 10910.000000, -428.000000, 204 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 10900.000000, -415.000000, 203 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 10890.000000, -400.000000, 202 }, resources::crowdAnims2);
+
+	//Long narrow pier
+	CreateCrowd({ 11971.000000, -420.000000, 166 }, resources::crowdAnims1);
+	CreateCrowd({ 11955.000000, -415.000000, 165 }, resources::crowdAnims1);
+
+
+
 	PlayCountdown(Vector3(1434.0f, -1470.0f, 200.0f));
 	PlayerController::lapCount = 1;
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1434.0f, -1520.0f));
@@ -623,13 +719,13 @@ int main()
 	//Bind all input actions
 	SetupInput();
 
-	/*
+	
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 166), .scale = 20 });
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
 	ecs::AddTag(placementEditor, "persistent");
-	*/
+	
 
 	//Collision layer matrix setup
 	//Currently 0 = default, 1 = surface players, 2 = underwater, 3 = bridges, 4 = projectiles
@@ -651,7 +747,7 @@ int main()
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
-		/*
+		
 		//Object editor
 		{
 			const float editorSpeed = 0.5;
@@ -702,7 +798,7 @@ int main()
 				TransformSystem::SetScale(placementEditor, 20);
 			}
 		}
-		*/
+		
 
 		if (glfwGetKey(window, GLFW_KEY_0))
 		{
