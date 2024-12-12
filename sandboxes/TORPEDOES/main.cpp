@@ -548,6 +548,34 @@ static void LoadLevel4(engine::Camera* cam)
 	CreateCrowd({ 11971.000000, -420.000000, 166 }, resources::crowdAnims1);
 	CreateCrowd({ 11955.000000, -415.000000, 165 }, resources::crowdAnims1);
 
+	//Long pontoon
+	CreateSmallCrowd({ 13155, -780, 160 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 13135, -790, 161 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 13165, -810, 162 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 13145, -840, 163 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 13155, -860, 164 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 13150, -890, 165 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 13135, -900, 166 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 13175, -940, 167 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 13145, -970, 168 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 13170, -1000, 169 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 13150, -1050, 170 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 13130, -1080, 171 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 13155, -1100, 172 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 13165, -1140, 173 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 13140, -1170, 174 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 13155, -1200, 175 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 13170, -1210, 176 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 13155, -1235, 177 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 13185, -1265, 178 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 13130, -1270, 179 }, resources::crowdAnims2);
+
+	//Finish line
+	CreateCrowd({ 15740, -1270, 166 }, resources::crowdAnims1);
+	CreateCrowd({ 15760, -1255, 165 }, resources::crowdAnims1);
+	CreateCrowd({ 15840, -1275, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 15800, -1250, 164 }, resources::crowdAnims1);
+	CreateCrowd({ 15780, -1280, 168 }, resources::crowdAnims1);
 
 
 	PlayCountdown(Vector3(1434.0f, -1470.0f, 200.0f));
