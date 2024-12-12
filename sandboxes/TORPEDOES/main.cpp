@@ -71,6 +71,14 @@ static void PlayCountdown(Vector3 pos)
 
 std::vector<Vector3> cheeringSoundPos;
 
+void OnSoundComponentDestroyed(ecs::Entity e, engine::SoundComponent c)
+{
+	for (auto sound : c.Sounds) 
+	{
+		sound.second->stop();
+	}
+}
+
 void SetupCheeringSounds(const std::vector<Vector3>& positions)
 {
 	for (const auto& pos : positions) {
@@ -687,6 +695,7 @@ int main()
 	soundSystem->AddSoundEngine("Boat");
 	soundSystem->AddSoundEngine("Background");
 	soundSystem->AddSoundEngine("Music");
+	ecs::SetComponentDestructor<engine::SoundComponent>(OnSoundComponentDestroyed);
 
 	//Loads all globally used resources
 	resources::LoadResources(cam);
