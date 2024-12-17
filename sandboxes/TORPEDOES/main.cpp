@@ -885,12 +885,12 @@ int main()
 		glfwSwapBuffers(window);
 	}
 
-	soundSystem->Uninitialize();
-
+	//Unitialize and free everything
+	ecs::DestroyAllEntities(true);
 	engine::UninitializeTimers();
 	input::uninitialize();
-
-	ecs::DestroyAllEntities(true);
+	soundSystem->Uninitialize();
 	glfwTerminate();
+
 	return 0;
 }
