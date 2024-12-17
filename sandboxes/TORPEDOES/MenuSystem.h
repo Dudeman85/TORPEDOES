@@ -5,10 +5,10 @@
 #include "engine/Input.h"  
 #include "engine/Timing.h"
 #include <functional>
+#include "engine/SoundComponent.h"
 
 enum GameState { menuMainState, selectPlayersState, mapSelection, gamePlayState, inGameOptionsState };
 static GameState gameState = menuMainState;
-
 static bool canStartLoadingMap;
 static bool isSceneloaded;
 std::unordered_map<int, ShipType> playerShips;
@@ -16,6 +16,15 @@ static void LoadLevel4(engine::Camera* cam);
 static void LoadLevel3(engine::Camera* cam);
 static void LoadLevel2(engine::Camera* cam);
 static void LoadLevel1(engine::Camera* cam);
+
+
+//void MenuSounds()
+//{
+//	Audio* switchAudio = engine::AddAudio("Background", "audio/leftright.wav", false, 0.01f, DistanceModel::LINEAR);
+//	switchAudio->pause();
+//}
+
+
 class PlayerSelectSystem;
 ECS_REGISTER_COMPONENT(Level)
 struct Level
@@ -110,6 +119,9 @@ public:
 		engine::TransformSystem::AddParent(arrowLeft, arrowsPivot);
 		/*engine::TransformSystem::AddParent(mapName, arrowsPivot);
 		engine::TransformSystem::AddParent(mapSelectText, arrowsPivot);*/
+
+
+
 	}
 	void LoadThisLevel(int mapIndex)
 	{
@@ -137,19 +149,19 @@ public:
 	void Update()
 	{
 		float turnInput = input::GetTotalInputValue("Turn" + to_string(firstPlayer));
-
+		Audio* switchAudio = engine::AddAudio("Background", "audio/leftright.wav", false, 0.01f, DistanceModel::LINEAR);
+		switchAudio->pause();
 		if (turnInput > 0 && readyToMoveLeft)
 		{
 			readyToMoveLeft = false;
 
 			TimerSystem::ScheduleFunction([this]() { readyToMoveLeft = true; }, mapChangeTime);
-
+			switchAudio->play();
 			mapLevelIndex++;
 			if (mapLevelIndex >= mapImages.size())
 			{
 				mapLevelIndex = 0;
 			}
-
 			//TODO: LEVEL NAME HERE
 			ecs::GetComponent<TextRenderer>(mapName).text = mapNames[mapLevelIndex];
 
@@ -162,7 +174,7 @@ public:
 		{
 			readyToMoveRight = false;
 			TimerSystem::ScheduleFunction([this]() { readyToMoveRight = true; }, mapChangeTime);
-
+			switchAudio->play();
 			mapLevelIndex--;
 
 			if (mapLevelIndex < 0)

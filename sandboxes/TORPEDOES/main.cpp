@@ -88,6 +88,7 @@ void SetupCheeringSounds(const std::vector<Vector3>& positions)
 
 		Audio* cheerSound = engine::AddAudio("Gameplay", "audio/cheering.wav", true, 0.3f, DistanceModel::LINEAR);
 
+
 		cheerSound->setAbsoluteDirection(pos);
 
 		// Randomize start and stop delays
