@@ -46,7 +46,7 @@ namespace resources
 		};
 		subUnderwaterTexture = new Texture(assetPath + "3dmodels/Player_Underwater.png");
 
-		models = engine::PreloadModels("3dmodels");
+		models = engine::PreloadModels("3dmodels", true, GL_NEAREST);
 
 		niagaraFont = new Font("Niagara Solid.ttf", 0, 0, 48);
 

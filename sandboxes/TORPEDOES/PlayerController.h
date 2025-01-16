@@ -463,6 +463,7 @@ static void BoostEnd(engine::ecs::Entity entity, float boostStrenght)
 	player._boostScale -= boostStrenght;
 
 	player.specialEnabled = false;
+	player._specialTimer = player.specialCooldown;
 
 	AnimationSystem::PlayAnimation(player.wakeAnimationEntity, "normal", true);
 }
@@ -692,12 +693,12 @@ void BoostIndicatorUpdate(engine::ecs::Entity entity)
 	{
 		if (player.specialCooldown <= player._specialTimer)
 		{
-			// In use
+			// Available to use
 			sprite.texture = it.textures[0];
 		}
 		else
 		{
-			// Available to use
+			// In use
 			sprite.texture = it.textures[1];
 		}
 	}
@@ -954,9 +955,6 @@ public:
 				SkipAddingHit:
 
 					CreateAnimation(collision.b);
-
-					//engine::SoundComponent& sound = ecs::GetComponent<engine::SoundComponent>(collision.b);
-					//sound.Sounds["Explosion"]->play();
 
 					//Destroy projectile at end of frame
 					engine::ecs::DestroyEntity(collision.b);
