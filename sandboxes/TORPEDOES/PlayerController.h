@@ -36,7 +36,7 @@ struct Player
 
 	// Movement stats
 	float forwardSpeed = 400;
-	float reverseSpeed = 133;
+	float reverseSpeed = 233;
 
 	float rotationSpeed = 120;
 	float minSpeedWhileTurning = 60;
@@ -1081,7 +1081,7 @@ public:
 
 				// Set min speed while turning
 
-				Vector2 minRotateImpulse = player.forwardDirection * std::abs(trueRotateInput) * player.minSpeedWhileTurning * engine::deltaTime;
+				Vector2 minRotateImpulse = player.forwardDirection * accelerationInput * std::abs(trueRotateInput) * player.minSpeedWhileTurning * engine::deltaTime;
 
 				if (minRotateImpulse.Length() > forwardImpulse.Length())
 				{
