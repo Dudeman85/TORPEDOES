@@ -686,6 +686,7 @@ public:
 							playerSelection.selection = 0;
 						}
 					}
+					engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowDown).scale = Vector3(0.03f);
 					engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowUp).scale = Vector3(0.08f);
 					engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).model = shipModels[playerSelection.selection];
 					playerSelection.isArrowBig = true;
@@ -712,6 +713,7 @@ public:
 							playerSelection.selection = shipModels.size() - 1;
 						}
 					}
+					engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowUp).scale = Vector3(0.03f);
 					engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowDown).scale = Vector3(0.08f);
 					engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).model = shipModels[playerSelection.selection];
 					playerSelection.isArrowBig = true;

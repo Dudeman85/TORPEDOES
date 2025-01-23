@@ -161,7 +161,11 @@ namespace engine
             // Load .obj as model
             if (extension == "obj")
             {
-                models.emplace(name, new Model(pathName));
+                Model* model = new Model(pathName);
+                for (const Mesh& mesh : model->meshes)
+                    for(Texture* tex : mesh.textures)
+                        tex->SetScalingFilter(filteringType);
+                models.emplace(name, model);
             }
         }
 
