@@ -1239,9 +1239,11 @@ public:
 			if (nextCheckpointAngle < 0)
 				nextCheckpointAngle += 360;
 			float currentAngle = ecs::GetComponent<Transform>(player.checkpointIndicatorEntity).rotation.z;
-			//Forgive me father for i have sinned
+			//This is so shit
 			while (currentAngle < 0)
 				currentAngle += 360;
+			while (currentAngle > 360)
+				currentAngle -= 360;
 
 			//Rotate ccw if it is closer
 			float rotationDirection = abs(nextCheckpointAngle - currentAngle) > 180 ? -1 : 1;
@@ -1322,7 +1324,7 @@ public:
 			AnimationSystem::AddAnimations(wakeAnimation, resources::wakeAnims, { "boost", "normal" });
 			AnimationSystem::PlayAnimation(wakeAnimation, "normal", true);
 
-			engine::ecs::AddComponent(checkpointIndicator, engine::Transform{ .position = Vector3(0, 0, -15), .rotation = Vector3(0), .scale = Vector3(2, 5, 0) });
+			engine::ecs::AddComponent(checkpointIndicator, engine::Transform{ .position = Vector3(0, 0, 11), .rotation = Vector3(0), .scale = Vector3(1.2, 7, 0) });
 			engine::ecs::AddComponent(checkpointIndicator, engine::SpriteRenderer{ .texture = resources::uiTextures["Checkpoint_Arrow.png"], .enabled = true });
 			engine::TransformSystem::AddParent(checkpointIndicator, playerEntity);
 			playerComponent.nextCheckpoint = checkpointEntities[0];
