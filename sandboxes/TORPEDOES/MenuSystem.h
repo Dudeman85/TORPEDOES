@@ -18,13 +18,6 @@ static void LoadLevel2(engine::Camera* cam);
 static void LoadLevel1(engine::Camera* cam);
 
 
-//void MenuSounds()
-//{
-//	Audio* switchAudio = engine::AddAudio("Background", "audio/leftright.wav", false, 0.01f, DistanceModel::LINEAR);
-//	switchAudio->pause();
-//}
-
-
 class PlayerSelectSystem;
 ECS_REGISTER_COMPONENT(Level)
 struct Level
@@ -223,6 +216,12 @@ struct PlayerSelection
 
 	float throttleCurrentWaitedTimeUp = 0;
 	float throttleCurrentWaitedTimeDown = 0;
+
+
+	Audio* playerSelectAudio;
+
+	Audio* playerReadyAudio;
+	
 };
 
 ECS_REGISTER_SYSTEM(PlayerSelectSystem, PlayerSelection)
@@ -483,7 +482,12 @@ public:
 
 			engine::ecs::AddComponent(selectionWindow, engine::Transform{ .position = offsetPlayerWindows, .scale = Vector3(0.5, 0.5, -0.1f) });
 			engine::ecs::AddComponent(selectionWindow, PlayerSelection{ .playerID = i, .arrowUp = arrowUp, .arrowDown = arrowDown, .shipModel = shipModel, .readyText = readyText, .playerWindow = selectionWindow, .shipInfo = shipInfo,.shipNameEntity = shipNameEntity,.baseSpeedEntity = baseSpeedEntity,.maneuvarabilityEntity = maneuvarabilityEntity,.boostEntity = boostEntity ,.specialEntity = specialEntity, .backgroundImage = backgroundImage });
-
+			
+			PlayerSelection& playerselection = ecs::GetComponent<PlayerSelection>(selectionWindow);
+			playerselection.playerSelectAudio = engine::AddAudio("Background", "audio/leftright.wav", false, 0.005f, DistanceModel::LINEAR);
+			playerselection.playerSelectAudio->pause();
+			playerselection.playerReadyAudio = engine::AddAudio("Background", "audio/select.wav", false, 0.005f, DistanceModel::LINEAR);
+			playerselection.playerReadyAudio->pause();
 			engine::ecs::AddComponent(selectionWindow, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(0, 0.15f, 0), .uiElement = true });
 
 			engine::TextRenderer& selectWin = engine::ecs::GetComponent<engine::TextRenderer>(selectionWindow);
@@ -623,6 +627,7 @@ public:
 
 					if (playerSelection.ready)
 					{
+						playerSelection.playerReadyAudio->play();
 						playersThatAreReadyAmount++;
 						printf(" TIMER STARTED \n");
 
@@ -674,7 +679,7 @@ public:
 					{
 						// Next ship
 						playerSelection.throttleCurrentWaitedTimeUp -= throttleMoveWaitTime;;
-
+						playerSelection.playerSelectAudio->play();
 						playerSelection.selection++;
 						if (playerSelection.selection >= shipModels.size())
 						{
@@ -700,7 +705,7 @@ public:
 					{
 						// Previous ship
 						playerSelection.throttleCurrentWaitedTimeDown -= throttleMoveWaitTime;
-
+						playerSelection.playerSelectAudio->play();
 						playerSelection.selection--;
 						if (playerSelection.selection < 0)
 						{
