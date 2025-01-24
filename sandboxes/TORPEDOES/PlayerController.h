@@ -1081,11 +1081,15 @@ public:
 
 				// Set min speed while turning
 
-				Vector2 minRotateImpulse = player.forwardDirection * accelerationInput * std::abs(trueRotateInput) * player.minSpeedWhileTurning * engine::deltaTime;
+				Vector2 minRotateImpulse = player.forwardDirection  * std::abs(trueRotateInput) * player.minSpeedWhileTurning * engine::deltaTime;
 
 				if (minRotateImpulse.Length() > forwardImpulse.Length())
 				{
 					forwardImpulse = minRotateImpulse;
+				}
+				else if (accelerationInput < 0.0f)
+				{
+					minRotateImpulse.Length() * -1 ;
 				}
 			}
 

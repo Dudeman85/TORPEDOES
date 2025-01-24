@@ -22,7 +22,7 @@ class PlayerSelectSystem;
 ECS_REGISTER_COMPONENT(Level)
 struct Level
 {
-// PASS
+	// PASS
 };
 ECS_REGISTER_SYSTEM(LevelSelectionSystem, Level)
 class LevelSelectionSystem : public engine::ecs::System
@@ -56,7 +56,7 @@ class LevelSelectionSystem : public engine::ecs::System
 	float arrowPosHight = 0.88f;
 	float arrowsOffsetX = 0.6f;
 
-	std::vector<std::string> mapNames = {"Lake", "Caves", "Beach", "River"};
+	std::vector<std::string> mapNames = { "Lake", "Caves", "Beach", "River" };
 
 public:
 	engine::ecs::Entity arrowLeft;
@@ -83,16 +83,18 @@ public:
 		mapImages.push_back(resources::menuTextures["level3.png"]);
 		mapImages.push_back(resources::menuTextures["level4.png"]);
 
+		// Level select Teksti
+		printf("Level Select Text rendering:");
 		engine::ecs::AddComponent(arrowsPivot, engine::Transform{ .position = Vector3(0, arrowPosHight, 0), .scale = Vector3(1) });
 		engine::ecs::AddComponent(mapName, engine::Transform{ .position = Vector3(-0.05f, 0.85f, 0.0f)});
-		engine::ecs::AddComponent(mapName, engine::TextRenderer{ .font = resources::niagaraFont, .text = mapNames[0], .offset = Vector3(0.003f, 0.005f, 0.0f), .scale = Vector3(0.003f), .color = mapTextColor, .uiElement = true});
+		engine::ecs::AddComponent(mapName, engine::TextRenderer{ .font = resources::niagaraFont, .text = mapNames[0], .offset = Vector3(0.9f * 0.003f, 0.005f, 0.0f), .scale = Vector3(0.003f), .color = mapTextColor, .uiElement = true});
 
 		engine::ecs::AddComponent(mapSelectText, engine::Transform{ .position = Vector3(0, -0.94f, 0.95), .scale = Vector3(1) });
 		engine::ecs::AddComponent(mapSelectText, engine::TextRenderer
 			{
 				.font = resources::niagaraFont,
 					.text = "Press Start to Play!", .offset = Vector3(-0.36f, 0, 0), .scale = Vector3(0.003f), .color = playTextColor, .uiElement = true }
-		);
+					);
 
 		engine::ecs::AddComponent(levelSelectionBackground, engine::Transform{ .position = Vector3(0, 0, -0.5f), .scale = Vector3(1) });
 		engine::ecs::AddComponent(levelSelectionBackground, SpriteRenderer{ .texture = resources::menuTextures["Selection_BG_Var3.png"], .enabled = true,.uiElement = true });
@@ -192,7 +194,7 @@ ECS_REGISTER_COMPONENT(PlayerSelection)
 struct PlayerSelection
 {
 	int playerID;
-	bool isActivePlayer = false;
+	bool hasJoined = false;
 	int selection;
 	float cooldownToMoveSelection;
 	bool ready = false;
@@ -274,12 +276,27 @@ public:
 		BackToUIMenu
 	};
 
-	void PrintShipInfos(PlayerSelection& playerSelection)
+	void UpdateShipInfos(PlayerSelection& playerSelection)
 	{
+		//Disable all if player has not joined
+		if (!playerSelection.hasJoined)
+		{
+			engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipInfo).text = "PRESS SHOOT TO JOIN!";
+			engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipInfo).color = Vector3(57, 150, 54);
+			engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipNameEntity).text = "";
+			engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.baseSpeedEntity).text = "";
+			engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.maneuvarabilityEntity).text = "";
+			engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.boostEntity).text = "";
+			engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.specialEntity).text = "";
+			return;
+		}
+
 		//SHIP STATS
 
 		std::string shipName;
 		Vector3 nameColor;
+		Vector3 speedColor = { 8, 201, 31 };
+		Vector3 maneuverColor;
 		std::string baseSpeed;
 		std::string maneuverability;
 		std::string mainAttack;
@@ -293,28 +310,36 @@ public:
 		case ShipType::torpedoBoat:
 			shipName = "Torpedo Boat";
 			baseSpeed = "Fast";
+			speedColor = { 8, 201, 31 };
 			maneuverability = "Low";
+			maneuverColor = { 186, 30, 2 };
 			mainAttack = "Torpedo";
 			special = "Boost";
 			break;
 		case ShipType::submarine:
 			shipName = "Submarine";
 			baseSpeed = "Medium";
+			speedColor = { 235, 151, 26 };
 			maneuverability = "Medium";
+			maneuverColor = { 235, 151, 26 };
 			mainAttack = "Torpedo";
 			special = "Submerge";
 			break;
 		case ShipType::cannonBoat:
 			shipName = "Battleship";
 			baseSpeed = "Slow";
+			speedColor = { 186, 30, 2 };
 			maneuverability = "Fast";
+			maneuverColor = { 8, 201, 31 };
 			mainAttack = "Cannon";
 			special = "Boost";
 			break;
 		case ShipType::hedgehogBoat:
 			shipName = "Destroyer";
 			baseSpeed = "Medium";
+			speedColor = { 235, 151, 26 };
 			maneuverability = "Medium";
+			maneuverColor = { 235, 151, 26 };
 			mainAttack = "Hedghehog Mortar";
 			special = "Boost";
 			break;
@@ -344,7 +369,7 @@ public:
 		case 3:			   //purple
 
 			nameColor = Vector3(196, 0, 255);
-	
+
 			break;
 		default:
 			break;
@@ -352,11 +377,13 @@ public:
 
 		std::string playerNumStats = "Player " + to_string(playerSelection.playerID + 1);
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipInfo).text = playerNumStats;
-		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipInfo).color = Vector3(nameColor.x, nameColor.y, nameColor.z);
+		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipInfo).color = nameColor;
 
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipNameEntity).text = shipName;
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.baseSpeedEntity).text = "Speed: " + baseSpeed;
+		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.baseSpeedEntity).color = speedColor;
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.maneuvarabilityEntity).text = "Maneuverability: " + maneuverability;
+		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.maneuvarabilityEntity).color = maneuverColor;
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.boostEntity).text = "Weapon: " + mainAttack;
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.specialEntity).text = "Special: " + special;
 	}
@@ -451,7 +478,7 @@ public:
 			engine::ecs::AddComponent(baseSpeedEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .color = Vector3(57, 150, 54), .uiElement = true });
 			//Rotation speed text
 			engine::ecs::AddComponent(maneuvarabilityEntity, engine::Transform{ .position = Vector3(-statsOffset, 2 * statsOffsetEatch - statsOffsetY, -0.1f), .scale = scaleForStatsChilds });
-			engine::ecs::AddComponent(maneuvarabilityEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .color = Vector3(57, 150, 54), .uiElement = true });
+			engine::ecs::AddComponent(maneuvarabilityEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "",.uiElement = true });
 			//boostEntity
 			engine::ecs::AddComponent(boostEntity, engine::Transform{ .position = Vector3(-statsOffset, 3 * statsOffsetEatch - statsOffsetY, -0.1f), .scale = scaleForStatsChilds });
 			engine::ecs::AddComponent(boostEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .color = Vector3(57, 150, 54), .uiElement = true });
@@ -589,149 +616,184 @@ public:
 			PlayerSelection& playerSelection = engine::ecs::GetComponent<PlayerSelection>(entity);
 
 			float turnInput = input::GetTotalInputValue("Turn" + std::to_string(playerSelection.playerID));
-			bool selectInput = input::GetNewPress("Shoot" + std::to_string(playerSelection.playerID));
+			bool aPressed = input::GetNewPress("Shoot" + std::to_string(playerSelection.playerID));
+			bool bPressed = input::GetNewPress("Boost" + std::to_string(playerSelection.playerID));
 
 			std::string& playerReadyText = engine::ecs::GetComponent<engine::TextRenderer>(playerSelection.readyText).text;
 
-			// Shoot input adds player to the game and after that makes player Ready/Not ready
-			if (selectInput)
+			//Add player if not already joined
+			if (!playerSelection.hasJoined)
 			{
-				if (!playerSelection.isActivePlayer)
+				// Shoot input adds player to the game and after that makes player Ready/Not ready
+				if (aPressed)
 				{
-					engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.backgroundImage).enabled = true;
-
 					// Add player to selectedShipsAtTheFrame if not yet have that player ID
-					if (!selectedShipsAtTheFrame.contains(playerSelection.playerID))
-					{
-						selectedShipsAtTheFrame.insert({ playerSelection.playerID, ShipType::torpedoBoat });
-					}
+					selectedShipsAtTheFrame.insert({ playerSelection.playerID, ShipType::torpedoBoat });
+
+					playerReadyText = "Not Ready";
+					playerSelection.hasJoined = true;
 
 					engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowUp).enabled = true;
 					engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowDown).enabled = true;
-					playerReadyText = "Not Ready";
-
-					playerSelection.isActivePlayer = true;
+					engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.backgroundImage).enabled = true;
 					engine::ecs::GetComponent< engine::Transform>(playerSelection.shipModel).scale = 0.2;
 					engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).color = Vector3(200, 0, 0);
 
-					//engine::ecs::GetComponent< engine::Transform>(playerSelection.shipModel).position = (0.9f, 0.2f, -0.1f);
-					//engine::ecs::GetComponent<engine::TextRenderer>(playerSelection.playerWindow).text = "P" + to_string(playerSelection.playerID);
+					UpdateShipInfos(playerSelection);
 				}
-				else
+			}
+			else
+			{
+				//If controller disconnects
+				if (!glfwJoystickPresent(playerSelection.playerID)) 
 				{
-					playerReadyText = playerReadyText == "Not Ready" ? "Ready" : "Not Ready";
-					playerSelection.ready = !playerSelection.ready;
+					printf(playerSelection.playerID + " disconnected");
+				}
 
-					//Select correct player in selectedShipsAtTheFrame and set shipType be playerID in index 
-					selectedShipsAtTheFrame[playerSelection.playerID] = ShipType(playerSelection.selection);
-
-					if (playerSelection.ready)
+				if (!playerSelection.ready)
+				{
+					// Ready player with a
+					if (aPressed)
 					{
 						playerSelection.playerReadyAudio->play();
-						playersThatAreReadyAmount++;
-						printf(" TIMER STARTED \n");
+						playerReadyText = "Ready";
+						playerSelection.ready = true;
+
+						//Select correct player in selectedShipsAtTheFrame and set shipType be playerID in index 
+						selectedShipsAtTheFrame[playerSelection.playerID] = ShipType(playerSelection.selection);
 
 						engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).model = shipModelsReady[playerSelection.selection];
 						engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).textures = { resources::playerIdToTexture[playerSelection.playerID] };
 						engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).color = Vector3(0, 255, 0);
+
+						playersThatAreReadyAmount++;
+
+						UpdateShipInfos(playerSelection);
+					}
+					//Unjoin player
+					else if (bPressed)
+					{
+						// Remove player from selectedShipsAtTheFrame
+						selectedShipsAtTheFrame.erase(playerSelection.playerID);
+
+						playerReadyText = "";
+						playerSelection.hasJoined = false;
+
+						engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowUp).enabled = false;
+						engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowDown).enabled = false;
+						engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.backgroundImage).enabled = false;
+						engine::ecs::GetComponent< engine::Transform>(playerSelection.shipModel).scale = 0;
+						engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).color = Vector3(200, 0, 0);
+
+						UpdateShipInfos(playerSelection);
+					}
+				}
+				//Make unready
+				else
+				{
+					// Unready player with a or b
+					if (aPressed || bPressed)
+					{
+						playerReadyText = "Not Ready";
+						playerSelection.ready = false;
+
+						engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).model = shipModels[playerSelection.selection];
+						engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).color = Vector3(200, 0, 0);
+
+						playersThatAreReadyAmount--;
+
+						UpdateShipInfos(playerSelection);
+					}
+				}
+
+				// Ready players can't change ships
+				if (!playerSelection.ready)
+				{
+					if (turnInput == 0)
+					{
+						// Throttle in deadzone
+
+						playerSelection.throttleCurrentWaitedTimeUp = throttleMoveWaitTime;
+						playerSelection.throttleCurrentWaitedTimeDown = throttleMoveWaitTime;
+
+						// Set arrow size to normal
+						playerSelection.timeArrowBigTime += engine::deltaTime;
+						if (playerSelection.timeArrowBigTime > 0.15f)
+						{
+							engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowDown).scale = Vector3(0.03f);
+							engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowUp).scale = Vector3(0.03f);
+
+							playerSelection.isArrowBig = false;
+							playerSelection.timeArrowBigTime = 0;
+						}
+
+						goto SkipTurnInput;
+					}
+
+					if (turnInput > 0)
+					{
+						// Throttle up
+						playerSelection.throttleCurrentWaitedTimeUp += engine::deltaTime;
+
+						while (playerSelection.throttleCurrentWaitedTimeUp >= throttleMoveWaitTime)
+						{
+							// Next ship
+							playerSelection.throttleCurrentWaitedTimeUp -= throttleMoveWaitTime;
+
+							playerSelection.playerSelectAudio->play();
+							playerSelection.selection++;
+							if (playerSelection.selection >= shipModels.size())
+							{
+								playerSelection.selection = 0;
+							}
+						}
+						engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowDown).scale = Vector3(0.03f);
+						engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowUp).scale = Vector3(0.08f);
+						engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).model = shipModels[playerSelection.selection];
+						playerSelection.isArrowBig = true;
 					}
 					else
 					{
-						engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).model = shipModels[playerSelection.selection];
-						playersThatAreReadyAmount--;
-						engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).color = Vector3(200, 0, 0);
+						// No throttle input up
+						playerSelection.throttleCurrentWaitedTimeUp = 0;
 					}
-				}
 
-				PrintShipInfos(playerSelection);
-			}
-			// Ready players can't change ships
-			// TODO: What is ActivePlayer and is it required?
-			if (!playerSelection.ready && playerSelection.isActivePlayer)
-			{
-				if (turnInput == 0)
-				{
-					// Throttle in deadzone
-
-					playerSelection.throttleCurrentWaitedTimeUp = throttleMoveWaitTime;
-					playerSelection.throttleCurrentWaitedTimeDown = throttleMoveWaitTime;
-
-					// Set arrow size to normal
-					playerSelection.timeArrowBigTime += engine::deltaTime;
-					if (playerSelection.timeArrowBigTime > 0.15f)
+					if (turnInput < 0)
 					{
-						engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowDown).scale = Vector3(0.03f);
+						// Throttle down
+						playerSelection.throttleCurrentWaitedTimeDown += engine::deltaTime;
+
+						while (playerSelection.throttleCurrentWaitedTimeDown >= throttleMoveWaitTime)
+						{
+							// Previous ship
+							playerSelection.throttleCurrentWaitedTimeDown -= throttleMoveWaitTime;
+
+							playerSelection.playerSelectAudio->play();
+							playerSelection.selection--;
+							if (playerSelection.selection < 0)
+							{
+								playerSelection.selection = shipModels.size() - 1;
+							}
+						}
 						engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowUp).scale = Vector3(0.03f);
-
-						playerSelection.isArrowBig = false;
-						playerSelection.timeArrowBigTime = 0;
+						engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowDown).scale = Vector3(0.08f);
+						engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).model = shipModels[playerSelection.selection];
+						playerSelection.isArrowBig = true;
 					}
-
-					goto SkipTurnInput;
-				}
-
-				if (turnInput > 0)
-				{
-					// Throttle up
-					playerSelection.throttleCurrentWaitedTimeUp += engine::deltaTime;
-
-					while (playerSelection.throttleCurrentWaitedTimeUp >= throttleMoveWaitTime)
+					else
 					{
-						// Next ship
-						playerSelection.throttleCurrentWaitedTimeUp -= throttleMoveWaitTime;;
-						playerSelection.playerSelectAudio->play();
-						playerSelection.selection++;
-						if (playerSelection.selection >= shipModels.size())
-						{
-							playerSelection.selection = 0;
-						}
+						// No throttle input down
+						playerSelection.throttleCurrentWaitedTimeDown = 0;
 					}
-					engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowDown).scale = Vector3(0.03f);
-					engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowUp).scale = Vector3(0.08f);
-					engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).model = shipModels[playerSelection.selection];
-					playerSelection.isArrowBig = true;
-				}
-				else
-				{
-					// No throttle input up
-					playerSelection.throttleCurrentWaitedTimeUp = 0;
-				}
 
-				if (turnInput < 0)
-				{
-					// Throttle down
-					playerSelection.throttleCurrentWaitedTimeDown += engine::deltaTime;
-
-					while (playerSelection.throttleCurrentWaitedTimeDown >= throttleMoveWaitTime)
-					{
-						// Previous ship
-						playerSelection.throttleCurrentWaitedTimeDown -= throttleMoveWaitTime;
-						playerSelection.playerSelectAudio->play();
-						playerSelection.selection--;
-						if (playerSelection.selection < 0)
-						{
-							playerSelection.selection = shipModels.size() - 1;
-						}
-					}
-					engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowUp).scale = Vector3(0.03f);
-					engine::ecs::GetComponent< engine::Transform>(playerSelection.arrowDown).scale = Vector3(0.08f);
-					engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).model = shipModels[playerSelection.selection];
-					playerSelection.isArrowBig = true;
+					// Set ship info	
+					UpdateShipInfos(playerSelection);
 				}
-				else
-				{
-					// No throttle input down
-					playerSelection.throttleCurrentWaitedTimeDown = 0;
-				}
-
-				// Set ship info	
-				PrintShipInfos(playerSelection);
 			}
 		SkipTurnInput:
 
 			engine::Transform& ShipModelTransform = engine::ecs::GetComponent<engine::Transform>(playerSelection.shipModel);
 
-			//double a = (int)(ShipModelTransform.rotation.y + 160 * engine::deltaTime) % 360;
 			double yRotation = ShipModelTransform.rotation.y;
 			if (ShipModelTransform.rotation.y < 360)
 			{
@@ -740,8 +802,6 @@ public:
 			else  yRotation = ShipModelTransform.rotation.y - 360 + 35 * engine::deltaTime;
 
 			ShipModelTransform.rotation = Vector3(6, yRotation, 0);
-			/*	ShipModelTransform.position= Vector2(ShipModelTransform.position.x,-.4f);*/
-			//std::cout << "\n" << "isArrowBig: " << playerSelection.isArrowBig << "time:" << playerSelection.timeArrowBigTime << "\n";
 		}
 
 		StartGame();
@@ -755,20 +815,8 @@ public:
 		{
 			PlayerSelection& playerSelection = engine::ecs::GetComponent<PlayerSelection>(entity);
 
-			if (isShipSelectionMenuOn)// Show every thing
+			if (isShipSelectionMenuOn)// Show everything
 			{
-				/*
-				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowUp).enabled = false;
-				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowDown).enabled = false;
-				engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).enabled = true;
-
-				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).text = "";
-				engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.readyText).color = Vector3(0, 0, 255);
-				engine::ecs::GetComponent< engine::Transform>(playerSelection.readyText).scale = 0.003f;
-
-				engine::ecs::GetComponent<engine::TextRenderer>(playerSelection.playerWindow).scale = 0.002f;
-				std::cout << "\nisShipSelectionMenuOn: " << isShipSelectionMenuOn << "\n";
-				*/
 				canStartLoadingMap = false;
 
 				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.backgroundImage).enabled = true;
@@ -777,9 +825,7 @@ public:
 				engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowDown).enabled = true;
 				engine::ecs::GetComponent< engine::ModelRenderer>(playerSelection.shipModel).enabled = true;
 
-				//engine::ecs::GetComponent< engine::Transform>(playerSelection.readyText).scale = 0.003f;
-
-				PrintShipInfos(playerSelection);
+				UpdateShipInfos(playerSelection);
 
 				std::cout << "\nisShipSelectionMenuOn: " << isShipSelectionMenuOn << "\n";
 			}

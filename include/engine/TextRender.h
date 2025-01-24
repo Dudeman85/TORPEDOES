@@ -19,7 +19,7 @@ namespace engine
 		///Size of the text
 		Vector3 scale = Vector3(1);
 		///Color of the text
-		Vector3 color;
+		Vector3 color = Vector3(0);
 		///Bool to turn on the ui elements
 		bool uiElement = false;
 	};
@@ -60,6 +60,8 @@ namespace engine
 					})",
 				false);
 		}
+
+		int times = 0;
 		///Call this every frame
 		void Update(Camera* cam)
 		{
@@ -114,6 +116,8 @@ namespace engine
 				for (c = textRenderer.text.begin(); c != textRenderer.text.end(); ++c)
 				{
 					Character ch = textRenderer.font->characters[*c];
+					
+					
 
 					float xpos = x + ch.Bearing.x * textRenderer.scale.x;
 					float ypos = y - (ch.Size.y - ch.Bearing.y) * textRenderer.scale.y;
@@ -137,7 +141,19 @@ namespace engine
 					glBindBuffer(GL_ARRAY_BUFFER, 0);
 					glDrawArrays(GL_TRIANGLES, 0, 6);
 					x += (ch.Advance >> 6) * textRenderer.scale.x;
+
+					/*
+					for (int num = 0; num < sizeof(vertices) / sizeof(vertices[0]); num++)
+					{
+						if (num == sizeof(vertices) / sizeof(vertices[0]))
+						{
+							printf("\n");
+						}
+						printf("Rendering -> %c", *c);
+					}
+					*/
 				}
+				
 
 				glBindVertexArray(0);
 				glBindTexture(GL_TEXTURE_2D, 0);

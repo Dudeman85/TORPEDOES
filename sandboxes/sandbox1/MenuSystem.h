@@ -19,7 +19,7 @@ struct PlayerSelection
 {
 
 	int playerID;
-	bool isActivePlayer = false;
+	bool hasJoined = false;
 	int selection;
 	float cooldownToMoveSelection;
 	bool ready = false;
@@ -95,7 +95,7 @@ public:
 	};
 
 
-	void PrintShipInfos(PlayerSelection& playerSelection)
+	void UpdateShipInfos(PlayerSelection& playerSelection)
 	{
 		//SHIP STATS
 
@@ -370,7 +370,7 @@ public:
 			if (select)
 			{
 
-				if (!playerSelection.isActivePlayer)
+				if (!playerSelection.hasJoined)
 				{
 					//add player to selectedShipsAtTheFrame if not yet have that player ID
 					if (!selectedShipsAtTheFrame.contains(playerSelection.playerID))
@@ -379,7 +379,7 @@ public:
 					engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowUp).enabled = true;
 					engine::ecs::GetComponent< engine::SpriteRenderer>(playerSelection.arrowDown).enabled = true;
 					playerReadyText = "UNready";
-					playerSelection.isActivePlayer = true;
+					playerSelection.hasJoined = true;
 					engine::ecs::GetComponent< engine::Transform>(playerSelection.shipModel).scale = 0.2;
 					//engine::ecs::GetComponent< engine::Transform>(playerSelection.shipModel).position = (0.9f, 0.2f, -0.1f);
 					//engine::ecs::GetComponent<engine::TextRenderer>(playerSelection.playerWindow).text = "P" + to_string(playerSelection.playerID);
@@ -411,7 +411,7 @@ public:
 				}
 			}
 			//IF READY CAN'T CHANGE SHIP
-			if (!playerSelection.ready && playerSelection.isActivePlayer)
+			if (!playerSelection.ready && playerSelection.hasJoined)
 			{
 
 
@@ -471,7 +471,7 @@ public:
 				}
 
 				//SETS SHIP INFO TEXT BY THE ShipType 			
-				PrintShipInfos(playerSelection);
+				UpdateShipInfos(playerSelection);
 			}
 
 			auto& ShipModelTransform = engine::ecs::GetComponent< engine::Transform>(playerSelection.shipModel);
