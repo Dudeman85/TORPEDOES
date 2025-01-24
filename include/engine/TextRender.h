@@ -19,7 +19,7 @@ namespace engine
 		///Size of the text
 		Vector3 scale = Vector3(1);
 		///Color of the text
-		Vector3 color;
+		Vector3 color = Vector3(0);
 		///Bool to turn on the ui elements
 		bool uiElement = false;
 	};
