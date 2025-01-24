@@ -83,9 +83,11 @@ public:
 		mapImages.push_back(resources::menuTextures["level3.png"]);
 		mapImages.push_back(resources::menuTextures["level4.png"]);
 
+		// Level select Teksti
+		printf("Level Select Text rendering:");
 		engine::ecs::AddComponent(arrowsPivot, engine::Transform{ .position = Vector3(0, arrowPosHight, 0), .scale = Vector3(1) });
 		engine::ecs::AddComponent(mapName, engine::Transform{ .position = Vector3(-0.05f, 0.85f, 0.0f)});
-		engine::ecs::AddComponent(mapName, engine::TextRenderer{ .font = resources::niagaraFont, .text = mapNames[0], .offset = Vector3(0.003f, 0.005f, 0.0f), .scale = Vector3(0.003f), .color = mapTextColor, .uiElement = true});
+		engine::ecs::AddComponent(mapName, engine::TextRenderer{ .font = resources::niagaraFont, .text = mapNames[0], .offset = Vector3(0.9f * 0.003f, 0.005f, 0.0f), .scale = Vector3(0.003f), .color = mapTextColor, .uiElement = true});
 
 		engine::ecs::AddComponent(mapSelectText, engine::Transform{ .position = Vector3(0, -0.94f, 0.95), .scale = Vector3(1) });
 		engine::ecs::AddComponent(mapSelectText, engine::TextRenderer
