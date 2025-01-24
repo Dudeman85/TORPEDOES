@@ -1226,7 +1226,7 @@ public:
 			TransformSystem::SetPosition(player.wakeAnimationEntity, transform.position - wakeOffset);
 
 			engine::SoundComponent& soundComponent = engine::ecs::GetComponent<engine::SoundComponent>(entity);
-			soundComponent.Sounds["Engine"]->setPitch(rigidbody.velocity.Length() / (166.0f * 4) + player.forwardDirection.Length() + forwardImpulse.Length() / (166.0f * 16));
+			soundComponent.Sounds["Engine"]->setPitch((player.id * 0.001) + rigidbody.velocity.Length() / (166.0f * 4) + player.forwardDirection.Length() + forwardImpulse.Length() / (166.0f * 16));
 
 			if (soundComponent.Sounds["Engine"]->getAtEnd())
 			{
