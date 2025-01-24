@@ -1305,7 +1305,7 @@ public:
 			engine::ecs::AddComponent(playerEntity, engine::Transform{ .position = Vector3(startPos - offset * playerShip.first, 150), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			engine::ecs::AddComponent(playerEntity, engine::Rigidbody{ .drag = 1.5 });
 			vector<Vector2> colliderVerts{ Vector2(3, 1), Vector2(3, -1), Vector2(-3, -1), Vector2(-3, 1) };
-			engine::ecs::AddComponent(playerEntity, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .trigger = true, .layer = 1, .visualise = true });
+			engine::ecs::AddComponent(playerEntity, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .trigger = false, .layer = 1, .visualise = true });
 
 			//Create the player's name tag
 			engine::ecs::AddComponent(playerNameText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .color = Vector3(0.5, 0.8, 0.2) });

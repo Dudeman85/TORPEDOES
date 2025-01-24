@@ -51,7 +51,7 @@ namespace resources
 		niagaraFont = new Font("Niagara Solid.ttf", 0, 0, 48);
 
 		level1Map = new Tilemap(cam);
-		level1Map->loadMap("/levels/level1.tmx");
+		level1Map->loadMap("/levels/level5.tmx");
 		level2Map = new Tilemap(cam);
 		level2Map->loadMap("/levels/level2.tmx");
 		level3Map = new Tilemap(cam);
