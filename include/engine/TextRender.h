@@ -61,7 +61,6 @@ namespace engine
 				false);
 		}
 
-		int times = 0;
 		///Call this every frame
 		void Update(Camera* cam)
 		{
@@ -141,17 +140,7 @@ namespace engine
 					glBindBuffer(GL_ARRAY_BUFFER, 0);
 					glDrawArrays(GL_TRIANGLES, 0, 6);
 					x += (ch.Advance >> 6) * textRenderer.scale.x;
-
-					/*
-					for (int num = 0; num < sizeof(vertices) / sizeof(vertices[0]); num++)
-					{
-						if (num == sizeof(vertices) / sizeof(vertices[0]))
-						{
-							printf("\n");
-						}
-						printf("Rendering -> %c", *c);
-					}
-					*/
+					
 				}
 				
 

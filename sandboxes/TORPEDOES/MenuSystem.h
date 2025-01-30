@@ -35,6 +35,10 @@ class LevelSelectionSystem : public engine::ecs::System
 	engine::ecs::Entity arrowsPivot;
 	engine::ecs::Entity mapName;
 	engine::ecs::Entity mapSelectText;
+	/*
+	// Testi teksti
+	engine::ecs::Entity Teksti;
+	*/
 
 	int mapLevelIndex = 0;
 
@@ -76,13 +80,20 @@ public:
 		arrowLeft = ecs::NewEntity();
 		mapName = ecs::NewEntity();
 		mapSelectText = ecs::NewEntity();
-
+		/*
+		// Testi teksti
+		Teksti = ecs::NewEntity();
+		*/
 		mapImages.clear();
 		mapImages.push_back(resources::menuTextures["level1.png"]);
 		mapImages.push_back(resources::menuTextures["level2.png"]);
 		mapImages.push_back(resources::menuTextures["level3.png"]);
 		mapImages.push_back(resources::menuTextures["level4.png"]);
 
+		/*
+		// Testi teksti
+		engine::ecs::AddComponent(Teksti, engine::TextRenderer{ .font = resources::niagaraFont, .text = "TEST!!!", .offset = Vector3(0.9f * 0.003f, 0.005f, 0.0f), .scale = Vector3(0.003f), .color = Vector3(120.0f, 6.0f, 6.0f), .uiElement = true });
+		*/
 		// Level select Teksti
 		printf("Level Select Text rendering:");
 		engine::ecs::AddComponent(arrowsPivot, engine::Transform{ .position = Vector3(0, arrowPosHight, 0), .scale = Vector3(1) });
