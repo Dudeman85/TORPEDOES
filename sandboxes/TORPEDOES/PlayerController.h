@@ -1090,7 +1090,6 @@ public:
 			
 				else if (accelerationInput < 0.0f)
 				{
-					rotateInput = forwardImpulse.Length() < minRotateImpulse.Length()   ;
 					/*forwardImpulse = minRotateImpulse *= accelerationInput;*/
 				}
 			}
