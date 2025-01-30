@@ -862,6 +862,14 @@ int main()
 			playerSelectionSystem->Update();
 			break;
 		case gamePlayState:
+			//DEBUG Toggle pause menu
+			if (glfwGetKey(window, GLFW_KEY_P))
+			{
+				pauseSystem->Init(window);
+				pauseSystem->ToggleShowUIMenu();
+				gameState = inGameOptionsState;
+			}
+
 			UpdateCam(cam, collisionSystem->tilemap, currentLevel == 4);
 			//Camera position must be divided by 2 because of a known camera bug
 			soundSystem->SetListeningPosition(Vector3(cam->position.x * 2, cam->position.y * 2, 30));
