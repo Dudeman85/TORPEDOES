@@ -1088,10 +1088,11 @@ public:
 					forwardImpulse = minRotateImpulse;
 				}
 			
-				/*else if (accelerationInput < 0.0f)
+				else if (accelerationInput < 0.0f)
 				{
-					minRotateImpulse * (- 1) + player.forwardDirection;
-				}*/
+					rotateInput = forwardImpulse.Length() < minRotateImpulse.Length()   ;
+					/*forwardImpulse = minRotateImpulse *= accelerationInput;*/
+				}
 			}
 
 			//Set the collider's rotation
@@ -1135,7 +1136,7 @@ public:
 
 			bool reachedMaxAmmoThisFrame = false;
 			bool shotThisFrame = false;
-
+			
 			// If not max ammo
 			if (player.ammo < player.maxAmmo)
 			{
