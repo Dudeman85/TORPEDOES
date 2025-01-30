@@ -39,7 +39,7 @@ struct Player
 	float reverseSpeed = 233;
 
 	float rotationSpeed = 120;
-	float minSpeedWhileTurning = 60;
+	float minSpeedWhileTurning = 1;
 
 	float offtrackSpeedScale = 0.6;
 	Vector2 forwardDirection;
@@ -1081,16 +1081,17 @@ public:
 
 				// Set min speed while turning
 
-				Vector2 minRotateImpulse = player.forwardDirection  * std::abs(trueRotateInput) * player.minSpeedWhileTurning * engine::deltaTime;
+				Vector2 minRotateImpulse = player.forwardDirection  * std::abs(trueRotateInput) * player.minSpeedWhileTurning;
 
 				if (minRotateImpulse.Length() > forwardImpulse.Length())
 				{
 					forwardImpulse = minRotateImpulse;
 				}
-				else if (accelerationInput < 0.0f)
+			
+				/*else if (accelerationInput < 0.0f)
 				{
-					minRotateImpulse.Length() * -1 ;
-				}
+					minRotateImpulse * (- 1) + player.forwardDirection;
+				}*/
 			}
 
 			//Set the collider's rotation
