@@ -36,7 +36,7 @@ namespace resources
 	void LoadResources(Camera* cam)
 	{
 		uiTextures = engine::PreloadTextures("GUI");
-		menuTextures = engine::PreloadTextures("menuUI", true, GL_LINEAR_MIPMAP_NEAREST);
+		menuTextures = engine::PreloadTextures("menuUI", true, GL_LINEAR);
 
 		//Set the player textures
 		playerIdToTexture = {
