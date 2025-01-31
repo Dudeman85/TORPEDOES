@@ -67,13 +67,19 @@ static void PlayCountdown(Vector3 pos)
 	engine::AnimationSystem::AddAnimation(countdown, resources::countdownAnim, "CountDown");
 	engine::AnimationSystem::PlayAnimation(countdown, "CountDown", false);
 	engine::ecs::GetSystem<PlayerController>()->countdownTimer = 3;
+	Audio* CountdownSound = engine::AddAudio("Gameplay", "audio/CountdownSound.wav", false, 0.2f, DistanceModel::LINEAR, 5000.0f, 1.0f, 0.0f);
+	engine::ecs::AddComponent(countdown, engine::SoundComponent{ .Sounds =
+	{
+		{"Countdown", CountdownSound}
+	} , .maxDistance = 2000, .referenceDistance = 1, .rolloffFactor = 0 });
+	CountdownSound->play();
 }
 
 std::vector<Vector3> cheeringSoundPos;
 
 void OnSoundComponentDestroyed(ecs::Entity e, engine::SoundComponent c)
 {
-	for (auto sound : c.Sounds) 
+	for (auto sound : c.Sounds)
 	{
 		sound.second->stop();
 	}
@@ -83,7 +89,7 @@ void SetupCheeringSounds(const std::vector<Vector3>& positions)
 {
 	for (const auto& pos : positions) {
 
-		engine::ecs::Entity cheerEntity = engine::ecs::NewEntity(); 
+		engine::ecs::Entity cheerEntity = engine::ecs::NewEntity();
 		engine::ecs::AddComponent(cheerEntity, engine::Transform{ .position = pos });
 
 		Audio* cheerSound = engine::AddAudio("Gameplay", "audio/cheering.wav", true, 0.1f, DistanceModel::LINEAR);
@@ -216,7 +222,7 @@ static void LoadLevel2(engine::Camera* cam)
 
 	//second loop, between stones
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2950.000000, -1585.000000, 0.300000));
-	
+
 	//topright hairpin
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3355.000000, -440.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3355.000000, -400.000000, 0.300000));
@@ -299,7 +305,7 @@ static void LoadLevel3(engine::Camera* cam)
 	//first hairpin
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2860.000000, -425.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2810.000000, -425.000000, 0.300000));
-	
+
 
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1825.000000, -895.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1880.000000, -825.000000, 0.300000));
@@ -357,18 +363,18 @@ static void LoadLevel3(engine::Camera* cam)
 	// ********************
 	// Dock audience
 	CreateCrowd({ 500.000000, -810.000000, 166 }, resources::crowdAnims1);			// 1. crowd from top.
-	CreateCrowd({ 480.000000, -825.000000, 167}, resources::crowdAnims1);			// 2. crowd
+	CreateCrowd({ 480.000000, -825.000000, 167 }, resources::crowdAnims1);			// 2. crowd
 	CreateSmallCrowd({ 445.000000, -910.000000, 166 }, resources::crowdAnims2);		// 3. crowd
 	CreateSmallCrowd({ 445.000000, -935.000000, 167 }, resources::crowdAnims2);		// 4. crowd
 	CreateSmallCrowd({ 445.000000, -1000.000000, 166 }, resources::crowdAnims2);	// 5. crowd
 	CreateSmallCrowd({ 445.000000, -1070.000000, 166 }, resources::crowdAnims2);	// 6. crowd
 	CreateSmallCrowd({ 445.000000, -1100.000000, 167 }, resources::crowdAnims2);	// 7. crowd
 	CreateSmallCrowd({ 445.000000, -1130.000000, 168 }, resources::crowdAnims2);	// 8. crowd
-	CreateCrowd({ 890.000000, -1220.000000, 166}, resources::crowdAnims1);			// 9. crowd
+	CreateCrowd({ 890.000000, -1220.000000, 166 }, resources::crowdAnims1);			// 9. crowd
 	CreateCrowd({ 870.5, -1235.000000, 167 }, resources::crowdAnims1);				// 10. crowd
 	CreateCrowd({ 840, -1245.000000, 168 }, resources::crowdAnims1);				// 11. crowd
 	CreateCrowd({ 890, -1265.000000, 169 }, resources::crowdAnims1);				// 12. crowd
-	CreateCrowd({ 610.000000, -1220.000000, 166}, resources::crowdAnims1);
+	CreateCrowd({ 610.000000, -1220.000000, 166 }, resources::crowdAnims1);
 	CreateCrowd({ 560.5, -1235.000000, 167 }, resources::crowdAnims1);
 	CreateCrowd({ 650, -1245.000000, 168 }, resources::crowdAnims1);
 	CreateCrowd({ 600, -1265.000000, 169 }, resources::crowdAnims1);
@@ -625,21 +631,14 @@ static void LoadLevel5(engine::Camera* cam)
 //Bind all input events here
 static void SetupInput()
 {
-	input::ConstructDigitalEvent("Pause");
-	input::ConstructDigitalEvent("Menu");
-	input::bindDigitalInput(GLFW_KEY_U, { "Menu" });
-	input::ConstructDigitalEvent("StartGame");
-	input::bindDigitalInput(GLFW_KEY_G, { "StartGame" });
-
-	input::bindDigitalInput(GLFW_GAMEPAD_BUTTON_DPAD_LEFT, { "Turn" });
-
-	// TODO: add controller pause key
-
 	float AnalogPositiveMinDeadZone = 0;
 	float AnalogPositiveMaxDeadZone = 0.2;
 
 	float AnalogNegativeMinDeadZone = -0.2;
 	float AnalogNegativeMaxDeadZone = 0;
+
+	input::ConstructDigitalEvent("Pause");
+	input::ConstructAnalogEvent("MenuVertical");
 
 	for (size_t i = 0; i < 4; i++)
 	{
@@ -662,6 +661,11 @@ static void SetupInput()
 			},
 			{ "Throttle" + std::to_string(i) });
 
+		input::bindAnalogControllerInput(i,
+			{
+				{ { input::controllerMixedInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_Y }
+			},
+			{ "MenuVertical" });
 
 		input::bindAnalogControllerInput(i,
 			{
@@ -679,7 +683,10 @@ static void SetupInput()
 	input::bindAnalogInput(GLFW_KEY_Z, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
 	input::bindAnalogInput(GLFW_KEY_UP, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
 	input::bindAnalogInput(GLFW_KEY_DOWN, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
-	
+
+	input::bindAnalogInput(GLFW_KEY_UP, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "MenuVertical" });
+	input::bindAnalogInput(GLFW_KEY_DOWN, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "MenuVertical" });
+
 	input::bindDigitalInput(GLFW_KEY_N, { "Shoot" + std::to_string(KeyboardPlayer) });
 	input::bindDigitalInput(GLFW_KEY_B, { "Boost" + std::to_string(KeyboardPlayer) });
 
@@ -690,12 +697,14 @@ static void SetupInput()
 	input::bindAnalogInput(GLFW_KEY_W, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer2) });
 	input::bindAnalogInput(GLFW_KEY_S, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer2) });
 
+	input::bindAnalogInput(GLFW_KEY_W, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "MenuVertical" });
+	input::bindAnalogInput(GLFW_KEY_S, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "MenuVertical" });
+
 	input::bindDigitalInput(GLFW_KEY_H, { "Shoot" + std::to_string(KeyboardPlayer2) });
 	input::bindDigitalInput(GLFW_KEY_J, { "Boost" + std::to_string(KeyboardPlayer2) });
 
-	input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
-	input::bindDigitalInput(GLFW_KEY_G, { "StartGame" });
-} 
+	input::bindDigitalInput(GLFW_KEY_G, { "Pause" });
+}
 
 static void PlayersMenu(std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem)
 {
@@ -795,13 +804,13 @@ int main()
 	//Bind all input actions
 	SetupInput();
 
-	
+
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 166), .scale = 20 });
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
 	ecs::AddTag(placementEditor, "persistent");
-	
+
 
 	//Collision layer matrix setup
 	//Currently 0 = default, 1 = surface players, 2 = underwater, 3 = bridges, 4 = projectiles
@@ -823,7 +832,7 @@ int main()
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
-		
+
 		//Object editor
 		{
 			const float editorSpeed = 0.5;
@@ -874,7 +883,6 @@ int main()
 				TransformSystem::SetScale(placementEditor, 20);
 			}
 		}
-		
 
 		if (glfwGetKey(window, GLFW_KEY_0))
 		{
@@ -892,7 +900,7 @@ int main()
 		case mapSelection:
 			levelSelectionSystem->Update();
 			break;
-		case inGameOptionsState:
+		case pauseMenuState:
 			pauseSystem->Update();
 			break;
 		case selectPlayersState:
@@ -900,12 +908,12 @@ int main()
 			playerSelectionSystem->Update();
 			break;
 		case gamePlayState:
-			//DEBUG Toggle pause menu
-			if (glfwGetKey(window, GLFW_KEY_P))
+			//Check for pause has to be done here unfortunately
+			if (input::GetPressed("Pause") && playerController->countdownTimer <= 0)
 			{
 				pauseSystem->Init(window);
 				pauseSystem->ToggleShowUIMenu();
-				gameState = inGameOptionsState;
+				gameState = pauseMenuState;
 			}
 
 			UpdateCam(cam, collisionSystem->tilemap, currentLevel == 4);
