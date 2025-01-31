@@ -1264,7 +1264,7 @@ public:
 		engine::ecs::Entity shootIndicator = engine::ecs::NewEntity();
 
 		engine::ecs::AddComponent(shootIndicator, engine::SpriteRenderer{ .texture = resources::uiTextures[textureNames[1]] });
-		engine::ecs::AddComponent(shootIndicator, engine::Transform{ .position = pos + Vector3(0, 0, 50), .scale = scale });
+		engine::ecs::AddComponent(shootIndicator, engine::Transform{ .position = pos + Vector3(0, 0, 50 + ((double)rand() / RAND_MAX)), .scale = scale });
 		engine::TransformSystem::AddParent(shootIndicator, entity);
 
 		std::vector<engine::Texture*> textures;
@@ -1312,11 +1312,6 @@ public:
 			vector<Vector2> colliderVerts{ Vector2(3, 1), Vector2(3, -1), Vector2(-3, -1), Vector2(-3, 1) };
 			engine::ecs::AddComponent(playerEntity, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .trigger = false, .layer = 1, .visualise = true });
 
-			//Create the player's name tag
-			engine::ecs::AddComponent(playerNameText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .color = Vector3(0.5, 0.8, 0.2) });
-			engine::ecs::AddComponent(playerNameText, engine::Transform{ .position = Vector3(-2, 2, 20), .scale = Vector3(0.1) });
-			engine::TransformSystem::AddParent(playerNameText, playerEntity);
-
 			//Create the player's rendered entity
 			engine::ecs::AddComponent(playerRender, engine::Transform{ .rotation = Vector3(45, 0, 0), .scale = Vector3(1.5) });
 			engine::ecs::AddComponent(playerRender, engine::ModelRenderer{ .model = shipModels[playerShip.second], .textures = {resources::playerIdToTexture[playerShip.first]} });
@@ -1329,7 +1324,7 @@ public:
 			AnimationSystem::AddAnimations(wakeAnimation, resources::wakeAnims, { "boost", "normal" });
 			AnimationSystem::PlayAnimation(wakeAnimation, "normal", true);
 
-			engine::ecs::AddComponent(checkpointIndicator, engine::Transform{ .position = Vector3(0, 0, 11), .rotation = Vector3(0), .scale = Vector3(1.2, 7, 0) });
+			engine::ecs::AddComponent(checkpointIndicator, engine::Transform{ .position = Vector3(0, 0, 70.f + ((double)rand() / RAND_MAX)), .rotation = Vector3(0), .scale = Vector3(1.2, 7, 0) });
 			engine::ecs::AddComponent(checkpointIndicator, engine::SpriteRenderer{ .texture = resources::uiTextures["Checkpoint_Arrow.png"], .enabled = true });
 			engine::TransformSystem::AddParent(checkpointIndicator, playerEntity);
 			playerComponent.nextCheckpoint = checkpointEntities[0];

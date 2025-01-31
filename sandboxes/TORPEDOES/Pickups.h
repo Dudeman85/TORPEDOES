@@ -9,8 +9,10 @@
 ECS_REGISTER_COMPONENT(PickupComponent)
 struct PickupComponent
 {
+	Vector3 basePosition;
 	bool respawn = true;
 	bool active = true;
+	float randomOffset;
 };
 
 ECS_REGISTER_SYSTEM(PickupSystem, PickupComponent, Transform, PolygonCollider)
@@ -25,8 +27,10 @@ public:
 		//For each entity
 		for (ecs::Entity entity : entities)
 		{
-			TransformSystem::Translate(entity, { 0, (float)sin(programTime * 2) * 0.07f, (float)sin(programTime * 2) * 0.05f });;
-			TransformSystem::Rotate(entity, { 0, (float)sin(programTime * 2) * 0.2f, 0 });
+			PickupComponent& pc = ecs::GetComponent<PickupComponent>(entity);
+			TransformSystem::SetPosition(entity, pc.basePosition);
+			TransformSystem::Translate(entity, { 0, (float)sin(programTime * 2 + pc.randomOffset) * 2.0f, (float)sin(programTime * 2 + pc.randomOffset) * 1.5f });;
+			TransformSystem::Rotate(entity, { 0, (float)sin(programTime * 2 + pc.randomOffset) * 0.2f, 0 });
 		}
 	}
 
@@ -36,7 +40,7 @@ public:
 		ecs::Entity pickup = ecs::NewEntity();
 		ecs::AddComponent(pickup, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
 		ecs::AddComponent(pickup, Transform{ .position = position, .rotation = {60, 35, 0}, .scale = 25 });
-		ecs::AddComponent(pickup, PickupComponent{ .respawn = respawn });
+		ecs::AddComponent(pickup, PickupComponent{ .basePosition = position, .respawn = respawn, .randomOffset = (float)rand() / RAND_MAX * 3 });
 		vector<Vector2> colliderVerts{ Vector2(.5, .5), Vector2(.5, -.5), Vector2(-.5, -.5), Vector2(-.5, .5) };
 		ecs::AddComponent(pickup, PolygonCollider{ .vertices = colliderVerts, .callback = OnCollision, .trigger = true, .visualise = false });
 	}

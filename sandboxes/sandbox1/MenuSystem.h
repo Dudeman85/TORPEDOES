@@ -664,7 +664,7 @@ class PauseSystem : public engine::ecs::System
 	//std::map<std::string, ecs::Entity> optionsButtons{ {"return", optionsResumeButton}, {"music", musicSliderEntity}, {"fullscreen", fullscreenEntity} };
 
 	static GLFWwindow* window;
-	float moveWaitedTimerUP;
+	float repeatInputDelay;
 	float moveWaitedTimerDown;
 	const  float  delay = 0.8f;
 
@@ -796,27 +796,27 @@ public:
 
 					if (accelerationInput >= 0.5f)
 					{
-						std::cout << "upTimer" << moveWaitedTimerUP << "\n";
-						moveWaitedTimerUP += engine::deltaTime;
+						std::cout << "upTimer" << repeatInputDelay << "\n";
+						repeatInputDelay += engine::deltaTime;
 
-						if (moveWaitedTimerUP >= delay)
+						if (repeatInputDelay >= delay)
 						{
 							printf("\n\n move up input\n\n");
 							MoveUpper();
-							moveWaitedTimerUP = 0;
+							repeatInputDelay = 0;
 						}
 
 					}
 					else
 					{
-						moveWaitedTimerUP = 0;
+						repeatInputDelay = 0;
 					}
 					if (accelerationInput <= -0.5f)
 					{
-						std::cout << "downTimer" << moveWaitedTimerUP << "\n";
-						moveWaitedTimerUP += engine::deltaTime;
+						std::cout << "downTimer" << repeatInputDelay << "\n";
+						repeatInputDelay += engine::deltaTime;
 
-						if (moveWaitedTimerUP >= delay)
+						if (repeatInputDelay >= delay)
 						{
 							printf("\n\n move down input\n\n");
 							MoveLower();
