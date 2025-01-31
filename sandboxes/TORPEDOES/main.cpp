@@ -620,12 +620,12 @@ static void LoadLevel5(engine::Camera* cam)
 
 	////Make all the checkpoints manually
 	checkPointNumber = 0;
-	CreateCheckpoint(Vector3(1475.000000, -460.000000, 70.000000), Vector3(-25.000000, -90.000000, -90.000000), Vector3(24.f), resources::models["Prop_Goal.obj"], 360.f, true);
+	CreateCheckpoint(Vector3(1475.000000, -660.000000, 70.000000), Vector3(-25.000000, -90.000000, -90.000000), Vector3(24.f), resources::models["Prop_Goal.obj"], 360.f, true);
 
-	PlayCountdown(Vector3(1235.0f, -310.0f, 200.0f));
+	PlayCountdown(Vector3(3300.0f, -4000.0f, 200.0f));
 	PlayerController::lapCount = 3;
 	//Create the players
-	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1225.0f, -700.0f));
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(3390.0f, -4055.0f));
 }
 
 //Bind all input events here
