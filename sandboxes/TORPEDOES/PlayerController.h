@@ -1082,16 +1082,18 @@ public:
 				// Set min speed while turning
 
 				Vector2 minRotateImpulse = player.forwardDirection  * std::abs(trueRotateInput) * player.minSpeedWhileTurning;
+				 if (accelerationInput < 0.0f)
+				 {
+					minRotateImpulse *= -1;
+					
+				 }
 
 				if (minRotateImpulse.Length() > forwardImpulse.Length())
 				{
 					forwardImpulse = minRotateImpulse;
 				}
 			
-				else if (accelerationInput < 0.0f)
-				{
-					/*forwardImpulse = minRotateImpulse *= accelerationInput;*/
-				}
+				
 			}
 
 			//Set the collider's rotation
@@ -1335,9 +1337,9 @@ public:
 
 
 			// Create shoot indicators
-			float rangeEnd = 2;
-			float rangeStart = -2;
-			Vector3 offset = Vector3(-2, -2, 10);
+			float rangeEnd = -3;
+			float rangeStart = -4.5;
+			Vector3 offset = Vector3(1, -3, 10);
 			Vector3 scale = Vector3(2, 2, 1);
 			auto func = *playerComponent.shootAction.target<void(*)(engine::ecs::Entity)>();
 
@@ -1349,8 +1351,8 @@ public:
 				for (int i = 0; i < playerComponent.maxAmmo; i++)
 				{
 					// Place indicators equidistant along the range
-					offset.x = generateEquidistantPoint(rangeStart, rangeEnd, playerComponent.maxAmmo, i);
-
+					offset.y = generateEquidistantPoint(rangeStart, rangeEnd, playerComponent.maxAmmo, i);
+					
 					playerComponent.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Torpedo_Icon.png", "UI_Red_Torpedo_Icon.png" }));
 				}
 			}
