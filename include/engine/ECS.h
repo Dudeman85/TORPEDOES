@@ -98,6 +98,8 @@ namespace engine::ecs
 				currentPtr = current;
 				parentList = list;
 			}
+
+			//Iterator constructors
 			static Iterator Begin(EntityList* list)
 			{
 				Entity* current = &list->entities[0];
@@ -177,6 +179,12 @@ namespace engine::ecs
 		~EntityList()
 		{
 			delete[] entities;
+		}
+
+		//Getters
+		int Size()
+		{
+			return size;
 		}
 
 		//Debug function, will print all entities

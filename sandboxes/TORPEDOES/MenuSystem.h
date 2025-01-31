@@ -7,7 +7,7 @@
 #include <functional>
 #include "engine/SoundComponent.h"
 
-enum GameState { menuMainState, selectPlayersState, mapSelection, gamePlayState, inGameOptionsState };
+enum GameState { menuMainState, selectPlayersState, mapSelection, gamePlayState, pauseMenuState };
 static GameState gameState = menuMainState;
 static bool canStartLoadingMap;
 static bool isSceneloaded;
@@ -37,10 +37,9 @@ class LevelSelectionSystem : public engine::ecs::System
 	engine::ecs::Entity arrowsPivot;
 	engine::ecs::Entity mapName;
 	engine::ecs::Entity mapSelectText;
-	/*
+
 	// Testi teksti
 	engine::ecs::Entity Teksti;
-	*/
 
 	int mapLevelIndex = 0;
 
@@ -62,7 +61,7 @@ class LevelSelectionSystem : public engine::ecs::System
 	float arrowPosHight = 0.88f;
 	float arrowsOffsetX = 0.6f;
 
-	std::vector<std::string> mapNames = { "Lake", "Caves", "Beach", "River", "Ocean"};
+	std::vector<std::string> mapNames = { "Lake", "Caves", "Beach", "River", "Ocean" };
 
 public:
 	engine::ecs::Entity arrowLeft;
@@ -82,10 +81,10 @@ public:
 		arrowLeft = ecs::NewEntity();
 		mapName = ecs::NewEntity();
 		mapSelectText = ecs::NewEntity();
-		/*
+		
 		// Testi teksti
 		Teksti = ecs::NewEntity();
-		*/
+		
 		mapImages.clear();
 		mapImages.push_back(resources::menuTextures["level1.png"]);
 		mapImages.push_back(resources::menuTextures["level2.png"]);
@@ -93,10 +92,11 @@ public:
 		mapImages.push_back(resources::menuTextures["level4.png"]);
 		mapImages.push_back(resources::menuTextures["level5.png"]);
 
-		/*
+		
 		// Testi teksti
+		engine::ecs::AddComponent(Teksti, engine::Transform{ .position = Vector3(0.0f), .scale = Vector3(1.0f)});
 		engine::ecs::AddComponent(Teksti, engine::TextRenderer{ .font = resources::niagaraFont, .text = "TEST!!!", .offset = Vector3(0.9f * 0.003f, 0.005f, 0.0f), .scale = Vector3(0.003f), .color = Vector3(120.0f, 6.0f, 6.0f), .uiElement = true });
-		*/
+		
 		// Level select Teksti
 		printf("Level Select Text rendering:");
 		engine::ecs::AddComponent(arrowsPivot, engine::Transform{ .position = Vector3(0, arrowPosHight, 0), .scale = Vector3(1) });
@@ -194,7 +194,7 @@ public:
 			ecs::GetComponent<SpriteRenderer>(currentSelectedLevel).texture = mapImages[mapLevelIndex];
 		}
 
-		if (input::GetNewPress("Shoot" + std::to_string(firstPlayer)) || input::GetNewPress("Pause") || input::GetNewPress("StartGame"))
+		if (input::GetNewPress("Shoot" + std::to_string(firstPlayer)) || input::GetNewPress("Pause"))
 		{
 			LoadThisLevel(mapLevelIndex);
 		}
@@ -592,7 +592,7 @@ public:
 			return;
 		}
 
-		if (startLevelTimer >= (startLevelTime + startLevelLoadingTime) || input::GetNewPress("StartGame"))
+		if (startLevelTimer >= (startLevelTime + startLevelLoadingTime) || input::GetNewPress("Pause"))
 		{
 			auto& firstPlayer = ecs::GetSystem<LevelSelectionSystem>()->firstPlayer;
 			firstPlayer = 5;
@@ -925,7 +925,7 @@ namespace MainMenuSystem
 		TransformSystem::SetScale(startText, Vector3(.45, .1, 0) + Vector3((std::sin(programTime * 4) / 700), (std::sin(programTime * 4) / 3150), 0) * 35);
 
 		bool goPlayerSelect = false;
-		if (input::GetNewPress("Pause") || input::GetNewPress("StartGame"))
+		if (input::GetNewPress("Pause"))
 		{
 			goPlayerSelect = true;
 		}
@@ -1015,9 +1015,9 @@ class PauseSystem : public engine::ecs::System
 	//std::map<std::string, ecs::Entity> optionsButtons{ {"return", optionsResumeButton}, {"music", musicSliderEntity}, {"fullscreen", fullscreenEntity} };
 
 	static GLFWwindow* window;
-	float moveWaitedTimerUP;
+	float repeatInputDelay;
 	float moveWaitedTimerDown;
-	const  float  delay = 0.8f;
+	const float delay = 0.8f;
 
 public:
 	int playerWhichPaused = 0;
@@ -1027,23 +1027,6 @@ public:
 	void Init(GLFWwindow* mainWindow)
 	{
 		PauseSystem::window = mainWindow;
-		input::initialize(window);
-
-		//INPUTS  START	
-		input::ConstructDigitalEvent("MoveUp");
-		input::ConstructDigitalEvent("MoveDown");
-		input::ConstructDigitalEvent("Select");
-		input::ConstructDigitalEvent("Pause");
-		input::ConstructDigitalEvent("MoveRight");
-		input::ConstructDigitalEvent("MoveLeft");
-
-		//TODO: add controller input
-		input::bindDigitalInput(GLFW_KEY_LEFT, { "MoveLeft" });
-		input::bindDigitalInput(GLFW_KEY_RIGHT, { "MoveRight" });
-		input::bindDigitalInput(GLFW_KEY_UP, { "MoveUp" });
-		input::bindDigitalInput(GLFW_KEY_DOWN, { "MoveDown" });
-		input::bindDigitalInput(GLFW_KEY_ENTER, { "Select" });
-		input::bindDigitalInput(GLFW_KEY_P, { "Pause" });
 
 		resumeButton = engine::ecs::NewEntity();
 		optionsButton = engine::ecs::NewEntity();
@@ -1101,60 +1084,31 @@ public:
 
 	void Update()
 	{
-		float verticalInput = input::GetTotalInputValue("Throttle" + playerWhichPaused);
+		float verticalInput = input::GetTotalInputValue("MenuVertical");
+
+		repeatInputDelay -= engine::deltaTime;
 
 		if (verticalInput >= 0.5f)
 		{
-			std::cout << "upTimer" << moveWaitedTimerUP << "\n";
-			moveWaitedTimerUP += engine::deltaTime;
-
-			if (moveWaitedTimerUP >= delay)
+			if (repeatInputDelay <= 0)
 			{
 				printf("\n\n move up input\n\n");
 				MoveUpper();
-				moveWaitedTimerUP = 0;
+				repeatInputDelay = delay;
 			}
 		}
-		else
+		else if (verticalInput <= -0.5f)
 		{
-			moveWaitedTimerUP = 0;
-		}
-		if (verticalInput <= -0.5f)
-		{
-			std::cout << "downTimer" << moveWaitedTimerUP << "\n";
-			moveWaitedTimerUP += engine::deltaTime;
-
-			if (moveWaitedTimerUP >= delay)
+			if (repeatInputDelay <= 0)
 			{
 				printf("\n\n move down input\n\n");
 				MoveLower();
-				moveWaitedTimerDown = 0;
+				repeatInputDelay = delay;
 			}
 		}
 		else
 		{
-			moveWaitedTimerDown = 0;
-		}
-
-		if (IsCurrentPauseComponentSlider())
-		{
-
-			if (input::GetNewPress("MoveLeft"))
-			{
-				/*this dosent works*///UpdateSlider();
-
-				MoveSliderLeft();
-			}
-			if (input::GetNewPress("MoveRight"))
-			{
-				MoveSliderRight();
-				//selectedPauseComponent.sliderValue += -0.01;
-				/*this dosent works*///UpdateSlider();
-			}
-		}
-		if (input::GetNewPress("Select"))
-		{
-			Selected();
+			repeatInputDelay = 0;
 		}
 	}
 
