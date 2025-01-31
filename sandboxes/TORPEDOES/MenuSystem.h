@@ -1084,7 +1084,7 @@ public:
 
 	void Update()
 	{
-		float verticalInput = input::GetTotalInputValue("MoveVertical");
+		float verticalInput = input::GetTotalInputValue("MenuVertical");
 
 		repeatInputDelay -= engine::deltaTime;
 

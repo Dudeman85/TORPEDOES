@@ -638,9 +638,7 @@ static void SetupInput()
 	float AnalogNegativeMaxDeadZone = 0;
 
 	input::ConstructDigitalEvent("Pause");
-	input::ConstructDigitalEvent("Up");
-	input::ConstructDigitalEvent("Down");
-	input::ConstructAnalogEvent("MoveVertical");
+	input::ConstructAnalogEvent("MenuVertical");
 
 	for (size_t i = 0; i < 4; i++)
 	{
@@ -662,12 +660,12 @@ static void SetupInput()
 				{ { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_TRIGGER }
 			},
 			{ "Throttle" + std::to_string(i) });
+
 		input::bindAnalogControllerInput(i,
 			{
-				{ { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_Y ,  },
-				{ { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_Y }
+				{ { input::controllerMixedInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_Y }
 			},
-			{ "MoveVertical" });
+			{ "MenuVertical" });
 
 		input::bindAnalogControllerInput(i,
 			{
@@ -686,6 +684,9 @@ static void SetupInput()
 	input::bindAnalogInput(GLFW_KEY_UP, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
 	input::bindAnalogInput(GLFW_KEY_DOWN, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
 
+	input::bindAnalogInput(GLFW_KEY_UP, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "MenuVertical" });
+	input::bindAnalogInput(GLFW_KEY_DOWN, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "MenuVertical" });
+
 	input::bindDigitalInput(GLFW_KEY_N, { "Shoot" + std::to_string(KeyboardPlayer) });
 	input::bindDigitalInput(GLFW_KEY_B, { "Boost" + std::to_string(KeyboardPlayer) });
 
@@ -695,6 +696,9 @@ static void SetupInput()
 
 	input::bindAnalogInput(GLFW_KEY_W, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer2) });
 	input::bindAnalogInput(GLFW_KEY_S, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer2) });
+
+	input::bindAnalogInput(GLFW_KEY_W, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "MenuVertical" });
+	input::bindAnalogInput(GLFW_KEY_S, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "MenuVertical" });
 
 	input::bindDigitalInput(GLFW_KEY_H, { "Shoot" + std::to_string(KeyboardPlayer2) });
 	input::bindDigitalInput(GLFW_KEY_J, { "Boost" + std::to_string(KeyboardPlayer2) });
