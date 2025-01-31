@@ -1338,9 +1338,9 @@ public:
 
 			// Create shoot indicators
 			float rangeEnd = -3;
-			float rangeStart = -4.5;
-			Vector3 offset = Vector3(1, -3, 10);
-			Vector3 scale = Vector3(2, 2, 1);
+			float rangeStart = -5.0;
+			Vector3 offset = Vector3(1, -1, 10);
+			Vector3 scale = Vector3(1.5, 1.5, 1);
 			auto func = *playerComponent.shootAction.target<void(*)(engine::ecs::Entity)>();
 
 			if (*func == CreateTorpedo)
@@ -1371,7 +1371,7 @@ public:
 
 			// Create special indicators
 			rangeEnd = 2;
-			rangeStart = -2;
+			rangeStart = -5;
 			offset = Vector3(-2, -4, 10);
 			scale = Vector3(1.25, 1.25, 1);
 			func = *playerComponent.specialAction.target<void(*)(engine::ecs::Entity)>();
