@@ -67,6 +67,12 @@ static void PlayCountdown(Vector3 pos)
 	engine::AnimationSystem::AddAnimation(countdown, resources::countdownAnim, "CountDown");
 	engine::AnimationSystem::PlayAnimation(countdown, "CountDown", false);
 	engine::ecs::GetSystem<PlayerController>()->countdownTimer = 3;
+	Audio* CountdownSound = engine::AddAudio("Gameplay", "audio/CountdownSound.wav", false, 0.2f, DistanceModel::LINEAR, 5000.0f, 1.0f, 0.0f);
+	engine::ecs::AddComponent(countdown, engine::SoundComponent{ .Sounds =
+	{
+		{"Countdown", CountdownSound}
+	} , .maxDistance = 2000, .referenceDistance = 1, .rolloffFactor = 0 });
+	CountdownSound->play();
 }
 
 std::vector<Vector3> cheeringSoundPos;
