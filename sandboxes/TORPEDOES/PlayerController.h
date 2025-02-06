@@ -459,6 +459,8 @@ void ShootHedgehog(engine::ecs::Entity entity)
 
 static void BoostEnd(engine::ecs::Entity entity, float boostStrenght)
 {
+	engine::SoundComponent& sound = ecs::GetComponent<engine::SoundComponent>(entity);
+	sound.Sounds["boostAudio"]->pause();
 	Player& player = engine::ecs::GetComponent<Player>(entity);
 	player._boostScale -= boostStrenght;
 
@@ -471,6 +473,8 @@ static void BoostEnd(engine::ecs::Entity entity, float boostStrenght)
 // Increases player speed for a short while
 void Boost(engine::ecs::Entity entity)
 {
+	engine::SoundComponent& sound = ecs::GetComponent<engine::SoundComponent>(entity);
+	sound.Sounds["boostAudio"]->play();
 	double boostTime = 1.5f;
 	float boostStrenght = 0.4f;
 
@@ -489,7 +493,8 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 	Player& playerComponent = ecs::GetComponent<Player>(playerEntity);
 	Transform& transformComponent = ecs::GetComponent<Transform>(playerEntity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(playerComponent.renderedEntity);
-
+	engine::SoundComponent& sound = ecs::GetComponent<engine::SoundComponent>(playerEntity);
+	
 	//Submerge if surfaced
 	if (!playerComponent.submerged)
 	{
@@ -502,7 +507,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 		AnimationSystem::AddAnimation(playerComponent.animationEntity, resources::continuousDivingAnim, "diving");
 		AnimationSystem::PlayAnimation(playerComponent.animationEntity, "diving", true);
 		TransformSystem::AddParent(playerComponent.animationEntity, playerEntity);
-
+		sound.Sounds["submergeAudio"]->play();
 		//Start submerging and slow down
 		playerComponent._boostScale -= 0.1;
 		playerComponent.forwardSpeed *= 0.80;
@@ -1396,6 +1401,10 @@ public:
 			shootShell->pause();
 			Audio* shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.3f, DistanceModel::LINEAR);
 			shootTorpedo->pause();
+			Audio* boostAudio = engine::AddAudio("Gameplay", "audio/boost_01.wav", false, 0.6f, DistanceModel::LINEAR);
+			boostAudio->pause();
+			Audio* submergeAudio = engine::AddAudio("Gameplay", "audio/submerge_01.wav", false, 0.3f, DistanceModel::LINEAR);
+			submergeAudio->pause();
 			float startDelay = Random(0.0f, 100.0f); // Start delay between 0-100ms
 			engineAudio->setStartTimeMilliseconds(startDelay);
 
@@ -1404,7 +1413,9 @@ public:
 			{
 				{"Engine", engineAudio},
 				{"ShootShell", shootShell},
-				{"ShootTorpedo", shootTorpedo}
+				{"ShootTorpedo", shootTorpedo},
+				{"boostAudio", boostAudio},
+				{"submergeAudio", submergeAudio}
 			} , .maxDistance = 1500 });
 		}
 	}

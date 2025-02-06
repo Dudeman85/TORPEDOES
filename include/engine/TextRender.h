@@ -1,6 +1,8 @@
 #include <engine/Font.h>
 #include <engine/Transform.h>
 #include <engine/GL/Camera.h>
+// Include Window.h
+#include "../include/engine/GL/Window.h"
 
 namespace engine
 {
@@ -153,7 +155,17 @@ namespace engine
 
 	private:
 		Shader* m_shader;
+<<<<<<< HEAD
+		// Temporal Window variables
+		GLFWwindow* window;
+		int width = 1920;
+		int height = 1080;
+=======
 		// Window size variables
+<<<<<<< HEAD
 	
+=======
+>>>>>>> d07ae8b4c17cddcb3cd93e0d51f1e25e97f3de57
+>>>>>>> 3dd2c92a582637f775b10104b390cf044ae66fa7
 	};
 }

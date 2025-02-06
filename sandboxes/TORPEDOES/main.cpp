@@ -12,7 +12,6 @@ using namespace engine;
 
 int checkPointNumber = 0;
 int currentLevel = 0;
-bool isGamePaused = false;
 
 static void CreateCheckpoint(Vector3 position, Vector3 rotation, Vector3 scale, engine::Model* checkPointModel, float hitboxrotation, bool finishLine = false)
 {
@@ -639,6 +638,8 @@ static void SetupInput()
 
 	input::ConstructDigitalEvent("Pause");
 	input::ConstructAnalogEvent("MenuVertical");
+	input::ConstructDigitalEvent("MenuConfirm");
+	input::ConstructDigitalEvent("MenuBack");
 
 	for (size_t i = 0; i < 4; i++)
 	{
@@ -653,6 +654,8 @@ static void SetupInput()
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "Boost" + std::to_string(i) });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_START, { "Pause" });
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "MenuConfirm" });
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "MenuBack" });
 
 		input::bindAnalogControllerInput(i,
 			{
@@ -686,6 +689,8 @@ static void SetupInput()
 
 	input::bindAnalogInput(GLFW_KEY_UP, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "MenuVertical" });
 	input::bindAnalogInput(GLFW_KEY_DOWN, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "MenuVertical" });
+	input::bindDigitalInput(GLFW_KEY_N, { "MenuConfirm" });
+	input::bindDigitalInput(GLFW_KEY_B, { "MenuBack" });
 
 	input::bindDigitalInput(GLFW_KEY_N, { "Shoot" + std::to_string(KeyboardPlayer) });
 	input::bindDigitalInput(GLFW_KEY_B, { "Boost" + std::to_string(KeyboardPlayer) });
@@ -699,23 +704,13 @@ static void SetupInput()
 
 	input::bindAnalogInput(GLFW_KEY_W, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "MenuVertical" });
 	input::bindAnalogInput(GLFW_KEY_S, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "MenuVertical" });
+	input::bindDigitalInput(GLFW_KEY_H, { "MenuConfirm" });
+	input::bindDigitalInput(GLFW_KEY_J, { "MenuBack" });
 
 	input::bindDigitalInput(GLFW_KEY_H, { "Shoot" + std::to_string(KeyboardPlayer2) });
 	input::bindDigitalInput(GLFW_KEY_J, { "Boost" + std::to_string(KeyboardPlayer2) });
 
 	input::bindDigitalInput(GLFW_KEY_G, { "Pause" });
-}
-
-static void PlayersMenu(std::shared_ptr<PlayerSelectSystem> ShipSelectionSystem)
-{
-	ShipSelectionSystem->isShipSelectionMenuOn = !ShipSelectionSystem->isShipSelectionMenuOn;
-	isGamePaused = !isGamePaused;
-
-
-	ShipSelectionSystem->ToggleMenuPlayerSelection();
-
-
-	std::cout << "is Ship selection open:" << ShipSelectionSystem->isShipSelectionMenuOn;
 }
 
 engine::Camera* cam;
@@ -726,7 +721,6 @@ static void ReturnToMainMenu()
 	ecs::DestroyAllEntities();
 
 	spriteRenderSystem->SetTilemap(nullptr);
-	isGamePaused = true;
 	canStartLoadingMap = false;
 	ecs::GetSystem<PlayerSelectSystem>()->isShipSelectionMenuOn = false;
 	cam->SetPosition(0);
@@ -780,7 +774,6 @@ int main()
 
 	//Get pointers and call init of every custom system
 	std::shared_ptr<PauseSystem> pauseSystem = engine::ecs::GetSystem<PauseSystem>();
-	pauseSystem->Init(window);
 	std::shared_ptr<PlayerController> playerController = engine::ecs::GetSystem<PlayerController>();
 	playerController->Init();
 	std::shared_ptr<HedgehogSystem> hedgehogSystem = engine::ecs::GetSystem<HedgehogSystem>();
@@ -797,7 +790,6 @@ int main()
 
 
 	GameState currentGameState = menuMainState;
-	isGamePaused = true;
 
 	MainMenuSystem::Load();
 
@@ -909,9 +901,8 @@ int main()
 			break;
 		case gamePlayState:
 			//Check for pause has to be done here unfortunately
-			if (input::GetPressed("Pause") && playerController->countdownTimer <= 0)
+			if (input::GetNewPress("Pause") && playerController->countdownTimer <= 0)
 			{
-				pauseSystem->Init(window);
 				pauseSystem->ToggleShowUIMenu();
 				gameState = pauseMenuState;
 			}
