@@ -154,6 +154,5 @@ namespace engine
 	private:
 		Shader* m_shader;
 		// Window size variables
-		Window* 
 	};
 }
