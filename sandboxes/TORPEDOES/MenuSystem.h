@@ -81,10 +81,10 @@ public:
 		arrowLeft = ecs::NewEntity();
 		mapName = ecs::NewEntity();
 		mapSelectText = ecs::NewEntity();
-		
+
 		// Testi teksti
 		Teksti = ecs::NewEntity();
-		
+
 		mapImages.clear();
 		mapImages.push_back(resources::menuTextures["level1.png"]);
 		mapImages.push_back(resources::menuTextures["level2.png"]);
@@ -92,11 +92,11 @@ public:
 		mapImages.push_back(resources::menuTextures["level4.png"]);
 		mapImages.push_back(resources::menuTextures["level5.png"]);
 
-		
+
 		// Testi teksti
-		engine::ecs::AddComponent(Teksti, engine::Transform{ .position = Vector3(0.0f), .scale = Vector3(1.0f)});
+		engine::ecs::AddComponent(Teksti, engine::Transform{ .position = Vector3(0.0f), .scale = Vector3(1.0f) });
 		engine::ecs::AddComponent(Teksti, engine::TextRenderer{ .font = resources::niagaraFont, .text = "TEST!!!", .offset = Vector3(0.9f * 0.003f, 0.005f, 0.0f), .scale = Vector3(0.003f), .color = Vector3(120.0f, 6.0f, 6.0f), .uiElement = true });
-		
+
 		// Level select Teksti
 		printf("Level Select Text rendering:");
 		engine::ecs::AddComponent(arrowsPivot, engine::Transform{ .position = Vector3(0, arrowPosHight, 0), .scale = Vector3(1) });
@@ -127,31 +127,9 @@ public:
 		engine::TransformSystem::AddParent(arrowRight, arrowsPivot);
 		engine::TransformSystem::AddParent(arrowLeft, arrowsPivot);
 	}
-	void LoadThisLevel(int mapIndex)
-	{
-		ecs::DestroyAllEntities();
-		gameState = gamePlayState;
-		switch (mapIndex)
-		{
-		case 0:
-			LoadLevel1(cam);
-			break;
-		case 1:
-			LoadLevel2(cam);
-			break;
-		case 2:
-			LoadLevel3(cam);
-			break;
-		case 3:
-			LoadLevel4(cam);
-			break;
-		case 4:
-			LoadLevel5(cam);
-		default:
-			std::cout << "NO LEVEL ON THAT INDEX" << mapIndex << std::endl;
-			break;
-		}
-	}
+	//Defined at 1300
+	void LoadThisLevel(int mapIndex);
+
 	void Update()
 	{
 		float turnInput = input::GetTotalInputValue("Turn" + to_string(firstPlayer));
@@ -993,7 +971,7 @@ struct PauseComponent
 ECS_REGISTER_SYSTEM(PauseSystem, PauseComponent, engine::Transform)
 class PauseSystem : public engine::ecs::System
 {
-	enum inGamePauseOptionsStates { mainOptions, sounds };
+	enum inGamePauseOptionsStates { main, options, sounds };
 	inGamePauseOptionsStates pauseMenuAt;
 	engine::ecs::Entity pausedImage;
 
@@ -1014,20 +992,17 @@ class PauseSystem : public engine::ecs::System
 	vector<engine::ecs::Entity>  optionsButtons = { {optionsResumeButton},{musicSliderEntity}, {fullscreenEntity} };
 	//std::map<std::string, ecs::Entity> optionsButtons{ {"return", optionsResumeButton}, {"music", musicSliderEntity}, {"fullscreen", fullscreenEntity} };
 
-	static GLFWwindow* window;
 	float repeatInputDelay;
 	float moveWaitedTimerDown;
-	const float delay = 0.8f;
+	const float delay = 0.3f;
 
 public:
 	int playerWhichPaused = 0;
 	bool isGamePause = false;
 	engine::ecs::Entity currentSelection;
 
-	void Init(GLFWwindow* mainWindow)
+	void Init()
 	{
-		PauseSystem::window = mainWindow;
-
 		resumeButton = engine::ecs::NewEntity();
 		optionsButton = engine::ecs::NewEntity();
 		mainMenuButton = engine::ecs::NewEntity();
@@ -1085,14 +1060,17 @@ public:
 	void Update()
 	{
 		float verticalInput = input::GetTotalInputValue("MenuVertical");
+		bool confirmInput = input::GetNewPress("MenuConfirm");
+		bool backInput = input::GetNewPress("MenuBack");
+		bool pauseInput = input::GetNewPress("Pause");
 
 		repeatInputDelay -= engine::deltaTime;
 
+		//Move up/down
 		if (verticalInput >= 0.5f)
 		{
 			if (repeatInputDelay <= 0)
 			{
-				printf("\n\n move up input\n\n");
 				MoveUpper();
 				repeatInputDelay = delay;
 			}
@@ -1101,7 +1079,6 @@ public:
 		{
 			if (repeatInputDelay <= 0)
 			{
-				printf("\n\n move down input\n\n");
 				MoveLower();
 				repeatInputDelay = delay;
 			}
@@ -1109,6 +1086,34 @@ public:
 		else
 		{
 			repeatInputDelay = 0;
+		}
+
+		//A pressed
+		if (confirmInput)
+		{
+			Selected();
+		}
+
+		//B pressed
+		if (backInput)
+		{
+			if (pauseMenuAt == options)
+			{
+				BackToUIMenu();
+			}
+			else
+			{
+				OnResumePressed();
+			}
+		}
+		//Return to game
+		if (pauseInput)
+		{
+			if (pauseMenuAt == options)
+			{
+				BackToUIMenu();
+			}
+			OnResumePressed();
 		}
 	}
 
@@ -1166,6 +1171,7 @@ public:
 	}
 	static void BackToUIMenu()
 	{
+		engine::ecs::GetSystem<PauseSystem>()->pauseMenuAt = main;
 		engine::ecs::GetSystem<PauseSystem>()->ToggleShowUIMenu();
 	}
 	static  void OnResumePressed()
@@ -1174,6 +1180,8 @@ public:
 
 		engine::ecs::GetSystem<PauseSystem>()->isGamePause = !engine::ecs::GetSystem<PauseSystem>()->isGamePause;
 		engine::ecs::GetSystem<PauseSystem>()->ToggleShowUIMenu();
+
+		gameState = gamePlayState;
 	}
 	static  void OnOptionsPressed()
 	{
@@ -1184,16 +1192,14 @@ public:
 	static void OnQuitGamePressed()
 	{
 		printf("OnQuitGamePressed()\n");
-		glfwSetWindowShouldClose(PauseSystem::window, true);
 	}
 	static  void OnMainMenuPressed()
 	{
 		printf("OnMainMenuPressed()\n");
+		ReturnToMainMenu();
 	}
 	void Selected()
 	{
-		engine::deltaTime;
-
 		PauseComponent& pauseComponent = engine::ecs::GetComponent<PauseComponent>(currentSelection);
 		engine::SpriteRenderer& pauseSpriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(currentSelection);
 		pauseSpriteRenderer.texture = pauseComponent.selectedTexture;
@@ -1215,6 +1221,12 @@ public:
 			{
 				enabled = false;
 			}
+
+			PauseComponent& pauseComponent = engine::ecs::GetComponent<PauseComponent>(entity);
+			engine::SpriteRenderer& selectedSpriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(entity);
+			engine::Transform& selectedSpriteTransform = engine::ecs::GetComponent<engine::Transform>(entity);
+			selectedSpriteTransform.scale = Vector3(0.25f);
+			selectedSpriteRenderer.texture = pauseComponent.unselectedTexture;
 		}
 		currentSelection = resumeButton;
 
@@ -1223,7 +1235,6 @@ public:
 		engine::Transform& selectedSpriteTransform = engine::ecs::GetComponent<engine::Transform>(currentSelection);
 		selectedSpriteTransform.scale = Vector3(0.32f);
 		selectedSpriteRenderer.texture = pauseComponent.selectedTexture;
-
 	}
 	void SetCurrentSelection(engine::ecs::Entity entity)
 	{
@@ -1272,7 +1283,7 @@ public:
 	}
 	void ToggleShowUIOptionsMenu()
 	{
-		pauseMenuAt = mainOptions;
+		pauseMenuAt = options;
 		printf("options menu UI\n");
 
 		PauseComponent& pauseComponentOld = engine::ecs::GetComponent<PauseComponent>(currentSelection);
@@ -1302,4 +1313,30 @@ public:
 		selectedSpriteRenderer.texture = pauseComponent.selectedTexture;
 	}
 };
-GLFWwindow* PauseSystem::window = window;
+
+void LevelSelectionSystem::LoadThisLevel(int mapIndex)
+{
+	ecs::DestroyAllEntities();
+	gameState = gamePlayState;
+	switch (mapIndex)
+	{
+	case 0:
+		LoadLevel1(cam);
+		break;
+	case 1:
+		LoadLevel2(cam);
+		break;
+	case 2:
+		LoadLevel3(cam);
+		break;
+	case 3:
+		LoadLevel4(cam);
+		break;
+	case 4:
+		LoadLevel5(cam);
+	default:
+		std::cout << "NO LEVEL ON THAT INDEX" << mapIndex << std::endl;
+		break;
+	}
+	ecs::GetSystem<PauseSystem>()->Init();
+}
