@@ -1337,15 +1337,15 @@ public:
 
 
 			// Create shoot indicators
-			float rangeEnd = -3;
-			float rangeStart = -5.0;
+			float rangeEnd = -3.2;
+			float rangeStart = -4.5;
 			Vector3 offset = Vector3(1, -1, 10);
 			Vector3 scale = Vector3(1.5, 1.5, 1);
 			auto func = *playerComponent.shootAction.target<void(*)(engine::ecs::Entity)>();
 
 			if (*func == CreateTorpedo)
 			{
-				scale = Vector3(2, 0.5, 1);
+				scale = Vector3(1.5, 0.45, 1);
 
 				// Add max ammo's number of indicators
 				for (int i = 0; i < playerComponent.maxAmmo; i++)
@@ -1358,13 +1358,15 @@ public:
 			}
 			else if (*func == ShootHedgehog)
 			{
-				scale = Vector3(1, 1, 1);
+				offset = Vector3(1.5, -3.7, 10);
+				scale = Vector3(1 * 1.45 , 1 * 1.45, 1);
 
 				playerComponent.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Hedgehog_Icon.png", "UI_Red_Hedgehog_Icon.png" }));
 			}
 			else if (*func == ShootShell)
 			{
-				scale = Vector3(1, 1, 1);
+				offset = Vector3(1.5,-3.7, 10);
+				scale = Vector3(1.13, 1.13, 1);
 
 				playerComponent.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Cannon_Icon.png", "UI_Red_Cannon_Icon.png" }));
 			}
@@ -1372,7 +1374,7 @@ public:
 			// Create special indicators
 			rangeEnd = 2;
 			rangeStart = -5;
-			offset = Vector3(-2, -4, 10);
+			offset = Vector3(-2, -3.8, 10);
 			scale = Vector3(1.25, 1.25, 1);
 			func = *playerComponent.specialAction.target<void(*)(engine::ecs::Entity)>();
 
