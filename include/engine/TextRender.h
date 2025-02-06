@@ -3,6 +3,7 @@
 #include <engine/GL/Camera.h>
 // Include Window.h
 #include "../include/engine/GL/Window.h"
+#include <stdio.h>
 
 namespace engine
 {
@@ -66,6 +67,9 @@ namespace engine
 		///Call this every frame
 		void Update(Camera* cam)
 		{
+			// Main windows size variable.
+			windowSize = engine::GetMainWindowSize();
+
 			for (auto const& entity : entities)
 			{
 				Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -90,6 +94,7 @@ namespace engine
 
 				if (!textRenderer.uiElement)
 				{
+
 					//Give the shader the camera's view matrix
 					glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(cam->GetViewMatrix()));
 
@@ -110,6 +115,10 @@ namespace engine
 				glActiveTexture(GL_TEXTURE0);
 				glBindVertexArray(textRenderer.font->VAO);
 
+				// Scale text relative to window size
+				scaleFactor = std::min(windowSize.x, windowSize.y) / resolution;
+				scaledTextSize = textRenderer.scale * scaleFactor;
+
 				// Renders text one letter at a time
 				std::string::const_iterator c;
 				float x = textRenderer.offset.x;
@@ -119,12 +128,21 @@ namespace engine
 					Character ch = textRenderer.font->characters[*c];
 					
 					
+					// Old rendering code
+					//float xpos = x + ch.Bearing.x * textRenderer.scale.x;
+					//float ypos = y - (ch.Size.y - ch.Bearing.y) * textRenderer.scale.y;
 
-					float xpos = x + ch.Bearing.x * textRenderer.scale.x;
-					float ypos = y - (ch.Size.y - ch.Bearing.y) * textRenderer.scale.y;
+					// New rendering code
+					float xpos = x + ch.Bearing.x * scaledTextSize.x;
+					float ypos = y - (ch.Size.y - ch.Bearing.y) * scaledTextSize.y;
 
-					float w = ch.Size.x * textRenderer.scale.x;
-					float h = ch.Size.y * textRenderer.scale.y;
+					// Old renderin code
+					//float w = ch.Size.x * textRenderer.scale.x;
+					//float h = ch.Size.y * textRenderer.scale.y;
+
+					// New rendering code
+					float w = ch.Size.x * scaledTextSize.x;
+					float h = ch.Size.y * scaledTextSize.y;
 
 					float vertices[6][4] = {
 						{xpos, ypos + h, 0.0f, 0.0f},
@@ -141,7 +159,10 @@ namespace engine
 					glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
 					glBindBuffer(GL_ARRAY_BUFFER, 0);
 					glDrawArrays(GL_TRIANGLES, 0, 6);
-					x += (ch.Advance >> 6) * textRenderer.scale.x;
+					// Old rendering code
+					//x += (ch.Advance >> 6) * textRenderer.scale.x;
+					// New rendering code
+					x += (ch.Advance >> 6) * scaledTextSize.x;
 					
 				}
 				
@@ -155,17 +176,13 @@ namespace engine
 
 	private:
 		Shader* m_shader;
-<<<<<<< HEAD
-		// Temporal Window variables
-		GLFWwindow* window;
-		int width = 1920;
-		int height = 1080;
-=======
-		// Window size variables
-<<<<<<< HEAD
-	
-=======
->>>>>>> d07ae8b4c17cddcb3cd93e0d51f1e25e97f3de57
->>>>>>> 3dd2c92a582637f775b10104b390cf044ae66fa7
+		// Window variable
+		Vector2 windowSize;
+		// Text scaleFactor variable
+		float scaleFactor;
+		// Text scaled based on the window size variable
+		Vector3 scaledTextSize;
+		// Window resolution
+		float resolution = 800.0f;
 	};
 }
