@@ -686,10 +686,10 @@ void BoostIndicatorUpdate(engine::ecs::Entity entity)
 {
 	Player& player = engine::ecs::GetComponent<Player>(entity);
 
-	if (player.shootIndicators.empty())
+	/*if (player.specialIndicators.empty())
 	{
 		return;
-	}
+	}*/
 
 	indicatorStruct& it = player.specialIndicators[0];
 	engine::SpriteRenderer& sprite = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
