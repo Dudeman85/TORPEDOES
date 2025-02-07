@@ -20,6 +20,9 @@ namespace engine
 		///Rotation of the text
 		Vector3 rotation;
 		///Size of the text
+		/// Make it so that TextRender.h
+		/// scale is Font.h size
+		/// Vector2 charRes = Vector2(1);
 		Vector3 scale = Vector3(1);
 		///Color of the text
 		Vector3 color = Vector3(0);
@@ -114,6 +117,9 @@ namespace engine
 				glUniform3f(glGetUniformLocation(m_shader->ID, "textColor"), textRenderer.color.x, textRenderer.color.y, textRenderer.color.z);
 				glActiveTexture(GL_TEXTURE0);
 				glBindVertexArray(textRenderer.font->VAO);
+
+				// Position character resolution values to the font
+				//textRenderer.font
 
 				// Scale text relative to window size
 				scaleFactor = std::min(windowSize.x, windowSize.y) / resolution;
