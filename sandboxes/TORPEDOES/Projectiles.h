@@ -139,7 +139,7 @@ public:
 	const float minDistance = 100.0f;	// No charge distance 
 	const float chargeTime = 1.0f;		// Time until full charge
 
-	const float speed = 500.0f;
+	const float speed = 1000.0f;
 
 	void Update()
 	{

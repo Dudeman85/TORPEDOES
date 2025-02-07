@@ -718,6 +718,9 @@ engine::Camera* cam;
 //Delete all entities and load menu
 static void ReturnToMainMenu()
 {
+	engine::enablePhysics = true;
+	engine::enableAnimation = true;
+
 	ecs::DestroyAllEntities();
 
 	spriteRenderSystem->SetTilemap(nullptr);
@@ -779,7 +782,6 @@ int main()
 	std::shared_ptr<HedgehogSystem> hedgehogSystem = engine::ecs::GetSystem<HedgehogSystem>();
 	std::shared_ptr<SubmarineSystem> submarineSystem = ecs::GetSystem<SubmarineSystem>();
 	std::shared_ptr<PickupSystem> pickupSystem = engine::ecs::GetSystem<PickupSystem>();
-	TimerSystem::ScheduleFunction([pickupSystem]() {pickupSystem->Update(); }, 0.016, true);
 
 	std::shared_ptr<LevelSelectionSystem> levelSelectionSystem = engine::ecs::GetSystem<LevelSelectionSystem>();
 	std::shared_ptr<PlayerSelectSystem> playerSelectionSystem = engine::ecs::GetSystem<PlayerSelectSystem>();
@@ -900,11 +902,15 @@ int main()
 			playerSelectionSystem->Update();
 			break;
 		case gamePlayState:
+			engine::enablePhysics = true;
+			engine::enableAnimation = true;
 			//Check for pause has to be done here unfortunately
 			if (input::GetNewPress("Pause") && playerController->countdownTimer <= 0)
 			{
 				pauseSystem->ToggleShowUIMenu();
 				gameState = pauseMenuState;
+				engine::enablePhysics = false;
+				engine::enableAnimation = false;
 			}
 
 			UpdateCam(cam, collisionSystem->tilemap, currentLevel == 4);
@@ -916,6 +922,7 @@ int main()
 			submarineSystem->Update();
 			hedgehogSystem->Update();
 			soundSystem->Update();
+			pickupSystem->Update();
 
 			break;
 		default:
