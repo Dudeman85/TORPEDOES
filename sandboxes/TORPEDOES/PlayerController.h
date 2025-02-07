@@ -508,9 +508,6 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 		AnimationSystem::PlayAnimation(playerComponent.animationEntity, "diving", true);
 		TransformSystem::AddParent(playerComponent.animationEntity, playerEntity);
 		sound.Sounds["submergeAudio"]->play();
-		//Start submerging and slow down
-		playerComponent._boostScale -= 0.1;
-		playerComponent.forwardSpeed *= 0.80;
 
 		TransformSystem::Translate(playerEntity, { 0, 0, -20 });
 
@@ -566,8 +563,6 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 		playerComponent.animationEntity = 0;
 
 		//Start surfacing and speed up
-		playerComponent._boostScale += 0.1;
-		playerComponent.forwardSpeed /= 0.80;
 		playerComponent.specialEnabled = false;
 		TransformSystem::Translate(playerEntity, { 0, 0, 20 });
 
@@ -583,7 +578,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 
 	//Make the diving bubbles animation
 	ecs::Entity divingEntity = ecs::NewEntity();
-	ecs::AddComponent(divingEntity, Transform{ .position = {0, 0, 10}, .scale = {5, 2, 1} });
+	ecs::AddComponent(divingEntity, Transform{ .position = {0, 0, 4}, .scale = {5, 2, 0} });
 	ecs::AddComponent(divingEntity, SpriteRenderer{});
 	ecs::AddComponent(divingEntity, Animator{ .onAnimationEnd = ecs::DestroyEntity });
 	TransformSystem::SetRotation(divingEntity, { 0, 0, modelTransform.rotation.y });
@@ -729,7 +724,7 @@ void SubmergeIndicatorUpdate(engine::ecs::Entity entity)
 
 	if (player.submerged)
 	{
-		if (/*player.specialCooldown <= player._specialTimer ||*/ player.specialEnabled)
+		if (player.specialEnabled)
 		{
 			sprite.texture = it.textures[0];
 		}
@@ -740,7 +735,7 @@ void SubmergeIndicatorUpdate(engine::ecs::Entity entity)
 	}
 	else
 	{
-		if (/*player.specialCooldown <= player._specialTimer ||*/ player.specialEnabled)
+		if (player.specialEnabled)
 		{
 
 			sprite.texture = it.textures[2];
@@ -750,12 +745,6 @@ void SubmergeIndicatorUpdate(engine::ecs::Entity entity)
 			sprite.texture = it.textures[3];
 		}
 	}
-
-	/*
-	Vector2 baseScale = { 0.9, 0.8 };
-	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
-	transform.scale = { baseScale.x * camHeight * 0.001f, baseScale.y * (camHeight * aspectRatio) * 0.001f, 0 };
-	*/
 }
 
 // Player controller System. Requires Player , Tranform , Rigidbody , PolygonCollider

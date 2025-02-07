@@ -1125,7 +1125,6 @@ public:
 	}
 	void MoveUpper()
 	{
-		printf("Move upper\n");
 		PauseComponent& pauseComponent = engine::ecs::GetComponent<PauseComponent>(currentSelection);
 		engine::SpriteRenderer& unselectedSpriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(currentSelection);
 		engine::Transform& unselectedTransform = engine::ecs::GetComponent<engine::Transform>(currentSelection);
@@ -1142,7 +1141,6 @@ public:
 	}
 	void MoveLower()
 	{
-		printf("Move lower\n");
 		PauseComponent& pauseComponent = engine::ecs::GetComponent<PauseComponent>(currentSelection);
 		engine::SpriteRenderer& unselectedSpriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(currentSelection);
 		engine::Transform& unselectedTransform = engine::ecs::GetComponent<engine::Transform>(currentSelection);
@@ -1176,26 +1174,23 @@ public:
 	}
 	static  void OnResumePressed()
 	{
-		printf("OnResumePressed()\n");
-
 		engine::ecs::GetSystem<PauseSystem>()->isGamePause = !engine::ecs::GetSystem<PauseSystem>()->isGamePause;
 		engine::ecs::GetSystem<PauseSystem>()->ToggleShowUIMenu();
 
 		gameState = gamePlayState;
+		engine::enablePhysics = true;
+		engine::enableAnimation = true;
 	}
 	static  void OnOptionsPressed()
 	{
-		printf("open options in pause menu\n");
-
 		engine::ecs::GetSystem<PauseSystem>()->ToggleShowUIOptionsMenu();
 	}
 	static void OnQuitGamePressed()
 	{
-		printf("OnQuitGamePressed()\n");
+		glfwSetWindowShouldClose(mainWindow, true);
 	}
 	static  void OnMainMenuPressed()
 	{
-		printf("OnMainMenuPressed()\n");
 		ReturnToMainMenu();
 	}
 	void Selected()
@@ -1208,7 +1203,6 @@ public:
 
 	void ToggleShowUIMenu()
 	{
-		printf("menu UI\n");
 		for (engine::ecs::Entity entity : entities)
 		{
 			bool& isOptionsMenu = engine::ecs::GetComponent<PauseComponent>(entity).isOptionsMenu;
