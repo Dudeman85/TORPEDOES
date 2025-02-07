@@ -1371,7 +1371,7 @@ public:
 			else if (*func == ShootShell)
 			{
 				offset = Vector3(1.5,-3.7, 10);
-				scale = Vector3(1.13, 1.13, 1);
+				scale = Vector3(1 * 1.34, 1 * 1.34, 1);
 
 				playerComponent.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Cannon_Icon.png", "UI_Red_Cannon_Icon.png" }));
 			}
