@@ -93,7 +93,7 @@ namespace engine
 		//Transform must be after physics, collision and rendering
 		transformSystem->Update();
 		//Timer must be last
-		timerSystem->Update();
+		timerSystem->Update(enablePhysics);
 
 		return deltaTime;
 	}

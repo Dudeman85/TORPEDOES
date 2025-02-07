@@ -48,18 +48,18 @@ namespace engine
 
 		bool operator == (const ScheduledFunction comp) const
 		{
-			return 
-			type == comp.type
-			&& duration == comp.duration
-			&& repeat == comp.repeat
-			&& function == comp.function
-			&& timePassed == comp.timePassed;
+			return
+				type == comp.type
+				&& duration == comp.duration
+				&& repeat == comp.repeat
+				&& function == comp.function
+				&& timePassed == comp.timePassed;
 		}
 	};
 
 	//Timer Component
 	ECS_REGISTER_COMPONENT(TimerComponent)
-	struct TimerComponent
+		struct TimerComponent
 	{
 		//Duration of the timer in seconds
 		double duration = 0;
@@ -75,7 +75,7 @@ namespace engine
 
 	//Timer System, Requires Timer
 	ECS_REGISTER_SYSTEM(TimerSystem, TimerComponent)
-	class TimerSystem : public ecs::System
+		class TimerSystem : public ecs::System
 	{
 	private:
 		static std::vector<ScheduledFunction*> schedule;
@@ -87,81 +87,84 @@ namespace engine
 			_lastFrame = std::chrono::high_resolution_clock::now();
 		}
 
-		void Update()
+		void Update(bool timersActive)
 		{
-			// Iterate through scheduled functions
-			for (auto itr = schedule.begin(); itr != schedule.end();)
+			if (timersActive)
 			{
-				// Get the entity and increment the iterator
-				ScheduledFunction* future = *itr;
-
-				if (future->type == ScheduledFunction::Type::seconds)
+				// Iterate through scheduled functions
+				for (auto itr = schedule.begin(); itr != schedule.end();)
 				{
-					// Timer is realtime, add deltaTime
-					future->timePassed += deltaTime;
-				}
-				else
-				{
-					// Timer is in frames, add one frame
-					future->timePassed++;
-				}
+					// Get the entity and increment the iterator
+					ScheduledFunction* future = *itr;
 
-				// Whether timer is done
-				while (future->timePassed >= future->duration)
-				{
-					future->timePassed -= future->duration;
-
-					future->function->Call();
-
-					// If not repeating, delete the event
-					if (!future->repeat)
+					if (future->type == ScheduledFunction::Type::seconds)
 					{
-						// Remove function from _CallbackWrappers
-						auto it = std::find(_CallbackWrappers.begin(), _CallbackWrappers.end(), future->function);
-						if (it != _CallbackWrappers.end()) 
+						// Timer is realtime, add deltaTime
+						future->timePassed += deltaTime;
+					}
+					else
+					{
+						// Timer is in frames, add one frame
+						future->timePassed++;
+					}
+
+					// Whether timer is done
+					while (future->timePassed >= future->duration)
+					{
+						future->timePassed -= future->duration;
+
+						future->function->Call();
+
+						// If not repeating, delete the event
+						if (!future->repeat)
 						{
-							_CallbackWrappers.erase(it);
+							// Remove function from _CallbackWrappers
+							auto it = std::find(_CallbackWrappers.begin(), _CallbackWrappers.end(), future->function);
+							if (it != _CallbackWrappers.end())
+							{
+								_CallbackWrappers.erase(it);
+							}
+
+							delete future->function;
+							future->function = nullptr;
+
+							itr = schedule.erase(itr);
+							break;
+						}
+					}
+
+					// Iterator can get a new value so make sure it is not at end
+					if (itr != schedule.end())
+					{
+						itr++;
+					}
+				}
+
+				// Iterate through entities
+				for (ecs::Entity entity : entities)
+				{
+					TimerComponent& timer = ecs::GetComponent<TimerComponent>(entity);
+
+					// If timer is not done
+					if (timer.timePassed < timer.duration)
+					{
+						timer.timePassed += deltaTime;
+					}
+					else
+					{
+						timer.timePassed = 0;
+
+						// Call callback if applicable
+						if (timer.callback)
+						{
+							timer.callback->Call();
 						}
 
-						delete future->function;
-						future->function = nullptr;
-
-						itr = schedule.erase(itr);
-						break;
-					}
-				}
-
-				// Iterator can get a new value so make sure it is not at end
-				if (itr != schedule.end())
-				{
-					itr++;
-				}
-			}
-
-			// Iterate through entities
-			for (ecs::Entity entity : entities)
-			{
-				TimerComponent& timer = ecs::GetComponent<TimerComponent>(entity);
-
-				// If timer is not done
-				if (timer.timePassed < timer.duration)
-				{
-					timer.timePassed += deltaTime;
-				}
-				else
-				{
-					timer.timePassed = 0;
-
-					// Call callback if applicable
-					if (timer.callback)
-					{
-						timer.callback->Call();
-					}
-						
-					// Stop timer if not repeating
-					if (!timer.repeat)
-					{
-						timer.running = false;
+						// Stop timer if not repeating
+						if (!timer.repeat)
+						{
+							timer.running = false;
+						}
 					}
 				}
 			}

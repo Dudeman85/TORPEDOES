@@ -3,7 +3,9 @@
 
 using namespace std;
 using namespace engine;
-
+// In this function set the
+// text resolution size what
+// we got from TextRender.h
 Font::Font(std::string filepathname, FT_Long face_index, FT_UInt pixel_width, FT_UInt pixel_height)
 {
 	try
