@@ -13,6 +13,7 @@ struct PickupComponent
 	bool respawn = true;
 	bool active = true;
 	float randomOffset;
+	float respawnTimer;
 };
 
 ECS_REGISTER_SYSTEM(PickupSystem, PickupComponent, Transform, PolygonCollider)
@@ -28,9 +29,26 @@ public:
 		for (ecs::Entity entity : entities)
 		{
 			PickupComponent& pc = ecs::GetComponent<PickupComponent>(entity);
-			TransformSystem::SetPosition(entity, pc.basePosition);
-			TransformSystem::Translate(entity, { 0, (float)sin(programTime * 2 + pc.randomOffset) * 2.0f, (float)sin(programTime * 2 + pc.randomOffset) * 1.5f });;
-			TransformSystem::Rotate(entity, { 0, (float)sin(programTime * 2 + pc.randomOffset) * 0.2f, 0 });
+
+			if (!pc.active)
+			{
+				//Countdown to respawn
+				if (pc.respawnTimer > 0)
+				{
+					pc.respawnTimer -= engine::deltaTime;
+				}
+				else
+				{
+					ecs::GetComponent<ModelRenderer>(entity).enabled = true;
+					ecs::GetComponent<PickupComponent>(entity).active = true;
+				}
+			}
+			else
+			{
+				TransformSystem::SetPosition(entity, pc.basePosition);
+				TransformSystem::Translate(entity, { 0, (float)sin(programTime * 2 + pc.randomOffset) * 2.0f, (float)sin(programTime * 2 + pc.randomOffset) * 1.5f });;
+				TransformSystem::Rotate(entity, { 0, (float)sin(programTime * 2 + pc.randomOffset) * 0.2f, 0 });
+			}
 		}
 	}
 
@@ -53,15 +71,7 @@ public:
 
 		model.enabled = false;
 		pickupComponent.active = false;
-		TimerSystem::ScheduleFunction(
-			[pickup]()
-			{
-				if (ecs::EntityExists(pickup))
-				{
-					ecs::GetComponent<ModelRenderer>(pickup).enabled = true;
-					ecs::GetComponent<PickupComponent>(pickup).active = true;
-				}
-			}, respawnTime);
+		pickupComponent.respawnTimer = respawnTime;
 	}
 
 	static void OnCollision(Collision collision)
@@ -93,7 +103,7 @@ public:
 
 			//Make an explosion animation
 			ecs::Entity explosion = ecs::NewEntity();
-			ecs::AddComponent(explosion, Transform{ .position = transform.position + Vector3(0, 0, 50), .scale = Vector3(20)});
+			ecs::AddComponent(explosion, Transform{ .position = transform.position + Vector3(0, 0, 50), .scale = Vector3(20) });
 			ecs::AddComponent(explosion, SpriteRenderer{ });
 			ecs::AddComponent(explosion, Animator{ .onAnimationEnd = ecs::DestroyEntity });
 			engine::AnimationSystem::AddAnimation(explosion, resources::explosionAnimation, "hit");
