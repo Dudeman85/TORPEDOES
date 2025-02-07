@@ -619,6 +619,9 @@ static void LoadLevel5(engine::Camera* cam)
 
 	////Make all the checkpoints manually
 	checkPointNumber = 0;
+	CreateCheckpoint(Vector3(2580.000000, -2950.000000, 166.000000), Vector3(37.500000, -22.500000, -5.000000), Vector3(20.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(1525.000000, -1880.000000, 166.000000), Vector3(37.500000, -10.000000, -5.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 0.f);
+	
 	CreateCheckpoint(Vector3(1475.000000, -660.000000, 70.000000), Vector3(-25.000000, -90.000000, -90.000000), Vector3(24.f), resources::models["Prop_Goal.obj"], 360.f, true);
 
 	PlayCountdown(Vector3(3300.0f, -4000.0f, 200.0f));
@@ -800,7 +803,7 @@ int main()
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 166), .scale = 20 });
-	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
+	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Buoy.obj"] });
 	ecs::AddTag(placementEditor, "persistent");
 
 

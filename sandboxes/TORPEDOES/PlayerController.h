@@ -291,7 +291,6 @@ void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide,
 	Projectile& hedgehogProjectile = ecs::GetComponent<Projectile>(hedgehog);
 	hedgehogProjectile.ownerEntity = entity;
 
-	std::cout << "hello!";
 }
 
 struct aimingGuideStruct
