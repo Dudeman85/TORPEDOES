@@ -11,6 +11,7 @@
 #include <engine/GL/Camera.h>
 #include <map>
 #include <exception>
+#include <engine/Vector.h>
 
 ///Struct to store data about the characters
 struct Character
@@ -32,6 +33,9 @@ namespace engine
 	public:
 		/// Constructor
 		Font(std::string filepathname, FT_Long face_index, FT_UInt pixel_width, FT_UInt pixel_height);
+
+		// Function for characters resolution.
+		void SetResolution(FT_UInt pixel_width, FT_UInt pixel_height);
 
 		// Destructor
 		~Font();

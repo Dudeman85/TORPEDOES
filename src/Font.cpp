@@ -33,8 +33,17 @@ Font::Font(std::string filepathname, FT_Long face_index, FT_UInt pixel_width, FT
 	}
 }
 
+void Font::SetResolution(FT_UInt pixel_width, FT_UInt pixel_height)
+{
+	FT_Set_Pixel_Sizes(face, pixel_width, pixel_height);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	load();
+}
+
 Font::~Font()
 {
+	FT_Done_Face(face);
+	FT_Done_FreeType(ft);
 }
 
 void Font::config()
@@ -87,8 +96,6 @@ void Font::load()
 
 		characters.insert(pair<char, Character>(c, character));
 	}
-	FT_Done_Face(face);
-	FT_Done_FreeType(ft);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	config();
