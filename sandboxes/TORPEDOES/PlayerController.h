@@ -680,10 +680,10 @@ void BoostIndicatorUpdate(engine::ecs::Entity entity)
 {
 	Player& player = engine::ecs::GetComponent<Player>(entity);
 
-	/*if (player.specialIndicators.empty())
+	if (player.specialIndicators.empty())
 	{
 		return;
-	}*/
+	}
 
 	indicatorStruct& it = player.specialIndicators[0];
 	engine::SpriteRenderer& sprite = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
@@ -700,8 +700,12 @@ void BoostIndicatorUpdate(engine::ecs::Entity entity)
 			// In use
 			sprite.texture = it.textures[1];
 		}
+	
 	}
-	else
+
+
+
+	else if (player.specialCooldown >= player._specialTimer)
 	{
 		// Not available
 		sprite.texture = it.textures[2];
@@ -1301,6 +1305,7 @@ public:
 			playerComponent.nameText = playerNameText;
 			playerComponent.wakeAnimationEntity = wakeAnimation;
 			playerComponent.checkpointIndicatorEntity = checkpointIndicator;
+			playerComponent._specialTimer = playerComponent.specialCooldown;
 
 			engine::ecs::AddComponent(playerEntity, engine::Transform{ .position = Vector3(startPos - offset * playerShip.first, 150), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			engine::ecs::AddComponent(playerEntity, engine::Rigidbody{ .drag = 1.5 });
