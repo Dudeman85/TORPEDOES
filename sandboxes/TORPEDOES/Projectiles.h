@@ -72,7 +72,7 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 	engine::ecs::DestroyEntity(hedgehog.aimingGuide);
 
 	Vector2 explosionSize = Vector2(0.7, -0.7);
-	Vector2 explosionScale = Vector3(20);
+	Vector2 explosionScale = Vector3(30);
 
 	engine::ecs::Entity hedgehogExplosion = engine::ecs::NewEntity();
 	engine::ecs::AddComponent(hedgehogExplosion, engine::Transform{ .position = transform.position + Vector3(0, 0, 100 + (double)rand() / ((double)RAND_MAX + 1)), .scale = explosionScale });
