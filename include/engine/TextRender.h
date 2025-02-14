@@ -20,7 +20,8 @@ namespace engine
 		///Rotation of the text
 		Vector3 rotation;
 		///Size of the text
-		//Vector2 charRes = Vector2(1);
+		//Vector2 charRes;
+		// Old
 		Vector3 scale = Vector3(1);
 		///Color of the text
 		Vector3 color = Vector3(0);
@@ -118,7 +119,18 @@ namespace engine
 
 				// Position character resolution values to the font
 				// might not be a good idea to set in update...
-				//textRenderer.font->SetResolution(textRenderer.charRes.x, textRenderer.charRes.y);
+				/*if (textRenderer.charRes.x != oldCharRes.x && textRenderer.charRes.y != oldCharRes.y)
+				{
+					oldCharRes = textRenderer.charRes;
+					textRenderer.font->SetResolution(textRenderer.charRes.x, textRenderer.charRes.y);
+					printf("Character resolution: %.2f x %.2f \n", textRenderer.charRes.x, textRenderer.charRes.y);
+				}
+				else
+				{
+					continue;
+				}*/
+				
+				
 
 				// Scale text relative to window size
 				scaleFactor = std::min(windowSize.x, windowSize.y) / resolution;
@@ -184,10 +196,12 @@ namespace engine
 		// Window variable
 		Vector2 windowSize;
 		// Text scaleFactor variable
-		float scaleFactor;
+		float scaleFactor = 0.0f;
 		// Text scaled based on the window size variable
-		Vector3 scaledTextSize;
+		Vector3 scaledTextSize = Vector3(0);
 		// Window resolution
 		float resolution = 800.0f;
+		// Compare value for charRes
+		Vector2 oldCharRes = Vector2(0.0f, 0.0f);
 	};
 }

@@ -619,18 +619,23 @@ static void LoadLevel5(engine::Camera* cam)
 
 	////Make all the checkpoints manually
 	checkPointNumber = 0;
-	CreateCheckpoint(Vector3(2580.000000, -2950.000000, 166.000000), Vector3(37.500000, -22.500000, -5.000000), Vector3(20.f), resources::models["Prop_Buoy.obj"], 60.f);
+	CreateCheckpoint(Vector3(4090.000000, -3175.000000, 166.000000), Vector3(25.000000, 20.000000, 15.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 120.f);
+	CreateCheckpoint(Vector3(2065.000000, -3590.000000, 166.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(20.f), resources::models["Prop_Buoy.obj"], 0.f);
 	CreateCheckpoint(Vector3(1525.000000, -1880.000000, 166.000000), Vector3(37.500000, -10.000000, -5.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 90.f);
 	CreateCheckpoint(Vector3(7630.000000, -1255.000000, 166.000000), Vector3(25.000000, -87.500000, -25.000000), Vector3(20.5f), resources::models["Prop_Buoy.obj"], 0.f);
 	CreateCheckpoint(Vector3(8320.000000, -2440.000000, 166.000000), Vector3(35.000000, -42.500000, -10.000000), Vector3(21.5f), resources::models["Prop_Buoy.obj"], 225.f);
 	CreateCheckpoint(Vector3(8190.000000, -4185.000000, 166.000000), Vector3(35.000000, -57.500000, -22.500000), Vector3(22.f), resources::models["Prop_Buoy.obj"], 210.f);
 	CreateCheckpoint(Vector3(5605.000000, -2740.000000, 166.000000), Vector3(22.500000, -47.500000, -20.000000), Vector3(22.f), resources::models["Prop_Buoy.obj"], 45.f);
 	CreateCheckpoint(Vector3(1440.000000, -4970.000000, 166.000000), Vector3(22.500000, -132.500000, -20.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 150.f);
-	
+
 	CreateCheckpoint(Vector3(3600.000000, -4140.000000, 70.000000), Vector3(-25.000000, -90.000000, -90.000000), Vector3(24.f), resources::models["Prop_Goal.obj"], 360.f, true);
 
+	//Collectibles
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1190.000000, -1325.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1265.000000, -1325.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1355.000000, -1325.000000, 0.300000));
 	PlayCountdown(Vector3(3300.0f, -4000.0f, 200.0f));
-	PlayerController::lapCount = 3;
+	PlayerController::lapCount = 2;
 	//Create the players
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(3390.0f, -4055.0f));
 }
@@ -645,9 +650,13 @@ static void SetupInput()
 	float AnalogNegativeMaxDeadZone = 0;
 
 	input::ConstructDigitalEvent("Pause");
+	input::ConstructDigitalEvent("MenuDpadUp");
+	input::ConstructDigitalEvent("MenuDpadDown");
 	input::ConstructAnalogEvent("MenuVertical");
 	input::ConstructDigitalEvent("MenuConfirm");
 	input::ConstructDigitalEvent("MenuBack");
+	input::ConstructDigitalEvent("DpadRight");
+	input::ConstructDigitalEvent("DpadLeft");
 
 	for (size_t i = 0; i < 4; i++)
 	{
@@ -664,10 +673,14 @@ static void SetupInput()
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_START, { "Pause" });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "MenuConfirm" });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "MenuBack" });
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_UP, { "MenuDpadUp" });
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_DOWN, { "MenuDpadDown" });
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, { "DpadRight" });
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_LEFT, { "DpadLeft" });
 
 		input::bindAnalogControllerInput(i,
 			{
-				{ { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER ,  },
+				{ { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER },
 				{ { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_TRIGGER }
 			},
 			{ "Throttle" + std::to_string(i) });
@@ -695,8 +708,8 @@ static void SetupInput()
 	input::bindAnalogInput(GLFW_KEY_UP, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
 	input::bindAnalogInput(GLFW_KEY_DOWN, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
 
-	input::bindAnalogInput(GLFW_KEY_UP, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "MenuVertical" });
-	input::bindAnalogInput(GLFW_KEY_DOWN, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "MenuVertical" });
+	input::bindAnalogInput(GLFW_KEY_UP, { input::digitalNegativeInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "MenuVertical" });
+	input::bindAnalogInput(GLFW_KEY_DOWN, { input::digitalPositiveInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "MenuVertical" });
 	input::bindDigitalInput(GLFW_KEY_N, { "MenuConfirm" });
 	input::bindDigitalInput(GLFW_KEY_B, { "MenuBack" });
 
@@ -710,8 +723,8 @@ static void SetupInput()
 	input::bindAnalogInput(GLFW_KEY_W, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer2) });
 	input::bindAnalogInput(GLFW_KEY_S, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer2) });
 
-	input::bindAnalogInput(GLFW_KEY_W, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "MenuVertical" });
-	input::bindAnalogInput(GLFW_KEY_S, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "MenuVertical" });
+	input::bindAnalogInput(GLFW_KEY_W, { input::digitalNegativeInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "MenuVertical" });
+	input::bindAnalogInput(GLFW_KEY_S, { input::digitalPositiveInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "MenuVertical" });
 	input::bindDigitalInput(GLFW_KEY_H, { "MenuConfirm" });
 	input::bindDigitalInput(GLFW_KEY_J, { "MenuBack" });
 
@@ -749,7 +762,7 @@ int main()
 	ShowWindow(GetConsoleWindow(), SW_HIDE);
 #endif
 
-	GLFWwindow* window = engine::CreateGLWindow(1920, 1080, "Window", false);
+	GLFWwindow* window = engine::CreateGLWindow(1920, 1080, "Window", true);
 
 	engine::EngineInit();
 
