@@ -627,8 +627,12 @@ static void LoadLevel5(engine::Camera* cam)
 	CreateCheckpoint(Vector3(8190.000000, -4185.000000, 166.000000), Vector3(35.000000, -57.500000, -22.500000), Vector3(22.f), resources::models["Prop_Buoy.obj"], 210.f);
 	CreateCheckpoint(Vector3(5605.000000, -2740.000000, 166.000000), Vector3(22.500000, -47.500000, -20.000000), Vector3(22.f), resources::models["Prop_Buoy.obj"], 45.f);
 	CreateCheckpoint(Vector3(1440.000000, -4970.000000, 166.000000), Vector3(22.500000, -132.500000, -20.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 150.f);
-	
 	CreateCheckpoint(Vector3(3600.000000, -4140.000000, 70.000000), Vector3(-25.000000, -90.000000, -90.000000), Vector3(24.f), resources::models["Prop_Goal.obj"], 360.f, true);
+
+	//Collectibles
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1190.000000, -1325.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1265.000000, -1325.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1355.000000, -1325.000000, 0.300000));
 
 	PlayCountdown(Vector3(3300.0f, -4000.0f, 200.0f));
 	PlayerController::lapCount = 2;
