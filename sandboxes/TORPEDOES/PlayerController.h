@@ -340,7 +340,7 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 			guideTransform.position = playerTransform.position
 				+ (modifiedDirection * ecs::GetSystem<HedgehogSystem>()->minDistance)
 				+ ((modifiedDirection * guideSpeed * std::min(*playerIdToAimGuides[player.id].totalTime, ecs::GetSystem<HedgehogSystem>()->chargeTime)));
-			guideTransform.scale = 20;
+			guideTransform.scale = 30;
 		}
 		else
 		{
