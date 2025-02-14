@@ -140,6 +140,7 @@ public:
 	const float chargeTime = 1.0f;		// Time until full charge
 
 	const float speed = 1000.0f;
+	const float aimSpeed = 800.0f;
 
 	void Update()
 	{

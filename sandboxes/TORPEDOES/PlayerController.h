@@ -451,7 +451,7 @@ void ShootHedgehog(engine::ecs::Entity entity)
 	float shootAmount = 4;
 	//player.ammo++; // We don't use up ammo until we shoot
 
-	CreateAimingGuides(entity, ecs::GetSystem<HedgehogSystem>()->speed, shootAngle, shootAmount);
+	CreateAimingGuides(entity, ecs::GetSystem<HedgehogSystem>()->aimSpeed, shootAngle, shootAmount);
 }
 
 /* BOOST */
