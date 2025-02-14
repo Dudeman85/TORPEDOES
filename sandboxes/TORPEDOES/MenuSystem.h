@@ -606,6 +606,8 @@ public:
 			PlayerSelection& playerSelection = engine::ecs::GetComponent<PlayerSelection>(entity);
 
 			float turnInput = input::GetTotalInputValue("Turn" + std::to_string(playerSelection.playerID));
+			int turnDpadInput = input::GetPressed("DpadRight") - input::GetPressed("DpadLeft");
+			turnInput += turnDpadInput;
 			bool aPressed = input::GetNewPress("Shoot" + std::to_string(playerSelection.playerID));
 			bool bPressed = input::GetNewPress("Boost" + std::to_string(playerSelection.playerID));
 
@@ -1060,6 +1062,9 @@ public:
 	void Update()
 	{
 		float verticalInput = input::GetTotalInputValue("MenuVertical");
+		int verticalDpadInput = input::GetPressed("MenuDpadDown") - input::GetPressed("MenuDpadUp");
+		verticalInput += verticalDpadInput;
+
 		bool confirmInput = input::GetNewPress("MenuConfirm");
 		bool backInput = input::GetNewPress("MenuBack");
 		bool pauseInput = input::GetNewPress("Pause");
@@ -1071,7 +1076,7 @@ public:
 		{
 			if (repeatInputDelay <= 0)
 			{
-				MoveUpper();
+				MoveLower();
 				repeatInputDelay = delay;
 			}
 		}
@@ -1079,7 +1084,7 @@ public:
 		{
 			if (repeatInputDelay <= 0)
 			{
-				MoveLower();
+				MoveUpper();
 				repeatInputDelay = delay;
 			}
 		}
