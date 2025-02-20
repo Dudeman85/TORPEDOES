@@ -409,6 +409,26 @@ static void LoadLevel4(engine::Camera* cam)
 
 	// Make all the checkpoints manually
 	checkPointNumber = 0;
+
+	CreateCheckpoint(Vector3(2225.000000, -1310.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(28.f), resources::models["Prop_Buoy.obj"], 90.f);
+	CreateCheckpoint(Vector3(580.000000, -560.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 45.f);
+	CreateCheckpoint(Vector3(3125.000000, -1375.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 90.f);
+	CreateCheckpoint(Vector3(4725.000000, -510.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 130.f);
+	CreateCheckpoint(Vector3(4770.000000, -1735.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(6285.000000, -1580.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(6480.000000, -340.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(7590.000000, -790.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(38.f), resources::models["Prop_Buoy.obj"], 45.f);
+	CreateCheckpoint(Vector3(7435.000000, -1675.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(8775.000000, -575.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(20.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(9130.000000, -1430.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(17.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(10765.000000, -315.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(17.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(11115.000000, -1695.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(17.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(11850.000000, -915.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(17.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(12250.000000, -370.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(17.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(12760.000000, -1575.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(17.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(13695.000000, -340.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(19.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(14260.000000, -1365.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(37.f), resources::models["Prop_Buoy.obj"], 45.f);
+
 	CreateCheckpoint(Vector3(15760.000000, -925.000000, 100.000000), Vector3(-12.500000, -90.000000, -87.500000), Vector3(43.0f), resources::models["Prop_Goal.obj"], 360.f, true);
 
 	//Collectibles
@@ -606,7 +626,7 @@ static void LoadLevel4(engine::Camera* cam)
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1434.0f, -1520.0f));
 }
 
-// Create everything for level 1
+// Create everything for level 5
 static void LoadLevel5(engine::Camera* cam)
 {
 	currentLevel = 5;
@@ -631,9 +651,41 @@ static void LoadLevel5(engine::Camera* cam)
 	CreateCheckpoint(Vector3(3600.000000, -4140.000000, 70.000000), Vector3(-25.000000, -90.000000, -90.000000), Vector3(24.f), resources::models["Prop_Goal.obj"], 360.f, true);
 
 	//Collectibles
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1190.000000, -1325.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1265.000000, -1325.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1355.000000, -1325.000000, 0.300000));
+	// First boxes
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3590.000000, -2965.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3630.000000, -2910.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3670.000000, -2850.000000, 0.300000));
+
+	// First vertical straight
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1550.000000, -3360.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1600.000000, -3310.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1660.000000, -2745.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1745.000000, -2745.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1670.000000, -1415.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1640.000000, -1350.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1605.000000, -1290.000000, 0.300000));
+
+	// Long straight
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3260.000000, -1865.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3260.000000, -1790.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3260.000000, -1715.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3815.000000, -1140.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3815.000000, -1065.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3815.000000, -1000.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(4680.000000, -1400.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(4635.000000, -1335.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(6850.000000, -1320.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(6850.000000, -1250.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(6850.000000, -1175.000000, 0.300000));
+
+	// islands
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8820.000000, -1135.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8820.000000, -1190.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8820.000000, -1255.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(9340.000000, -1740.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(9280.000000, -1740.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(9210.000000, -1740.000000, 0.300000));
+
 	PlayCountdown(Vector3(3300.0f, -4000.0f, 200.0f));
 	PlayerController::lapCount = 2;
 	//Create the players
@@ -762,7 +814,7 @@ int main()
 	ShowWindow(GetConsoleWindow(), SW_HIDE);
 #endif
 
-	GLFWwindow* window = engine::CreateGLWindow(1920, 1080, "Window", true);
+	GLFWwindow* window = engine::CreateGLWindow(1920, 1080, "Window", false);
 
 	engine::EngineInit();
 
@@ -823,7 +875,7 @@ int main()
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 166), .scale = 20 });
-	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Buoy.obj"] });
+	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
 	ecs::AddTag(placementEditor, "persistent");
 
 
