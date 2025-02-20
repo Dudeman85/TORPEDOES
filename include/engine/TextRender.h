@@ -119,16 +119,21 @@ namespace engine
 
 				// Position character resolution values to the font
 				// might not be a good idea to set in update...
-				/*if (textRenderer.charRes.x != oldCharRes.x && textRenderer.charRes.y != oldCharRes.y)
+				/*
+				printf("Resolution X-value: %.2f Resolution Y-value: %.2f\n", textRenderer.charRes.x, textRenderer.charRes.y);
+  				if (textRenderer.charRes.x == oldCharRes.x && textRenderer.charRes.y == oldCharRes.y)
+				{
+					printf("X value: %.2f Y value: %.2f \n", textRenderer.charRes.x, textRenderer.charRes.y);
+					break;
+					
+				}
+				else
 				{
 					oldCharRes = textRenderer.charRes;
 					textRenderer.font->SetResolution(textRenderer.charRes.x, textRenderer.charRes.y);
 					printf("Character resolution: %.2f x %.2f \n", textRenderer.charRes.x, textRenderer.charRes.y);
 				}
-				else
-				{
-					continue;
-				}*/
+				*/
 				
 				
 
