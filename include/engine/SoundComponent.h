@@ -131,10 +131,14 @@ namespace engine
 			}
 		}
 
-		//void UpdateListenerPositionInEngine(AudioEngine* audioEngine)
-		//{
-		//	audioEngine->setListenerPosition(ListeningPosition);
-		//}
+		//Set the global volume percentage
+		void SetGlobalVolume(float volume) 
+		{
+			for (auto& audioEngine : AudioEngines)
+			{
+				audioEngine.second->setAmbientVolume(volume);
+			}
+		}
 
 		// Free up memory
 		void Uninitialize()
