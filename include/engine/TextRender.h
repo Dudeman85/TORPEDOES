@@ -157,6 +157,12 @@ namespace engine
 					// New rendering code
 					float xpos = x + ch.Bearing.x * scaledTextSize.x;
 					float ypos = y - (ch.Size.y - ch.Bearing.y) * scaledTextSize.y;
+					/*
+					* // New rendering code
+				float xpos = x + ch.Bearing.x * transform.scale.x;
+				float ypos = y - (ch.Size.y - ch.Bearing.y) * transform.scale.y;
+					*/
+					
 
 					// Old renderin code
 					//float w = ch.Size.x * textRenderer.scale.x;
@@ -165,6 +171,11 @@ namespace engine
 					// New rendering code
 					float w = ch.Size.x * scaledTextSize.x;
 					float h = ch.Size.y * scaledTextSize.y;
+					/*
+					* // New rendering code
+				float w = ch.Size.x * transform.scale.x;
+				float h = ch.Size.y * transform.scale.y;
+					*/
 
 					float vertices[6][4] = {
 						{xpos, ypos + h, 0.0f, 0.0f},
@@ -185,9 +196,9 @@ namespace engine
 					//x += (ch.Advance >> 6) * textRenderer.scale.x;
 					// New rendering code
 					x += (ch.Advance >> 6) * scaledTextSize.x;
+					//x += (ch.Advance >> 6) * transform.scale.x;
 					
 				}
-				
 
 				glBindVertexArray(0);
 				glBindTexture(GL_TEXTURE_2D, 0);
