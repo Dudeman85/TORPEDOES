@@ -59,8 +59,8 @@ public:
 		ecs::AddComponent(pickup, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
 		ecs::AddComponent(pickup, Transform{ .position = position, .rotation = {60, 35, 0}, .scale = 25 });
 		ecs::AddComponent(pickup, PickupComponent{ .basePosition = position, .respawn = respawn, .randomOffset = (float)rand() / RAND_MAX * 3 });
-		vector<Vector2> colliderVerts{ Vector2(.5, .5), Vector2(.5, -.5), Vector2(-.5, -.5), Vector2(-.5, .5) };
-		ecs::AddComponent(pickup, PolygonCollider{ .vertices = colliderVerts, .callback = OnCollision, .trigger = true, .visualise = false });
+		vector<Vector2> colliderVerts{ Vector2(.6, .6), Vector2(.6, -.6), Vector2(-.6, -.6), Vector2(-.6, .6) };
+		ecs::AddComponent(pickup, PolygonCollider{ .vertices = colliderVerts, .callback = OnCollision, .trigger = true, .visualise = false, .rotationOverride = 45 });
 	}
 
 	//Disables a pickup, it will re-enable after a while if set
