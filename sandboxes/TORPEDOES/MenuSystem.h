@@ -606,7 +606,7 @@ public:
 			PlayerSelection& playerSelection = engine::ecs::GetComponent<PlayerSelection>(entity);
 
 			float turnInput = input::GetTotalInputValue("Turn" + std::to_string(playerSelection.playerID));
-			int turnDpadInput = input::GetPressed("DpadRight") - input::GetPressed("DpadLeft");
+			int turnDpadInput = input::GetPressed("MenuDpadRight") - input::GetPressed("MenuDpadLeft");
 			turnInput += turnDpadInput;
 			bool aPressed = input::GetNewPress("Shoot" + std::to_string(playerSelection.playerID));
 			bool bPressed = input::GetNewPress("Boost" + std::to_string(playerSelection.playerID));
@@ -968,6 +968,7 @@ struct PauseComponent
 	bool isOptionsMenu = false;
 	bool isSlider = false;
 	float sliderValue = 0;
+	bool isTitle = false;
 };
 
 ECS_REGISTER_SYSTEM(PauseSystem, PauseComponent, engine::Transform)
@@ -976,6 +977,7 @@ class PauseSystem : public engine::ecs::System
 	enum inGamePauseOptionsStates { main, options, sounds };
 	inGamePauseOptionsStates pauseMenuAt;
 	engine::ecs::Entity pausedImage;
+	engine::ecs::Entity optionsImage;
 
 	engine::ecs::Entity resumeButton;
 	engine::ecs::Entity optionsButton;
@@ -1018,11 +1020,12 @@ public:
 		currentSelection = mainMenuButton;
 
 		pausedImage = engine::ecs::NewEntity();
+		optionsImage = engine::ecs::NewEntity();
 
 		//                      ---------  PAUSE BUTTONS init-------
 		engine::ecs::AddComponent(pausedImage, engine::Transform{ .position = Vector3(0, .8f, -0.1f), .scale = Vector3(0.35f) });
 		engine::ecs::AddComponent(pausedImage, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Paused.png"], .enabled = false, .uiElement = true });
-		engine::ecs::AddComponent(pausedImage, PauseComponent{ .upper = pausedImage, .lower = optionsButton, .selectedTexture = resources::menuTextures["UI_Paused.png"], .unselectedTexture = resources::menuTextures["UI_Paused.png"], .operation = PauseSystem::OnResumePressed });
+		engine::ecs::AddComponent(pausedImage, PauseComponent{ .upper = pausedImage, .lower = optionsButton, .selectedTexture = resources::menuTextures["UI_Paused.png"], .unselectedTexture = resources::menuTextures["UI_Paused.png"], .operation = PauseSystem::OnResumePressed, .isTitle = true });
 
 		engine::ecs::AddComponent(resumeButton, engine::Transform{ .position = Vector3(0, .5f, -0.1f), .scale = Vector3(0.25f) });
 		engine::ecs::AddComponent(resumeButton, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Resume_N.png"], .enabled = false, .uiElement = true });
@@ -1041,20 +1044,24 @@ public:
 		engine::ecs::AddComponent(quitGameButton, PauseComponent{ .upper = mainMenuButton, .lower = resumeButton, .selectedTexture = resources::menuTextures["UI_QuitGame.png"], .unselectedTexture = resources::menuTextures["UI_QuitGame_N.png"], .operation = PauseSystem::OnQuitGamePressed });
 
 		////                      ---------  OPTIONS BUTTONS init --------
+		//options Title
+		engine::ecs::AddComponent(optionsImage, engine::Transform{ .position = Vector3(0, .8f, -0.1f), .scale = Vector3(.35f) });
+		engine::ecs::AddComponent(optionsImage, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Options_N.png"], .enabled = false, .uiElement = true });
+		engine::ecs::AddComponent(optionsImage, PauseComponent{ .unselectedTexture = resources::menuTextures["UI_Options_N.png"], .isOptionsMenu = true, .isTitle = true });
 		//optionsResumeButton
-		engine::ecs::AddComponent(optionsResumeButton, engine::Transform{ .position = Vector3(0, .3f, -0.1f), .scale = Vector3(.25f) });
+		engine::ecs::AddComponent(optionsResumeButton, engine::Transform{ .position = Vector3(0, .5f, -0.1f), .scale = Vector3(.25f) });
 		engine::ecs::AddComponent(optionsResumeButton, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Resume.png"], .enabled = false, .uiElement = true });
 		engine::ecs::AddComponent(optionsResumeButton, PauseComponent{ .upper = fullscreenEntity, .lower = musicSliderEntity, .selectedTexture = resources::menuTextures["UI_Resume.png"], .unselectedTexture = resources::menuTextures["UI_Resume_N.png"], .operation = BackToUIMenu, .isOptionsMenu = true });
 		//musicSliderEntity
-		engine::ecs::AddComponent(musicSliderEntity, engine::Transform{ .position = Vector3(0, .1f, -0.1f), .scale = Vector3(0.25f) });
+		engine::ecs::AddComponent(musicSliderEntity, engine::Transform{ .position = Vector3(0, .3f, -0.1f), .scale = Vector3(0.25f) });
 		engine::ecs::AddComponent(musicSliderEntity, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Music_Slider.png"], .enabled = false, .uiElement = true });
-		engine::ecs::AddComponent(musicSliderEntity, PauseComponent{ .upper = optionsResumeButton, .lower = fullscreenEntity, .selectedTexture = resources::menuTextures["UI_Music_Slider.png"], .unselectedTexture = resources::menuTextures["UI_Music_Slider_N.png"], .operation = PauseSystem::OnMainMenuPressed, .isOptionsMenu = true,.isSlider = true });
+		engine::ecs::AddComponent(musicSliderEntity, PauseComponent{ .upper = optionsResumeButton, .lower = fullscreenEntity, .selectedTexture = resources::menuTextures["UI_Music_Slider.png"], .unselectedTexture = resources::menuTextures["UI_Music_Slider_N.png"], .isOptionsMenu = true,.isSlider = true });
 		//fullscreenEntity
-		engine::ecs::AddComponent(fullscreenEntity, engine::Transform{ .position = Vector3(0, -0.7f, -0.1f), .scale = Vector3(0.25f) });
-		engine::ecs::AddComponent(fullscreenEntity, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Fullscreen.png"], .enabled = false, .uiElement = true });
-		engine::ecs::AddComponent(fullscreenEntity, PauseComponent{ .upper = musicSliderEntity, .lower = optionsResumeButton, .selectedTexture = resources::menuTextures["UI_Fullscreen.png"], .unselectedTexture = resources::menuTextures["UI_Fullscreen_N.png"], .operation = PauseSystem::OnQuitGamePressed, .isOptionsMenu = true });
+		engine::ecs::AddComponent(fullscreenEntity, engine::Transform{ .position = Vector3(0, .1f, -0.1f), .scale = Vector3(0.25f) });
+		engine::ecs::AddComponent(fullscreenEntity, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Credits.png"], .enabled = false, .uiElement = true });
+		engine::ecs::AddComponent(fullscreenEntity, PauseComponent{ .upper = musicSliderEntity, .lower = optionsResumeButton, .selectedTexture = resources::menuTextures["UI_Credits.png"], .unselectedTexture = resources::menuTextures["UI_Credits_N.png"], .operation = ToggleFullscreen, .isOptionsMenu = true });
 		//musicSliderNub
-		engine::ecs::AddComponent(musicSliderNub, engine::Transform{ .position = engine::ecs::GetComponent<engine::Transform>(musicSliderEntity).position + Vector3(0, -0.2f, -0.1), .scale = Vector3(0.15f) });
+		engine::ecs::AddComponent(musicSliderNub, engine::Transform{ .position = engine::ecs::GetComponent<engine::Transform>(musicSliderEntity).position + Vector3(0, -0.2f, -0.1), .scale = Vector3(0.1f) });
 		engine::ecs::AddComponent(musicSliderNub, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Slider_Button.png"], .enabled = false, .uiElement = true });
 		engine::ecs::AddComponent(musicSliderNub, PauseComponent{ .selectedTexture = resources::menuTextures["UI_Slider_Button.png"], .unselectedTexture = resources::menuTextures["UI_Slider_Button.png"], .isOptionsMenu = true,.isSlider = true });
 	}
@@ -1177,7 +1184,7 @@ public:
 		engine::ecs::GetSystem<PauseSystem>()->pauseMenuAt = main;
 		engine::ecs::GetSystem<PauseSystem>()->ToggleShowUIMenu();
 	}
-	static  void OnResumePressed()
+	static void OnResumePressed()
 	{
 		engine::ecs::GetSystem<PauseSystem>()->isGamePause = !engine::ecs::GetSystem<PauseSystem>()->isGamePause;
 		engine::ecs::GetSystem<PauseSystem>()->ToggleShowUIMenu();
@@ -1186,7 +1193,7 @@ public:
 		engine::enablePhysics = true;
 		engine::enableAnimation = true;
 	}
-	static  void OnOptionsPressed()
+	static void OnOptionsPressed()
 	{
 		engine::ecs::GetSystem<PauseSystem>()->ToggleShowUIOptionsMenu();
 	}
@@ -1194,7 +1201,7 @@ public:
 	{
 		glfwSetWindowShouldClose(mainWindow, true);
 	}
-	static  void OnMainMenuPressed()
+	static void OnMainMenuPressed()
 	{
 		ReturnToMainMenu();
 	}
@@ -1222,10 +1229,13 @@ public:
 			}
 
 			PauseComponent& pauseComponent = engine::ecs::GetComponent<PauseComponent>(entity);
-			engine::SpriteRenderer& selectedSpriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(entity);
-			engine::Transform& selectedSpriteTransform = engine::ecs::GetComponent<engine::Transform>(entity);
-			selectedSpriteTransform.scale = Vector3(0.25f);
-			selectedSpriteRenderer.texture = pauseComponent.unselectedTexture;
+			if (!pauseComponent.isTitle)
+			{
+				engine::SpriteRenderer& selectedSpriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(entity);
+				engine::Transform& selectedSpriteTransform = engine::ecs::GetComponent<engine::Transform>(entity);
+				selectedSpriteTransform.scale = Vector3(0.25f);
+				selectedSpriteRenderer.texture = pauseComponent.unselectedTexture;
+			}
 		}
 		currentSelection = resumeButton;
 

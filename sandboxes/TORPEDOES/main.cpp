@@ -653,7 +653,7 @@ static void LoadLevel5(engine::Camera* cam)
 	//Collectibles
 	// First boxes
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3590.000000, -2965.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3630.000000, -2910.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3630.000000, -2907.500000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3670.000000, -2850.000000, 0.300000));
 
 	// First vertical straight
@@ -680,11 +680,51 @@ static void LoadLevel5(engine::Camera* cam)
 
 	// islands
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8820.000000, -1135.000000, 0.300000));
-	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8820.000000, -1190.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8820.000000, -1195.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8820.000000, -1255.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(9340.000000, -1740.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(9280.000000, -1740.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(9210.000000, -1740.000000, 0.300000));
+
+	// next section
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8300.000000, -2745.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8225.000000, -2745.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8375.000000, -2745.000000, 0.300000));
+
+	// before small shortcuts
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8480.000000, -4070.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8480.000000, -4130.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8480.000000, -4190.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(8480.000000, -4250.000000, 0.300000));
+
+	// after small shortcuts
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5620.000000, -3060.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5537.500000, -3060.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5455.000000, -3060.000000, 0.300000));
+
+	// wide section next to pontoon
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(6060.000000, -4465.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(6115.000000, -4465.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(6170.000000, -4465.000000, 0.300000));
+
+	// bottom branching paths
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5455.000000, -5200.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5455.000000, -5250.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5455.000000, -5300.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5100.000000, -4860.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(4745.000000, -4925.000000, 0.300000));
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3630.000000, -5140.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3630.000000, -5065.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3630.000000, -4990.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3630.000000, -5215.000000, 0.300000));
+
+	// before finish line
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1465.000000, -4670.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1415.000000, -4670.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1365.000000, -4670.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1315.000000, -4670.000000, 0.300000));
+
 
 	PlayCountdown(Vector3(3300.0f, -4000.0f, 200.0f));
 	PlayerController::lapCount = 2;
@@ -702,13 +742,13 @@ static void SetupInput()
 	float AnalogNegativeMaxDeadZone = 0;
 
 	input::ConstructDigitalEvent("Pause");
-	input::ConstructDigitalEvent("MenuDpadUp");
-	input::ConstructDigitalEvent("MenuDpadDown");
 	input::ConstructAnalogEvent("MenuVertical");
 	input::ConstructDigitalEvent("MenuConfirm");
 	input::ConstructDigitalEvent("MenuBack");
-	input::ConstructDigitalEvent("DpadRight");
-	input::ConstructDigitalEvent("DpadLeft");
+	input::ConstructDigitalEvent("MenuDpadUp");
+	input::ConstructDigitalEvent("MenuDpadDown");
+	input::ConstructDigitalEvent("MenuDpadLeft");
+	input::ConstructDigitalEvent("MenuDpadRight");
 
 	for (size_t i = 0; i < 4; i++)
 	{
@@ -722,13 +762,14 @@ static void SetupInput()
 
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "Boost" + std::to_string(i) });
+
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_START, { "Pause" });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "MenuConfirm" });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "MenuBack" });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_UP, { "MenuDpadUp" });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_DOWN, { "MenuDpadDown" });
-		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, { "DpadRight" });
-		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_LEFT, { "DpadLeft" });
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_LEFT, { "MenuDpadLeft" });
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, { "MenuDpadRight" });
 
 		input::bindAnalogControllerInput(i,
 			{
@@ -841,6 +882,7 @@ int main()
 	soundSystem->AddSoundEngine("Boat");
 	soundSystem->AddSoundEngine("Background");
 	soundSystem->AddSoundEngine("Music");
+	soundSystem->SetGlobalVolume(1);
 	ecs::SetComponentDestructor<engine::SoundComponent>(OnSoundComponentDestroyed);
 
 	//Loads all globally used resources
@@ -874,7 +916,7 @@ int main()
 
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
-	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(500, -500, 166), .scale = 20 });
+	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(5455.000000, -3060.000000, 166), .scale = 20 });
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
 	ecs::AddTag(placementEditor, "persistent");
 
@@ -889,6 +931,8 @@ int main()
 	//Delete loading screen
 	ecs::DestroyEntity(loadingScreen);
 	delete loadingTexture;
+
+	bool altDown = false;
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -955,6 +999,19 @@ int main()
 		{
 			ReturnToMainMenu();
 		}
+		if (glfwGetKey(window, GLFW_KEY_ENTER) && glfwGetKey(window, GLFW_KEY_LEFT_ALT))
+		{
+			if (!altDown)
+			{
+				altDown = true;
+				ToggleFullscreen();
+			}
+		}
+		else
+		{
+			altDown = false;
+		}
+
 
 		input::update();
 
