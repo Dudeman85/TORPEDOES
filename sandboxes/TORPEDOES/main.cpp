@@ -702,13 +702,13 @@ static void SetupInput()
 	float AnalogNegativeMaxDeadZone = 0;
 
 	input::ConstructDigitalEvent("Pause");
-	input::ConstructDigitalEvent("MenuDpadUp");
-	input::ConstructDigitalEvent("MenuDpadDown");
 	input::ConstructAnalogEvent("MenuVertical");
 	input::ConstructDigitalEvent("MenuConfirm");
 	input::ConstructDigitalEvent("MenuBack");
-	input::ConstructDigitalEvent("DpadRight");
-	input::ConstructDigitalEvent("DpadLeft");
+	input::ConstructDigitalEvent("MenuDpadUp");
+	input::ConstructDigitalEvent("MenuDpadDown");
+	input::ConstructDigitalEvent("MenuDpadLeft");
+	input::ConstructDigitalEvent("MenuDpadRight");
 
 	for (size_t i = 0; i < 4; i++)
 	{
@@ -722,13 +722,14 @@ static void SetupInput()
 
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "Boost" + std::to_string(i) });
+
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_START, { "Pause" });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "MenuConfirm" });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "MenuBack" });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_UP, { "MenuDpadUp" });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_DOWN, { "MenuDpadDown" });
-		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, { "DpadRight" });
-		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_LEFT, { "DpadLeft" });
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_LEFT, { "MenuDpadLeft" });
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, { "MenuDpadRight" });
 
 		input::bindAnalogControllerInput(i,
 			{
@@ -841,6 +842,7 @@ int main()
 	soundSystem->AddSoundEngine("Boat");
 	soundSystem->AddSoundEngine("Background");
 	soundSystem->AddSoundEngine("Music");
+	soundSystem->SetGlobalVolume(0.1);
 	ecs::SetComponentDestructor<engine::SoundComponent>(OnSoundComponentDestroyed);
 
 	//Loads all globally used resources

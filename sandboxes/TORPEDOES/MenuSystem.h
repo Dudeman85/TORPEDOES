@@ -606,7 +606,7 @@ public:
 			PlayerSelection& playerSelection = engine::ecs::GetComponent<PlayerSelection>(entity);
 
 			float turnInput = input::GetTotalInputValue("Turn" + std::to_string(playerSelection.playerID));
-			int turnDpadInput = input::GetPressed("DpadRight") - input::GetPressed("DpadLeft");
+			int turnDpadInput = input::GetPressed("MenuDpadRight") - input::GetPressed("MenuDpadLeft");
 			turnInput += turnDpadInput;
 			bool aPressed = input::GetNewPress("Shoot" + std::to_string(playerSelection.playerID));
 			bool bPressed = input::GetNewPress("Boost" + std::to_string(playerSelection.playerID));
