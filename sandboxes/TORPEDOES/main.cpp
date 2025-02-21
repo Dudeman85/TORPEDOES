@@ -842,7 +842,7 @@ int main()
 	soundSystem->AddSoundEngine("Boat");
 	soundSystem->AddSoundEngine("Background");
 	soundSystem->AddSoundEngine("Music");
-	soundSystem->SetGlobalVolume(0.1);
+	soundSystem->SetGlobalVolume(1);
 	ecs::SetComponentDestructor<engine::SoundComponent>(OnSoundComponentDestroyed);
 
 	//Loads all globally used resources
@@ -891,6 +891,8 @@ int main()
 	//Delete loading screen
 	ecs::DestroyEntity(loadingScreen);
 	delete loadingTexture;
+
+	bool altDown = false;
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -957,6 +959,19 @@ int main()
 		{
 			ReturnToMainMenu();
 		}
+		if (glfwGetKey(window, GLFW_KEY_ENTER) && glfwGetKey(window, GLFW_KEY_LEFT_ALT))
+		{
+			if (!altDown)
+			{
+				altDown = true;
+				ToggleFullscreen();
+			}
+		}
+		else
+		{
+			altDown = false;
+		}
+
 
 		input::update();
 
