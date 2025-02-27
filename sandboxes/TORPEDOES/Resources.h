@@ -19,6 +19,7 @@ namespace resources
 	Tilemap* level3Map; // Tropical tilemap
 	Tilemap* level4Map; // Long tilemap	
 	Tilemap* level5Map; // Ocean Tilemap
+	Tilemap* level6Map; // river2 Tilemap
 
 	Animation explosionAnimation;
 	Animation WaterexplosionAnimation;
@@ -61,6 +62,8 @@ namespace resources
 		level4Map->loadMap("/levels/level4.tmx");
 		level5Map = new Tilemap(cam);
 		level5Map->loadMap("/levels/level5.tmx");
+		level6Map = new Tilemap(cam);
+		level6Map->loadMap("/levels/level6.tmx");
 
 		explosionAnimation = AnimationsFromSpritesheet("/spritesheets/explosion.png", 6, 1, vector<int>(6, 150))[0];
 		WaterexplosionAnimation = AnimationsFromSpritesheet("/spritesheets/Hedgehog_Explosion.png", 14, 1, vector<int>(14, 70))[0];
@@ -93,5 +96,6 @@ namespace resources
 		delete level3Map;
 		delete level4Map;
 		delete level5Map;
+		delete level6Map;
 	}
 }

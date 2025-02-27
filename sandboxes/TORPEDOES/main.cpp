@@ -726,6 +726,58 @@ static void LoadLevel5(engine::Camera* cam)
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1315.000000, -4670.000000, 0.300000));
 
 
+	//Make the crowds manually
+	// Starting point crowd
+	CreateCrowd({ 3165.000000, -3935.000000, 168 }, resources::crowdAnims1);
+	CreateCrowd({ 3445.000000, -3930.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 3350.000000, -3925.000000, 166 }, resources::crowdAnims1);
+	CreateCrowd({ 3245.000000, -3910.000000, 165 }, resources::crowdAnims1);
+	CreateCrowd({ 3385.000000, -3900.000000, 164 }, resources::crowdAnims1);
+	CreateCrowd({ 3180.000000, -3890.000000, 163 }, resources::crowdAnims1);
+	CreateCrowd({ 3530.000000, -3885.000000, 162 }, resources::crowdAnims1);
+	CreateCrowd({ 3260.000000, -3880.000000, 161 }, resources::crowdAnims1);
+
+	// first island crowd
+	CreateCrowd({ 1845.000000, -1755.000000, 168 }, resources::crowdAnims1);
+	CreateCrowd({ 1825.000000, -1720.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 1790.000000, -1680.000000, 166 }, resources::crowdAnims1);
+	CreateCrowd({ 1850.000000, -1665.000000, 165 }, resources::crowdAnims1);
+
+	// large platform crowd
+	CreateCrowd({ 5625.000000, -1340.000000, 168 }, resources::crowdAnims1);
+	CreateCrowd({ 5810.000000, -1325.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 5710.000000, -1299.000000, 166 }, resources::crowdAnims1);
+	CreateCrowd({ 5630.000000, -1275.000000, 165 }, resources::crowdAnims1);
+	CreateCrowd({ 5800.000000, -1265.000000, 164 }, resources::crowdAnims1);
+	CreateCrowd({ 5700.000000, -1255.000000, 163 }, resources::crowdAnims1);
+
+	// islands platform crowd
+	CreateCrowd({ 7995.000000, -1395.000000, 168 }, resources::crowdAnims1);
+	CreateSmallCrowd({ 8015.000000, -1380.000000, 167 }, resources::crowdAnims2);
+	CreateCrowd({ 7990.000000, -1365.000000, 166 }, resources::crowdAnims1);
+	CreateSmallCrowd({ 7950.000000, -1355.000000, 165 }, resources::crowdAnims2);
+
+	// first narrow path crowd
+	CreateCrowd({ 7590.000000, -4050.000000, 168 }, resources::crowdAnims1);
+	CreateCrowd({ 7600.000000, -4035.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 7595.000000, -4020.000000, 166 }, resources::crowdAnims1);
+
+	// largest platform crowd
+	CreateCrowd({ 5500.000000, -4475.000000, 168 }, resources::crowdAnims1);
+	CreateCrowd({ 5615.000000, -4460.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 5695.000000, -4440.000000, 166 }, resources::crowdAnims1);
+	CreateCrowd({ 5560.000000, -4420.000000, 165 }, resources::crowdAnims1);
+	CreateCrowd({ 5515.000000, -4400.000000, 164 }, resources::crowdAnims1);
+	CreateCrowd({ 5660.000000, -4385.000000, 163 }, resources::crowdAnims1);
+	CreateCrowd({ 5500.000000, -4355.000000, 162 }, resources::crowdAnims1);
+	CreateCrowd({ 5690.000000, -4315.000000, 161 }, resources::crowdAnims1);
+
+	// small platform next to big one crowd
+	CreateCrowd({ 5265.000000, -4690.000000, 168 }, resources::crowdAnims1);
+	CreateCrowd({ 5185.000000, -4675.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 5225.000000, -4655.000000, 166 }, resources::crowdAnims1);
+
+
 	PlayCountdown(Vector3(3300.0f, -4000.0f, 200.0f));
 	PlayerController::lapCount = 2;
 	//Create the players
@@ -916,7 +968,7 @@ int main()
 
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
-	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(5455.000000, -3060.000000, 166), .scale = 20 });
+	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(3300.0f, -4000.0f, 166), .scale = 20 });
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
 	ecs::AddTag(placementEditor, "persistent");
 
