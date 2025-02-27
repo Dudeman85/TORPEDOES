@@ -133,6 +133,9 @@ public:
 	void Update()
 	{
 		float turnInput = input::GetTotalInputValue("Turn" + to_string(firstPlayer));
+		int dpadInput = input::GetPressed("MenuDpadLeft" + to_string(firstPlayer)) - input::GetPressed("MenuDpadRight" + to_string(firstPlayer));
+		turnInput += dpadInput;
+
 		Audio* switchAudio = engine::AddAudio("Background", "audio/leftright.wav", false, 0.01f, DistanceModel::LINEAR);
 		switchAudio->pause();
 		if (turnInput > 0 && readyToMoveLeft)
@@ -1056,14 +1059,14 @@ public:
 		engine::ecs::AddComponent(musicSliderEntity, engine::Transform{ .position = Vector3(0, .3f, -0.1f), .scale = Vector3(0.25f) });
 		engine::ecs::AddComponent(musicSliderEntity, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Music_Slider.png"], .enabled = false, .uiElement = true });
 		engine::ecs::AddComponent(musicSliderEntity, PauseComponent{ .upper = optionsResumeButton, .lower = fullscreenEntity, .selectedTexture = resources::menuTextures["UI_Music_Slider.png"], .unselectedTexture = resources::menuTextures["UI_Music_Slider_N.png"], .isOptionsMenu = true,.isSlider = true });
-		//fullscreenEntity
-		engine::ecs::AddComponent(fullscreenEntity, engine::Transform{ .position = Vector3(0, .1f, -0.1f), .scale = Vector3(0.25f) });
-		engine::ecs::AddComponent(fullscreenEntity, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Credits.png"], .enabled = false, .uiElement = true });
-		engine::ecs::AddComponent(fullscreenEntity, PauseComponent{ .upper = musicSliderEntity, .lower = optionsResumeButton, .selectedTexture = resources::menuTextures["UI_Credits.png"], .unselectedTexture = resources::menuTextures["UI_Credits_N.png"], .operation = ToggleFullscreen, .isOptionsMenu = true });
 		//musicSliderNub
-		engine::ecs::AddComponent(musicSliderNub, engine::Transform{ .position = engine::ecs::GetComponent<engine::Transform>(musicSliderEntity).position + Vector3(0, -0.2f, -0.1), .scale = Vector3(0.1f) });
+		engine::ecs::AddComponent(musicSliderNub, engine::Transform{ .position = engine::ecs::GetComponent<engine::Transform>(musicSliderEntity).position + Vector3(0, -0.1f, 0.1), .scale = Vector3(0.05f) });
 		engine::ecs::AddComponent(musicSliderNub, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Slider_Button.png"], .enabled = false, .uiElement = true });
-		engine::ecs::AddComponent(musicSliderNub, PauseComponent{ .selectedTexture = resources::menuTextures["UI_Slider_Button.png"], .unselectedTexture = resources::menuTextures["UI_Slider_Button.png"], .isOptionsMenu = true,.isSlider = true });
+		engine::ecs::AddComponent(musicSliderNub, PauseComponent{ .selectedTexture = resources::menuTextures["UI_Slider_Button.png"], .unselectedTexture = resources::menuTextures["UI_Slider_Button.png"], .isOptionsMenu = true, .isTitle = true });
+		//fullscreenEntity
+		engine::ecs::AddComponent(fullscreenEntity, engine::Transform{ .position = Vector3(0, .0f, -0.1f), .scale = Vector3(0.25f) });
+		engine::ecs::AddComponent(fullscreenEntity, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Windowed.png"], .enabled = false, .uiElement = true });
+		engine::ecs::AddComponent(fullscreenEntity, PauseComponent{ .upper = musicSliderEntity, .lower = optionsResumeButton, .selectedTexture = resources::menuTextures["UI_Windowed.png"], .unselectedTexture = resources::menuTextures["UI_Windowed_N.png"], .operation = OnFullScreenPressed, .isOptionsMenu = true });
 	}
 
 	void Update()
@@ -1071,6 +1074,10 @@ public:
 		float verticalInput = input::GetTotalInputValue("MenuVertical");
 		int verticalDpadInput = input::GetPressed("MenuDpadDown") - input::GetPressed("MenuDpadUp");
 		verticalInput += verticalDpadInput;
+
+		float horizontalInput = input::GetTotalInputValue("MenuHorizontal");
+		int horizontalDpadInput = input::GetPressed("MenuDpadLeft") - input::GetPressed("MenuDpadRight");
+		horizontalInput += horizontalDpadInput;
 
 		bool confirmInput = input::GetNewPress("MenuConfirm");
 		bool backInput = input::GetNewPress("MenuBack");
@@ -1098,6 +1105,20 @@ public:
 		else
 		{
 			repeatInputDelay = 0;
+		}
+
+		//Move slider left/right
+		PauseComponent& pc = ecs::GetComponent<PauseComponent>(currentSelection);
+		if (pc.isSlider)
+		{
+			if (horizontalInput >= 0.5f)
+			{
+				MusicSliderRight();
+			}
+			else if (horizontalInput <= -0.5f)
+			{
+				MusicSliderLeft();
+			}
 		}
 
 		//A pressed
@@ -1129,17 +1150,18 @@ public:
 		}
 	}
 
-	void AddButton(engine::ecs::Entity entity, Vector3 pos, engine::Texture selectedTexture, engine::Texture unselectedTexture, Vector3 scaleNormal, Vector3 scaleSelected)
-	{
-		engine::ecs::AddComponent(fullscreenEntity, engine::Transform{ .position = Vector3(0.7, -0.7f, -0.1f), .scale = Vector3(0.25f) });
-		engine::ecs::AddComponent(fullscreenEntity, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Fullscreen_N.png"], .enabled = false, .uiElement = true });
-		engine::ecs::AddComponent(fullscreenEntity, PauseComponent{ .upper = mainMenuButton, .lower = resumeButton, .selectedTexture = resources::menuTextures["UI_Fullscreen_N.png"], .unselectedTexture = resources::menuTextures["UI_Fullscreen.png"], .operation = PauseSystem::OnQuitGamePressed });
-	}
 	void MoveUpper()
 	{
 		PauseComponent& pauseComponent = engine::ecs::GetComponent<PauseComponent>(currentSelection);
 		engine::SpriteRenderer& unselectedSpriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(currentSelection);
 		engine::Transform& unselectedTransform = engine::ecs::GetComponent<engine::Transform>(currentSelection);
+
+		if (pauseComponent.isSlider)
+		{
+			Transform& nubTransform = ecs::GetComponent<Transform>(musicSliderNub);
+			nubTransform.position.y = unselectedTransform.position.y - 0.085f;
+			nubTransform.scale = Vector3(0.043f);
+		}
 
 		unselectedTransform.scale = Vector3(0.25f);
 		unselectedSpriteRenderer.texture = pauseComponent.unselectedTexture;
@@ -1150,6 +1172,13 @@ public:
 		engine::Transform& selectedSpriteTransform = engine::ecs::GetComponent<engine::Transform>(currentSelection);
 		selectedSpriteTransform.scale = Vector3(0.32f);
 		selectedSpriteRenderer.texture = pauseComponent1.selectedTexture;
+
+		if (pauseComponent1.isSlider)
+		{
+			Transform& nubTransform = ecs::GetComponent<Transform>(musicSliderNub);
+			nubTransform.position.y = selectedSpriteTransform.position.y - 0.107f;
+			nubTransform.scale = Vector3(0.063f);
+		}
 	}
 	void MoveLower()
 	{
@@ -1160,25 +1189,28 @@ public:
 		unselectedTransform.scale = Vector3(0.25f);
 		unselectedSpriteRenderer.texture = pauseComponent.unselectedTexture;
 
+		if (pauseComponent.isSlider)
+		{
+			Transform& nubTransform = ecs::GetComponent<Transform>(musicSliderNub);
+			nubTransform.position.y = unselectedTransform.position.y - 0.085f;
+			nubTransform.scale = Vector3(0.043f);
+		}
+
 		currentSelection = pauseComponent.lower;
 		PauseComponent& pauseComponent1 = engine::ecs::GetComponent<PauseComponent>(currentSelection);
 		engine::SpriteRenderer& selectedSpriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(currentSelection);
 		engine::Transform& selectedSpriteTransform = engine::ecs::GetComponent<engine::Transform>(currentSelection);
 		selectedSpriteTransform.scale = Vector3(0.32f);
 		selectedSpriteRenderer.texture = pauseComponent1.selectedTexture;
+
+		if (pauseComponent1.isSlider)
+		{
+			Transform& nubTransform = ecs::GetComponent<Transform>(musicSliderNub);
+			nubTransform.position.y = selectedSpriteTransform.position.y - 0.107f;
+			nubTransform.scale = Vector3(0.063f);
+		}
 	}
-	bool IsCurrentPauseComponentSlider()
-	{
-		return engine::ecs::GetComponent<PauseComponent>(currentSelection).isSlider;
-	}
-	PauseComponent& GetCurrentSelectedPauseComponent()
-	{
-		return engine::ecs::GetComponent<PauseComponent>(currentSelection);
-	}
-	engine::ecs::Entity GetCurrentSelection()
-	{
-		return currentSelection;
-	}
+
 	static void BackToUIMenu()
 	{
 		engine::ecs::GetSystem<PauseSystem>()->pauseMenuAt = main;
@@ -1205,12 +1237,40 @@ public:
 	{
 		ReturnToMainMenu();
 	}
+	static void OnFullScreenPressed()
+	{
+		ToggleFullscreen();
+		ecs::GetSystem<PauseSystem>()->UpdateFullscreenIcon();
+	}
+	void UpdateFullscreenIcon()
+	{
+		SpriteRenderer& sr = ecs::GetComponent<SpriteRenderer>(fullscreenEntity);
+		PauseComponent& pauseComp = ecs::GetComponent<PauseComponent>(fullscreenEntity);
+
+		if (!mainWindowFullscreen)
+		{
+			//Make windowed
+			pauseComp.selectedTexture = resources::menuTextures["UI_Windowed.png"];
+			pauseComp.unselectedTexture = resources::menuTextures["UI_Windowed_N.png"];
+		}
+		else
+		{
+			//Make Fullscreen
+			pauseComp.selectedTexture = resources::menuTextures["UI_Fullscreen.png"];
+			pauseComp.unselectedTexture = resources::menuTextures["UI_Fullscreen_N.png"];
+		}
+		//Set the button sprite
+		if (currentSelection == fullscreenEntity)
+			sr.texture = pauseComp.selectedTexture;
+		else
+			sr.texture = pauseComp.unselectedTexture;
+	}
+
 	void Selected()
 	{
 		PauseComponent& pauseComponent = engine::ecs::GetComponent<PauseComponent>(currentSelection);
-		engine::SpriteRenderer& pauseSpriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(currentSelection);
-		pauseSpriteRenderer.texture = pauseComponent.selectedTexture;
-		pauseComponent.operation();
+		if (pauseComponent.operation)
+			pauseComponent.operation();
 	}
 
 	void ToggleShowUIMenu()
@@ -1254,42 +1314,6 @@ public:
 		selectedSpriteRenderer.texture = pauseComponent.selectedTexture;
 	}
 
-	void UpdateSlider()
-	{
-		// TODO: change 	sliderValue dosent update in main Fix need pointer or reference
-		PauseComponent& pauseComponent = engine::ecs::GetComponent<PauseComponent>(currentSelection);
-		engine::Transform& selectedSliderTransform = engine::ecs::GetComponent<engine::Transform>(currentSelection);
-		PauseComponent& pauseComponentNub = engine::ecs::GetComponent<PauseComponent>(musicSliderNub);
-		engine::Transform& nubTransform = engine::ecs::GetComponent<engine::Transform>(musicSliderNub);
-		nubTransform.position = Vector3(pauseComponentNub.sliderValue, 0, 0);
-		//printf("pauseComponentNub.sliderValue ");
-		std::cout << pauseComponentNub.sliderValue;
-
-		//std::cout << "Nub pos:" << "x:" << nubTransform.position.x << " y:" << nubTransform.position.y << "\n";
-	}
-
-	void MoveSliderRight()
-	{
-		PauseComponent& pauseComponentNub = engine::ecs::GetComponent<PauseComponent>(musicSliderNub);
-		engine::Transform& nubTransform = engine::ecs::GetComponent<engine::Transform>(musicSliderNub);
-		nubTransform.position += Vector3(0.01f, 0, 0);
-		nubTransform.position.x = clamp(nubTransform.position.x, -0.17f, 0.17f);
-		//printf("pauseComponentNub.sliderValue ");
-		std::cout << pauseComponentNub.sliderValue;
-
-		//std::cout << "Nub pos:" << "x:" << nubTransform.position.x << " y:" << nubTransform.position.y << "\n";
-	}
-	void MoveSliderLeft()
-	{
-		PauseComponent& pauseComponentNub = engine::ecs::GetComponent<PauseComponent>(musicSliderNub);
-		engine::Transform& nubTransform = engine::ecs::GetComponent<engine::Transform>(musicSliderNub);
-		nubTransform.position -= Vector3(0.01f, 0, 0);
-		nubTransform.position.x = clamp(nubTransform.position.x, -0.17f, 0.17f);
-
-		std::cout << pauseComponentNub.sliderValue;
-
-		//std::cout << "Nub pos:" << "x:" << nubTransform.position.x << " y:" << nubTransform.position.y << "\n";
-	}
 	void ToggleShowUIOptionsMenu()
 	{
 		pauseMenuAt = options;
@@ -1315,11 +1339,53 @@ public:
 			enabled = !enabled;
 		}
 
+		//Set the right fullscreen/windowed button
+		UpdateFullscreenIcon();
+
+		//Set the music slider nub
+		Transform& nubTransform = ecs::GetComponent<Transform>(musicSliderNub);
+		nubTransform.position.y = ecs::GetComponent<Transform>(musicSliderEntity).position.y - 0.085f;
+		nubTransform.scale = Vector3(0.043f);
+
 		PauseComponent& pauseComponent = engine::ecs::GetComponent<PauseComponent>(currentSelection);
 		engine::SpriteRenderer& selectedSpriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(currentSelection);
 		engine::Transform& selectedSpriteTransform = engine::ecs::GetComponent<engine::Transform>(currentSelection);
 		selectedSpriteTransform.scale = Vector3(0.32f);
 		selectedSpriteRenderer.texture = pauseComponent.selectedTexture;
+	}
+
+	//right minimized 0.13
+	//left minimized -0.13
+	const float sliderLeftBound = -0.169;
+	const float sliderRightBound = 0.165;
+
+	void MusicSliderLeft()
+	{
+		Vector3 parentPos = ecs::GetComponent<Transform>(musicSliderEntity).position;
+		Transform& tf = ecs::GetComponent<Transform>(musicSliderNub);
+
+		if (tf.position.x > (parentPos.x + sliderLeftBound))
+		{
+			tf.position.x -= engine::deltaTime * 0.3;
+		}
+
+		tf.position.x = std::max(tf.position.x, parentPos.x + sliderLeftBound);
+
+		std::cout << tf.position.x << std::endl;
+	}
+	void MusicSliderRight()
+	{
+		Vector3 parentPos = ecs::GetComponent<Transform>(musicSliderEntity).position;
+		Transform& tf = ecs::GetComponent<Transform>(musicSliderNub);
+
+		if (tf.position.x < (parentPos.x + sliderRightBound))
+		{
+			tf.position.x += engine::deltaTime * 0.3;
+		}
+
+		tf.position.x = std::min(tf.position.x, parentPos.x + sliderRightBound);
+
+		std::cout << tf.position.x << std::endl;
 	}
 };
 

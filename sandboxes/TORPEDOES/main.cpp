@@ -795,6 +795,7 @@ static void SetupInput()
 
 	input::ConstructDigitalEvent("Pause");
 	input::ConstructAnalogEvent("MenuVertical");
+	input::ConstructAnalogEvent("MenuHorizontal");
 	input::ConstructDigitalEvent("MenuConfirm");
 	input::ConstructDigitalEvent("MenuBack");
 	input::ConstructDigitalEvent("MenuDpadUp");
@@ -810,6 +811,10 @@ static void SetupInput()
 		input::ConstructDigitalEvent("Shoot" + std::to_string(i));
 		input::ConstructDigitalEvent("Boost" + std::to_string(i));
 
+		//This is intentionally duplicate for map select
+		input::ConstructDigitalEvent("MenuDpadLeft" + std::to_string(i));
+		input::ConstructDigitalEvent("MenuDpadRight" + std::to_string(i));
+
 		// Controller input
 
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
@@ -822,6 +827,8 @@ static void SetupInput()
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_DOWN, { "MenuDpadDown" });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_LEFT, { "MenuDpadLeft" });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, { "MenuDpadRight" });
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_LEFT, { "MenuDpadLeft" + std::to_string(i) });
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, { "MenuDpadRight" + std::to_string(i) });
 
 		input::bindAnalogControllerInput(i,
 			{
@@ -835,6 +842,12 @@ static void SetupInput()
 				{ { input::controllerMixedInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_Y }
 			},
 			{ "MenuVertical" });
+
+		input::bindAnalogControllerInput(i,
+			{
+				{ { input::controllerMixedInput, AnalogNegativeMinDeadZone, AnalogPositiveMaxDeadZone }, GLFW_GAMEPAD_AXIS_LEFT_X }
+			},
+			{ "MenuHorizontal" });
 
 		input::bindAnalogControllerInput(i,
 			{
@@ -855,6 +868,8 @@ static void SetupInput()
 
 	input::bindAnalogInput(GLFW_KEY_UP, { input::digitalNegativeInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "MenuVertical" });
 	input::bindAnalogInput(GLFW_KEY_DOWN, { input::digitalPositiveInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "MenuVertical" });
+	input::bindAnalogInput(GLFW_KEY_LEFT, { input::digitalNegativeInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "MenuHorizontal" });
+	input::bindAnalogInput(GLFW_KEY_RIGHT, { input::digitalPositiveInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "MenuHorizontal" });
 	input::bindDigitalInput(GLFW_KEY_N, { "MenuConfirm" });
 	input::bindDigitalInput(GLFW_KEY_B, { "MenuBack" });
 
@@ -870,6 +885,8 @@ static void SetupInput()
 
 	input::bindAnalogInput(GLFW_KEY_W, { input::digitalNegativeInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "MenuVertical" });
 	input::bindAnalogInput(GLFW_KEY_S, { input::digitalPositiveInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "MenuVertical" });
+	input::bindAnalogInput(GLFW_KEY_A, { input::digitalNegativeInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "MenuHorizontal" });
+	input::bindAnalogInput(GLFW_KEY_D, { input::digitalPositiveInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "MenuHorizontal" });
 	input::bindDigitalInput(GLFW_KEY_H, { "MenuConfirm" });
 	input::bindDigitalInput(GLFW_KEY_J, { "MenuBack" });
 
@@ -1057,6 +1074,8 @@ int main()
 			{
 				altDown = true;
 				ToggleFullscreen();
+				if (gameState == pauseMenuState)
+					pauseSystem->UpdateFullscreenIcon();
 			}
 		}
 		else
