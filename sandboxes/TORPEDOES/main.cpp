@@ -758,6 +758,10 @@ static void SetupInput()
 		input::ConstructDigitalEvent("Shoot" + std::to_string(i));
 		input::ConstructDigitalEvent("Boost" + std::to_string(i));
 
+		//This is intentionally duplicate for map select
+		input::ConstructDigitalEvent("MenuDpadLeft" + std::to_string(i));
+		input::ConstructDigitalEvent("MenuDpadRight" + std::to_string(i));
+
 		// Controller input
 
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
@@ -770,6 +774,8 @@ static void SetupInput()
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_DOWN, { "MenuDpadDown" });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_LEFT, { "MenuDpadLeft" });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, { "MenuDpadRight" });
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_LEFT, { "MenuDpadLeft" + std::to_string(i) });
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, { "MenuDpadRight" + std::to_string(i) });
 
 		input::bindAnalogControllerInput(i,
 			{
@@ -1005,6 +1011,8 @@ int main()
 			{
 				altDown = true;
 				ToggleFullscreen();
+				if (gameState == pauseMenuState)
+					pauseSystem->UpdateFullscreenIcon();
 			}
 		}
 		else

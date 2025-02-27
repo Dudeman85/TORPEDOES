@@ -133,6 +133,9 @@ public:
 	void Update()
 	{
 		float turnInput = input::GetTotalInputValue("Turn" + to_string(firstPlayer));
+		int dpadInput = input::GetPressed("MenuDpadLeft" + to_string(firstPlayer)) - input::GetPressed("MenuDpadRight" + to_string(firstPlayer));
+		turnInput += dpadInput;
+
 		Audio* switchAudio = engine::AddAudio("Background", "audio/leftright.wav", false, 0.01f, DistanceModel::LINEAR);
 		switchAudio->pause();
 		if (turnInput > 0 && readyToMoveLeft)
@@ -1057,9 +1060,9 @@ public:
 		engine::ecs::AddComponent(musicSliderEntity, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Music_Slider.png"], .enabled = false, .uiElement = true });
 		engine::ecs::AddComponent(musicSliderEntity, PauseComponent{ .upper = optionsResumeButton, .lower = fullscreenEntity, .selectedTexture = resources::menuTextures["UI_Music_Slider.png"], .unselectedTexture = resources::menuTextures["UI_Music_Slider_N.png"], .isOptionsMenu = true,.isSlider = true });
 		//fullscreenEntity
-		engine::ecs::AddComponent(fullscreenEntity, engine::Transform{ .position = Vector3(0, .1f, -0.1f), .scale = Vector3(0.25f) });
-		engine::ecs::AddComponent(fullscreenEntity, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Credits.png"], .enabled = false, .uiElement = true });
-		engine::ecs::AddComponent(fullscreenEntity, PauseComponent{ .upper = musicSliderEntity, .lower = optionsResumeButton, .selectedTexture = resources::menuTextures["UI_Credits.png"], .unselectedTexture = resources::menuTextures["UI_Credits_N.png"], .operation = ToggleFullscreen, .isOptionsMenu = true });
+		engine::ecs::AddComponent(fullscreenEntity, engine::Transform{ .position = Vector3(0, .0f, -0.1f), .scale = Vector3(0.25f) });
+		engine::ecs::AddComponent(fullscreenEntity, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Windowed.png"], .enabled = false, .uiElement = true });
+		engine::ecs::AddComponent(fullscreenEntity, PauseComponent{ .upper = musicSliderEntity, .lower = optionsResumeButton, .selectedTexture = resources::menuTextures["UI_Windowed.png"], .unselectedTexture = resources::menuTextures["UI_Windowed_N.png"], .operation = OnFullScreenPressed, .isOptionsMenu = true });
 		//musicSliderNub
 		engine::ecs::AddComponent(musicSliderNub, engine::Transform{ .position = engine::ecs::GetComponent<engine::Transform>(musicSliderEntity).position + Vector3(0, -0.2f, -0.1), .scale = Vector3(0.1f) });
 		engine::ecs::AddComponent(musicSliderNub, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Slider_Button.png"], .enabled = false, .uiElement = true });
@@ -1129,12 +1132,6 @@ public:
 		}
 	}
 
-	void AddButton(engine::ecs::Entity entity, Vector3 pos, engine::Texture selectedTexture, engine::Texture unselectedTexture, Vector3 scaleNormal, Vector3 scaleSelected)
-	{
-		engine::ecs::AddComponent(fullscreenEntity, engine::Transform{ .position = Vector3(0.7, -0.7f, -0.1f), .scale = Vector3(0.25f) });
-		engine::ecs::AddComponent(fullscreenEntity, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Fullscreen_N.png"], .enabled = false, .uiElement = true });
-		engine::ecs::AddComponent(fullscreenEntity, PauseComponent{ .upper = mainMenuButton, .lower = resumeButton, .selectedTexture = resources::menuTextures["UI_Fullscreen_N.png"], .unselectedTexture = resources::menuTextures["UI_Fullscreen.png"], .operation = PauseSystem::OnQuitGamePressed });
-	}
 	void MoveUpper()
 	{
 		PauseComponent& pauseComponent = engine::ecs::GetComponent<PauseComponent>(currentSelection);
@@ -1205,6 +1202,35 @@ public:
 	{
 		ReturnToMainMenu();
 	}
+	static void OnFullScreenPressed()
+	{
+		ToggleFullscreen();
+		ecs::GetSystem<PauseSystem>()->UpdateFullscreenIcon();
+	}
+	void UpdateFullscreenIcon() 
+	{
+		SpriteRenderer& sr = ecs::GetComponent<SpriteRenderer>(fullscreenEntity);
+		PauseComponent& pauseComp = ecs::GetComponent<PauseComponent>(fullscreenEntity);
+
+		if (!mainWindowFullscreen)
+		{
+			//Make windowed
+			pauseComp.selectedTexture = resources::menuTextures["UI_Windowed.png"];
+			pauseComp.unselectedTexture = resources::menuTextures["UI_Windowed_N.png"];
+		}
+		else
+		{
+			//Make Fullscreen
+			pauseComp.selectedTexture = resources::menuTextures["UI_Fullscreen.png"];
+			pauseComp.unselectedTexture = resources::menuTextures["UI_Fullscreen_N.png"];
+		}
+		//Set the button sprite
+		if (currentSelection == fullscreenEntity)
+			sr.texture = pauseComp.selectedTexture;
+		else
+			sr.texture = pauseComp.unselectedTexture;
+	}
+
 	void Selected()
 	{
 		PauseComponent& pauseComponent = engine::ecs::GetComponent<PauseComponent>(currentSelection);
@@ -1314,6 +1340,9 @@ public:
 
 			enabled = !enabled;
 		}
+
+		//Set the right fullscreen/windowed button
+		UpdateFullscreenIcon();
 
 		PauseComponent& pauseComponent = engine::ecs::GetComponent<PauseComponent>(currentSelection);
 		engine::SpriteRenderer& selectedSpriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(currentSelection);
