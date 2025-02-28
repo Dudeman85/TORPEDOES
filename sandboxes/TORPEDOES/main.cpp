@@ -777,12 +777,46 @@ static void LoadLevel5(engine::Camera* cam)
 	CreateCrowd({ 5185.000000, -4675.000000, 167 }, resources::crowdAnims1);
 	CreateCrowd({ 5225.000000, -4655.000000, 166 }, resources::crowdAnims1);
 
+	// audio for crowd
+	cheeringSoundPos = {
+		{ 3245.000000, -3910.000000, 0 },
+		{ 1825.000000, -1700.000000, 0 },
+		{ 5700.000000, -1300.000000, 0 },
+		{ 8015.000000, -1380.000000, 0 },
+		{ 7600.000000, -4035.000000, 0 },
+		{ 5615.000000, -4400.000000, 0 },
+		{ 5185.000000, -4675.000000, 0 }
+	};
+	SetupCheeringSounds(cheeringSoundPos);
 
 	PlayCountdown(Vector3(3300.0f, -4000.0f, 200.0f));
 	PlayerController::lapCount = 2;
 	//Create the players
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(3390.0f, -4055.0f));
 }
+
+static void LoadLevel6(engine::Camera* cam)
+{
+	currentLevel = 6;
+	engine::collisionSystem->cam = cam;
+
+	// Set this level's tilemap
+	engine::spriteRenderSystem->SetTilemap(resources::level6Map);
+	engine::collisionSystem->SetTilemap(resources::level6Map);
+	engine::PhysicsSystem::SetTileProperty(1, engine::TileProperty{ true });
+
+	////Make all the checkpoints manually
+	checkPointNumber = 0;
+
+	CreateCheckpoint(Vector3(1475.000000, -460.000000, 70.000000), Vector3(-25.000000, -90.000000, -90.000000), Vector3(24.f), resources::models["Prop_Goal.obj"], 360.f, true);
+
+
+	PlayCountdown(Vector3(1235.0f, -310.0f, 200.0f));
+	PlayerController::lapCount = 3;
+	//Create the players
+	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1225.0f, -900.0f));
+}
+
 
 //Bind all input events here
 static void SetupInput()

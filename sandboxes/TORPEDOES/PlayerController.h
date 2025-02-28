@@ -523,7 +523,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 				playerComponent.submerged = true;
 				ecs::GetComponent<PolygonCollider>(playerEntity).layer = 2;
 				ecs::GetComponent<ModelRenderer>(playerComponent.renderedEntity).textures = { resources::subUnderwaterTexture };
-			}, 0.3);
+			}, 0.0);
 	}
 	//Surface if submerged
 	else

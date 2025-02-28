@@ -12,6 +12,7 @@ static GameState gameState = menuMainState;
 static bool canStartLoadingMap;
 static bool isSceneloaded;
 std::unordered_map<int, ShipType> playerShips;
+static void LoadLevel6(engine::Camera* cam);
 static void LoadLevel5(engine::Camera* cam);
 static void LoadLevel4(engine::Camera* cam);
 static void LoadLevel3(engine::Camera* cam);
@@ -61,7 +62,7 @@ class LevelSelectionSystem : public engine::ecs::System
 	float arrowPosHight = 0.88f;
 	float arrowsOffsetX = 0.6f;
 
-	std::vector<std::string> mapNames = { "Lake", "Caves", "Beach", "River", "Ocean" };
+	std::vector<std::string> mapNames = { "Lake", "Caves", "Beach", "River", "Ocean", "River2"};
 
 public:
 	engine::ecs::Entity arrowLeft;
@@ -91,6 +92,7 @@ public:
 		mapImages.push_back(resources::menuTextures["level3.png"]);
 		mapImages.push_back(resources::menuTextures["level4.png"]);
 		mapImages.push_back(resources::menuTextures["level5.png"]);
+		mapImages.push_back(resources::menuTextures["level6.png"]);
 
 
 		// Testi teksti
@@ -1409,6 +1411,10 @@ void LevelSelectionSystem::LoadThisLevel(int mapIndex)
 		break;
 	case 4:
 		LoadLevel5(cam);
+		break;
+	case 5:
+		LoadLevel6(cam);
+		break;
 	default:
 		std::cout << "NO LEVEL ON THAT INDEX" << mapIndex << std::endl;
 		break;
