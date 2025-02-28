@@ -954,7 +954,11 @@ public:
 					CreateAnimation(collision.b);
 
 					//Destroy projectile at end of frame
-					engine::ecs::DestroyEntity(collision.b);
+					if(projectile.deleteAffterHit == true)
+					{ 
+						engine::ecs::DestroyEntity(collision.b);
+					}
+					
 				}
 			}
 		}
