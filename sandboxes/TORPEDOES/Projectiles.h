@@ -2,6 +2,8 @@
 #include <engine/Application.h>
 #include "Resources.h"
 
+struct Player;
+
 enum HitStates
 {
 	None,			// Does nothing when hitting player
@@ -24,6 +26,7 @@ struct Projectile
 	float hitSpeedFactor = -0.05f;		// If hitType is not Stop, scale of speed change when hit
 	float hitTime = 2.0f;				// Time the hit lasts
 	bool canHitSubmerged = false;
+	bool deleteAffterHit = true;
 
 	/* Files */
 
@@ -75,12 +78,12 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 	Vector2 explosionScale = Vector3(30);
 
 	engine::ecs::Entity hedgehogExplosion = engine::ecs::NewEntity();
-	engine::ecs::AddComponent(hedgehogExplosion, engine::Transform{ .position = transform.position + Vector3(0, 0, 100 + (double)rand() / ((double)RAND_MAX + 1)), .scale = explosionScale });
+	engine::ecs::AddComponent(hedgehogExplosion, engine::Transform{ .position = transform.position + Vector3(0, 0, 50 + (double)rand() / ((double)RAND_MAX + 1)), .scale = explosionScale });
 	engine::ecs::AddComponent(hedgehogExplosion, engine::SpriteRenderer{ });
 	engine::ecs::AddComponent(hedgehogExplosion, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
 	std::vector<Vector2> explosionverts{ Vector2(explosionSize.x, explosionSize.x), Vector2(explosionSize.x, explosionSize.y), Vector2(explosionSize.y, explosionSize.y), Vector2(explosionSize.y, explosionSize.x) };
 	engine::ecs::AddComponent(hedgehogExplosion, engine::PolygonCollider{ .vertices = explosionverts, .trigger = true, .visualise = true });
-	engine::ecs::AddComponent(hedgehogExplosion, Projectile{ .ownerID = projectile.ownerID, .hitType = HitStates::Stop, .hitSpeedFactor = 0.5, .hitTime = 1, .canHitSubmerged = true, .hitAnimation = "" });
+	engine::ecs::AddComponent(hedgehogExplosion, Projectile{ .ownerID = projectile.ownerID, .hitType = HitStates::Stop, .hitSpeedFactor = 0.5, .hitTime = 1, .canHitSubmerged = true, .deleteAffterHit = false, .hitAnimation = "" });
 
 	// Crashes for some reason
 	
@@ -97,7 +100,20 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 		}, 0.5);
 
 	// check tilemap collision and activate explosion animation
-	if (engine::collisionSystem->tilemap->checkCollision(transform.position.x, transform.position.y) > 1)
+	engine::collisionSystem->UpdateAABB(hedgehogExplosion);
+	bool tileMapCollision = engine::collisionSystem->tilemap->checkCollision(transform.position.x, transform.position.y) > 1;
+	bool entityCollision = false;
+	for (engine::Collision& c : engine::collisionSystem->CheckCollision(hedgehogExplosion))
+	{
+		if (c.type == engine::Collision::Type::trigger) 
+		{
+			if (engine::ecs::HasComponent<Player>(c.b))
+			{
+				entityCollision = true;
+			}
+		}
+	}
+	if (tileMapCollision|| entityCollision)
 	{
 		engine::AnimationSystem::AddAnimation(hedgehogExplosion, resources::explosionAnimation, "explosion");
 		engine::AnimationSystem::PlayAnimation(hedgehogExplosion, "explosion", false);
@@ -140,7 +156,7 @@ public:
 	const float chargeTime = 1.0f;		// Time until full charge
 
 	const float speed = 1000.0f;
-	const float aimSpeed = 800.0f;
+	const float aimSpeed = 700.0f;
 
 	void Update()
 	{
