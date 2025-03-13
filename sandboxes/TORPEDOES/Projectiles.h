@@ -148,8 +148,8 @@ class HedgehogSystem : public engine::ecs::System
 public:
 	const float maxScale = 100.0f;
 	const float minScale = 50.0f;
-	const float minRotation = -50.0f;
-	const float maxRotation = +50.0f;
+	const float minRotation = -35.0f;
+	const float maxRotation = -130.0f;
 
 	const float maxDistance = 700.0f;	// Full charge distance
 	const float minDistance = 100.0f;	// No charge distance 
@@ -172,13 +172,16 @@ public:
 				// Projectile is still travelling to it's target distance
 
 				// Increment distance travelled
-				hedgehogComp.distanceTraveled += engine::ecs::GetSystem<HedgehogSystem>()->speed * engine::deltaTime;
+				hedgehogComp.distanceTraveled += engine::ecs::GetSystem<HedgehogSystem>()->speed * std::min(engine::deltaTime, 1.0 / 20.0);;
 
 				// Ratio of distance travelled to the target distance
 				float distanceRatio = hedgehogComp.distanceTraveled / hedgehogComp.targetDistance;
+				float rotation = minRotation + (maxRotation - minRotation) * distanceRatio;
 
 				// TODO: Calculate based on distance travelled
-				engine::TransformSystem::Rotate(entity, Vector3(0, 0, -105.5f * engine::deltaTime));
+				//engine::TransformSystem::Rotate(entity, Vector3(0, 0, -120.0f * engine::deltaTime));
+				transformComp.rotation.z = rotation;
+				transformComp.staleCache = true;
 
 				// Map scale to distance ratio
 				float scale = maxScale - (maxScale - minScale) * (2 * abs(0.5 - distanceRatio));
