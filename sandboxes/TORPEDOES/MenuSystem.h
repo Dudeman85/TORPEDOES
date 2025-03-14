@@ -1004,6 +1004,7 @@ class PauseSystem : public engine::ecs::System
 	float repeatInputDelay;
 	float moveWaitedTimerDown;
 	const float delay = 0.3f;
+	float volume = 0.5f;
 
 public:
 	int playerWhichPaused = 0;
@@ -1372,8 +1373,9 @@ public:
 		}
 
 		tf.position.x = std::max(tf.position.x, parentPos.x + sliderLeftBound);
-
-		std::cout << tf.position.x << std::endl;
+		volume = std::lerp(sliderLeftBound, sliderRightBound, tf.position.x);
+		std::cout << volume << std::endl;
+		ecs::GetSystem<SoundSystem>()->SetGlobalVolume(volume);
 	}
 	void MusicSliderRight()
 	{
@@ -1386,8 +1388,10 @@ public:
 		}
 
 		tf.position.x = std::min(tf.position.x, parentPos.x + sliderRightBound);
-
-		std::cout << tf.position.x << std::endl;
+		volume = std::lerp(sliderLeftBound, sliderRightBound, tf.position.x);
+		volume = sliderLeftBound / sliderRightBound * tf.position.x;
+		std::cout << volume << std::endl;
+		ecs::GetSystem<SoundSystem>()->SetGlobalVolume(volume);
 	}
 };
 
