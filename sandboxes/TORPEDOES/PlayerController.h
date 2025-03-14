@@ -880,7 +880,6 @@ public:
 		if (collision.type == engine::Collision::Type::tilemapCollision)
 		{
 			player._offroadThisFrame = true;
-			//engine::ecs::GetComponent<engine::Rigidbody>(collision.a).velocity *= player.offtrackSpeedScale;
 		}
 		else
 		{
@@ -1123,9 +1122,9 @@ public:
 			}
 
 			float finalBoostScale = player._boostScale;
-			if (player._offroadThisFrame)
+			if (player._offroadThisFrame && !player.submerged)
 			{
-				finalBoostScale = player.offtrackSpeedScale;
+				finalBoostScale *= player.offtrackSpeedScale;
 			}
 
 			// Apply the final impulse to the object
