@@ -109,7 +109,9 @@ public:
 			engine::AnimationSystem::AddAnimation(explosion, resources::explosionAnimation, "hit");
 			engine::AnimationSystem::PlayAnimation(explosion, "hit", false);
 
-			ecs::DestroyEntity(collision.b);
+			//Delete projectile if applicable
+			if(ecs::GetComponent<Projectile>(collision.b).deleteAffterHit)
+				ecs::DestroyEntity(collision.b);
 		}
 	}
 };

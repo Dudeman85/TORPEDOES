@@ -1255,6 +1255,7 @@ public:
 			//Rotate ccw if it is closer
 			float rotationDirection = abs(nextCheckpointAngle - currentAngle) > 180 ? -1 : 1;
 			//Apply rotation with a maximum speed
+			TransformSystem::SetPosition(player.checkpointIndicatorEntity, transform.position);
 			TransformSystem::Rotate(player.checkpointIndicatorEntity, Vector3(0, 0, rotationDirection * clamp(nextCheckpointAngle - currentAngle, -2.f, 2.f)));
 		}
 	}
@@ -1327,9 +1328,9 @@ public:
 			AnimationSystem::AddAnimations(wakeAnimation, resources::wakeAnims, { "boost", "normal" });
 			AnimationSystem::PlayAnimation(wakeAnimation, "normal", true);
 
-			engine::ecs::AddComponent(checkpointIndicator, engine::Transform{ .position = Vector3(0, 0, 70.f + ((double)rand() / RAND_MAX)), .rotation = Vector3(0), .scale = Vector3(1.2, 7, 0) });
+			engine::ecs::AddComponent(checkpointIndicator, engine::Transform{ .position = ecs::GetComponent<Transform>(playerEntity).position + Vector3(0, 0, 70.f + ((double)rand() / RAND_MAX)), .rotation = Vector3(0), .scale = Vector3(1.2 * 7, 7 * 7, 0) });
 			engine::ecs::AddComponent(checkpointIndicator, engine::SpriteRenderer{ .texture = resources::uiTextures["Checkpoint_Arrow.png"], .enabled = true });
-			engine::TransformSystem::AddParent(checkpointIndicator, playerEntity);
+			//engine::TransformSystem::AddParent(checkpointIndicator, playerEntity);
 			playerComponent.nextCheckpoint = checkpointEntities[0];
 			//Rotate the checkpoint indicator
 			Vector3 nextCheckpointPosition = ecs::GetComponent<Transform>(playerComponent.nextCheckpoint).position - ecs::GetComponent<Transform>(playerEntity).position;

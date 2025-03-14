@@ -238,7 +238,6 @@ namespace engine
 		{
 			//Get relevant components
 			SpriteRenderer& sprite = ecs::GetComponent<SpriteRenderer>(entity);
-			Transform& transform = ecs::GetComponent<Transform>(entity);
 
 			if (!sprite.enabled)
 				return;
