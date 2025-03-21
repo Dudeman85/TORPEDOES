@@ -1004,7 +1004,13 @@ class PauseSystem : public engine::ecs::System
 	float repeatInputDelay;
 	float moveWaitedTimerDown;
 	const float delay = 0.3f;
+
+	//Volume slider
 	float volume = 0.5f;
+	const float sliderLeftBound = -0.168;
+	const float sliderRightBound = 0.166;
+	const float sliderLeftBoundMin = -0.13;
+	const float sliderRightBoundMin = 0.13;
 
 public:
 	int playerWhichPaused = 0;
@@ -1155,6 +1161,7 @@ public:
 
 	void MoveUpper()
 	{
+		//Old selection
 		PauseComponent& pauseComponent = engine::ecs::GetComponent<PauseComponent>(currentSelection);
 		engine::SpriteRenderer& unselectedSpriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(currentSelection);
 		engine::Transform& unselectedTransform = engine::ecs::GetComponent<engine::Transform>(currentSelection);
@@ -1162,13 +1169,15 @@ public:
 		if (pauseComponent.isSlider)
 		{
 			Transform& nubTransform = ecs::GetComponent<Transform>(musicSliderNub);
-			nubTransform.position.y = unselectedTransform.position.y - 0.085f;
+			nubTransform.position.y = unselectedTransform.position.y - 0.083f;
 			nubTransform.scale = Vector3(0.043f);
+			nubTransform.position.x = std::lerp(sliderLeftBoundMin, sliderRightBoundMin, volume);
 		}
 
 		unselectedTransform.scale = Vector3(0.25f);
 		unselectedSpriteRenderer.texture = pauseComponent.unselectedTexture;
 
+		//New selection
 		currentSelection = pauseComponent.upper;
 		PauseComponent& pauseComponent1 = engine::ecs::GetComponent<PauseComponent>(currentSelection);
 		engine::SpriteRenderer& selectedSpriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(currentSelection);
@@ -1181,10 +1190,12 @@ public:
 			Transform& nubTransform = ecs::GetComponent<Transform>(musicSliderNub);
 			nubTransform.position.y = selectedSpriteTransform.position.y - 0.107f;
 			nubTransform.scale = Vector3(0.063f);
+			nubTransform.position.x = std::lerp(sliderLeftBound, sliderRightBound, volume);
 		}
 	}
 	void MoveLower()
 	{
+		//Old selection
 		PauseComponent& pauseComponent = engine::ecs::GetComponent<PauseComponent>(currentSelection);
 		engine::SpriteRenderer& unselectedSpriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(currentSelection);
 		engine::Transform& unselectedTransform = engine::ecs::GetComponent<engine::Transform>(currentSelection);
@@ -1195,10 +1206,12 @@ public:
 		if (pauseComponent.isSlider)
 		{
 			Transform& nubTransform = ecs::GetComponent<Transform>(musicSliderNub);
-			nubTransform.position.y = unselectedTransform.position.y - 0.085f;
+			nubTransform.position.y = unselectedTransform.position.y - 0.083f;
 			nubTransform.scale = Vector3(0.043f);
+			nubTransform.position.x = std::lerp(sliderLeftBoundMin, sliderRightBoundMin, volume);
 		}
 
+		//New selection
 		currentSelection = pauseComponent.lower;
 		PauseComponent& pauseComponent1 = engine::ecs::GetComponent<PauseComponent>(currentSelection);
 		engine::SpriteRenderer& selectedSpriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(currentSelection);
@@ -1211,6 +1224,7 @@ public:
 			Transform& nubTransform = ecs::GetComponent<Transform>(musicSliderNub);
 			nubTransform.position.y = selectedSpriteTransform.position.y - 0.107f;
 			nubTransform.scale = Vector3(0.063f);
+			nubTransform.position.x = std::lerp(sliderLeftBound, sliderRightBound, volume);
 		}
 	}
 
@@ -1347,8 +1361,9 @@ public:
 
 		//Set the music slider nub
 		Transform& nubTransform = ecs::GetComponent<Transform>(musicSliderNub);
-		nubTransform.position.y = ecs::GetComponent<Transform>(musicSliderEntity).position.y - 0.085f;
+		nubTransform.position.y = ecs::GetComponent<Transform>(musicSliderEntity).position.y - 0.083f;
 		nubTransform.scale = Vector3(0.043f);
+		nubTransform.position.x = std::lerp(sliderLeftBoundMin, sliderRightBoundMin, volume);
 
 		PauseComponent& pauseComponent = engine::ecs::GetComponent<PauseComponent>(currentSelection);
 		engine::SpriteRenderer& selectedSpriteRenderer = engine::ecs::GetComponent<engine::SpriteRenderer>(currentSelection);
@@ -1357,24 +1372,21 @@ public:
 		selectedSpriteRenderer.texture = pauseComponent.selectedTexture;
 	}
 
-	//right minimized 0.13
-	//left minimized -0.13
-	const float sliderLeftBound = -0.169;
-	const float sliderRightBound = 0.165;
-
 	void MusicSliderLeft()
 	{
 		Vector3 parentPos = ecs::GetComponent<Transform>(musicSliderEntity).position;
 		Transform& tf = ecs::GetComponent<Transform>(musicSliderNub);
 
-		if (tf.position.x > (parentPos.x + sliderLeftBound))
+		//Decrease volume
+		if (volume > 0)
 		{
-			tf.position.x -= engine::deltaTime * 0.3;
+			volume -= engine::deltaTime;
 		}
+		volume = std::max(volume, 0.f);
 
-		tf.position.x = std::max(tf.position.x, parentPos.x + sliderLeftBound);
-		volume = std::lerp(sliderLeftBound, sliderRightBound, tf.position.x);
-		std::cout << volume << std::endl;
+		//Move slider
+		tf.position.x = std::lerp(sliderLeftBound, sliderRightBound, volume);
+
 		ecs::GetSystem<SoundSystem>()->SetGlobalVolume(volume);
 	}
 	void MusicSliderRight()
@@ -1382,15 +1394,16 @@ public:
 		Vector3 parentPos = ecs::GetComponent<Transform>(musicSliderEntity).position;
 		Transform& tf = ecs::GetComponent<Transform>(musicSliderNub);
 
-		if (tf.position.x < (parentPos.x + sliderRightBound))
+		//Increase volume
+		if (volume < 1)
 		{
-			tf.position.x += engine::deltaTime * 0.3;
+			volume += engine::deltaTime;
 		}
+		volume = std::min(volume, 1.f);
 
-		tf.position.x = std::min(tf.position.x, parentPos.x + sliderRightBound);
-		volume = std::lerp(sliderLeftBound, sliderRightBound, tf.position.x);
-		volume = sliderLeftBound / sliderRightBound * tf.position.x;
-		std::cout << volume << std::endl;
+		//Move slider
+		tf.position.x = std::lerp(sliderLeftBound, sliderRightBound, volume);
+
 		ecs::GetSystem<SoundSystem>()->SetGlobalVolume(volume);
 	}
 };
