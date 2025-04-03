@@ -955,7 +955,7 @@ int main()
 	ShowWindow(GetConsoleWindow(), SW_SHOW);
 #else
 	//Disable console in release mode
-	ShowWindow(GetConsoleWindow(), SW_HIDE);
+	ShowWindow(GetConsoleWindow(), SW_SHOW);
 #endif
 
 	GLFWwindow* window = engine::CreateGLWindow(1920, 1080, "Window", false);
@@ -1000,6 +1000,7 @@ int main()
 	std::shared_ptr<HedgehogSystem> hedgehogSystem = engine::ecs::GetSystem<HedgehogSystem>();
 	std::shared_ptr<SubmarineSystem> submarineSystem = ecs::GetSystem<SubmarineSystem>();
 	std::shared_ptr<PickupSystem> pickupSystem = engine::ecs::GetSystem<PickupSystem>();
+	std::shared_ptr<CruiseMissileSystem> cruiseMissileSystem = engine::ecs::GetSystem<CruiseMissileSystem>();
 
 	std::shared_ptr<LevelSelectionSystem> levelSelectionSystem = engine::ecs::GetSystem<LevelSelectionSystem>();
 	std::shared_ptr<PlayerSelectSystem> playerSelectionSystem = engine::ecs::GetSystem<PlayerSelectSystem>();
@@ -1158,6 +1159,7 @@ int main()
 			hedgehogSystem->Update();
 			soundSystem->Update();
 			pickupSystem->Update();
+			cruiseMissileSystem->Update();
 
 			break;
 		default:

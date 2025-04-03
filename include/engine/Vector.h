@@ -101,7 +101,9 @@ public:
 	Vector3 Normalize();
 	Vector3 Pow(float power);
 	float Dot(Vector3 b) const;
-	Vector3 Cross(Vector3 b) const;
+	Vector3 Cross(Vector3 b) const;		
+	//Distance from this point to another
+	float Distance(Vector3 b) const;
 
 	//Comvert to a glm vec3
 	glm::vec3 ToGlm() const;

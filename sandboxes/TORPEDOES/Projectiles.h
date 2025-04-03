@@ -15,8 +15,7 @@ enum HitStates
 ECS_REGISTER_COMPONENT(Projectile)
 struct Projectile
 {
-	int ownerID = 0;
-	engine::ecs::Entity ownerEntity = 0;
+	engine::ecs::Entity owner;
 
 	float speed = 500;
 
@@ -83,7 +82,7 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 	engine::ecs::AddComponent(hedgehogExplosion, engine::Animator{ .onAnimationEnd = engine::ecs::DestroyEntity });
 	std::vector<Vector2> explosionverts{ Vector2(explosionSize.x, explosionSize.x), Vector2(explosionSize.x, explosionSize.y), Vector2(explosionSize.y, explosionSize.y), Vector2(explosionSize.y, explosionSize.x) };
 	engine::ecs::AddComponent(hedgehogExplosion, engine::PolygonCollider{ .vertices = explosionverts, .trigger = true, .visualise = true });
-	engine::ecs::AddComponent(hedgehogExplosion, Projectile{ .ownerID = projectile.ownerID, .hitType = HitStates::Stop, .hitSpeedFactor = 0.5, .hitTime = 1, .canHitSubmerged = true, .deleteAffterHit = false, .hitAnimation = "" });
+	engine::ecs::AddComponent(hedgehogExplosion, Projectile{ .owner = projectile.owner, .hitType = HitStates::Stop, .hitSpeedFactor = 0.5, .hitTime = 1, .canHitSubmerged = true, .deleteAffterHit = false, .hitAnimation = "" });
 
 	// Crashes for some reason
 	
