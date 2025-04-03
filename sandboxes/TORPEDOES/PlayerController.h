@@ -1,14 +1,14 @@
 #pragma once 
 #include <bitset>
-
 #include <engine/Application.h>
-#include "Globals.h"
-#include "Resources.h"
-#include "Projectiles.h"
 #include "engine/Input.h"
 #include "engine/Timing.h"
 #include "engine/Random.h"
 #include "engine/SoundComponent.h"
+#include "Globals.h"
+#include "Resources.h"
+#include "Projectiles.h"
+#include "CruiseMissile.h"
 
 using namespace engine;
 
@@ -130,15 +130,13 @@ void CreateTorpedo(engine::ecs::Entity entity)
 
 	// Torpedo shoot sound 
 
-	ecs::AddComponent(torpedo, Projectile{ .ownerID = player.id, .speed = speed, .hitType = HitStates::Stop, .hitTime = 0.8 });
+	ecs::AddComponent(torpedo, Projectile{ .owner = entity, .speed = speed, .hitType = HitStates::Stop, .hitTime = 0.8 });
 	Projectile& torpedoProjectile = ecs::GetComponent<Projectile>(torpedo);
 	ecs::AddComponent(torpedo, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(15) });
 	ecs::AddComponent(torpedo, Rigidbody{ .velocity = player.forwardDirection * torpedoProjectile.speed });
 	std::vector<Vector2> Torpedoverts{ Vector2(2, 0.5), Vector2(2, -0.5), Vector2(-2, -0.5), Vector2(-2, 0.5) };
 	ecs::AddComponent(torpedo, PolygonCollider{ .vertices = Torpedoverts, .callback = OnProjectileCollision, .trigger = true, .layer = 4, .visualise = true,  .rotationOverride = playerCollider.rotationOverride });
 	ecs::AddComponent(torpedo, ModelRenderer{ .model = resources::models[torpedoProjectile.model] });
-
-	torpedoProjectile.ownerEntity = entity;
 }
 
 /* SHELL */
@@ -157,7 +155,7 @@ void CreateShell(engine::ecs::Entity entity)
 	engine::SoundComponent& sound = ecs::GetComponent<engine::SoundComponent>(entity);
 	sound.Sounds["ShootShell"]->play();
 
-	ecs::AddComponent(shell, Projectile{ .ownerID = player.id, .speed = speed, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
+	ecs::AddComponent(shell, Projectile{ .owner = entity, .speed = speed, .hitType = HitStates::Additive, .hitSpeedFactor = -0.15f, .hitTime = 2.f });
 	Projectile& shellProjectile = ecs::GetComponent<Projectile>(shell);
 	ecs::AddComponent(shell, Transform{ .position = transform.position, .rotation = modelTransform.rotation, .scale = Vector3(30) });
 	ecs::AddComponent(shell, Rigidbody{ .velocity = player.forwardDirection * shellProjectile.speed });
@@ -165,8 +163,6 @@ void CreateShell(engine::ecs::Entity entity)
 	float shellSize = 0.1;
 	std::vector<Vector2> shellverts{ Vector2(shellSize, shellSize), Vector2(shellSize, -shellSize), Vector2(-shellSize, -shellSize), Vector2(-shellSize, shellSize) };
 	ecs::AddComponent(shell, PolygonCollider{ .vertices = shellverts, .callback = OnProjectileCollision, .trigger = true, .layer = 4, .visualise = true,  .rotationOverride = std::abs(modelTransform.rotation.y) });
-
-	shellProjectile.ownerEntity = entity;
 }
 
 void ShootShell(engine::ecs::Entity entity)
@@ -273,7 +269,7 @@ void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide,
 	engine::ecs::AddComponent(hedgehog, engine::Rigidbody{ .velocity = finalVelocity });
 	engine::ecs::AddComponent(hedgehog, ModelRenderer{ .model = resources::models["Weapon_HedgehogAmmo.obj"] });
 	std::vector<Vector2> Hedgehogverts{ Vector2(0.4, 0.5), Vector2(0.4, -0.5), Vector2(-0.4, -0.5), Vector2(-0.4, 0.5) };
-	ecs::AddComponent(hedgehog, Projectile{ .ownerID = player.id });
+	ecs::AddComponent(hedgehog, Projectile{ .owner = entity });
 
 	// Play shell shoot
 	engine::SoundComponent& sound = ecs::GetComponent<engine::SoundComponent>(entity);
@@ -287,10 +283,6 @@ void CreateHedgehog(engine::ecs::Entity entity, engine::ecs::Entity aimingGuide,
 			.targetDistance = (hedgehogTransform.position - aimingGuideTransform.position).Length(),
 			.aimingGuide = aimingGuide
 		});
-
-	Projectile& hedgehogProjectile = ecs::GetComponent<Projectile>(hedgehog);
-	hedgehogProjectile.ownerEntity = entity;
-
 }
 
 struct aimingGuideStruct
@@ -453,6 +445,8 @@ void ShootHedgehog(engine::ecs::Entity entity)
 
 	CreateAimingGuides(entity, ecs::GetSystem<HedgehogSystem>()->aimSpeed, shootAngle, shootAmount);
 }
+
+void ShootCruiseMissile(ecs::Entity owner);
 
 /* BOOST */
 
@@ -810,9 +804,9 @@ public:
 				ShipType::hedgehogBoat, Player
 				{
 					.forwardSpeed = 500, .rotationSpeed = 150,
-					.shootCooldown = 0.4, .specialCooldown = 5, .ammoRechargeCooldown = 5,
+					.shootCooldown = 0.4, .specialCooldown = 0, .ammoRechargeCooldown = 5,
 					.holdShoot = false, .maxAmmo = 1,
-					.shootAction = ShootHedgehog, .specialAction = Boost,
+					.shootAction = ShootHedgehog, .specialAction = ShootCruiseMissile,
 					.shootIndicatorUpdate = HedgehogIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
 				}
 			});
@@ -931,7 +925,7 @@ public:
 					return;
 				}
 
-				if (player.id != projectile.ownerID)
+				if (collision.a != projectile.owner)
 				{
 					for (auto& hitProjectile : player.hitProjectiles)
 					{
@@ -1391,6 +1385,11 @@ public:
 				playerComponent.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Surface_Icon.png", "UI_Red_Surface_Icon.png", "UI_Green_Submerge_Icon.png", "UI_Red_Submerge_Icon.png" }));
 				SubmergeIndicatorUpdate(playerEntity);
 			}
+			else if (*func == ShootCruiseMissile)
+			{
+				playerComponent.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Cruise_Icon.png", "UI_Red_Cruise_Icon.png", "UI_Red_Cruise_Icon.png" }));
+				BoostIndicatorUpdate(playerEntity);
+			}
 
 			Audio* engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", false, 0.1f, DistanceModel::LINEAR);
 			engineAudio->play();
@@ -1440,6 +1439,18 @@ public:
 		}
 	}
 };
+
+void ShootCruiseMissile(ecs::Entity owner)
+{
+	//Select the furthest ahead player
+	ecs::Entity target;
+	for (ecs::Entity entity : ecs::GetSystem<PlayerController>()->entities)
+	{
+		target = entity;
+	}
+	ecs::GetComponent<Player>(owner).specialEnabled = false;
+	CruiseMissileSystem::CreateMissile(owner, target);
+}
 
 //Static member definitions
 engine::ecs::Entity PlayerController::winScreen = winScreen;

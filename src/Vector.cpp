@@ -318,6 +318,11 @@ Vector3 Vector3::Cross(Vector3 b) const
 {
 	return Vector3((y * b.z) - (z * b.y), (z * b.x) - (x * b.z), (x * b.y) - (y * b.x));
 }
+//Distance from this point to another
+float Vector3::Distance(Vector3 b) const
+{
+	return sqrt((b.x - x) * (b.x - x) + (b.y - y) * (b.y - y) + (b.z - z) * (b.z - z));
+}
 
 glm::vec3 Vector3::ToGlm() const
 {
