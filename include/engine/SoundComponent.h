@@ -82,6 +82,8 @@ namespace engine
 						case DistanceModel::EXPONENTIAL:
 							attenuation = pow(0.5f, (distance - soundComponent.referenceDistance) / soundComponent.rolloffFactor);  // Exponential attenuation
 							break;
+						case DistanceModel::NONE:
+							break;
 						}
 					}
 					// Set the audio volume based on the calculated attenuation

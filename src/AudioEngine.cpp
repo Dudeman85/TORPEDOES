@@ -179,6 +179,9 @@ void Audio::setDistanceModel(DistanceModel model)
 	case DistanceModel::EXPONENTIAL:
 		ma_sound_set_attenuation_model(audioSound, ma_attenuation_model_exponential);
 		break;
+	case DistanceModel::NONE:
+		ma_sound_set_attenuation_model(audioSound, ma_attenuation_model_none);
+		break;
 	}
 }
 

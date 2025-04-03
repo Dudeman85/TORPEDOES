@@ -9,7 +9,8 @@ enum class DistanceModel
 {
 	LINEAR,
 	INVERSE,
-	EXPONENTIAL
+	EXPONENTIAL,
+	NONE
 };
 
 ///Class to create and store audio data

@@ -111,6 +111,20 @@ void SetupCheeringSounds(const std::vector<Vector3>& positions)
 	}
 }
 
+void SetupGameMusic()
+{
+	engine::ecs::Entity musicEntity = engine::ecs::NewEntity();
+	engine::ecs::AddComponent(musicEntity, engine::Transform{});
+	Audio* gameMusic = engine::AddAudio("Music", "audio/TheStruggleLoop1.wav", true, 0.05f, DistanceModel::NONE);
+	
+	engine::ecs::AddComponent(musicEntity, engine::SoundComponent{ .Sounds =
+			{
+				{"Music", gameMusic}
+			} , .maxDistance = 200000, .referenceDistance = 200000, .rolloffFactor = 0 });
+	
+	gameMusic->play();
+}
+
 // Create everything for level 1
 static void LoadLevel1(engine::Camera* cam)
 {
@@ -182,6 +196,8 @@ static void LoadLevel1(engine::Camera* cam)
 	PlayerController::lapCount = 3;
 	//Create the players
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1225.0f, -400.0f));
+
+	SetupGameMusic();
 }
 
 // Create everything for level 2
