@@ -288,6 +288,7 @@ static void LoadLevel2(engine::Camera* cam)
 	PlayerController::lapCount = 3;
 
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1160.0f, -1600.0f));
+	SetupGameMusic();
 }
 
 //Create everything for level 3
@@ -410,6 +411,7 @@ static void LoadLevel3(engine::Camera* cam)
 	PlayerController::lapCount = 3;
 	//Create the players
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(2480.0f, -1520.0f));
+	SetupGameMusic();
 }
 
 // Create everything for level 4
@@ -640,6 +642,7 @@ static void LoadLevel4(engine::Camera* cam)
 	PlayCountdown(Vector3(1434.0f, -1470.0f, 200.0f));
 	PlayerController::lapCount = 1;
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1434.0f, -1520.0f));
+	SetupGameMusic();
 }
 
 // Create everything for level 5
@@ -809,6 +812,7 @@ static void LoadLevel5(engine::Camera* cam)
 	PlayerController::lapCount = 2;
 	//Create the players
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(3390.0f, -4055.0f));
+	SetupGameMusic();
 }
 
 static void LoadLevel6(engine::Camera* cam)
@@ -824,11 +828,12 @@ static void LoadLevel6(engine::Camera* cam)
 	////Make all the checkpoints manually
 	checkPointNumber = 0;
 
-	CreateCheckpoint(Vector3(1475.000000, -460.000000, 70.000000), Vector3(-25.000000, -90.000000, -90.000000), Vector3(24.f), resources::models["Prop_Goal.obj"], 360.f, true);
+	CreateCheckpoint(Vector3(13510.000000, -2225.000000, 166.000000), Vector3(25.000000, 0.000000, 0.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 90.f);
+	CreateCheckpoint(Vector3(1475.000000, -960.000000, 70.000000), Vector3(-25.000000, -90.000000, -90.000000), Vector3(24.f), resources::models["Prop_Goal.obj"], 360.f, true);
 
 
 	PlayCountdown(Vector3(1235.0f, -310.0f, 200.0f));
-	PlayerController::lapCount = 3;
+	PlayerController::lapCount = 1;
 	//Create the players
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1225.0f, -900.0f));
 }
@@ -1036,7 +1041,7 @@ int main()
 
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
-	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(3300.0f, -4000.0f, 166), .scale = 20 });
+	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(1475, -460, 166), .scale = 20 });
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
 	ecs::AddTag(placementEditor, "persistent");
 
