@@ -9,6 +9,8 @@
 
 namespace engine
 {
+	enum RotationOrder { XYZ, ZYX };
+
 	///Transform component
 	ECS_REGISTER_COMPONENT(Transform)
 		struct Transform
@@ -24,6 +26,8 @@ namespace engine
 		ecs::Entity parent = 0;
 		///All the children of this entity
 		std::set<ecs::Entity> children;
+
+		RotationOrder rotationOrder = XYZ;
 
 		///If true updates all transform based caches, reverts to false next frame
 		//WARNING: This will not update if transform is manually changed
@@ -269,7 +273,7 @@ namespace engine
 		}
 
 		//Calculate the global transform of an entity, this is not a reference and does not affect the original transform
-		static Transform GetGlobalTransform(ecs::Entity entity) 
+		static Transform GetGlobalTransform(ecs::Entity entity)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
 
@@ -298,10 +302,8 @@ namespace engine
 			glm::mat4 transformMatrix = glm::mat4(1.0f);
 			//Position
 			transformMatrix = glm::translate(transformMatrix, transform.position.ToGlm());
-			//X, Y, Z euler rotations
-			transformMatrix = glm::rotate(transformMatrix, glm::radians(transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-			transformMatrix = glm::rotate(transformMatrix, glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-			transformMatrix = glm::rotate(transformMatrix, glm::radians(transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+			//Apply euler rotations in desired order
+			ApplyRotation(transformMatrix, transform.rotation, transform.rotationOrder);
 			//Scale
 			transformMatrix = glm::scale(transformMatrix, transform.scale.ToGlm());
 
@@ -337,16 +339,14 @@ namespace engine
 		}
 
 		///Applies transforms to vertices and returns the transformed vertices, takes rotation in degrees
-		static std::vector<Vector3> ApplyTransforms(std::vector<Vector3> vertices, Vector3 rotation, Vector3 scale, Vector3 position)
+		static std::vector<Vector3> ApplyTransforms(std::vector<Vector3> vertices, Vector3 rotation, Vector3 scale, Vector3 position, RotationOrder rotationOrder = XYZ)
 		{
 			//Create the transform matrix
 			glm::mat4 transform = glm::mat4(1.0f);
 			//Position
 			transform = glm::translate(transform, position.ToGlm());
-			//X, Y, Z euler rotations
-			transform = glm::rotate(transform, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-			transform = glm::rotate(transform, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-			transform = glm::rotate(transform, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+			//Apply euler rotations in desired order
+			ApplyRotation(transform, rotation, rotationOrder);
 			//Scale
 			transform = glm::scale(transform, scale.ToGlm());
 
@@ -384,6 +384,29 @@ namespace engine
 				transformedVerts.push_back(transformedVert);
 			}
 			return transformedVerts;
+		}
+
+	private:
+		static inline void ApplyRotation(glm::mat4& mat, Vector3 eulers, RotationOrder order)
+		{
+			switch (order)
+			{
+			case engine::XYZ:
+				mat = glm::rotate(mat, glm::radians(eulers.x), glm::vec3(1.0f, 0.0f, 0.0f));
+				mat = glm::rotate(mat, glm::radians(eulers.y), glm::vec3(0.0f, 1.0f, 0.0f));
+				mat = glm::rotate(mat, glm::radians(eulers.z), glm::vec3(0.0f, 0.0f, 1.0f));
+				break;
+			case engine::ZYX:
+				mat = glm::rotate(mat, glm::radians(eulers.z), glm::vec3(0.0f, 0.0f, 1.0f));
+				mat = glm::rotate(mat, glm::radians(eulers.y), glm::vec3(0.0f, 1.0f, 0.0f));
+				mat = glm::rotate(mat, glm::radians(eulers.x), glm::vec3(1.0f, 0.0f, 0.0f));
+				break;
+			default:
+				mat = glm::rotate(mat, glm::radians(eulers.x), glm::vec3(1.0f, 0.0f, 0.0f));
+				mat = glm::rotate(mat, glm::radians(eulers.y), glm::vec3(0.0f, 1.0f, 0.0f));
+				mat = glm::rotate(mat, glm::radians(eulers.z), glm::vec3(0.0f, 0.0f, 1.0f));
+				break;
+			}
 		}
 	};
 }

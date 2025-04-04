@@ -11,14 +11,14 @@ struct CruiseMissile
 {
 	ecs::Entity owner;
 	ecs::Entity target;
-	float targetDelay = 70;
+	float targetDelay = 1;
 };
 
 ECS_REGISTER_SYSTEM(CruiseMissileSystem, CruiseMissile);
 class CruiseMissileSystem : public ecs::System
 {
 private:
-	float speed = 8;
+	float speed = 800;
 	float rotationSpeed = 10;
 
 public:
@@ -36,7 +36,7 @@ public:
 			{
 				Vector3 dir = (TransformSystem::RightVector(entity) * Vector3(1, 1, 0)).Normalize() * speed * 0.5 * deltaTime;
 				TransformSystem::Translate(entity, dir);
-				//TransformSystem::Rotate(entity, { 0, 70.f * (float)deltaTime, 0 });
+				TransformSystem::Rotate(entity, { 0, 80.f * (float)deltaTime, 0 });
 				TransformSystem::Scale(entity, Vector3(20, 20, 20) * deltaTime);
 				missile.targetDelay -= deltaTime;
 			}
@@ -79,12 +79,11 @@ public:
 	}
 
 	//Spawn a missile going for a target
-	static void CreateMissile(ecs::Entity owner, ecs::Entity target, Vector3 rotation)
+	static void CreateMissile(ecs::Entity owner, ecs::Entity target, float rotation)
 	{
 		ecs::Entity missile = ecs::NewEntity();
 
-		ecs::AddComponent(missile, Transform{ .position = ecs::GetComponent<Transform>(owner).position, .rotation = rotation, .scale = {10, 10, 10} });
-		TransformSystem::Rotate(missile, {0, 0, -70});
+		ecs::AddComponent(missile, Transform{ .position = ecs::GetComponent<Transform>(owner).position, .rotation = {0, -90, rotation}, .scale = {10, 10, 10} , .rotationOrder = ZYX});
 		ecs::AddComponent(missile, ModelRenderer{ .model = resources::models["Weapon_CruiseMissile.obj"] });
 		ecs::AddComponent(missile, CruiseMissile{ .owner = owner, .target = target });
 	}

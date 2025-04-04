@@ -17,6 +17,8 @@ namespace engine
 	//Global timers, these are updated in TimerSystem::Update()
 	//How many seconds the last frame took
 	double deltaTime = 0;
+	//dt clampled to 20fps to reduce physics impercision
+	double cappedDeltaTime = 0;
 	//How many seconds the program has been running
 	double programTime = 0;
 	//How many frames the program has been through
@@ -173,6 +175,7 @@ namespace engine
 			CalculateDeltaTime();
 			frameCount++;
 			programTime += deltaTime;
+			cappedDeltaTime = std::min(engine::deltaTime, 1.0 / 20.0);
 		}
 
 		// Shorthand for starting an entity's timer

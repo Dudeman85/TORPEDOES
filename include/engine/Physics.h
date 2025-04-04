@@ -43,9 +43,6 @@ namespace engine
 		///Update the physics system, call this every frame
 		void Update()
 		{
-			//Physics dt is capped at 20 fps, less than that will slow down physics to stop impercision
-			float cappedDt = std::min(engine::deltaTime, 1.0 / 20.0);
-
 			//For each entity
 			for (ecs::Entity entity : entities)
 			{
@@ -57,14 +54,14 @@ namespace engine
 				if (!rigidbody.kinematic)
 				{
 					//Add gravity
-					rigidbody.velocity += gravity * rigidbody.mass * rigidbody.gravityScale * cappedDt;
+					rigidbody.velocity += gravity * rigidbody.mass * rigidbody.gravityScale * cappedDeltaTime;
 					//Apply drag
-					rigidbody.velocity -= rigidbody.velocity * rigidbody.drag * cappedDt;
+					rigidbody.velocity -= rigidbody.velocity * rigidbody.drag * cappedDeltaTime;
 				}
-				if ((rigidbody.velocity * cappedDt).Length() != 0)
+				if ((rigidbody.velocity * cappedDeltaTime).Length() != 0)
 				{
 					//Integrate position
-					Move(entity, rigidbody.velocity * cappedDt, step);
+					Move(entity, rigidbody.velocity * cappedDeltaTime, step);
 				}
 			}
 		}
