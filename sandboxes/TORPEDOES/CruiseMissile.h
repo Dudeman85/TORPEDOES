@@ -34,11 +34,11 @@ public:
 			//Move only forward for a time
 			if (missile.targetDelay > 0)
 			{
-				Vector3 dir = (TransformSystem::RightVector(entity) * Vector3(1, 1, 0)).Normalize() * speed * 0.5 * deltaTime;
+				Vector3 dir = (TransformSystem::RightVector(entity) * Vector3(1, 1, 0)).Normalize() * speed * 0.5 * cappedDeltaTime;
 				TransformSystem::Translate(entity, dir);
-				TransformSystem::Rotate(entity, { 0, 80.f * (float)deltaTime, 0 });
-				TransformSystem::Scale(entity, Vector3(20, 20, 20) * deltaTime);
-				missile.targetDelay -= deltaTime;
+				TransformSystem::Rotate(entity, { 0, 80.f * (float)cappedDeltaTime, 0 });
+				TransformSystem::Scale(entity, Vector3(20, 20, 20) * cappedDeltaTime);
+				missile.targetDelay -= cappedDeltaTime;
 			}
 			else
 			{

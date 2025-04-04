@@ -9,7 +9,7 @@
 
 namespace engine
 {
-	enum RotationOrder { XYZ, ZYX };
+	enum RotationOrder { XYZ, XZY, YXZ, ZXY, YZX, ZYX };
 
 	///Transform component
 	ECS_REGISTER_COMPONENT(Transform)
@@ -202,10 +202,8 @@ namespace engine
 
 			//Create the rotation matrix
 			glm::mat4 rotation = glm::mat4(1.0f);
-			//X, Y, Z euler rotations
-			rotation = glm::rotate(rotation, glm::radians(-transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-			rotation = glm::rotate(rotation, glm::radians(-transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-			rotation = glm::rotate(rotation, glm::radians(-transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+			//Apply euler rotations in reverse desired order
+			ApplyRotation(rotation, Vector3() - transform.rotation, (RotationOrder)(ZYX - transform.rotationOrder));
 
 			//Right vector is x
 			glm::vec4 right(1, 0, 0, 0);
@@ -221,10 +219,8 @@ namespace engine
 
 			//Create the rotation matrix
 			glm::mat4 rotation = glm::mat4(1.0f);
-			//X, Y, Z euler rotations
-			rotation = glm::rotate(rotation, glm::radians(-transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-			rotation = glm::rotate(rotation, glm::radians(-transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-			rotation = glm::rotate(rotation, glm::radians(-transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+			//Apply euler rotations in reverse desired order
+			ApplyRotation(rotation, Vector3() - transform.rotation, (RotationOrder)(ZYX - transform.rotationOrder));
 
 			//Up vector is y
 			glm::vec4 up(0, 1, 0, 0);
@@ -240,10 +236,8 @@ namespace engine
 
 			//Create the rotation matrix
 			glm::mat4 rotation = glm::mat4(1.0f);
-			//X, Y, Z euler rotations
-			rotation = glm::rotate(rotation, glm::radians(-transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-			rotation = glm::rotate(rotation, glm::radians(-transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-			rotation = glm::rotate(rotation, glm::radians(-transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+			//Apply euler rotations in reverse desired order
+			ApplyRotation(rotation, Vector3() - transform.rotation, (RotationOrder)(ZYX - transform.rotationOrder));
 
 			//Forward vector is z
 			glm::vec4 forward(0, 0, 1, 0);
@@ -396,15 +390,32 @@ namespace engine
 				mat = glm::rotate(mat, glm::radians(eulers.y), glm::vec3(0.0f, 1.0f, 0.0f));
 				mat = glm::rotate(mat, glm::radians(eulers.z), glm::vec3(0.0f, 0.0f, 1.0f));
 				break;
+			case engine::XZY:
+				mat = glm::rotate(mat, glm::radians(eulers.x), glm::vec3(1.0f, 0.0f, 0.0f));
+				mat = glm::rotate(mat, glm::radians(eulers.z), glm::vec3(0.0f, 0.0f, 1.0f));
+				mat = glm::rotate(mat, glm::radians(eulers.y), glm::vec3(0.0f, 1.0f, 0.0f));
+				break;
+			case engine::YXZ:
+				mat = glm::rotate(mat, glm::radians(eulers.y), glm::vec3(0.0f, 1.0f, 0.0f));
+				mat = glm::rotate(mat, glm::radians(eulers.x), glm::vec3(1.0f, 0.0f, 0.0f));
+				mat = glm::rotate(mat, glm::radians(eulers.z), glm::vec3(0.0f, 0.0f, 1.0f));
+				break;
+			case engine::ZXY:
+				mat = glm::rotate(mat, glm::radians(eulers.z), glm::vec3(0.0f, 0.0f, 1.0f));
+				mat = glm::rotate(mat, glm::radians(eulers.x), glm::vec3(1.0f, 0.0f, 0.0f));
+				mat = glm::rotate(mat, glm::radians(eulers.y), glm::vec3(0.0f, 1.0f, 0.0f));
+				break;
+			case engine::YZX:
+				mat = glm::rotate(mat, glm::radians(eulers.y), glm::vec3(0.0f, 1.0f, 0.0f));
+				mat = glm::rotate(mat, glm::radians(eulers.z), glm::vec3(0.0f, 0.0f, 1.0f));
+				mat = glm::rotate(mat, glm::radians(eulers.x), glm::vec3(1.0f, 0.0f, 0.0f));
+				break;
 			case engine::ZYX:
 				mat = glm::rotate(mat, glm::radians(eulers.z), glm::vec3(0.0f, 0.0f, 1.0f));
 				mat = glm::rotate(mat, glm::radians(eulers.y), glm::vec3(0.0f, 1.0f, 0.0f));
 				mat = glm::rotate(mat, glm::radians(eulers.x), glm::vec3(1.0f, 0.0f, 0.0f));
 				break;
 			default:
-				mat = glm::rotate(mat, glm::radians(eulers.x), glm::vec3(1.0f, 0.0f, 0.0f));
-				mat = glm::rotate(mat, glm::radians(eulers.y), glm::vec3(0.0f, 1.0f, 0.0f));
-				mat = glm::rotate(mat, glm::radians(eulers.z), glm::vec3(0.0f, 0.0f, 1.0f));
 				break;
 			}
 		}
