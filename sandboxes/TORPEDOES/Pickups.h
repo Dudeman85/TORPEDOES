@@ -88,7 +88,7 @@ public:
 		{
 			//Enable the special action if player does not already have it
 			Player& player = ecs::GetComponent<Player>(collision.b);
-			if (player.specialEnabled)
+			if (player.specialEnabled || player._specialTimer < player.specialCooldown)
 				return;
 			player.specialEnabled = true;
 

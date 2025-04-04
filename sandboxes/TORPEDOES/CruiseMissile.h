@@ -6,12 +6,15 @@
 
 using namespace engine;
 
+//Change the cruise missiles time before selecting a target here
+constexpr float targetDelayTime = 0.5;
+
 ECS_REGISTER_COMPONENT(CruiseMissile);
 struct CruiseMissile
 {
 	ecs::Entity owner;
 	ecs::Entity target;
-	float targetDelay = 1;
+	float targetDelay = targetDelayTime;
 };
 
 ECS_REGISTER_SYSTEM(CruiseMissileSystem, CruiseMissile);
@@ -34,10 +37,10 @@ public:
 			//Move only forward for a time
 			if (missile.targetDelay > 0)
 			{
-				Vector3 dir = (TransformSystem::RightVector(entity) * Vector3(1, 1, 0)).Normalize() * speed * 0.5 * cappedDeltaTime;
+				Vector3 dir = (TransformSystem::RightVector(entity) * Vector3(1, 1, 0)) * speed * 1 * cappedDeltaTime;
 				TransformSystem::Translate(entity, dir);
-				TransformSystem::Rotate(entity, { 0, 80.f * (float)cappedDeltaTime, 0 });
-				TransformSystem::Scale(entity, Vector3(20, 20, 20) * cappedDeltaTime);
+				TransformSystem::Rotate(entity, { 0, 90 * (float)cappedDeltaTime / targetDelayTime, 0 });
+				TransformSystem::Scale(entity, Vector3(20) * cappedDeltaTime / targetDelayTime);
 				missile.targetDelay -= cappedDeltaTime;
 			}
 			else
@@ -65,7 +68,7 @@ public:
 					TransformSystem::Rotate(entity, Vector3(0, 0, rotationDirection * clamp(targetAngle - currentAngle, -rotationSpeed, rotationSpeed)));
 
 					//Move forward
-					Vector3 dir = (TransformSystem::RightVector(entity) * Vector3(1, 1, 0)).Normalize() * speed * deltaTime;
+					Vector3 dir = (TransformSystem::RightVector(entity) * Vector3(1, 1, 0)).Normalize() * speed * cappedDeltaTime;
 					TransformSystem::Translate(entity, dir);
 				}
 				//If close enough, explode
@@ -95,7 +98,7 @@ public:
 		position.z += 500 + ((double)rand() / (double)RAND_MAX);
 
 		Audio* explosionSound = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 0.2f, DistanceModel::LINEAR);
-		explosionSound->play();
+		//explosionSound->play();
 
 		engine::ecs::Entity explosion = engine::ecs::NewEntity();
 		engine::ecs::AddComponent(explosion, engine::Transform{ .position = position, .scale = Vector3(70) });

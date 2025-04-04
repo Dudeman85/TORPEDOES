@@ -457,7 +457,6 @@ static void BoostEnd(engine::ecs::Entity entity, float boostStrenght)
 	Player& player = engine::ecs::GetComponent<Player>(entity);
 	player._boostScale -= boostStrenght;
 
-	player.specialEnabled = false;
 	player._specialTimer = player.specialCooldown;
 
 	AnimationSystem::PlayAnimation(player.wakeAnimationEntity, "normal", true);
@@ -472,7 +471,7 @@ void Boost(engine::ecs::Entity entity)
 	float boostStrenght = 0.4f;
 
 	Player& player = engine::ecs::GetComponent<Player>(entity);
-
+	player.specialEnabled = false;
 	player._boostScale += boostStrenght;
 
 	AnimationSystem::PlayAnimation(player.wakeAnimationEntity, "boost", true);
@@ -487,7 +486,7 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 	Transform& transformComponent = ecs::GetComponent<Transform>(playerEntity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(playerComponent.renderedEntity);
 	engine::SoundComponent& sound = ecs::GetComponent<engine::SoundComponent>(playerEntity);
-	
+
 	//Submerge if surfaced
 	if (!playerComponent.submerged)
 	{
@@ -682,34 +681,21 @@ void BoostIndicatorUpdate(engine::ecs::Entity entity)
 	indicatorStruct& it = player.specialIndicators[0];
 	engine::SpriteRenderer& sprite = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
 
-	if (player.specialEnabled)
+	if (player.specialCooldown <= player._specialTimer && player.specialEnabled)
 	{
-		if (player.specialCooldown <= player._specialTimer)
-		{
-			// Available to use
-			sprite.texture = it.textures[0];
-		}
-		else
-		{
-			// In use
-			sprite.texture = it.textures[1];
-		}
-	
+		// Available to use
+		sprite.texture = it.textures[0];
 	}
-
-
-
-	else if (player.specialCooldown >= player._specialTimer)
+	else if (player.specialCooldown <= player._specialTimer && !player.specialEnabled)
 	{
 		// Not available
 		sprite.texture = it.textures[2];
 	}
-
-	/*
-	Vector2 baseScale = { 0.9, 0.8 };
-	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
-	transform.scale = { baseScale.x * camHeight * 0.001f, baseScale.y * (camHeight * aspectRatio) * 0.001f, 0 };
-	*/
+	else
+	{
+		// In use
+		sprite.texture = it.textures[1];
+	}
 }
 
 void SubmergeIndicatorUpdate(engine::ecs::Entity entity)
@@ -804,7 +790,7 @@ public:
 				ShipType::hedgehogBoat, Player
 				{
 					.forwardSpeed = 500, .rotationSpeed = 150,
-					.shootCooldown = 0.4, .specialCooldown = 0, .ammoRechargeCooldown = 5,
+					.shootCooldown = 0.4, .specialCooldown = 5, .ammoRechargeCooldown = 5,
 					.holdShoot = false, .maxAmmo = 1,
 					.shootAction = ShootHedgehog, .specialAction = ShootCruiseMissile,
 					.shootIndicatorUpdate = HedgehogIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
@@ -947,11 +933,11 @@ public:
 					CreateAnimation(collision.b);
 
 					//Destroy projectile at end of frame
-					if(projectile.deleteAffterHit == true)
-					{ 
+					if (projectile.deleteAffterHit == true)
+					{
 						engine::ecs::DestroyEntity(collision.b);
 					}
-					
+
 				}
 			}
 		}
@@ -1075,19 +1061,19 @@ public:
 
 				// Set min speed while turning
 
-				Vector2 minRotateImpulse = player.forwardDirection  * std::abs(trueRotateInput) * player.minSpeedWhileTurning;
-				 if (accelerationInput < 0.0f)
-				 {
+				Vector2 minRotateImpulse = player.forwardDirection * std::abs(trueRotateInput) * player.minSpeedWhileTurning;
+				if (accelerationInput < 0.0f)
+				{
 					minRotateImpulse *= -1;
-					
-				 }
+
+				}
 
 				if (minRotateImpulse.Length() > forwardImpulse.Length())
 				{
 					forwardImpulse = minRotateImpulse;
 				}
-			
-				
+
+
 			}
 
 			//Set the collider's rotation
@@ -1131,7 +1117,7 @@ public:
 
 			bool reachedMaxAmmoThisFrame = false;
 			bool shotThisFrame = false;
-			
+
 			// If not max ammo
 			if (player.ammo < player.maxAmmo)
 			{
@@ -1249,7 +1235,7 @@ public:
 			//Rotate ccw if it is closer
 			float rotationDirection = abs(nextCheckpointAngle - currentAngle) > 180 ? -1 : 1;
 			//Apply rotation with a maximum speed
-			TransformSystem::SetPosition(player.checkpointIndicatorEntity, transform.position);
+			TransformSystem::SetPosition(player.checkpointIndicatorEntity, transform.position + Vector3(0, 0, (double)rand() / (double)RAND_MAX));
 			TransformSystem::Rotate(player.checkpointIndicatorEntity, Vector3(0, 0, rotationDirection * clamp(nextCheckpointAngle - currentAngle, -2.f, 2.f)));
 		}
 	}
@@ -1322,7 +1308,7 @@ public:
 			AnimationSystem::AddAnimations(wakeAnimation, resources::wakeAnims, { "boost", "normal" });
 			AnimationSystem::PlayAnimation(wakeAnimation, "normal", true);
 
-			engine::ecs::AddComponent(checkpointIndicator, engine::Transform{ .position = ecs::GetComponent<Transform>(playerEntity).position + Vector3(0, 0, 70.f + ((double)rand() / RAND_MAX)), .rotation = Vector3(0), .scale = Vector3(1.2 * 7, 7 * 7, 0) });
+			engine::ecs::AddComponent(checkpointIndicator, engine::Transform{ .position = ecs::GetComponent<Transform>(playerEntity).position, .rotation = Vector3(0), .scale = Vector3(1.2 * 7, 7 * 7, 0) });
 			engine::ecs::AddComponent(checkpointIndicator, engine::SpriteRenderer{ .texture = resources::uiTextures["Checkpoint_Arrow.png"], .enabled = true });
 			//engine::TransformSystem::AddParent(checkpointIndicator, playerEntity);
 			playerComponent.nextCheckpoint = checkpointEntities[0];
@@ -1348,20 +1334,20 @@ public:
 				{
 					// Place indicators equidistant along the range
 					offset.y = generateEquidistantPoint(rangeStart, rangeEnd, playerComponent.maxAmmo, i);
-					
+
 					playerComponent.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Torpedo_Icon.png", "UI_Red_Torpedo_Icon.png" }));
 				}
 			}
 			else if (*func == ShootHedgehog)
 			{
 				offset = Vector3(1.5, -3.7, 10);
-				scale = Vector3(1 * 1.45 , 1 * 1.45, 1);
+				scale = Vector3(1 * 1.45, 1 * 1.45, 1);
 
 				playerComponent.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Hedgehog_Icon.png", "UI_Red_Hedgehog_Icon.png" }));
 			}
 			else if (*func == ShootShell)
 			{
-				offset = Vector3(1.5,-3.7, 10);
+				offset = Vector3(1.5, -3.7, 10);
 				scale = Vector3(1 * 1.34, 1 * 1.34, 1);
 
 				playerComponent.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Cannon_Icon.png", "UI_Red_Cannon_Icon.png" }));
@@ -1387,7 +1373,7 @@ public:
 			}
 			else if (*func == ShootCruiseMissile)
 			{
-				playerComponent.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Cruise_Icon.png", "UI_Red_Cruise_Icon.png", "UI_Red_Cruise_Icon.png" }));
+				playerComponent.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Cruise_Icon.png", "UI_Booster_Icon.png", "UI_Red_Cruise_Icon.png" }));
 				BoostIndicatorUpdate(playerEntity);
 			}
 
