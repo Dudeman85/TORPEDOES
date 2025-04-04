@@ -135,7 +135,7 @@ public:
 	void Update()
 	{
 		float turnInput = input::GetTotalInputValue("Turn" + to_string(firstPlayer));
-		int dpadInput = input::GetPressed("MenuDpadLeft" + to_string(firstPlayer)) - input::GetPressed("MenuDpadRight" + to_string(firstPlayer));
+		int dpadInput =  input::GetPressed("MenuDpadRight" + to_string(firstPlayer)) - input::GetPressed("MenuDpadLeft" + to_string(firstPlayer));
 		turnInput += dpadInput;
 
 		Audio* switchAudio = engine::AddAudio("Background", "audio/leftright.wav", false, 0.01f, DistanceModel::LINEAR);

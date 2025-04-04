@@ -176,9 +176,6 @@ public:
 				// Ratio of distance travelled to the target distance
 				float distanceRatio = hedgehogComp.distanceTraveled / hedgehogComp.targetDistance;
 				float rotation = minRotation + (maxRotation - minRotation) * distanceRatio;
-
-				// TODO: Calculate based on distance travelled
-				//engine::TransformSystem::Rotate(entity, Vector3(0, 0, -120.0f * engine::deltaTime));
 				transformComp.rotation.z = rotation;
 				transformComp.staleCache = true;
 

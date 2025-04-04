@@ -1448,8 +1448,9 @@ void ShootCruiseMissile(ecs::Entity owner)
 	{
 		target = entity;
 	}
-	ecs::GetComponent<Player>(owner).specialEnabled = false;
-	CruiseMissileSystem::CreateMissile(owner, target);
+	Player& pc = ecs::GetComponent<Player>(owner);
+	pc.specialEnabled = false;
+	CruiseMissileSystem::CreateMissile(owner, target, ecs::GetComponent<Transform>(pc.renderedEntity).rotation);
 }
 
 //Static member definitions
