@@ -12,6 +12,7 @@
 
 using namespace engine;
 
+
 enum ShipType { torpedoBoat, submarine, cannonBoat, hedgehogBoat, pirateShip };
 
 static std::vector<engine::ecs::Entity> checkpointEntities;
@@ -1207,7 +1208,7 @@ public:
 				ecs::GetComponent<SpriteRenderer>(player.wakeAnimationEntity).enabled = false;
 			}
 
-			ecs::GetComponent<Animator>(player.wakeAnimationEntity).playbackSpeed = std::lerp(0.1, 2, rigidbody.velocity.Length() / 900);
+			ecs::GetComponent<Animator>(player.wakeAnimationEntity).playbackSpeed = std::lerp(0.1f, 2.0f, rigidbody.velocity.Length() / 900.0f);
 			Vector3 wakeOffset = player.forwardDirection.Normalize() * 20;
 			wakeOffset += Vector3(0, 0, 40);
 			TransformSystem::SetPosition(player.wakeAnimationEntity, transform.position - wakeOffset);
@@ -1403,6 +1404,7 @@ public:
 	}
 };
 
+
 ECS_REGISTER_SYSTEM(SubmarineSystem, SubmarineComponent, Transform, Player, PolygonCollider)
 class SubmarineSystem : public ecs::System
 {
@@ -1426,18 +1428,106 @@ public:
 	}
 };
 
+//Johtaja ampuu ja ohjus osuu toisella sijalla olevaan pelaajaan. first Option 
+//ecs::Entity GetLeadingPlayer()
+//{
+//	ecs::Entity leadingPlayer;
+//	int maxLap = -1;
+//	int maxCheckpoint = -1;
+//	float minDistanceToNext = std::numeric_limits<float>::max();
+//
+//	for (ecs::Entity entity : ecs::GetSystem<PlayerController>()->entities)
+//	{
+//		
+//		Player& player = ecs::GetComponent<Player>(entity);
+//		Transform& playerTransform = ecs::GetComponent<Transform>(player.renderedEntity);
+//		Transform& nextCheckpointTransform = ecs::GetComponent<Transform>(player.nextCheckpoint);
+//
+//		float distanceToNext = (nextCheckpointTransform.position - playerTransform.position).Length();
+//
+//		if (
+//			player.lap > maxLap ||
+//			(player.lap == maxLap && player.previousCheckpoint > maxCheckpoint) ||
+//			(player.lap == maxLap && player.previousCheckpoint == maxCheckpoint && distanceToNext < minDistanceToNext)
+//			)
+//		{
+//			maxLap = player.lap;
+//			maxCheckpoint = player.previousCheckpoint;
+//			minDistanceToNext = distanceToNext;
+//			leadingPlayer = entity;
+//		}
+//	}
+//
+//	return leadingPlayer;
+//}
+
+//void ShootCruiseMissile(ecs::Entity owner)
+//{
+//	//Select the furthest ahead player
+//	ecs::Entity target;
+//	for (ecs::Entity entity : ecs::GetSystem<PlayerController>()->entities)
+//	{
+//		target = GetLeadingPlayer();
+//	}
+//	Player& pc = ecs::GetComponent<Player>(owner);
+//	pc.specialEnabled = false;
+//	CruiseMissileSystem::CreateMissile(owner, target, ecs::GetComponent<Transform>(pc.renderedEntity).rotation.y);
+//}
+ 
+// version 2 working
+ecs::Entity GetLeadingPlayer()
+{
+	ecs::Entity leadingPlayer = 0; // 0 is the invalid value according to ecs.h
+	int maxLap = -1;
+	int maxCheckpoint = -1;
+	float minDistanceToNext = std::numeric_limits<float>::max();
+
+	auto playerController = ecs::GetSystem<PlayerController>(); // shared_ptr<PlayerController>
+	if (!playerController || playerController->entities.Size() == 0) {
+		return leadingPlayer; // We return 0 if there is no system or entities
+	}
+
+	for (ecs::Entity entity : playerController->entities)
+	{
+		Player& player = ecs::GetComponent<Player>(entity);
+		Transform& playerTransform = ecs::GetComponent<Transform>(player.renderedEntity);
+		Transform& nextCheckpointTransform = ecs::GetComponent<Transform>(player.nextCheckpoint);
+
+		float distanceToNext = (nextCheckpointTransform.position - playerTransform.position).Length();
+
+		if (player.lap > maxLap ||
+			(player.lap == maxLap && player.previousCheckpoint > maxCheckpoint) ||
+			(player.lap == maxLap && player.previousCheckpoint == maxCheckpoint && distanceToNext < minDistanceToNext))
+		{
+			maxLap = player.lap;
+			maxCheckpoint = player.previousCheckpoint;
+			minDistanceToNext = distanceToNext;
+			leadingPlayer = entity;
+		}
+	}
+
+	return leadingPlayer;
+}
+
 void ShootCruiseMissile(ecs::Entity owner)
 {
-	//Select the furthest ahead player
-	ecs::Entity target;
-	for (ecs::Entity entity : ecs::GetSystem<PlayerController>()->entities)
-	{
-		target = entity;
+	// Get the leading player
+	ecs::Entity target = GetLeadingPlayer();
+
+	// Verify that the target is valid and not the same as the trigger
+	if (target == 0 || target == owner) {
+		std::cout << "Cannot shoot: Invalid target or shooting self\n";
+		return;
 	}
+
+	// Deactivate special ability and shoot
 	Player& pc = ecs::GetComponent<Player>(owner);
+	std::cout << "Shooting missile from " << owner << " to " << target << "\n";
 	pc.specialEnabled = false;
 	CruiseMissileSystem::CreateMissile(owner, target, ecs::GetComponent<Transform>(pc.renderedEntity).rotation.y);
 }
+
+
 
 //Static member definitions
 engine::ecs::Entity PlayerController::winScreen = winScreen;
