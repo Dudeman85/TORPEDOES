@@ -1,4 +1,5 @@
 #define ECS_ENABLE_CHECKS
+#define NOMINMAX
 #include "PlayerController.h"
 #include "engine/Input.h"  
 #include "MenuSystem.h"	
@@ -1020,7 +1021,7 @@ static void ReturnToMainMenu()
 	cam->SetPosition(0);
 	checkpointEntities.clear();
 
-	MainMenuSystem::Load();
+	ecs::GetSystem<MainMenuSystem>()->Init();
 }
 
 int main()
@@ -1069,24 +1070,21 @@ int main()
 
 	//Get pointers and call init of every custom system
 	std::shared_ptr<PauseSystem> pauseSystem = engine::ecs::GetSystem<PauseSystem>();
+	std::shared_ptr<MainMenuSystem> mainMenuSystem = engine::ecs::GetSystem<MainMenuSystem>();
+	mainMenuSystem->Init();
 	std::shared_ptr<PlayerController> playerController = engine::ecs::GetSystem<PlayerController>();
 	playerController->Init();
 	std::shared_ptr<HedgehogSystem> hedgehogSystem = engine::ecs::GetSystem<HedgehogSystem>();
 	std::shared_ptr<SubmarineSystem> submarineSystem = ecs::GetSystem<SubmarineSystem>();
 	std::shared_ptr<PickupSystem> pickupSystem = engine::ecs::GetSystem<PickupSystem>();
 	std::shared_ptr<CruiseMissileSystem> cruiseMissileSystem = engine::ecs::GetSystem<CruiseMissileSystem>();
-
 	std::shared_ptr<LevelSelectionSystem> levelSelectionSystem = engine::ecs::GetSystem<LevelSelectionSystem>();
 	std::shared_ptr<PlayerSelectSystem> playerSelectionSystem = engine::ecs::GetSystem<PlayerSelectSystem>();
-
 
 	Vector3 newListenerPosition(2200.000000, -1075.000000, 0.00000);
 	soundSystem->SetListeningPosition(newListenerPosition);
 
-
 	GameState currentGameState = menuMainState;
-
-	MainMenuSystem::Load();
 
 	//Bind all input actions
 	SetupInput();
@@ -1199,7 +1197,7 @@ int main()
 		switch (gameState)
 		{
 		case menuMainState:
-			MainMenuSystem::Update();
+			mainMenuSystem->Update();
 			break;
 		case mapSelection:
 			levelSelectionSystem->Update();

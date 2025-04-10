@@ -1267,6 +1267,33 @@ public:
 		return minRange + (iteration * interval);
 	}
 
+	//Get the first player
+	ecs::Entity GetLeadingPlayer()
+	{
+		ecs::Entity leadingPlayer = 0; // 0 is the invalid value according to ecs.h
+		int maxLap = -1;
+		int maxCheckpoint = -1;
+		float minDistanceToNext = std::numeric_limits<float>::max();
+
+		for (ecs::Entity entity : entities)
+		{
+			Player& player = ecs::GetComponent<Player>(entity);
+			float distanceToNext = TransformSystem::Distance(entity, player.nextCheckpoint);
+
+			if (player.lap > maxLap ||
+				(player.lap == maxLap && player.previousCheckpoint > maxCheckpoint) ||
+				(player.lap == maxLap && player.previousCheckpoint == maxCheckpoint && distanceToNext < minDistanceToNext))
+			{
+				maxLap = player.lap;
+				maxCheckpoint = player.previousCheckpoint;
+				minDistanceToNext = distanceToNext;
+				leadingPlayer = entity;
+			}
+		}
+
+		return leadingPlayer;
+	}
+
 	//Spawn 1-4 players, all in a line from top to bottom
 	void CreatePlayers(std::unordered_map<int, ShipType> playerShips, Vector2 startPos)
 	{
@@ -1374,7 +1401,7 @@ public:
 			}
 			else if (*func == ShootCruiseMissile)
 			{
-				playerComponent.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Cruise_Icon.png", "UI_Booster_Icon.png", "UI_Red_Cruise_Icon.png" }));
+				playerComponent.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Cruise_Icon.png", "UI_Invalid_Cruise_Icon.png", "UI_Red_Cruise_Icon.png" }));
 				BoostIndicatorUpdate(playerEntity);
 			}
 
@@ -1428,106 +1455,20 @@ public:
 	}
 };
 
-//Johtaja ampuu ja ohjus osuu toisella sijalla olevaan pelaajaan. first Option 
-//ecs::Entity GetLeadingPlayer()
-//{
-//	ecs::Entity leadingPlayer;
-//	int maxLap = -1;
-//	int maxCheckpoint = -1;
-//	float minDistanceToNext = std::numeric_limits<float>::max();
-//
-//	for (ecs::Entity entity : ecs::GetSystem<PlayerController>()->entities)
-//	{
-//		
-//		Player& player = ecs::GetComponent<Player>(entity);
-//		Transform& playerTransform = ecs::GetComponent<Transform>(player.renderedEntity);
-//		Transform& nextCheckpointTransform = ecs::GetComponent<Transform>(player.nextCheckpoint);
-//
-//		float distanceToNext = (nextCheckpointTransform.position - playerTransform.position).Length();
-//
-//		if (
-//			player.lap > maxLap ||
-//			(player.lap == maxLap && player.previousCheckpoint > maxCheckpoint) ||
-//			(player.lap == maxLap && player.previousCheckpoint == maxCheckpoint && distanceToNext < minDistanceToNext)
-//			)
-//		{
-//			maxLap = player.lap;
-//			maxCheckpoint = player.previousCheckpoint;
-//			minDistanceToNext = distanceToNext;
-//			leadingPlayer = entity;
-//		}
-//	}
-//
-//	return leadingPlayer;
-//}
-
-//void ShootCruiseMissile(ecs::Entity owner)
-//{
-//	//Select the furthest ahead player
-//	ecs::Entity target;
-//	for (ecs::Entity entity : ecs::GetSystem<PlayerController>()->entities)
-//	{
-//		target = GetLeadingPlayer();
-//	}
-//	Player& pc = ecs::GetComponent<Player>(owner);
-//	pc.specialEnabled = false;
-//	CruiseMissileSystem::CreateMissile(owner, target, ecs::GetComponent<Transform>(pc.renderedEntity).rotation.y);
-//}
- 
-// version 2 working
-ecs::Entity GetLeadingPlayer()
-{
-	ecs::Entity leadingPlayer = 0; // 0 is the invalid value according to ecs.h
-	int maxLap = -1;
-	int maxCheckpoint = -1;
-	float minDistanceToNext = std::numeric_limits<float>::max();
-
-	auto playerController = ecs::GetSystem<PlayerController>(); // shared_ptr<PlayerController>
-	if (!playerController || playerController->entities.Size() == 0) {
-		return leadingPlayer; // We return 0 if there is no system or entities
-	}
-
-	for (ecs::Entity entity : playerController->entities)
-	{
-		Player& player = ecs::GetComponent<Player>(entity);
-		Transform& playerTransform = ecs::GetComponent<Transform>(player.renderedEntity);
-		Transform& nextCheckpointTransform = ecs::GetComponent<Transform>(player.nextCheckpoint);
-
-		float distanceToNext = (nextCheckpointTransform.position - playerTransform.position).Length();
-
-		if (player.lap > maxLap ||
-			(player.lap == maxLap && player.previousCheckpoint > maxCheckpoint) ||
-			(player.lap == maxLap && player.previousCheckpoint == maxCheckpoint && distanceToNext < minDistanceToNext))
-		{
-			maxLap = player.lap;
-			maxCheckpoint = player.previousCheckpoint;
-			minDistanceToNext = distanceToNext;
-			leadingPlayer = entity;
-		}
-	}
-
-	return leadingPlayer;
-}
-
 void ShootCruiseMissile(ecs::Entity owner)
 {
 	// Get the leading player
-	ecs::Entity target = GetLeadingPlayer();
+	ecs::Entity target = ecs::GetSystem<PlayerController>()->GetLeadingPlayer();
 
 	// Verify that the target is valid and not the same as the trigger
-	if (target == 0 || target == owner) {
-		std::cout << "Cannot shoot: Invalid target or shooting self\n";
+	if (target == 0 || target == owner)
 		return;
-	}
 
 	// Deactivate special ability and shoot
 	Player& pc = ecs::GetComponent<Player>(owner);
-	std::cout << "Shooting missile from " << owner << " to " << target << "\n";
 	pc.specialEnabled = false;
 	CruiseMissileSystem::CreateMissile(owner, target, ecs::GetComponent<Transform>(pc.renderedEntity).rotation.y);
 }
-
-
 
 //Static member definitions
 engine::ecs::Entity PlayerController::winScreen = winScreen;
