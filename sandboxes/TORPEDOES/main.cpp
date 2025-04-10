@@ -830,13 +830,66 @@ static void LoadLevel6(engine::Camera* cam)
 	checkPointNumber = 0;
 
 	CreateCheckpoint(Vector3(13510.000000, -2225.000000, 166.000000), Vector3(25.000000, 0.000000, 0.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 90.f);
-	CreateCheckpoint(Vector3(1475.000000, -960.000000, 70.000000), Vector3(-25.000000, -90.000000, -90.000000), Vector3(24.f), resources::models["Prop_Goal.obj"], 360.f, true);
+	CreateCheckpoint(Vector3(1375.000000, -950.000000, 70.000000), Vector3(-25.000000, -90.000000, -90.000000), Vector3(28.f), resources::models["Prop_Goal.obj"], 360.f, true);
+
+	//Collectibles
+	// First boxes
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2900.000000, -1205.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2900.000000, -1262.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(2900.000000, -1320.000000, 0.300000));
+
+	// second boxes
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1545.000000, -2390.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1490.000000, -2410.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1435.000000, -2435.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(1370.000000, -2460.000000, 0.300000));
+
+	// boxes
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3305.000000, -2405.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3365.000000, -2418.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3425.000000, -2432.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(3490.000000, -2445.000000, 0.300000));
+
+	// boxes
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(4945.000000, -1970.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(4990.000000, -2005.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5045.000000, -2050.000000, 0.300000));
+
+	// boxes
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5705.000000, -2310.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5705.000000, -2365.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5705.000000, -2420.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5705.000000, -2475.000000, 0.300000));
+
+	// boxes
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10040.000000, -1180.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10040.000000, -1130.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10040.000000, -1080.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10040.000000, -1030.000000, 0.300000));
+
+	// boxes
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10330.000000, -2400.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10245.000000, -2400.000000, 0.300000));
+
+	// boxes
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10785.000000, -1820.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10785.000000, -1700.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10785.000000, -1580.000000, 0.300000));
+
+	// boxes
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(12785.000000, -2000.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(12725.000000, -1970.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(12885.000000, -2450.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(12810.000000, -2475.000000, 0.300000));
 
 
-	PlayCountdown(Vector3(1235.0f, -310.0f, 200.0f));
+
+	PlayCountdown(Vector3(1235.0f, -780.0f, 200.0f));
 	PlayerController::lapCount = 1;
 	//Create the players
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1225.0f, -900.0f));
+
+	SetupGameMusic();
 }
 
 
