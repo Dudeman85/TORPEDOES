@@ -1295,7 +1295,7 @@ public:
 	}
 };
 
-enum class MainMenuState { Off, Main, Options, Credits, Any };
+enum class MainMenuState { Off, Splash, Main, Options, Credits, Any };
 
 ECS_REGISTER_COMPONENT(MainMenuComponent)
 struct MainMenuComponent
@@ -1307,7 +1307,7 @@ struct MainMenuComponent
 	bool isSlider = false;
 	float sliderValue = 0;
 	bool isTitle = false;
-	MainMenuState showInState;
+	std::vector<MainMenuState> showInStates;
 };
 
 ECS_REGISTER_SYSTEM(MainMenuSystem, MainMenuComponent)
@@ -1317,6 +1317,7 @@ public:
 	MainMenuState state = MainMenuState::Off;
 
 	ecs::Entity currentSelection;
+	ecs::Entity startText;
 
 	//Make and show the main menu
 	void Init()
@@ -1324,21 +1325,21 @@ public:
 		ecs::Entity splashScreen = ecs::NewEntity();
 		ecs::AddComponent(splashScreen, Transform{ .position = {0, 0, -0.5}, .scale = {1, 1, 0} });
 		ecs::AddComponent(splashScreen, SpriteRenderer{ .texture = resources::menuTextures["UI_Title_Background_1.png"], .uiElement = true });
-		ecs::AddComponent(splashScreen, MainMenuComponent{ .showInState = MainMenuState::Any });
+		ecs::AddComponent(splashScreen, MainMenuComponent{ .showInStates = {MainMenuState::Splash, MainMenuState::Main} });
 
-		ecs::Entity startText = ecs::NewEntity();
+		startText = ecs::NewEntity();
 		ecs::AddComponent(startText, Transform{ .position = { -0.5, 0.2, -0.1 }, .rotation = { 0, 0, 15 }, .scale = { .45, .1, 0 } });
 		ecs::AddComponent(startText, SpriteRenderer{ .texture = resources::menuTextures["UI_PressStart.png"], .uiElement = true });
-		ecs::AddComponent(startText, MainMenuComponent{ .showInState = MainMenuState::Main });
+		ecs::AddComponent(startText, MainMenuComponent{ .showInStates = {MainMenuState::Splash} });
 
 		ecs::Entity creditsScreen = ecs::NewEntity();
 		ecs::AddComponent(creditsScreen, Transform{ .position = { 0, -0, 0.5 }, .scale = { 1, 1, 0 } });
 		ecs::AddComponent(creditsScreen, SpriteRenderer{ .texture = resources::menuTextures["UI_Credits_Screen.png"], .uiElement = true });
-		ecs::AddComponent(creditsScreen, MainMenuComponent{ .showInState = MainMenuState::Credits });
+		ecs::AddComponent(creditsScreen, MainMenuComponent{ .showInStates = {MainMenuState::Credits} });
 
 		gameState = menuMainState;
 		currentSelection = 0;
-		ChangeState(MainMenuState::Main);
+		ChangeState(MainMenuState::Splash);
 	}
 
 	//Destroy the main menu
@@ -1356,11 +1357,39 @@ public:
 	//Handle animations and input
 	void Update()
 	{
-		/*
+		//Get Inputs
+		float verticalInput = input::GetTotalInputValue("MenuVertical");
+		int verticalDpadInput = input::GetPressed("MenuDpadDown") - input::GetPressed("MenuDpadUp");
+		verticalInput += verticalDpadInput;
+
+		float horizontalInput = input::GetTotalInputValue("MenuHorizontal");
+		int horizontalDpadInput = input::GetPressed("MenuDpadLeft") - input::GetPressed("MenuDpadRight");
+		horizontalInput += horizontalDpadInput;
+
+		bool confirmInput = input::GetNewPress("MenuConfirm");
+		bool backInput = input::GetNewPress("MenuBack");
+		bool pauseInput = input::GetNewPress("Pause");
+
 		switch (state)
 		{
 		case MainMenuState::Off:
 			return;
+			break;
+		case MainMenuState::Splash:
+			//Splash title animation
+			TransformSystem::SetScale(startText, Vector3(.45, .1, 0) + Vector3((std::sin(programTime * 4) / 700), (std::sin(programTime * 4) / 3150), 0) * 35);
+			//Go to Main selection
+			if (confirmInput || pauseInput) 
+			{
+				//DEBUG Go to ship select menu
+				ecs::GetSystem<PlayerSelectSystem>()->Init();
+				ecs::GetSystem<PlayerSelectSystem>()->isShipSelectionMenuOn = true;
+				gameState = selectPlayersState;
+				Unload();
+
+
+				ChangeState(MainMenuState::Main);
+			}
 			break;
 		case MainMenuState::Main:
 			break;
@@ -1371,33 +1400,6 @@ public:
 		default:
 			break;
 		}
-		*/
-		//TransformSystem::SetScale(startText, Vector3(.45, .1, 0) + Vector3((std::sin(programTime * 4) / 700), (std::sin(programTime * 4) / 3150), 0) * 35);
-
-		bool goPlayerSelect = false;
-		if (input::GetNewPress("Pause"))
-		{
-			goPlayerSelect = true;
-		}
-		for (int i = 0; i < 4; i++)
-		{
-			if (input::GetNewPress("Shoot" + to_string(i)))
-			{
-				goPlayerSelect = true;
-				break;
-			}
-		}
-		if (goPlayerSelect)
-		{
-			{
-				// Go to ship select menu
-				ecs::GetSystem<PlayerSelectSystem>()->Init();
-				ecs::GetSystem<PlayerSelectSystem>()->isShipSelectionMenuOn = true;
-				gameState = selectPlayersState;
-				Unload();
-			}
-		}
-
 	}
 
 	void ChangeState(MainMenuState newState)
@@ -1408,10 +1410,17 @@ public:
 		for (ecs::Entity entity : entities)
 		{
 			MainMenuComponent& mmc = ecs::GetComponent<MainMenuComponent>(entity);
+			SpriteRenderer& sr = ecs::GetComponent<SpriteRenderer>(entity);
+
 			//Show all entities which should be shown
-			if (mmc.showInState == state || mmc.showInState == MainMenuState::Any)
+			if (std::find(mmc.showInStates.begin(), mmc.showInStates.end(), state) != mmc.showInStates.end() || 
+				std::find(mmc.showInStates.begin(), mmc.showInStates.end(), MainMenuState::Any) != mmc.showInStates.end())
 			{
-				SpriteRenderer& sr = ecs::GetComponent<SpriteRenderer>(entity);
+				sr.enabled = true;
+			}
+			else
+			{
+				sr.enabled = false;
 			}
 		}
 	}
