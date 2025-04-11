@@ -13,6 +13,7 @@ enum GameState { menuMainState, selectPlayersState, mapSelection, gamePlayState,
 static GameState gameState = menuMainState;
 static bool canStartLoadingMap;
 static bool isSceneloaded;
+static float volume = 0.5f;
 std::unordered_map<int, ShipType> playerShips;
 static void LoadLevel6(engine::Camera* cam);
 static void LoadLevel5(engine::Camera* cam);
@@ -893,7 +894,6 @@ class PauseSystem : public engine::ecs::System
 	const float delay = 0.3f;
 
 	//Volume slider
-	float volume = 0.5f;
 	const float sliderLeftBound = -0.168;
 	const float sliderRightBound = 0.166;
 	const float sliderLeftBoundMin = -0.13;
@@ -972,7 +972,7 @@ public:
 		verticalInput += verticalDpadInput;
 
 		float horizontalInput = input::GetTotalInputValue("MenuHorizontal");
-		int horizontalDpadInput = input::GetPressed("MenuDpadLeft") - input::GetPressed("MenuDpadRight");
+		int horizontalDpadInput = input::GetPressed("MenuDpadRight") - input::GetPressed("MenuDpadLeft");
 		horizontalInput += horizontalDpadInput;
 
 		bool confirmInput = input::GetNewPress("MenuConfirm");
@@ -1304,7 +1304,7 @@ struct MainMenuComponent
 	Texture* selectedTexture;
 	Texture* unselectedTexture;
 	std::function<void()> operation;
-	bool isSlider = false;
+	ecs::Entity slider = 0;
 	float sliderValue = 0;
 	std::vector<MainMenuState> showInStates;
 };
@@ -1315,8 +1315,18 @@ class MainMenuSystem : public ecs::System
 public:
 	MainMenuState state = MainMenuState::Off;
 
+	const float delay = 0.3f;
+	float repeatInputDelay;
+
+	//Slider bounds
+	const float sliderLeftBound = -0.168;
+	const float sliderRightBound = 0.166;
+	const float sliderLeftBoundMin = -0.13;
+	const float sliderRightBoundMin = 0.13;
+
 	ecs::Entity currentSelection;
 	ecs::Entity startText;
+	ecs::Entity startGame;
 
 	//Make and show the main menu
 	void Init()
@@ -1326,33 +1336,33 @@ public:
 		ecs::AddComponent(splashScreen, Transform{ .position = {0, 0, -0.5}, .scale = {1, 1, 0} });
 		ecs::AddComponent(splashScreen, SpriteRenderer{ .texture = resources::menuTextures["UI_Title_Background_1.png"], .uiElement = true });
 		ecs::AddComponent(splashScreen, MainMenuComponent{ .showInStates = {MainMenuState::Splash, MainMenuState::Main} });
+
 		startText = ecs::NewEntity();
 		ecs::AddComponent(startText, Transform{ .position = { -0.5, 0.2, -0.1 }, .rotation = { 0, 0, 15 }, .scale = { .45, .1, 0 } });
 		ecs::AddComponent(startText, SpriteRenderer{ .texture = resources::menuTextures["UI_PressStart.png"], .uiElement = true });
 		ecs::AddComponent(startText, MainMenuComponent{ .showInStates = {MainMenuState::Splash} });
 
 		//Main menu entities
-		ecs::Entity startGame = ecs::NewEntity();
+		startGame = ecs::NewEntity();
 		ecs::Entity options = ecs::NewEntity();
 		ecs::Entity credits = ecs::NewEntity();
 		ecs::Entity quitGame = ecs::NewEntity();
 
-		ecs::AddComponent(startGame, engine::Transform{ .position = Vector3(0, .5f, -0.1f), .scale = Vector3(0.25f) });
-		ecs::AddComponent(startGame, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_StartGame.png"], .enabled = false, .uiElement = true });
+		ecs::AddComponent(startGame, Transform{ .position = Vector3(0, .5f, -0.1f), .scale = Vector3(0.32f) });
+		ecs::AddComponent(startGame, SpriteRenderer{ .texture = resources::menuTextures["UI_StartGame.png"], .enabled = false, .uiElement = true });
 		ecs::AddComponent(startGame, MainMenuComponent{ .upper = quitGame, .lower = options, .selectedTexture = resources::menuTextures["UI_StartGame.png"], .unselectedTexture = resources::menuTextures["UI_StartGame_N.png"], .operation = OnStartGamePressed, .showInStates = {MainMenuState::Main} });
-		/*
-		engine::ecs::AddComponent(optionsButton, engine::Transform{ .position = Vector3(0, .3f, -0.1f), .scale = Vector3(.25f) });
-		engine::ecs::AddComponent(optionsButton, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Options_N.png"], .enabled = false, .uiElement = true });
-		engine::ecs::AddComponent(optionsButton, PauseComponent{ .upper = resumeButton, .lower = mainMenuButton, .selectedTexture = resources::menuTextures["UI_Options.png"], .unselectedTexture = resources::menuTextures["UI_Options_N.png"], .operation = PauseSystem::OnOptionsPressed });
 
-		engine::ecs::AddComponent(mainMenuButton, engine::Transform{ .position = Vector3(0, .1f, -0.1f), .scale = Vector3(0.25f) });
-		engine::ecs::AddComponent(mainMenuButton, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_BackToMenu_N.png"], .enabled = false, .uiElement = true });
-		engine::ecs::AddComponent(mainMenuButton, PauseComponent{ .upper = optionsButton, .lower = quitGameButton, .selectedTexture = resources::menuTextures["UI_BackToMenu.png"], .unselectedTexture = resources::menuTextures["UI_BackToMenu_N.png"], .operation = PauseSystem::OnMainMenuPressed });
+		ecs::AddComponent(options, Transform{ .position = Vector3(0, .3f, -0.1f), .scale = Vector3(.25f) });
+		ecs::AddComponent(options, SpriteRenderer{ .texture = resources::menuTextures["UI_Options_N.png"], .enabled = false, .uiElement = true });
+		ecs::AddComponent(options, MainMenuComponent{ .upper = startGame, .lower = credits, .selectedTexture = resources::menuTextures["UI_Options.png"], .unselectedTexture = resources::menuTextures["UI_Options_N.png"], .operation = OnOptionsPressed, .showInStates = {MainMenuState::Main} });
 
-		engine::ecs::AddComponent(quitGameButton, engine::Transform{ .position = Vector3(0, -0.7f, -0.1f), .scale = Vector3(0.25f) });
-		engine::ecs::AddComponent(quitGameButton, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_QuitGame_N.png"], .enabled = false, .uiElement = true });
-		engine::ecs::AddComponent(quitGameButton, PauseComponent{ .upper = mainMenuButton, .lower = resumeButton, .selectedTexture = resources::menuTextures["UI_QuitGame.png"], .unselectedTexture = resources::menuTextures["UI_QuitGame_N.png"], .operation = PauseSystem::OnQuitGamePressed });
-		*/
+		ecs::AddComponent(credits, Transform{ .position = Vector3(0, .1f, -0.1f), .scale = Vector3(0.25f) });
+		ecs::AddComponent(credits, SpriteRenderer{ .texture = resources::menuTextures["UI_Credits_N.png"], .enabled = false, .uiElement = true });
+		ecs::AddComponent(credits, MainMenuComponent{ .upper = options, .lower = quitGame, .selectedTexture = resources::menuTextures["UI_Credits.png"], .unselectedTexture = resources::menuTextures["UI_Credits_N.png"], .operation = OnCreditsPressed, .showInStates = {MainMenuState::Main} });
+
+		ecs::AddComponent(quitGame, Transform{ .position = Vector3(0, -0.7f, -0.1f), .scale = Vector3(0.25f) });
+		ecs::AddComponent(quitGame, SpriteRenderer{ .texture = resources::menuTextures["UI_QuitGame_N.png"], .enabled = false, .uiElement = true });
+		ecs::AddComponent(quitGame, MainMenuComponent{ .upper = credits, .lower = startGame, .selectedTexture = resources::menuTextures["UI_QuitGame.png"], .unselectedTexture = resources::menuTextures["UI_QuitGame_N.png"], .operation = PauseSystem::OnQuitGamePressed, .showInStates = {MainMenuState::Main} });
 
 		//Options entities
 
@@ -1389,37 +1399,109 @@ public:
 		verticalInput += verticalDpadInput;
 
 		float horizontalInput = input::GetTotalInputValue("MenuHorizontal");
-		int horizontalDpadInput = input::GetPressed("MenuDpadLeft") - input::GetPressed("MenuDpadRight");
+		int horizontalDpadInput = input::GetPressed("MenuDpadRight") - input::GetPressed("MenuDpadLeft");
 		horizontalInput += horizontalDpadInput;
 
 		bool confirmInput = input::GetNewPress("MenuConfirm");
 		bool backInput = input::GetNewPress("MenuBack");
 		bool pauseInput = input::GetNewPress("Pause");
+		repeatInputDelay -= engine::deltaTime;
 
 		switch (state)
 		{
 		case MainMenuState::Off:
 			return;
 			break;
+
 		case MainMenuState::Splash:
 			//Splash title animation
 			TransformSystem::SetScale(startText, Vector3(.45, .1, 0) + Vector3((std::sin(programTime * 4) / 700), (std::sin(programTime * 4) / 3150), 0) * 35);
 			//Go to Main selection
 			if (confirmInput || pauseInput)
 			{
-				OnStartGamePressed();
-
 				ChangeState(MainMenuState::Main);
+				currentSelection = startGame;
 			}
 			break;
+
 		case MainMenuState::Main:
+			//Move up/down
+			if (verticalInput >= 0.5f)
+			{
+				if (repeatInputDelay <= 0)
+				{
+					MoveSelection(false);
+					repeatInputDelay = delay;
+				}
+			}
+			else if (verticalInput <= -0.5f)
+			{
+				if (repeatInputDelay <= 0)
+				{
+					MoveSelection(true);
+					repeatInputDelay = delay;
+				}
+			}
+			else
+			{
+				repeatInputDelay = 0;
+			}
+
+			//A pressed
+			if (confirmInput)
+			{
+				Selected();
+			}
 			break;
+
 		case MainMenuState::Options:
 			break;
+
 		case MainMenuState::Credits:
 			break;
-		default:
-			break;
+		}
+	}
+
+	void Selected()
+	{
+		MainMenuComponent& mmc = ecs::GetComponent<MainMenuComponent>(currentSelection);
+		if (mmc.operation)
+			mmc.operation();
+	}
+
+	void MoveSelection(bool up)
+	{
+		//Old selection
+		MainMenuComponent& oldMMC = ecs::GetComponent<MainMenuComponent>(currentSelection);
+		SpriteRenderer& oldSR = ecs::GetComponent<SpriteRenderer>(currentSelection);
+		Transform& oldTF = ecs::GetComponent<Transform>(currentSelection);
+
+		oldTF.scale = Vector3(0.25f);
+		oldSR.texture = oldMMC.unselectedTexture;
+
+		if (ecs::EntityExists(oldMMC.slider))
+		{
+			Transform& sliderTF = ecs::GetComponent<Transform>(oldMMC.slider);
+			sliderTF.position.y = oldTF.position.y - 0.083f;
+			sliderTF.scale = Vector3(0.043f);
+			sliderTF.position.x = std::lerp(sliderLeftBoundMin, sliderRightBoundMin, oldMMC.sliderValue);
+		}
+
+		//New selection
+		currentSelection = up ? oldMMC.upper : oldMMC.lower;
+		MainMenuComponent& newMMC = ecs::GetComponent<MainMenuComponent>(currentSelection);
+		SpriteRenderer& newSR = ecs::GetComponent<SpriteRenderer>(currentSelection);
+		Transform& newTF = ecs::GetComponent<Transform>(currentSelection);
+
+		newTF.scale = Vector3(0.32f);
+		newSR.texture = newMMC.selectedTexture;
+
+		if (ecs::EntityExists(newMMC.slider))
+		{
+			Transform& sliderTF = ecs::GetComponent<Transform>(newMMC.slider);
+			sliderTF.position.y = newTF.position.y - 0.107f;
+			sliderTF.scale = Vector3(0.063f);
+			sliderTF.position.x = std::lerp(sliderLeftBound, sliderRightBound, oldMMC.sliderValue);
 		}
 	}
 
@@ -1429,6 +1511,16 @@ public:
 		ecs::GetSystem<PlayerSelectSystem>()->isShipSelectionMenuOn = true;
 		gameState = selectPlayersState;
 		ecs::GetSystem<MainMenuSystem>()->Unload();
+	}
+
+	static void OnOptionsPressed()
+	{
+
+	}
+
+	static void OnCreditsPressed()
+	{
+
 	}
 
 	void ChangeState(MainMenuState newState)
