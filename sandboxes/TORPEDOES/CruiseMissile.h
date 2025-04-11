@@ -35,8 +35,8 @@ public:
 			Transform& missileTransform = ecs::GetComponent<Transform>(entity);
 			Vector3 targetPos = ecs::GetComponent<Transform>(missile.target).position;
 			TransformSystem::SetPosition(missile.renderTargetIconi,targetPos);
-			TransformSystem::Rotate(missile.renderTargetIconi, Vector3(0, 0, cappedDeltaTime * 20.5));
-
+			TransformSystem::Rotate(missile.renderTargetIconi, Vector3(0, 0, cappedDeltaTime * 200.5));
+			TransformSystem::Scale(missile.renderTargetIconi, (sin(engine::programTime*6)*0.5));
 			//Move only forward for a time
 			if (missile.targetDelay > 0)
 			{
