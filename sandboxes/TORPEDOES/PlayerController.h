@@ -757,7 +757,7 @@ public:
 			{
 				ShipType::torpedoBoat, Player
 				{
-					.forwardSpeed = 550, .rotationSpeed = 120,
+					.forwardSpeed = 550, .rotationSpeed = 100,
 					.shootCooldown = 0.2, .specialCooldown = 5, .ammoRechargeCooldown = 2,
 					.holdShoot = false, .maxAmmo = 2,
 					.shootAction = CreateTorpedo, .specialAction = Boost,
@@ -779,7 +779,7 @@ public:
 			{
 				ShipType::cannonBoat, Player
 				{
-					.forwardSpeed = 470, .rotationSpeed = 180, .reloading = true,
+					.forwardSpeed = 480, .rotationSpeed = 180, .reloading = true,
 					.shootCooldown = 0.02, .specialCooldown = 5, .ammoRechargeCooldown = 0.16,
 					.holdShoot = true, .maxAmmo = 20,
 					.shootAction = ShootShell, .specialAction = Boost,
