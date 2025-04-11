@@ -9,8 +9,8 @@
 
 using namespace engine;
 
-enum GameState { menuMainState, selectPlayersState, mapSelection, gamePlayState, pauseMenuState };
-static GameState gameState = menuMainState;
+enum GameState { mainMenuState, selectPlayersState, mapSelection, gamePlayState, pauseMenuState };
+static GameState gameState = mainMenuState;
 static bool canStartLoadingMap;
 static bool isSceneloaded;
 static float volume = 0.5f;
@@ -1261,7 +1261,6 @@ public:
 
 	void MusicSliderLeft()
 	{
-		Vector3 parentPos = ecs::GetComponent<Transform>(musicSliderEntity).position;
 		Transform& tf = ecs::GetComponent<Transform>(musicSliderNub);
 
 		//Decrease volume
@@ -1278,7 +1277,6 @@ public:
 	}
 	void MusicSliderRight()
 	{
-		Vector3 parentPos = ecs::GetComponent<Transform>(musicSliderEntity).position;
 		Transform& tf = ecs::GetComponent<Transform>(musicSliderNub);
 
 		//Increase volume
@@ -1327,6 +1325,8 @@ public:
 	ecs::Entity currentSelection;
 	ecs::Entity startText;
 	ecs::Entity startGame;
+	ecs::Entity resume;
+	ecs::Entity fullscreen;
 
 	//Make and show the main menu
 	void Init()
@@ -1335,7 +1335,7 @@ public:
 		ecs::Entity splashScreen = ecs::NewEntity();
 		ecs::AddComponent(splashScreen, Transform{ .position = {0, 0, -0.5}, .scale = {1, 1, 0} });
 		ecs::AddComponent(splashScreen, SpriteRenderer{ .texture = resources::menuTextures["UI_Title_Background_1.png"], .uiElement = true });
-		ecs::AddComponent(splashScreen, MainMenuComponent{ .showInStates = {MainMenuState::Splash, MainMenuState::Main} });
+		ecs::AddComponent(splashScreen, MainMenuComponent{ .showInStates = {MainMenuState::Splash, MainMenuState::Main, MainMenuState::Options} });
 
 		startText = ecs::NewEntity();
 		ecs::AddComponent(startText, Transform{ .position = { -0.5, 0.2, -0.1 }, .rotation = { 0, 0, 15 }, .scale = { .45, .1, 0 } });
@@ -1365,6 +1365,31 @@ public:
 		ecs::AddComponent(quitGame, MainMenuComponent{ .upper = credits, .lower = startGame, .selectedTexture = resources::menuTextures["UI_QuitGame.png"], .unselectedTexture = resources::menuTextures["UI_QuitGame_N.png"], .operation = PauseSystem::OnQuitGamePressed, .showInStates = {MainMenuState::Main} });
 
 		//Options entities
+		ecs::Entity optionsImage = ecs::NewEntity();
+		resume = ecs::NewEntity();
+		ecs::Entity sfx = ecs::NewEntity();
+		ecs::Entity sfxSlider = ecs::NewEntity();
+		fullscreen = ecs::NewEntity();
+
+		ecs::AddComponent(optionsImage, Transform{ .position = Vector3(0, .8f, -0.1f), .scale = Vector3(.35f) });
+		ecs::AddComponent(optionsImage, SpriteRenderer{ .texture = resources::menuTextures["UI_Options_N.png"], .enabled = false, .uiElement = true });
+		ecs::AddComponent(optionsImage, MainMenuComponent{ .unselectedTexture = resources::menuTextures["UI_Options_N.png"], .showInStates = {MainMenuState::Options} });
+
+		ecs::AddComponent(resume, Transform{ .position = Vector3(0, .5f, -0.1f), .scale = Vector3(.25f) });
+		ecs::AddComponent(resume, SpriteRenderer{ .texture = resources::menuTextures["UI_Resume.png"], .enabled = false, .uiElement = true });
+		ecs::AddComponent(resume, MainMenuComponent{ .upper = fullscreen, .lower = sfx, .selectedTexture = resources::menuTextures["UI_Resume.png"], .unselectedTexture = resources::menuTextures["UI_Resume_N.png"], .operation = OnOptionsResumePressed, .showInStates = {MainMenuState::Options} });
+
+		ecs::AddComponent(sfx, Transform{ .position = Vector3(0, .3f, -0.1f), .scale = Vector3(0.25f) });
+		ecs::AddComponent(sfx, SpriteRenderer{ .texture = resources::menuTextures["UI_SFX_Slider_N.png"], .enabled = false, .uiElement = true });
+		ecs::AddComponent(sfx, MainMenuComponent{ .upper = resume, .lower = fullscreen, .selectedTexture = resources::menuTextures["UI_SFX_Slider.png"], .unselectedTexture = resources::menuTextures["UI_SFX_Slider_N.png"], .slider = sfxSlider, .showInStates = {MainMenuState::Options} });
+
+		ecs::AddComponent(sfxSlider, Transform{ .position = ecs::GetComponent<Transform>(sfx).position + Vector3(0, -0.1f, 0.1), .scale = Vector3(0.05f) });
+		ecs::AddComponent(sfxSlider, SpriteRenderer{ .texture = resources::menuTextures["UI_Slider_Button.png"], .enabled = false, .uiElement = true });
+		ecs::AddComponent(sfxSlider, MainMenuComponent{ .selectedTexture = resources::menuTextures["UI_Slider_Button.png"], .unselectedTexture = resources::menuTextures["UI_Slider_Button.png"], .showInStates = {MainMenuState::Options} });
+
+		ecs::AddComponent(fullscreen, Transform{ .position = Vector3(0, .0f, -0.1f), .scale = Vector3(0.25f) });
+		ecs::AddComponent(fullscreen, SpriteRenderer{ .texture = resources::menuTextures["UI_Windowed_N.png"], .enabled = false, .uiElement = true });
+		ecs::AddComponent(fullscreen, MainMenuComponent{ .upper = sfx, .lower = resume, .selectedTexture = resources::menuTextures["UI_Windowed.png"], .unselectedTexture = resources::menuTextures["UI_Windowed_N.png"], .operation = OnFullScreenPressed, .showInStates = {MainMenuState::Options} });
 
 		//Credits entities
 		ecs::Entity creditsScreen = ecs::NewEntity();
@@ -1373,9 +1398,8 @@ public:
 		ecs::AddComponent(creditsScreen, MainMenuComponent{ .showInStates = {MainMenuState::Credits} });
 
 		//Setup the state
-		gameState = menuMainState;
-		currentSelection = 0;
-		ChangeState(MainMenuState::Splash);
+		gameState = mainMenuState;
+		ChangeState(MainMenuState::Splash, 0);
 	}
 
 	//Destroy the main menu
@@ -1419,8 +1443,7 @@ public:
 			//Go to Main selection
 			if (confirmInput || pauseInput)
 			{
-				ChangeState(MainMenuState::Main);
-				currentSelection = startGame;
+				ChangeState(MainMenuState::Main, startGame);
 			}
 			break;
 
@@ -1455,8 +1478,57 @@ public:
 			break;
 
 		case MainMenuState::Options:
-			break;
+		{
+			//Move up/down
+			if (verticalInput >= 0.5f)
+			{
+				if (repeatInputDelay <= 0)
+				{
+					MoveSelection(false);
+					repeatInputDelay = delay;
+				}
+			}
+			else if (verticalInput <= -0.5f)
+			{
+				if (repeatInputDelay <= 0)
+				{
+					MoveSelection(true);
+					repeatInputDelay = delay;
+				}
+			}
+			else
+			{
+				repeatInputDelay = 0;
+			}
 
+			//Move slider left/right
+			MainMenuComponent& mmc = ecs::GetComponent<MainMenuComponent>(currentSelection);
+			if (ecs::EntityExists(mmc.slider))
+			{
+				if (horizontalInput >= 0.5f)
+				{
+					SliderRight(mmc.slider);
+				}
+				else if (horizontalInput <= -0.5f)
+				{
+					SliderLeft(mmc.slider);
+				}
+			}
+
+			//A pressed
+			if (confirmInput)
+			{
+				Selected();
+			}
+
+			//B pressed
+			if (backInput)
+			{
+				TransformSystem::SetScale(currentSelection, Vector3(0.25f));
+				ChangeState(MainMenuState::Main, startGame);
+			}
+			break;
+		}
 		case MainMenuState::Credits:
 			break;
 		}
@@ -1484,7 +1556,7 @@ public:
 			Transform& sliderTF = ecs::GetComponent<Transform>(oldMMC.slider);
 			sliderTF.position.y = oldTF.position.y - 0.083f;
 			sliderTF.scale = Vector3(0.043f);
-			sliderTF.position.x = std::lerp(sliderLeftBoundMin, sliderRightBoundMin, oldMMC.sliderValue);
+			sliderTF.position.x = std::lerp(sliderLeftBoundMin, sliderRightBoundMin, volume);
 		}
 
 		//New selection
@@ -1501,8 +1573,39 @@ public:
 			Transform& sliderTF = ecs::GetComponent<Transform>(newMMC.slider);
 			sliderTF.position.y = newTF.position.y - 0.107f;
 			sliderTF.scale = Vector3(0.063f);
-			sliderTF.position.x = std::lerp(sliderLeftBound, sliderRightBound, oldMMC.sliderValue);
+			sliderTF.position.x = std::lerp(sliderLeftBound, sliderRightBound, volume);
 		}
+	}
+
+	void SliderLeft(ecs::Entity slider)
+	{
+		//Decrease volume
+		if (volume > 0)
+		{
+			volume -= engine::deltaTime;
+		}
+		volume = std::max(volume, 0.f);
+
+		//Move slider
+		Transform& tf = ecs::GetComponent<Transform>(slider);
+		tf.position.x = std::lerp(sliderLeftBound, sliderRightBound, volume);
+
+		ecs::GetSystem<SoundSystem>()->SetGlobalVolume(volume);
+	}
+	void SliderRight(ecs::Entity slider)
+	{
+		//Increase volume
+		if (volume < 1)
+		{
+			volume += engine::deltaTime;
+		}
+		volume = std::min(volume, 1.f);
+
+		//Move slider
+		Transform& tf = ecs::GetComponent<Transform>(slider);
+		tf.position.x = std::lerp(sliderLeftBound, sliderRightBound, volume);
+
+		ecs::GetSystem<SoundSystem>()->SetGlobalVolume(volume);
 	}
 
 	static void OnStartGamePressed()
@@ -1515,15 +1618,52 @@ public:
 
 	static void OnOptionsPressed()
 	{
-
+		auto mms = ecs::GetSystem<MainMenuSystem>();
+		mms->ChangeState(MainMenuState::Options, mms->resume);
 	}
 
 	static void OnCreditsPressed()
 	{
-
+		auto mms = ecs::GetSystem<MainMenuSystem>();
+		mms->ChangeState(MainMenuState::Credits, 0);
 	}
 
-	void ChangeState(MainMenuState newState)
+	static void OnOptionsResumePressed()
+	{
+		auto mms = ecs::GetSystem<MainMenuSystem>();
+		mms->ChangeState(MainMenuState::Main, mms->startGame);
+	}
+
+	static void OnFullScreenPressed()
+	{
+		ToggleFullscreen();
+		ecs::GetSystem<MainMenuSystem>()->UpdateFullscreenIcon();
+	}
+	void UpdateFullscreenIcon()
+	{
+		SpriteRenderer& sr = ecs::GetComponent<SpriteRenderer>(fullscreen);
+		MainMenuComponent& pauseComp = ecs::GetComponent<MainMenuComponent>(fullscreen);
+
+		if (!mainWindowFullscreen)
+		{
+			//Make windowed
+			pauseComp.selectedTexture = resources::menuTextures["UI_Windowed.png"];
+			pauseComp.unselectedTexture = resources::menuTextures["UI_Windowed_N.png"];
+		}
+		else
+		{
+			//Make Fullscreen
+			pauseComp.selectedTexture = resources::menuTextures["UI_Fullscreen.png"];
+			pauseComp.unselectedTexture = resources::menuTextures["UI_Fullscreen_N.png"];
+		}
+		//Set the button sprite
+		if (currentSelection == fullscreen)
+			sr.texture = pauseComp.selectedTexture;
+		else
+			sr.texture = pauseComp.unselectedTexture;
+	}
+
+	void ChangeState(MainMenuState newState, ecs::Entity newSelection)
 	{
 		state = newState;
 
@@ -1543,6 +1683,25 @@ public:
 			{
 				sr.enabled = false;
 			}
+		}
+
+		//Set the previous selected to unselected
+		if (ecs::EntityExists(currentSelection))
+		{
+			MainMenuComponent& selectedMMC = ecs::GetComponent<MainMenuComponent>(currentSelection);
+			SpriteRenderer& selectedSR = ecs::GetComponent<SpriteRenderer>(currentSelection);
+			selectedSR.texture = selectedMMC.unselectedTexture;
+			TransformSystem::SetScale(currentSelection, Vector3(0.25f));
+		}
+
+		//Set the new selected to selected
+		currentSelection = newSelection;
+		if (ecs::EntityExists(currentSelection))
+		{
+			MainMenuComponent& selectedMMC = ecs::GetComponent<MainMenuComponent>(currentSelection);
+			SpriteRenderer& selectedSR = ecs::GetComponent<SpriteRenderer>(currentSelection);
+			selectedSR.texture = selectedMMC.selectedTexture;
+			TransformSystem::SetScale(currentSelection, Vector3(0.32f));
 		}
 	}
 };

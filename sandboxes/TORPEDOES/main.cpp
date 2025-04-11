@@ -1119,7 +1119,7 @@ int main()
 	Vector3 newListenerPosition(2200.000000, -1075.000000, 0.00000);
 	soundSystem->SetListeningPosition(newListenerPosition);
 
-	GameState currentGameState = menuMainState;
+	GameState currentGameState = mainMenuState;
 
 	//Bind all input actions
 	SetupInput();
@@ -1218,6 +1218,8 @@ int main()
 				ToggleFullscreen();
 				if (gameState == pauseMenuState)
 					pauseSystem->UpdateFullscreenIcon();
+				if (gameState == mainMenuState)
+					mainMenuSystem->UpdateFullscreenIcon();
 			}
 		}
 		else
@@ -1231,7 +1233,7 @@ int main()
 		//Handle updating of proper systems
 		switch (gameState)
 		{
-		case menuMainState:
+		case mainMenuState:
 			mainMenuSystem->Update();
 			break;
 		case mapSelection:
