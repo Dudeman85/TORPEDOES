@@ -14,6 +14,7 @@ struct CruiseMissile
 {
 	ecs::Entity owner;
 	ecs::Entity target;
+	ecs::Entity renderTargetIconi;
 	float targetDelay = targetDelayTime;
 };
 
@@ -33,7 +34,9 @@ public:
 			CruiseMissile& missile = ecs::GetComponent<CruiseMissile>(entity);
 			Transform& missileTransform = ecs::GetComponent<Transform>(entity);
 			Vector3 targetPos = ecs::GetComponent<Transform>(missile.target).position;
-
+			TransformSystem::SetPosition(missile.renderTargetIconi,targetPos);
+			TransformSystem::Rotate(missile.renderTargetIconi, Vector3(0, 0, cappedDeltaTime * 200.5));
+			TransformSystem::Scale(missile.renderTargetIconi, (sin(engine::programTime*6)*0.5));
 			//Move only forward for a time
 			if (missile.targetDelay > 0)
 			{
@@ -74,6 +77,7 @@ public:
 				//If close enough, explode
 				else
 				{
+					ecs::DestroyEntity(missile.renderTargetIconi);
 					CreateExplosion(entity);
 					ecs::DestroyEntity(entity);
 				}
@@ -85,10 +89,14 @@ public:
 	static void CreateMissile(ecs::Entity owner, ecs::Entity target, float rotation)
 	{
 		ecs::Entity missile = ecs::NewEntity();
+		ecs::Entity renderTargetIconi = ecs::NewEntity();
 
 		ecs::AddComponent(missile, Transform{ .position = ecs::GetComponent<Transform>(owner).position, .rotation = {0, -90, rotation}, .scale = {10, 10, 10} , .rotationOrder = ZYX});
 		ecs::AddComponent(missile, ModelRenderer{ .model = resources::models["Weapon_CruiseMissile.obj"] });
-		ecs::AddComponent(missile, CruiseMissile{ .owner = owner, .target = target });
+		ecs::AddComponent(missile, CruiseMissile{ .owner = owner, .target = target, .renderTargetIconi = renderTargetIconi });
+		ecs::AddComponent(renderTargetIconi, Transform{ .scale = Vector3(40) });
+		ecs::AddComponent(renderTargetIconi, SpriteRenderer{ .texture = resources::uiTextures["crosshair.png"] });
+
 	}
 
 	//Make the cruie missile explosion animation and hitbox

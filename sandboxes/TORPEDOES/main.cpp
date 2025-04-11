@@ -829,7 +829,42 @@ static void LoadLevel6(engine::Camera* cam)
 	////Make all the checkpoints manually
 	checkPointNumber = 0;
 
+
+	CreateCheckpoint(Vector3(3325.000000, -1030.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(26.f), resources::models["Prop_Buoy.obj"], 90.f);
+	CreateCheckpoint(Vector3(1425.000000, -2250.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(19.f), resources::models["Prop_Buoy.obj"], 90.f);
+	CreateCheckpoint(Vector3(2535.000000, -2950.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(20.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(4680.000000, -1075.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(22.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(5080.000000, -2520.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(22.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(6510.000000, -1835.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(34.f), resources::models["Prop_Buoy.obj"], 90.f);
+	CreateCheckpoint(Vector3(6680.000000, -895.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(22.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(8035.000000, -2715.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(30.f), resources::models["Prop_Buoy.obj"], 145.f);
+	CreateCheckpoint(Vector3(9555.000000, -2360.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 90.f);
+	CreateCheckpoint(Vector3(8840.000000, -1050.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(25.f), resources::models["Prop_Buoy.obj"], 45.f);
+	CreateCheckpoint(Vector3(10240.000000, -1170.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(16.f), resources::models["Prop_Buoy.obj"], 90.f);
+	CreateCheckpoint(Vector3(10155.000000, -2885.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(21.f), resources::models["Prop_Buoy.obj"], 90.f);
+	CreateCheckpoint(Vector3(11575.000000, -2820.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 90.f);
+	CreateCheckpoint(Vector3(10790.000000, -1580.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(15.f), resources::models["Prop_Buoy.obj"], 90.f);
+	CreateCheckpoint(Vector3(11720.000000, -1560.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(23.f), resources::models["Prop_Buoy.obj"], 90.f);
+
+	//turnabout
 	CreateCheckpoint(Vector3(13510.000000, -2225.000000, 166.000000), Vector3(25.000000, 0.000000, 0.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 90.f);
+
+	CreateCheckpoint(Vector3(11720.000000, -1560.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(23.f), resources::models["Prop_Buoy.obj"], 90.f);
+	CreateCheckpoint(Vector3(10790.000000, -1580.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(15.f), resources::models["Prop_Buoy.obj"], 90.f);
+	CreateCheckpoint(Vector3(11575.000000, -2820.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 90.f);
+	CreateCheckpoint(Vector3(10155.000000, -2885.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(21.f), resources::models["Prop_Buoy.obj"], 90.f);
+	CreateCheckpoint(Vector3(10240.000000, -1170.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(16.f), resources::models["Prop_Buoy.obj"], 90.f);
+	CreateCheckpoint(Vector3(8840.000000, -1050.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(25.f), resources::models["Prop_Buoy.obj"], 45.f);
+	CreateCheckpoint(Vector3(9555.000000, -2360.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 90.f);
+	CreateCheckpoint(Vector3(8035.000000, -2715.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(30.f), resources::models["Prop_Buoy.obj"], 145.f);
+	CreateCheckpoint(Vector3(6680.000000, -895.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(22.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(6510.000000, -1835.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(34.f), resources::models["Prop_Buoy.obj"], 90.f);
+	CreateCheckpoint(Vector3(5080.000000, -2520.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(22.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(4680.000000, -1075.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(22.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(2535.000000, -2950.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(20.f), resources::models["Prop_Buoy.obj"], 0.f);
+	CreateCheckpoint(Vector3(1425.000000, -2250.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(19.f), resources::models["Prop_Buoy.obj"], 90.f);
+	CreateCheckpoint(Vector3(3325.000000, -1030.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(26.f), resources::models["Prop_Buoy.obj"], 90.f);
+
 	CreateCheckpoint(Vector3(1375.000000, -950.000000, 70.000000), Vector3(-25.000000, -90.000000, -90.000000), Vector3(28.f), resources::models["Prop_Goal.obj"], 360.f, true);
 
 	//Collectibles
@@ -1093,7 +1128,7 @@ int main()
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
 	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(1475, -460, 166), .scale = 20 });
-	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
+	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Buoy.obj"] });
 	ecs::AddTag(placementEditor, "persistent");
 
 
