@@ -35,7 +35,7 @@ public:
 			Transform& missileTransform = ecs::GetComponent<Transform>(entity);
 			Vector3 targetPos = ecs::GetComponent<Transform>(missile.target).position;
 			TransformSystem::SetPosition(missile.renderTargetIconi,targetPos);
-			TransformSystem::Rotate(missile.renderTargetIconi, Vector3(0, 0, cappedDeltaTime * 20.5));
+			TransformSystem::Rotate(missile.renderTargetIconi, Vector3(0, 0, cappedDeltaTime * 50.5));
 
 			//Move only forward for a time
 			if (missile.targetDelay > 0)
@@ -94,7 +94,7 @@ public:
 		ecs::AddComponent(missile, Transform{ .position = ecs::GetComponent<Transform>(owner).position, .rotation = {0, -90, rotation}, .scale = {10, 10, 10} , .rotationOrder = ZYX});
 		ecs::AddComponent(missile, ModelRenderer{ .model = resources::models["Weapon_CruiseMissile.obj"] });
 		ecs::AddComponent(missile, CruiseMissile{ .owner = owner, .target = target, .renderTargetIconi = renderTargetIconi });
-		ecs::AddComponent(renderTargetIconi, Transform{ .scale = Vector3(40) });
+		ecs::AddComponent(renderTargetIconi, Transform{ .scale = Vector3(30) });
 		ecs::AddComponent(renderTargetIconi, SpriteRenderer{ .texture = resources::uiTextures["crosshair.png"] });
 
 	}
