@@ -1289,7 +1289,7 @@ int main()
 				engine::enableAnimation = false;
 			}
 
-			UpdateCam(cam, collisionSystem->tilemap, currentLevel == 4);
+			UpdateCam(cam, collisionSystem->tilemap, currentLevel == 4 || currentLevel == 6);
 			//Camera position must be divided by 2 because of a known camera bug
 			soundSystem->SetListeningPosition(Vector3(cam->position.x * 2, cam->position.y * 2, 30));
 			newListenerPosition = (Vector3(cam->position.x * 2, cam->position.y * 2, 30));

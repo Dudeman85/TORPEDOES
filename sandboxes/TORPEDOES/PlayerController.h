@@ -52,7 +52,6 @@ struct Player
 	// State variables
 	bool specialEnabled = false;
 	bool submerged = false;
-	bool reloading = false;
 
 	// Action cooldowns
 	float shootCooldown = 0.2f;			// Time between shots
@@ -62,6 +61,7 @@ struct Player
 	bool holdShoot = false;				// Whether we can hold to shoot
 	int ammo = 0;
 	int maxAmmo = 2;
+	int ammoPerReload = 1;
 
 	// Action timers
 	float _ammoRechargeTimer = 0.0f;
@@ -146,6 +146,7 @@ void CreateShell(engine::ecs::Entity entity)
 	Player& player = ecs::GetComponent<Player>(entity);
 	Transform& transform = ecs::GetComponent<Transform>(entity);
 	Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
+	player._ammoRechargeTimer = 0;
 
 	float speed = 1200;
 
@@ -163,14 +164,6 @@ void CreateShell(engine::ecs::Entity entity)
 	float shellSize = 0.1;
 	std::vector<Vector2> shellverts{ Vector2(shellSize, shellSize), Vector2(shellSize, -shellSize), Vector2(-shellSize, -shellSize), Vector2(-shellSize, shellSize) };
 	ecs::AddComponent(shell, PolygonCollider{ .vertices = shellverts, .callback = OnProjectileCollision, .trigger = true, .layer = 4, .visualise = true,  .rotationOverride = std::abs(modelTransform.rotation.y) });
-}
-
-void ShootShell(engine::ecs::Entity entity)
-{
-	Player& player = ecs::GetComponent<Player>(entity);
-	player.reloading = false;
-
-	CreateShell(entity);
 }
 
 /* MULTISHOT */
@@ -573,7 +566,7 @@ void CannonIndicatorUpdate(ecs::Entity entity)
 	Transform& tf0 = ecs::GetComponent<Transform>(it0.entity);
 	Transform& tf1 = ecs::GetComponent<Transform>(it1.entity);
 
-	tf1.position.z = tf0.position.z + (player.ammo - (player.maxAmmo / 2) / 10);
+	tf1.position.z = tf0.position.z - 0.001 + ((float)player.ammo - ((float)player.maxAmmo / 2)) / 50.f;
 }
 
 void HedgehogIndicatorUpdate(engine::ecs::Entity entity)
@@ -732,10 +725,10 @@ public:
 			{
 				ShipType::cannonBoat, Player
 				{
-					.forwardSpeed = 480, .rotationSpeed = 180, .reloading = true,
-					.shootCooldown = 0.2, .specialCooldown = 5, .ammoRechargeCooldown = 0.16,
-					.holdShoot = true, .maxAmmo = 20,
-					.shootAction = ShootShell, .specialAction = Boost,
+					.forwardSpeed = 480, .rotationSpeed = 180,
+					.shootCooldown = 0.15, .specialCooldown = 5, .ammoRechargeCooldown = 4,
+					.holdShoot = true, .maxAmmo = 20, .ammoPerReload = 20,
+					.shootAction = CreateShell, .specialAction = Boost,
 					.shootIndicatorUpdate = CannonIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
 				}
 			});
@@ -1105,37 +1098,31 @@ public:
 			// If not max ammo
 			if (player.ammo < player.maxAmmo)
 			{
-				if (player.reloading)
+				player._ammoRechargeTimer += engine::deltaTime;
+
+				while (player._ammoRechargeTimer >= player.ammoRechargeCooldown)
 				{
-					player._ammoRechargeTimer += engine::deltaTime;
+					// Add ammo
+					player.ammo += player.ammoPerReload;
 
-					while (player._ammoRechargeTimer >= player.ammoRechargeCooldown)
+					if (player.ammo < player.maxAmmo)
 					{
-						// Add ammo
-						player.ammo++;
-
-						if (player.ammo < player.maxAmmo)
-						{
-							// Not max ammo, continue recharge
-							player._ammoRechargeTimer -= player.ammoRechargeCooldown;
-						}
-						else
-						{
-							// Max ammo, handle recharge after shooting
-							player.ammo = player.maxAmmo;
-							reachedMaxAmmoThisFrame = true;
-							break;
-						}
+						// Not max ammo, continue recharge
+						player._ammoRechargeTimer -= player.ammoRechargeCooldown;
+					}
+					else
+					{
+						// Max ammo, handle recharge after shooting
+						player.ammo = player.maxAmmo;
+						reachedMaxAmmoThisFrame = true;
+						break;
 					}
 				}
-
-				player.reloading = true;
 			}
 
 			// Max ammo, stop rechage
 			if (reachedMaxAmmoThisFrame)
 			{
-				player.reloading = false;
 				if (player.ammo < player.maxAmmo)
 				{
 					// Not max ammo, continue recharge
@@ -1332,7 +1319,7 @@ public:
 
 				playerComponent.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Hedgehog_Icon.png", "UI_Red_Hedgehog_Icon.png" }));
 			}
-			else if (*func == ShootShell)
+			else if (*func == CreateShell)
 			{
 				offset = Vector3(1.5, -3.7, 10);
 				scale = Vector3(1 * 1.34, 1 * 1.34, 1);
@@ -1340,7 +1327,7 @@ public:
 				playerComponent.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Red_Cannon_Icon.png" }));
 				playerComponent.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Cannon_Icon.png" }));
 				TransformSystem::Scale(playerComponent.shootIndicators.back().entity, 0, 0.01, 0);
-				TransformSystem::Rotate(playerComponent.shootIndicators.back().entity, 10, 0, 0);
+				TransformSystem::Rotate(playerComponent.shootIndicators.back().entity, -10, 0, 0);
 			}
 
 			// Create special indicators
@@ -1353,19 +1340,19 @@ public:
 			if (*func == Boost)
 			{
 				playerComponent.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Booster_Icon.png", "UI_Booster_Icon.png", "UI_Red_Booster_Icon.png" }));
-				BoostIndicatorUpdate(playerEntity);
 			}
 			else if (*func == ToggleSubmerge)
 			{
 				ecs::AddComponent(playerEntity, SubmarineComponent{});
 				playerComponent.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Surface_Icon.png", "UI_Red_Surface_Icon.png", "UI_Green_Submerge_Icon.png", "UI_Red_Submerge_Icon.png" }));
-				SubmergeIndicatorUpdate(playerEntity);
 			}
 			else if (*func == ShootCruiseMissile)
 			{
 				playerComponent.specialIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Cruise_Icon.png", "UI_Invalid_Cruise_Icon.png", "UI_Red_Cruise_Icon.png" }));
-				BoostIndicatorUpdate(playerEntity);
 			}
+
+			playerComponent.shootIndicatorUpdate(playerEntity);
+			playerComponent.specialIndicatorUpdate(playerEntity);
 
 			Audio* engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", false, 0.1f, DistanceModel::LINEAR);
 			engineAudio->play();
