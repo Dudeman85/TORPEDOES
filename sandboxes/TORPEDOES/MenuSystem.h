@@ -385,7 +385,7 @@ public:
 		shipModels.push_back({ resources::models["Ship_PT_109_Wireframe.obj"] });
 		shipModels.push_back({ resources::models["Ship_U_99_Wireframe.obj"] });
 		shipModels.push_back({ resources::models["Ship_Yamato_Wireframe.obj"] });
-		shipModels.push_back({ resources::models["Ship_HMCS_Sackville_Wireframe.obj"] });
+		shipModels.push_back({ resources::models["Ship_HMCS_Sackville_Wireframe_Hedgehog.obj"] });
 
 		shipModelsReady.push_back({ resources::models["Ship_PT_109_Torpedo.obj"] });
 		shipModelsReady.push_back({ resources::models["Ship_U_99_Submarine.obj"] });
