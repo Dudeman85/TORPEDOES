@@ -86,9 +86,6 @@ public:
 		mapName = ecs::NewEntity();
 		mapSelectText = ecs::NewEntity();
 
-		// Testi teksti
-		Teksti = ecs::NewEntity();
-
 		mapImages.clear();
 		mapImages.push_back(resources::menuTextures["level1.png"]);
 		mapImages.push_back(resources::menuTextures["level2.png"]);
@@ -97,22 +94,16 @@ public:
 		mapImages.push_back(resources::menuTextures["level5.png"]);
 		mapImages.push_back(resources::menuTextures["level6.png"]);
 
-
-		// Testi teksti
-		engine::ecs::AddComponent(Teksti, engine::Transform{ .position = Vector3(0.0f), .scale = Vector3(1.0f) });
-		engine::ecs::AddComponent(Teksti, engine::TextRenderer{ .font = resources::niagaraFont, .text = "TEST!!!", .offset = Vector3(0.9f * 0.003f, 0.005f, 0.0f), .scale = Vector3(0.003f), .color = Vector3(120.0f, 6.0f, 6.0f), .uiElement = true });
-
 		// Level select Teksti
-		printf("Level Select Text rendering:");
 		engine::ecs::AddComponent(arrowsPivot, engine::Transform{ .position = Vector3(0, arrowPosHight, 0), .scale = Vector3(1) });
-		engine::ecs::AddComponent(mapName, engine::Transform{ .position = Vector3(-0.05f, 0.85f, 0.0f) });
+		engine::ecs::AddComponent(mapName, engine::Transform{ .position = Vector3(-0.10f, 0.82f, 0.0f) });
 		engine::ecs::AddComponent(mapName, engine::TextRenderer{ .font = resources::niagaraFont, .text = mapNames[0], .offset = Vector3(0.9f * 0.003f, 0.005f, 0.0f), .scale = Vector3(0.003f), .color = mapTextColor, .uiElement = true });
 
-		engine::ecs::AddComponent(mapSelectText, engine::Transform{ .position = Vector3(0, -0.94f, 0.95), .scale = Vector3(1) });
+		engine::ecs::AddComponent(mapSelectText, engine::Transform{ .position = Vector3(-0.43f, -0.96f, 0.95), .scale = Vector3(1) });
 		engine::ecs::AddComponent(mapSelectText, engine::TextRenderer
 			{
 				.font = resources::niagaraFont,
-					.text = "Press Start to Play!", .offset = Vector3(-0.36f, 0, 0), .scale = Vector3(0.003f), .color = playTextColor, .uiElement = true }
+					.text = "Press Start to Play!", .offset = Vector3(0, 0, 0), .scale = Vector3(0.003f), .color = playTextColor, .uiElement = true }
 					);
 
 		engine::ecs::AddComponent(levelSelectionBackground, engine::Transform{ .position = Vector3(0, 0, -0.5f), .scale = Vector3(1) });
@@ -154,8 +145,9 @@ public:
 			{
 				mapLevelIndex = 0;
 			}
-			//TODO: LEVEL NAME HERE
+
 			ecs::GetComponent<TextRenderer>(mapName).text = mapNames[mapLevelIndex];
+			ecs::GetComponent<Transform>(mapName).position.x = -0.026f * mapNames[mapLevelIndex].size();
 
 			TransformSystem::SetScale(arrowLeft, Vector3(0.08f));
 			TimerSystem::ScheduleFunction([this]() { TransformSystem::SetScale(arrowLeft, Vector3(0.04f)); }, 0.1);
@@ -173,7 +165,9 @@ public:
 			{
 				mapLevelIndex = mapImages.size() - 1;
 			}
+
 			ecs::GetComponent<TextRenderer>(mapName).text = mapNames[mapLevelIndex];
+			ecs::GetComponent<Transform>(mapName).position.x = -0.026f * mapNames[mapLevelIndex].size();
 
 			TransformSystem::SetScale(arrowRight, Vector3(0.08f));
 			TimerSystem::ScheduleFunction([this]() { TransformSystem::SetScale(arrowRight, Vector3(0.04f)); }, 0.1);
@@ -367,7 +361,7 @@ public:
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.shipNameEntity).text = shipName;
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.baseSpeedEntity).text = "Speed: " + baseSpeed;
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.baseSpeedEntity).color = speedColor;
-		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.maneuvarabilityEntity).text = "Maneuverability: " + maneuverability;
+		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.maneuvarabilityEntity).text = "Turning: " + maneuverability;
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.maneuvarabilityEntity).color = maneuverColor;
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.boostEntity).text = "Weapon: " + mainAttack;
 		engine::ecs::GetComponent< engine::TextRenderer>(playerSelection.specialEntity).text = "Special: " + special;
@@ -398,8 +392,7 @@ public:
 
 		startGameTimerEntity = engine::ecs::NewEntity();
 		engine::ecs::AddComponent(startGameTimerEntity, engine::Transform{ .position = Vector3(-0.1, 0.08, -0.5), .rotation = Vector3(0, 0, 0), .scale = Vector3(0.04f) });
-		//engine::ecs::AddComponent(startGameTimerEntity, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"], .enabled = false, .uiElement = true });
-		engine::ecs::AddComponent(startGameTimerEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "&", .scale = 0.05f, .color = Vector3(200, 140, 50), .uiElement = true });
+		engine::ecs::AddComponent(startGameTimerEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .scale = 0.05f, .color = Vector3(200, 140, 50), .uiElement = true });
 
 		float statsOffset = -0.1f;
 		float statsOffsetY = 90.0f;
@@ -431,23 +424,19 @@ public:
 
 			engine::ecs::Entity backgroundImage = engine::ecs::NewEntity();
 
-			//engine::ecs::AddComponent(pausedImage, engine::Transform{ .position = Vector3(0,.8f,-0.1f), .scale = Vector3(0.35f) });
-			//engine::ecs::AddComponent(pausedImage, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Paused.png"],  .enabled = false, .uiElement = true });
-			//engine::ecs::AddComponent(pausedImage, PauseComponent{ .upper = pausedImage, .lower = optionsButton, .selectedTexture = resources::menuTextures["UI_Paused.png"], .unselectedTexture = resources::menuTextures["UI_Paused.png"], .operation = PauseSystem::OnResumePressed });
-
 			engine::ecs::AddComponent(arrowUp, engine::Transform{ .position = Vector3(arrowsPosX + 0.2f, arrowUPposY, -0.1f), .rotation = Vector3(0, 0, 180), .scale = Vector3(0.04f) });
 			engine::ecs::AddComponent(arrowUp, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"], .enabled = false, .uiElement = true });
 
 			engine::ecs::AddComponent(arrowDown, engine::Transform{ .position = Vector3(arrowsPosX, arrowUPposY, -0.1f), .rotation = Vector3(0, 0, 0), .scale = Vector3(0.04f) });
 			engine::ecs::AddComponent(arrowDown, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Arrow.png"], .enabled = false, .uiElement = true });
 
-			engine::ecs::AddComponent(shipModel, engine::Transform{ .position = Vector3(0.7f, -0.2f, -0.1f), .scale = 0 });
+			engine::ecs::AddComponent(shipModel, engine::Transform{ .position = Vector3(0.65f, -0.2f, -0.1f), .scale = 0 });
 			engine::ecs::AddComponent(shipModel, engine::ModelRenderer{ .model = shipModels[0], .uiElement = true, .textures = { resources::playerIdToTexture[i] } });
 
-			engine::ecs::AddComponent(backgroundImage, engine::Transform{ .position = Vector3(0.06f, 0, -0.9f), .rotation = Vector3(0, 0, 0), .scale = Vector3(1.2) });
+			engine::ecs::AddComponent(backgroundImage, engine::Transform{ .position = Vector3(0, 0, -0.9f), .rotation = Vector3(0, 0, 0), .scale = Vector3(1.2) });
 			engine::ecs::AddComponent(backgroundImage, engine::SpriteRenderer{ .texture = resources::menuTextures["Selection_BG_Var3.png"], .enabled = false, .uiElement = true });
 
-			engine::ecs::AddComponent(readyText, engine::Transform{ .position = Vector3(arrowsPosX - 0.1f, arrowDownposY + 0.25f, 0.4f), .scale = 0.004f });
+			engine::ecs::AddComponent(readyText, engine::Transform{ .position = Vector3(arrowsPosX - 0.2f, arrowDownposY + 0.25f, 0.4f), .scale = 0.004f });
 			engine::ecs::AddComponent(readyText, engine::TextRenderer{ .font = resources::niagaraFont, .text = "Not Ready", .uiElement = true });
 
 			//shipInfo Entity
@@ -471,8 +460,8 @@ public:
 			engine::ecs::AddComponent(specialEntity, engine::Transform{ .position = Vector3(-statsOffset, 4 * statsOffsetEatch - statsOffsetY, -0.1f), .scale = scaleForStatsChilds });
 			engine::ecs::AddComponent(specialEntity, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .color = Vector3(57, 150, 54), .uiElement = true });
 
-			float offsetY = 0.85f;
-			float offsetX = 0.80f;
+			float offsetY = 0.83f;
+			float offsetX = 0.83f;
 			Vector3 offsetPlayerWindows;
 			switch (i)
 			{
@@ -643,7 +632,7 @@ public:
 					if (aPressed)
 					{
 						playerSelection.playerReadyAudio->play();
-						playerReadyText = "Ready";
+						playerReadyText = "   Ready";
 						playerSelection.ready = true;
 
 						//Select correct player in selectedShipsAtTheFrame and set shipType be playerID in index 
@@ -796,8 +785,6 @@ public:
 
 	void ToggleMenuPlayerSelection()
 	{
-		printf("in MenuPlayerSelection\n");
-
 		for (engine::ecs::Entity entity : entities)
 		{
 			PlayerSelection& playerSelection = engine::ecs::GetComponent<PlayerSelection>(entity);
@@ -1385,9 +1372,10 @@ public:
 		ecs::AddComponent(sfx, SpriteRenderer{ .texture = resources::menuTextures["UI_SFX_Slider_N.png"], .enabled = false, .uiElement = true });
 		ecs::AddComponent(sfx, MainMenuComponent{ .upper = resume, .lower = fullscreen, .selectedTexture = resources::menuTextures["UI_SFX_Slider.png"], .unselectedTexture = resources::menuTextures["UI_SFX_Slider_N.png"], .slider = sfxSlider, .showInStates = {MainMenuState::Options} });
 
-		ecs::AddComponent(sfxSlider, Transform{ .position = ecs::GetComponent<Transform>(sfx).position + Vector3(0, -0.1f, 0.1), .scale = Vector3(0.05f) });
+		ecs::AddComponent(sfxSlider, Transform{ .position = ecs::GetComponent<Transform>(sfx).position + Vector3(0, -0.083f, 0.1), .scale = Vector3(0.043f) });
 		ecs::AddComponent(sfxSlider, SpriteRenderer{ .texture = resources::menuTextures["UI_Slider_Button.png"], .enabled = false, .uiElement = true });
 		ecs::AddComponent(sfxSlider, MainMenuComponent{ .selectedTexture = resources::menuTextures["UI_Slider_Button.png"], .unselectedTexture = resources::menuTextures["UI_Slider_Button.png"], .showInStates = {MainMenuState::Options} });
+		ecs::GetComponent<Transform>(sfxSlider).position.x = std::lerp(sliderLeftBoundMin, sliderRightBoundMin, volume);
 
 		ecs::AddComponent(fullscreen, Transform{ .position = Vector3(0, -.1f, -0.1f) + offset, .scale = Vector3(0.25f) });
 		ecs::AddComponent(fullscreen, SpriteRenderer{ .texture = resources::menuTextures["UI_Windowed_N.png"], .enabled = false, .uiElement = true });
@@ -1627,6 +1615,7 @@ public:
 	{
 		auto mms = ecs::GetSystem<MainMenuSystem>();
 		mms->ChangeState(MainMenuState::Options, mms->resume);
+		mms->UpdateFullscreenIcon();
 	}
 
 	static void OnCreditsPressed()
