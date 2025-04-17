@@ -1316,11 +1316,13 @@ public:
 	const float delay = 0.3f;
 	float repeatInputDelay;
 
+	const Vector2 offset{ -0.5, -0.35 };
+
 	//Slider bounds
-	const float sliderLeftBound = -0.168;
-	const float sliderRightBound = 0.166;
-	const float sliderLeftBoundMin = -0.13;
-	const float sliderRightBoundMin = 0.13;
+	const float sliderLeftBound = -0.168 + offset.x;
+	const float sliderRightBound = 0.166 + offset.x;
+	const float sliderLeftBoundMin = -0.13 + offset.x;
+	const float sliderRightBoundMin = 0.13 + offset.x;
 
 	ecs::Entity currentSelection;
 	ecs::Entity startText;
@@ -1348,19 +1350,19 @@ public:
 		ecs::Entity credits = ecs::NewEntity();
 		ecs::Entity quitGame = ecs::NewEntity();
 
-		ecs::AddComponent(startGame, Transform{ .position = Vector3(0, .5f, -0.1f), .scale = Vector3(0.32f) });
+		ecs::AddComponent(startGame, Transform{ .position = Vector3(0, .6f, -0.1f) + offset, .scale = Vector3(0.32f) });
 		ecs::AddComponent(startGame, SpriteRenderer{ .texture = resources::menuTextures["UI_StartGame.png"], .enabled = false, .uiElement = true });
 		ecs::AddComponent(startGame, MainMenuComponent{ .upper = quitGame, .lower = options, .selectedTexture = resources::menuTextures["UI_StartGame.png"], .unselectedTexture = resources::menuTextures["UI_StartGame_N.png"], .operation = OnStartGamePressed, .showInStates = {MainMenuState::Main} });
 
-		ecs::AddComponent(options, Transform{ .position = Vector3(0, .3f, -0.1f), .scale = Vector3(.25f) });
+		ecs::AddComponent(options, Transform{ .position = Vector3(0, .4f, -0.1f) + offset, .scale = Vector3(.25f) });
 		ecs::AddComponent(options, SpriteRenderer{ .texture = resources::menuTextures["UI_Options_N.png"], .enabled = false, .uiElement = true });
 		ecs::AddComponent(options, MainMenuComponent{ .upper = startGame, .lower = credits, .selectedTexture = resources::menuTextures["UI_Options.png"], .unselectedTexture = resources::menuTextures["UI_Options_N.png"], .operation = OnOptionsPressed, .showInStates = {MainMenuState::Main} });
 
-		ecs::AddComponent(credits, Transform{ .position = Vector3(0, .1f, -0.1f), .scale = Vector3(0.25f) });
+		ecs::AddComponent(credits, Transform{ .position = Vector3(0, .2f, -0.1f) + offset, .scale = Vector3(0.25f) });
 		ecs::AddComponent(credits, SpriteRenderer{ .texture = resources::menuTextures["UI_Credits_N.png"], .enabled = false, .uiElement = true });
 		ecs::AddComponent(credits, MainMenuComponent{ .upper = options, .lower = quitGame, .selectedTexture = resources::menuTextures["UI_Credits.png"], .unselectedTexture = resources::menuTextures["UI_Credits_N.png"], .operation = OnCreditsPressed, .showInStates = {MainMenuState::Main} });
 
-		ecs::AddComponent(quitGame, Transform{ .position = Vector3(0, -0.7f, -0.1f), .scale = Vector3(0.25f) });
+		ecs::AddComponent(quitGame, Transform{ .position = Vector3(0, -0.3f, -0.1f) + offset, .scale = Vector3(0.25f) });
 		ecs::AddComponent(quitGame, SpriteRenderer{ .texture = resources::menuTextures["UI_QuitGame_N.png"], .enabled = false, .uiElement = true });
 		ecs::AddComponent(quitGame, MainMenuComponent{ .upper = credits, .lower = startGame, .selectedTexture = resources::menuTextures["UI_QuitGame.png"], .unselectedTexture = resources::menuTextures["UI_QuitGame_N.png"], .operation = PauseSystem::OnQuitGamePressed, .showInStates = {MainMenuState::Main} });
 
@@ -1371,15 +1373,15 @@ public:
 		ecs::Entity sfxSlider = ecs::NewEntity();
 		fullscreen = ecs::NewEntity();
 
-		ecs::AddComponent(optionsImage, Transform{ .position = Vector3(0, .8f, -0.1f), .scale = Vector3(.35f) });
+		ecs::AddComponent(optionsImage, Transform{ .position = Vector3(0, .65f, -0.1f) + offset, .scale = Vector3(.35f) });
 		ecs::AddComponent(optionsImage, SpriteRenderer{ .texture = resources::menuTextures["UI_Options_N.png"], .enabled = false, .uiElement = true });
 		ecs::AddComponent(optionsImage, MainMenuComponent{ .unselectedTexture = resources::menuTextures["UI_Options_N.png"], .showInStates = {MainMenuState::Options} });
 
-		ecs::AddComponent(resume, Transform{ .position = Vector3(0, .5f, -0.1f), .scale = Vector3(.25f) });
+		ecs::AddComponent(resume, Transform{ .position = Vector3(0, .4f, -0.1f) + offset, .scale = Vector3(.25f) });
 		ecs::AddComponent(resume, SpriteRenderer{ .texture = resources::menuTextures["UI_Resume.png"], .enabled = false, .uiElement = true });
 		ecs::AddComponent(resume, MainMenuComponent{ .upper = fullscreen, .lower = sfx, .selectedTexture = resources::menuTextures["UI_Resume.png"], .unselectedTexture = resources::menuTextures["UI_Resume_N.png"], .operation = OnOptionsResumePressed, .showInStates = {MainMenuState::Options} });
 
-		ecs::AddComponent(sfx, Transform{ .position = Vector3(0, .3f, -0.1f), .scale = Vector3(0.25f) });
+		ecs::AddComponent(sfx, Transform{ .position = Vector3(0, .2f, -0.1f) + offset, .scale = Vector3(0.25f) });
 		ecs::AddComponent(sfx, SpriteRenderer{ .texture = resources::menuTextures["UI_SFX_Slider_N.png"], .enabled = false, .uiElement = true });
 		ecs::AddComponent(sfx, MainMenuComponent{ .upper = resume, .lower = fullscreen, .selectedTexture = resources::menuTextures["UI_SFX_Slider.png"], .unselectedTexture = resources::menuTextures["UI_SFX_Slider_N.png"], .slider = sfxSlider, .showInStates = {MainMenuState::Options} });
 
@@ -1387,7 +1389,7 @@ public:
 		ecs::AddComponent(sfxSlider, SpriteRenderer{ .texture = resources::menuTextures["UI_Slider_Button.png"], .enabled = false, .uiElement = true });
 		ecs::AddComponent(sfxSlider, MainMenuComponent{ .selectedTexture = resources::menuTextures["UI_Slider_Button.png"], .unselectedTexture = resources::menuTextures["UI_Slider_Button.png"], .showInStates = {MainMenuState::Options} });
 
-		ecs::AddComponent(fullscreen, Transform{ .position = Vector3(0, .0f, -0.1f), .scale = Vector3(0.25f) });
+		ecs::AddComponent(fullscreen, Transform{ .position = Vector3(0, -.1f, -0.1f) + offset, .scale = Vector3(0.25f) });
 		ecs::AddComponent(fullscreen, SpriteRenderer{ .texture = resources::menuTextures["UI_Windowed_N.png"], .enabled = false, .uiElement = true });
 		ecs::AddComponent(fullscreen, MainMenuComponent{ .upper = sfx, .lower = resume, .selectedTexture = resources::menuTextures["UI_Windowed.png"], .unselectedTexture = resources::menuTextures["UI_Windowed_N.png"], .operation = OnFullScreenPressed, .showInStates = {MainMenuState::Options} });
 
@@ -1524,12 +1526,17 @@ public:
 			//B pressed
 			if (backInput)
 			{
-				TransformSystem::SetScale(currentSelection, Vector3(0.25f));
 				ChangeState(MainMenuState::Main, startGame);
 			}
 			break;
 		}
 		case MainMenuState::Credits:
+			//Any key pressed
+			if (backInput || confirmInput || pauseInput)
+			{
+				ChangeState(MainMenuState::Main, startGame);
+			}
+
 			break;
 		}
 	}
