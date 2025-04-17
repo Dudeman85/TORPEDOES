@@ -896,6 +896,30 @@ static void LoadLevel6(engine::Camera* cam)
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5705.000000, -2420.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5705.000000, -2475.000000, 0.300000));
 
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// boxes
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(6825.000000, -980.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(6825.000000, -923.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(6825.000000, -866.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(6825.000000, -810.000000, 0.300000));
+
+	// islands boxes
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(7395.000000, -1715.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(7455.000000, -1715.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(7815.000000, -1900.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(7865.000000, -1900.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(7615.000000, -2450.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(7575.000000, -2450.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(7530.000000, -2450.000000, 0.300000));
+
+
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(9090.000000, -1840.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(9140.000000, -1840.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(9190.000000, -1840.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(9240.000000, -1840.000000, 0.300000));
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	// boxes
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10040.000000, -1180.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10040.000000, -1130.000000, 0.300000));
@@ -905,6 +929,13 @@ static void LoadLevel6(engine::Camera* cam)
 	// boxes
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10330.000000, -2400.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10245.000000, -2400.000000, 0.300000));
+
+
+	// boxes
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(11465.000000, -3010.000000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(11465.000000, -3057.500000, 0.300000));
+	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(11465.000000, -3105.000000, 0.300000));
+
 
 	// boxes
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10785.000000, -1820.000000, 0.300000));
@@ -1127,8 +1158,8 @@ int main()
 
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
-	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(1475, -460, 166), .scale = 20 });
-	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Buoy.obj"] });
+	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(5705.000000, -2475.000000, 166), .scale = 20 });
+	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
 	ecs::AddTag(placementEditor, "persistent");
 
 

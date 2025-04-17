@@ -23,7 +23,7 @@ class CruiseMissileSystem : public ecs::System
 {
 private:
 	float speed = 800;
-	float rotationSpeed = 10;
+	float rotationSpeed = 10; 
 
 public:
 	void Update()
