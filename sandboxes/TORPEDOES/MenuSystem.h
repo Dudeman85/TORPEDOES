@@ -326,7 +326,7 @@ public:
 			maneuverability = "Medium";
 			maneuverColor = { 235, 151, 26 };
 			mainAttack = "Hedghehog Mortar";
-			special = "Boost";
+			special = "Cruise Missile";
 			break;
 		case ShipType::pirateShip:
 			shipName = "PirateShip";
@@ -601,7 +601,7 @@ public:
 			PlayerSelection& playerSelection = engine::ecs::GetComponent<PlayerSelection>(entity);
 
 			float turnInput = input::GetTotalInputValue("Turn" + std::to_string(playerSelection.playerID));
-			int turnDpadInput = input::GetPressed("MenuDpadRight") - input::GetPressed("MenuDpadLeft");
+			int turnDpadInput = input::GetPressed("MenuDpadRight" + std::to_string(playerSelection.playerID)) - input::GetPressed("MenuDpadLeft" + std::to_string(playerSelection.playerID));
 			turnInput += turnDpadInput;
 			bool aPressed = input::GetNewPress("Shoot" + std::to_string(playerSelection.playerID));
 			bool bPressed = input::GetNewPress("Boost" + std::to_string(playerSelection.playerID));

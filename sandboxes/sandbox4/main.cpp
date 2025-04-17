@@ -5,35 +5,6 @@
 //Sanity saver
 using namespace engine;
 
-ECS_REGISTER_COMPONENT(TestComponent)
-struct TestComponent
-{
-	ecs::Entity toDelete;
-};
-
-ECS_REGISTER_SYSTEM(TestSystem, TestComponent)
-class TestSystem : public ecs::System
-{
-public:
-	void Update()
-	{
-		int i = 0;
-
-		for (ecs::Entity entity : entities)
-		{
-			TestComponent& comp = ecs::GetComponent<TestComponent>(entity);
-
-			if (ecs::EntityExists(comp.toDelete))
-			{
-				//ecs::DestroyEntity(comp.toDelete);
-				ecs::DestroyEntity(entity);
-			}
-
-			cout << "Completed Iterations: " << i++ << endl;
-		}
-	}
-};
-
 int main()
 {
 	//Create the window and OpenGL context before creating EngineLib
@@ -53,20 +24,18 @@ int main()
 	//Set the bacground color
 	SpriteRenderSystem::SetBackgroundColor(0, 150, 0);
 
-	auto testSystem = ecs::GetSystem<TestSystem>();
-
-
 	ecs::Entity e1 = ecs::NewEntity();
 	ecs::Entity e2 = ecs::NewEntity();
 	ecs::Entity e3 = ecs::NewEntity();
 	ecs::Entity e4 = ecs::NewEntity();
 
+	Texture tex1("../../../assets/GUI/UI_Green_Cannon_Icon.png");
+	Texture tex2("../../../assets/GUI/UI_Red_Cannon_Icon.png");
 
-	ecs::AddComponent(e1, TestComponent{ 0 });
-	ecs::AddComponent(e2, TestComponent{ 0 });
-	ecs::AddComponent(e3, TestComponent{ e4 });
-	ecs::AddComponent(e4, TestComponent{ 0 });
-
+	ecs::AddComponent(e1, Transform{ .rotation = {0, 0, 0}, .scale = {1000} });
+	ecs::AddComponent(e1, SpriteRenderer{.texture = &tex1});
+	ecs::AddComponent(e2, Transform{ .position = {0, 0, -1}, .rotation = {12, 0, 0}, .scale = {1000} });
+	ecs::AddComponent(e2, SpriteRenderer{.texture = &tex2});
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -75,7 +44,10 @@ int main()
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
-		testSystem->Update();
+		if (glfwGetKey(window, GLFW_KEY_0))
+			TransformSystem::Translate(e2, 0, 0, 1);
+		if (glfwGetKey(window, GLFW_KEY_1))
+			TransformSystem::Translate(e2, 0, 0, -1);
 
 		//Update all engine systems, this usually should go last in the game loop
 		Update(&cam);

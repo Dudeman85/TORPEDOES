@@ -143,9 +143,9 @@ namespace engine
 		static void Scale(ecs::Entity entity, float dx, float dy, float dz = 0)
 		{
 			Transform& transform = ecs::GetComponent<Transform>(entity);
-			transform.scale.x = dx;
-			transform.scale.y = dy;
-			transform.scale.z = dz;
+			transform.scale.x += dx;
+			transform.scale.y += dy;
+			transform.scale.z += dz;
 
 			transform.staleCache = true;
 		}

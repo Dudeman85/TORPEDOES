@@ -139,7 +139,7 @@ namespace engine
 
 				// Scale text relative to window size
 				scaleFactor = std::min(windowSize.x, windowSize.y) / resolution;
-				scaledTextSize = textRenderer.scale * scaleFactor;
+				scaledTextSize = textRenderer.scale * scaleFactor / 10;
 
 				// Renders text one letter at a time
 				std::string::const_iterator c;

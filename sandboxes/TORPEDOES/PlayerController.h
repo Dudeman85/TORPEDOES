@@ -53,7 +53,6 @@ struct Player
 	bool specialEnabled = false;
 	bool submerged = false;
 	bool reloading = false;
-	int secondaryAmmo = 0;
 
 	// Action cooldowns
 	float shootCooldown = 0.2f;			// Time between shots
@@ -169,29 +168,7 @@ void CreateShell(engine::ecs::Entity entity)
 void ShootShell(engine::ecs::Entity entity)
 {
 	Player& player = ecs::GetComponent<Player>(entity);
-
-	if (player.reloading)
-	{
-		// Reloading
-		if (player.ammo < player.maxAmmo)
-		{
-			// Not reloaded
-			player.ammo++; // We didn't shoot
-			return;
-		}
-		// Fully reloaded
-		player.reloading = false;
-		player.secondaryAmmo = player.maxAmmo;
-	}
-
-	if (player.secondaryAmmo <= 1)
-	{
-		// Last ammo, start reload
-		player.reloading = true;
-	}
-
-	player.secondaryAmmo--;
-	player.ammo = 0;
+	player.reloading = false;
 
 	CreateShell(entity);
 }
@@ -582,33 +559,21 @@ void ToggleSubmerge(engine::ecs::Entity playerEntity)
 
 /* INDICATOR UPDATES */
 
-void CannonIndicatorUpdate(engine::ecs::Entity entity)
+void CannonIndicatorUpdate(ecs::Entity entity)
 {
-	Player& player = engine::ecs::GetComponent<Player>(entity);
+	Player& player = ecs::GetComponent<Player>(entity);
 
 	if (player.shootIndicators.empty())
 	{
 		return;
 	}
 
-	indicatorStruct& it = player.shootIndicators.back();
+	indicatorStruct& it0 = player.shootIndicators.front();
+	indicatorStruct& it1 = player.shootIndicators.back();
+	Transform& tf0 = ecs::GetComponent<Transform>(it0.entity);
+	Transform& tf1 = ecs::GetComponent<Transform>(it1.entity);
 
-	engine::SpriteRenderer& sprite = engine::ecs::GetComponent<engine::SpriteRenderer>(it.entity);
-
-	if (!player.reloading || (player.ammo >= player.maxAmmo))
-	{
-		sprite.texture = it.textures[0];
-	}
-	else
-	{
-		sprite.texture = it.textures[1];
-	}
-
-	/*
-	Vector2 baseScale = { 0.9, 0.8 };
-	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
-	transform.scale = { baseScale.x * camHeight * 0.001f, baseScale.y * (camHeight * aspectRatio) * 0.001f, 0 };
-	*/
+	tf1.position.z = tf0.position.z + (player.ammo - (player.maxAmmo / 2) / 10);
 }
 
 void HedgehogIndicatorUpdate(engine::ecs::Entity entity)
@@ -631,12 +596,6 @@ void HedgehogIndicatorUpdate(engine::ecs::Entity entity)
 	{
 		sprite.texture = it.textures[1];
 	}
-
-	/*
-	Vector2 baseScale = { 1, 0.8 };
-	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
-	transform.scale = { baseScale.x * camHeight * 0.001f, baseScale.y * (camHeight * aspectRatio) * 0.001f, 0 };
-	*/
 }
 
 void TorpedoIndicatorUpdate(engine::ecs::Entity entity)
@@ -661,12 +620,6 @@ void TorpedoIndicatorUpdate(engine::ecs::Entity entity)
 		{
 			sprite.texture = it.textures[1];
 		}
-
-		/*
-		Vector2 baseScale = { 1.8, 0.4 };
-		engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(it.entity);
-		transform.scale = { baseScale.x * camHeight * 0.001f, baseScale.y * (camHeight * aspectRatio) * 0.001f, 0 };
-		*/
 	}
 }
 
@@ -780,7 +733,7 @@ public:
 				ShipType::cannonBoat, Player
 				{
 					.forwardSpeed = 480, .rotationSpeed = 180, .reloading = true,
-					.shootCooldown = 0.02, .specialCooldown = 5, .ammoRechargeCooldown = 0.16,
+					.shootCooldown = 0.2, .specialCooldown = 5, .ammoRechargeCooldown = 0.16,
 					.holdShoot = true, .maxAmmo = 20,
 					.shootAction = ShootShell, .specialAction = Boost,
 					.shootIndicatorUpdate = CannonIndicatorUpdate, .specialIndicatorUpdate = BoostIndicatorUpdate
@@ -1119,31 +1072,6 @@ public:
 			bool reachedMaxAmmoThisFrame = false;
 			bool shotThisFrame = false;
 
-			// If not max ammo
-			if (player.ammo < player.maxAmmo)
-			{
-				player._ammoRechargeTimer += engine::deltaTime;
-
-				while (player._ammoRechargeTimer >= player.ammoRechargeCooldown)
-				{
-					// Add ammo
-					player.ammo++;
-
-					if (player.ammo < player.maxAmmo)
-					{
-						// Not max ammo, continue recharge
-						player._ammoRechargeTimer -= player.ammoRechargeCooldown;
-					}
-					else
-					{
-						// Max ammo, handle recharge after shooting
-						player.ammo = player.maxAmmo;
-						reachedMaxAmmoThisFrame = true;
-						break;
-					}
-				}
-			}
-
 			// Increase the projectile timer
 			player._shootTimer += engine::deltaTime;
 
@@ -1174,9 +1102,40 @@ public:
 				player._shootTimer -= player.shootCooldown;
 			}
 
+			// If not max ammo
+			if (player.ammo < player.maxAmmo)
+			{
+				if (player.reloading)
+				{
+					player._ammoRechargeTimer += engine::deltaTime;
+
+					while (player._ammoRechargeTimer >= player.ammoRechargeCooldown)
+					{
+						// Add ammo
+						player.ammo++;
+
+						if (player.ammo < player.maxAmmo)
+						{
+							// Not max ammo, continue recharge
+							player._ammoRechargeTimer -= player.ammoRechargeCooldown;
+						}
+						else
+						{
+							// Max ammo, handle recharge after shooting
+							player.ammo = player.maxAmmo;
+							reachedMaxAmmoThisFrame = true;
+							break;
+						}
+					}
+				}
+
+				player.reloading = true;
+			}
+
 			// Max ammo, stop rechage
 			if (reachedMaxAmmoThisFrame)
 			{
+				player.reloading = false;
 				if (player.ammo < player.maxAmmo)
 				{
 					// Not max ammo, continue recharge
@@ -1247,7 +1206,7 @@ public:
 
 		engine::ecs::Entity shootIndicator = engine::ecs::NewEntity();
 
-		engine::ecs::AddComponent(shootIndicator, engine::SpriteRenderer{ .texture = resources::uiTextures[textureNames[1]] });
+		engine::ecs::AddComponent(shootIndicator, engine::SpriteRenderer{ .texture = resources::uiTextures[textureNames[0]] });
 		engine::ecs::AddComponent(shootIndicator, engine::Transform{ .position = pos + Vector3(0, 0, 50 + ((double)rand() / RAND_MAX)), .scale = scale });
 		engine::TransformSystem::AddParent(shootIndicator, entity);
 
@@ -1378,7 +1337,10 @@ public:
 				offset = Vector3(1.5, -3.7, 10);
 				scale = Vector3(1 * 1.34, 1 * 1.34, 1);
 
-				playerComponent.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Cannon_Icon.png", "UI_Red_Cannon_Icon.png" }));
+				playerComponent.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Red_Cannon_Icon.png" }));
+				playerComponent.shootIndicators.push_back(CreateIndicator(playerEntity, offset, scale, { "UI_Green_Cannon_Icon.png" }));
+				TransformSystem::Scale(playerComponent.shootIndicators.back().entity, 0, 0.01, 0);
+				TransformSystem::Rotate(playerComponent.shootIndicators.back().entity, 10, 0, 0);
 			}
 
 			// Create special indicators
