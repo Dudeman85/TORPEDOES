@@ -847,7 +847,7 @@ static void LoadLevel6(engine::Camera* cam)
 	CreateCheckpoint(Vector3(11720.000000, -1560.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(23.f), resources::models["Prop_Buoy.obj"], 90.f);
 
 	//turnabout
-	CreateCheckpoint(Vector3(13510.000000, -2225.000000, 166.000000), Vector3(25.000000, 0.000000, 0.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 90.f);
+	CreateCheckpoint(Vector3(13515.000000, -2225.000000, 166.000000), Vector3(25.000000, 0.000000, 0.000000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 90.f);
 
 	CreateCheckpoint(Vector3(11720.000000, -1560.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(23.f), resources::models["Prop_Buoy.obj"], 90.f);
 	CreateCheckpoint(Vector3(10790.000000, -1580.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(15.f), resources::models["Prop_Buoy.obj"], 90.f);
@@ -948,7 +948,62 @@ static void LoadLevel6(engine::Camera* cam)
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(12885.000000, -2450.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(12810.000000, -2475.000000, 0.300000));
 
+	// Crowds
 
+	// Starting point crowd
+	CreateCrowd({ 1620.000000, -800.000000, 168 }, resources::crowdAnims1);
+	CreateCrowd({ 1680.000000, -790.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 1640.000000, -765.000000, 166 }, resources::crowdAnims1);
+	CreateCrowd({ 1600.000000, -750.000000, 165 }, resources::crowdAnims1);
+	CreateCrowd({ 1700.000000, -740.000000, 164 }, resources::crowdAnims1);
+
+	//Early narrow path
+	CreateCrowd({ 3435.000000, -1535.000000, 171 }, resources::crowdAnims1);
+	CreateCrowd({ 3420.000000, -1510.000000, 170 }, resources::crowdAnims1);
+	CreateCrowd({ 3455.000000, -1490.000000, 169 }, resources::crowdAnims1);
+	CreateCrowd({ 3400.000000, -1420.000000, 168 }, resources::crowdAnims1);
+	CreateCrowd({ 3330.000000, -1400.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 3400.000000, -1390.000000, 166 }, resources::crowdAnims1);
+	CreateCrowd({ 3420.000000, -1385.000000, 165 }, resources::crowdAnims1);
+	CreateCrowd({ 3370.000000, -1360.000000, 164 }, resources::crowdAnims1);
+
+	//pontoon in south
+	CreateCrowd({ 2522.000000, -2925.000000, 165 }, resources::crowdAnims1);
+	CreateCrowd({ 2530.000000, -2910.000000, 164 }, resources::crowdAnims1);
+
+	// curve after first narrow crowd
+	CreateCrowd({ 5165.000000, -2755.000000, 168 }, resources::crowdAnims1);
+	CreateCrowd({ 5065.000000, -2740.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 5265.000000, -2735.000000, 166 }, resources::crowdAnims1);
+	CreateCrowd({ 5205.000000, -2713.000000, 165 }, resources::crowdAnims1);
+	CreateCrowd({ 5165.000000, -2700.000000, 164 }, resources::crowdAnims1);
+
+	// between island sections crowd
+	CreateCrowd({ 6275.000000, -1250.000000, 168 }, resources::crowdAnims1);
+	CreateCrowd({ 6340.000000, -1235.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 6260.000000, -1205.000000, 166 }, resources::crowdAnims1);
+	CreateCrowd({ 6310.000000, -1198.000000, 165 }, resources::crowdAnims1);
+	CreateCrowd({ 6330.000000, -1185.000000, 164 }, resources::crowdAnims1);
+
+
+	//Small bridge
+	CreateCrowd({ 8985.000000, -1210.000000, 165 }, resources::crowdAnims1);
+	CreateCrowd({ 9015.000000, -1195.000000, 164 }, resources::crowdAnims1);
+
+	//Lookout point
+	CreateSmallCrowd({ 9650.000000, -1295.000000, 166 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 9665.000000, -1270.000000, 165 }, resources::crowdAnims2);
+	CreateSmallCrowd({ 9635.000000, -1265.000000, 164 }, resources::crowdAnims2);
+
+	// Land strip next to narrows
+	CreateCrowd({ 10550.000000, -2015.000000, 171 }, resources::crowdAnims1);
+	CreateCrowd({ 10605.000000, -2000.000000, 170 }, resources::crowdAnims1);
+	CreateCrowd({ 10580.000000, -1985.000000, 169 }, resources::crowdAnims1);
+	CreateCrowd({ 10620.000000, -1960.000000, 168 }, resources::crowdAnims1);
+	CreateCrowd({ 10590.000000, -1950.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 10610.000000, -1933.000000, 166 }, resources::crowdAnims1);
+	CreateCrowd({ 10545.000000, -1900.000000, 165 }, resources::crowdAnims1);
+	CreateCrowd({ 10630.000000, -1885.000000, 164 }, resources::crowdAnims1);
 
 	PlayCountdown(Vector3(1235.0f, -780.0f, 200.0f));
 	PlayerController::lapCount = 1;
@@ -1158,8 +1213,8 @@ int main()
 
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
-	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(5705.000000, -2475.000000, 166), .scale = 20 });
-	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_PowerUpBox2.obj"] });
+	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(1375.000000, -950.000000, 166), .scale = 20 });
+	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Buoy.obj"] });
 	ecs::AddTag(placementEditor, "persistent");
 
 
