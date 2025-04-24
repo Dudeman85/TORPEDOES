@@ -97,17 +97,9 @@ public:
 		//Destroy if hit by a projectile
 		if (ecs::HasComponent<Projectile>(collision.b))
 		{
-			Disable(collision.a);
-
 			Transform& transform = ecs::GetComponent<Transform>(collision.a);
-
-			//Make an explosion animation
-			ecs::Entity explosion = ecs::NewEntity();
-			ecs::AddComponent(explosion, Transform{ .position = transform.position + Vector3(0, 0, 50), .scale = Vector3(20) });
-			ecs::AddComponent(explosion, SpriteRenderer{ });
-			ecs::AddComponent(explosion, Animator{ .onAnimationEnd = ecs::DestroyEntity });
-			engine::AnimationSystem::AddAnimation(explosion, resources::explosionAnimation, "hit");
-			engine::AnimationSystem::PlayAnimation(explosion, "hit", false);
+			Disable(collision.a);
+			CreateExplosionAnimation(transform.position);
 
 			//Delete projectile if applicable
 			if(ecs::GetComponent<Projectile>(collision.b).deleteAffterHit)

@@ -877,7 +877,12 @@ public:
 					player.hitProjectiles.push_back({ projectile, 0.f });
 				SkipAddingHit:
 
-					CreateAnimation(collision.b);
+					// Do animation projectile impact animation
+					Vector3 pos = engine::ecs::GetComponent<engine::Transform>(collision.b).position;
+					if(ecs::HasComponent<Rigidbody>(collision.b))
+						if(ecs::GetComponent<Projectile>(collision.b).hitType != HitStates::Additive)
+							pos += engine::ecs::GetComponent<Rigidbody>(collision.b).velocity.Normalize() * 20;
+					CreateExplosionAnimation(pos);
 
 					//Destroy projectile at end of frame
 					if (projectile.deleteAffterHit == true)

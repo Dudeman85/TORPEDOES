@@ -2,6 +2,8 @@
 #include <engine/Application.h>
 #include "Resources.h"
 
+using namespace engine;
+
 struct Player;
 
 enum HitStates
@@ -42,24 +44,20 @@ struct Hedgehog
 	engine::ecs::Entity aimingGuide;
 };
 
-static void CreateAnimation(engine::ecs::Entity entity)
+static void CreateExplosionAnimation(Vector3 animPosition)
 {
-	Projectile& projectile = engine::ecs::GetComponent<Projectile>(entity);
-	engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(entity);
-	Vector3 animPosition = transform.position;
 	animPosition.z += 500;
 
-
-	engine::ecs::Entity torpedoAnim = engine::ecs::NewEntity();	
+	engine::ecs::Entity torpedoAnim = engine::ecs::NewEntity();
 	Audio* explosion = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 0.2f, DistanceModel::LINEAR);
-	
+
 	explosion->play();
 	auto remover = [explosion, torpedoAnim](engine::ecs::Entity) { engine::ecs::DestroyEntity(torpedoAnim); };
-	engine::ecs::AddComponent(torpedoAnim, engine::Animator{.onAnimationEnd = remover });
+	engine::ecs::AddComponent(torpedoAnim, engine::Animator{ .onAnimationEnd = remover });
 	engine::ecs::AddComponent(torpedoAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, ((double)rand() / (double)RAND_MAX) + 2), .scale = Vector3(20) });
 	engine::ecs::AddComponent(torpedoAnim, engine::SpriteRenderer{ });
 	engine::ecs::AddComponent(torpedoAnim, engine::SoundComponent{ .Sounds = {{"Explosion", explosion}} });
-	
+
 	//Play explosion animation
 	engine::AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, "hit");
 	engine::AnimationSystem::PlayAnimation(torpedoAnim, "hit", false);
@@ -85,7 +83,7 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 	engine::ecs::AddComponent(hedgehogExplosion, Projectile{ .owner = projectile.owner, .hitType = HitStates::Stop, .hitSpeedFactor = 0.5, .hitTime = 1, .canHitSubmerged = true, .deleteAffterHit = false, .hitAnimation = "" });
 
 	// Crashes for some reason
-	
+
 	//Disable the hedgehog collider after .5 seconds
 	engine::TimerSystem::ScheduleFunction([hedgehogExplosion]()
 		{
@@ -104,7 +102,7 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 	bool entityCollision = false;
 	for (engine::Collision& c : engine::collisionSystem->CheckCollision(hedgehogExplosion))
 	{
-		if (c.type == engine::Collision::Type::trigger) 
+		if (c.type == engine::Collision::Type::trigger)
 		{
 			if (engine::ecs::HasComponent<Player>(c.b))
 			{
@@ -112,7 +110,7 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 			}
 		}
 	}
-	if (tileMapCollision|| entityCollision)
+	if (tileMapCollision || entityCollision)
 	{
 		engine::AnimationSystem::AddAnimation(hedgehogExplosion, resources::explosionAnimation, "explosion");
 		engine::AnimationSystem::PlayAnimation(hedgehogExplosion, "explosion", false);
@@ -135,7 +133,11 @@ static void OnProjectileCollision(engine::Collision collision)
 		if (collision.b != 1)
 		{
 			// Do animation projectile impact animation
-			CreateAnimation(collision.a);
+			Vector3 pos = engine::ecs::GetComponent<engine::Transform>(collision.a).position;
+			if (ecs::GetComponent<Projectile>(collision.a).hitType != HitStates::Additive)
+				pos += engine::ecs::GetComponent<Rigidbody>(collision.a).velocity.Normalize() * 20;
+
+			CreateExplosionAnimation(pos);
 			engine::ecs::DestroyEntity(collision.a);
 		}
 	}
