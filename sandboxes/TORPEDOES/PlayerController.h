@@ -273,11 +273,11 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 
 	if (input::GetPressed("Shoot" + std::to_string(player.id)))
 	{
+		player._ammoRechargeTimer = 0;
 		// When button is pressed, move aim guide forward
 		Transform& transform = ecs::GetComponent<Transform>(entity);
 		Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-		Player& player = ecs::GetComponent<Player>(entity);
 		Transform& playerTransform = ecs::GetComponent<Transform>(entity);
 
 		const float playerAngle = atan2(player.forwardDirection.y, player.forwardDirection.x);
@@ -365,6 +365,7 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 			spriteRenderer.texture = resources::uiTextures["crosshair.png"];
 		}
 	}
+	printf("Animm:\n");
 }
 
 void CreateAimingGuides(engine::ecs::Entity entity, float guideSpeed, float shootAngle, int shootAmount)
@@ -393,6 +394,7 @@ void CreateAimingGuides(engine::ecs::Entity entity, float guideSpeed, float shoo
 		// Start 1-frame looping timer to check button press
 		engine::timerSystem->ScheduleFunction(&AimHedgehog, 1, true, ScheduledFunction::Type::frames, entity, aimingGuides, guideSpeed, shootAngle, shootAmount)
 	};
+	printf("guie:\n");
 }
 
 void ShootHedgehog(engine::ecs::Entity entity)
@@ -408,7 +410,7 @@ void ShootHedgehog(engine::ecs::Entity entity)
 			return;
 		}
 	}
-
+	printf("hedgeho: %ammo\n");
 	float shootAngle = Radians(8.0f);
 	//float shootAmount = player.ammo;
 	float shootAmount = 4;
