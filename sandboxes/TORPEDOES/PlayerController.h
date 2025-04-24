@@ -1413,7 +1413,12 @@ void ShootCruiseMissile(ecs::Entity owner)
 
 	// Verify that the target is valid and not the same as the trigger
 	if (target == 0 || target == owner)
+	{
+		//Decrease the cooldown time for failed shot
+		Player& pc = ecs::GetComponent<Player>(owner);
+		pc._specialTimer += pc.specialCooldown / 1.4;
 		return;
+	}
 
 	// Deactivate special ability and shoot
 	Player& pc = ecs::GetComponent<Player>(owner);

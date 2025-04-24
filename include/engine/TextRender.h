@@ -69,9 +69,6 @@ namespace engine
 		///Call this every frame
 		void Update(Camera* cam)
 		{
-			// Main windows size variable.
-			windowSize = engine::GetMainWindowSize();
-
 			for (auto const& entity : entities)
 			{
 				Transform& transform = ecs::GetComponent<Transform>(entity);
@@ -135,11 +132,7 @@ namespace engine
 				}
 				*/
 				
-				
-
-				// Scale text relative to window size
-				scaleFactor = std::min(windowSize.x, windowSize.y) / resolution;
-				scaledTextSize = textRenderer.scale * scaleFactor / 10;
+				Vector2 scaledTextSize = textRenderer.scale / 10;
 
 				// Renders text one letter at a time
 				std::string::const_iterator c;
@@ -157,25 +150,10 @@ namespace engine
 					// New rendering code
 					float xpos = x + ch.Bearing.x * scaledTextSize.x;
 					float ypos = y - (ch.Size.y - ch.Bearing.y) * scaledTextSize.y;
-					/*
-					* // New rendering code
-				float xpos = x + ch.Bearing.x * transform.scale.x;
-				float ypos = y - (ch.Size.y - ch.Bearing.y) * transform.scale.y;
-					*/
-					
-
-					// Old renderin code
-					//float w = ch.Size.x * textRenderer.scale.x;
-					//float h = ch.Size.y * textRenderer.scale.y;
 
 					// New rendering code
 					float w = ch.Size.x * scaledTextSize.x;
 					float h = ch.Size.y * scaledTextSize.y;
-					/*
-					* // New rendering code
-				float w = ch.Size.x * transform.scale.x;
-				float h = ch.Size.y * transform.scale.y;
-					*/
 
 					float vertices[6][4] = {
 						{xpos, ypos + h, 0.0f, 0.0f},
@@ -209,15 +187,5 @@ namespace engine
 
 	private:
 		Shader* m_shader;
-		// Window variable
-		Vector2 windowSize;
-		// Text scaleFactor variable
-		float scaleFactor = 0.0f;
-		// Text scaled based on the window size variable
-		Vector3 scaledTextSize = Vector3(0);
-		// Window resolution
-		float resolution = 800.0f;
-		// Compare value for charRes
-		Vector2 oldCharRes = Vector2(0.0f, 0.0f);
 	};
 }
