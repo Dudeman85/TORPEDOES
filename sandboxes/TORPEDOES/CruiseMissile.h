@@ -106,7 +106,7 @@ public:
 		position.z += 500 + ((double)rand() / (double)RAND_MAX);
 
 		Audio* explosionSound = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 0.2f, DistanceModel::LINEAR);
-		//explosionSound->play();
+		explosionSound->play();
 
 		engine::ecs::Entity explosion = engine::ecs::NewEntity();
 		engine::ecs::AddComponent(explosion, engine::Transform{ .position = position, .scale = Vector3(70) });
