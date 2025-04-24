@@ -273,11 +273,11 @@ void AimHedgehog(engine::ecs::Entity entity, std::vector<engine::ecs::Entity> ai
 
 	if (input::GetPressed("Shoot" + std::to_string(player.id)))
 	{
+		player._ammoRechargeTimer = 0;
 		// When button is pressed, move aim guide forward
 		Transform& transform = ecs::GetComponent<Transform>(entity);
 		Transform& modelTransform = ecs::GetComponent<Transform>(player.renderedEntity);
 
-		Player& player = ecs::GetComponent<Player>(entity);
 		Transform& playerTransform = ecs::GetComponent<Transform>(entity);
 
 		const float playerAngle = atan2(player.forwardDirection.y, player.forwardDirection.x);
@@ -408,7 +408,6 @@ void ShootHedgehog(engine::ecs::Entity entity)
 			return;
 		}
 	}
-
 	float shootAngle = Radians(8.0f);
 	//float shootAmount = player.ammo;
 	float shootAmount = 4;
@@ -877,14 +876,18 @@ public:
 					player.hitProjectiles.push_back({ projectile, 0.f });
 				SkipAddingHit:
 
-					CreateAnimation(collision.b);
-
+					// Do animation projectile impact animation
+					Vector3 pos = engine::ecs::GetComponent<engine::Transform>(collision.b).position;
+					if(ecs::HasComponent<Rigidbody>(collision.b))
+						if(ecs::GetComponent<Projectile>(collision.b).hitType != HitStates::Additive)
+							pos += engine::ecs::GetComponent<Rigidbody>(collision.b).velocity.Normalize() * 20;
+					
 					//Destroy projectile at end of frame
 					if (projectile.deleteAffterHit == true)
 					{
+						CreateExplosionAnimation(pos);
 						engine::ecs::DestroyEntity(collision.b);
 					}
-
 				}
 			}
 		}
@@ -1411,7 +1414,12 @@ void ShootCruiseMissile(ecs::Entity owner)
 
 	// Verify that the target is valid and not the same as the trigger
 	if (target == 0 || target == owner)
+	{
+		//Decrease the cooldown time for failed shot
+		Player& pc = ecs::GetComponent<Player>(owner);
+		pc._specialTimer += pc.specialCooldown / 1.4;
 		return;
+	}
 
 	// Deactivate special ability and shoot
 	Player& pc = ecs::GetComponent<Player>(owner);

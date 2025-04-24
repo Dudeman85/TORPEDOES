@@ -174,7 +174,7 @@ public:
 			ecs::GetComponent<SpriteRenderer>(currentSelectedLevel).texture = mapImages[mapLevelIndex];
 		}
 
-		if (input::GetNewPress("Shoot" + std::to_string(firstPlayer)) || input::GetNewPress("Pause"))
+		if (input::GetNewPress("Shoot" + std::to_string(firstPlayer)) || input::GetNewPress("Pause" + std::to_string(firstPlayer)) || input::GetNewPress("Pause"))
 		{
 			LoadThisLevel(mapLevelIndex);
 		}

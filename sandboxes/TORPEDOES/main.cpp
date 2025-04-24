@@ -1040,6 +1040,7 @@ static void SetupInput()
 
 		input::ConstructDigitalEvent("Shoot" + std::to_string(i));
 		input::ConstructDigitalEvent("Boost" + std::to_string(i));
+		input::ConstructDigitalEvent("Pause" + std::to_string(i));
 
 		//This is intentionally duplicate for map select
 		input::ConstructDigitalEvent("MenuDpadLeft" + std::to_string(i));
@@ -1050,7 +1051,7 @@ static void SetupInput()
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "Shoot" + std::to_string(i) });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "Boost" + std::to_string(i) });
 
-		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_START, { "Pause" });
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_START, { "Pause" + std::to_string(i) });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "MenuConfirm" });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "MenuBack" });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_UP, { "MenuDpadUp" });
