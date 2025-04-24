@@ -50,7 +50,7 @@ namespace resources
 
 		models = engine::PreloadModels("3dmodels", true, GL_NEAREST);
 
-		niagaraFont = new Font("Niagara Solid.ttf", 0, 0, 480);
+		niagaraFont = new Font("Niagara Solid.ttf", 0, 0, 600);
 
 		level1Map = new Tilemap(cam);
 		level1Map->loadMap("/levels/level1.tmx");
