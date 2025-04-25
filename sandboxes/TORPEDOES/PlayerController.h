@@ -1363,7 +1363,7 @@ public:
 			shootShell->pause();
 			Audio* shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.3f, DistanceModel::LINEAR);
 			shootTorpedo->pause();
-			Audio* boostAudio = engine::AddAudio("Gameplay", "audio/boost_01.wav", false, 0.6f, DistanceModel::LINEAR);
+			Audio* boostAudio = engine::AddAudio("Gameplay", "audio/boost_01.wav", false, 0.3f, DistanceModel::LINEAR);
 			boostAudio->pause();
 			Audio* submergeAudio = engine::AddAudio("Gameplay", "audio/submerge_01.wav", false, 0.3f, DistanceModel::LINEAR);
 			submergeAudio->pause();

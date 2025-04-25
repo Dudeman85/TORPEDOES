@@ -116,7 +116,7 @@ void SetupGameMusic()
 {
 	engine::ecs::Entity musicEntity = engine::ecs::NewEntity();
 	engine::ecs::AddComponent(musicEntity, engine::Transform{});
-	Audio* gameMusic = engine::AddAudio("Music", "audio/TheStruggleLoop1.wav", true, 0.05f, DistanceModel::NONE);
+	Audio* gameMusic = engine::AddAudio("Music", "audio/TheStruggleLoop1.wav", true, 0.03f, DistanceModel::NONE);
 	
 	engine::ecs::AddComponent(musicEntity, engine::SoundComponent{ .Sounds =
 			{
@@ -1005,11 +1005,53 @@ static void LoadLevel6(engine::Camera* cam)
 	CreateCrowd({ 10545.000000, -1900.000000, 165 }, resources::crowdAnims1);
 	CreateCrowd({ 10630.000000, -1885.000000, 164 }, resources::crowdAnims1);
 
+	// Turnabout pontoons
+	CreateCrowd({ 13585.000000, -2685.000000, 168 }, resources::crowdAnims1);
+	CreateCrowd({ 13550.000000, -2660.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 13610.000000, -2645.000000, 166 }, resources::crowdAnims1);
+	CreateCrowd({ 13535.000000, -2625.000000, 165 }, resources::crowdAnims1);
+	CreateCrowd({ 13585.000000, -2610.000000, 164 }, resources::crowdAnims1);
+
+	CreateCrowd({ 13800.000000, -2395.000000, 168 }, resources::crowdAnims1);
+	CreateCrowd({ 13880.000000, -2370.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 13810.000000, -2360.000000, 166 }, resources::crowdAnims1);
+	CreateCrowd({ 13820.000000, -2345.000000, 165 }, resources::crowdAnims1);
+	CreateCrowd({ 13840.000000, -2330.000000, 164 }, resources::crowdAnims1);
+
+	CreateCrowd({ 13830.000000, -2140.000000, 168 }, resources::crowdAnims1);
+	CreateCrowd({ 13875.000000, -2130.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 13910.000000, -2120.000000, 166 }, resources::crowdAnims1);
+	CreateCrowd({ 13845.000000, -2100.000000, 165 }, resources::crowdAnims1);
+	CreateCrowd({ 13885.000000, -2080.000000, 164 }, resources::crowdAnims1);
+
+	CreateCrowd({ 13390.000000, -1790.000000, 168 }, resources::crowdAnims1);
+	CreateCrowd({ 13435.000000, -1765.000000, 167 }, resources::crowdAnims1);
+	CreateCrowd({ 13385.000000, -1745.000000, 166 }, resources::crowdAnims1);
+	CreateCrowd({ 13405.000000, -1735.000000, 165 }, resources::crowdAnims1);
+	CreateCrowd({ 13465.000000, -1720.000000, 164 }, resources::crowdAnims1);
+	// audio for crowd
+	cheeringSoundPos = {
+		{ 1640.000000, -765.000000, 0 },
+		{ 3330.000000, -1400.000000, 0 },
+		{ 2530.000000, -2910.000000, 0 },
+		{ 5265.000000, -2735.000000, 0 },
+		{ 6260.000000, -1205.000000, 0 },
+		{ 8985.000000, -1210.000000, 0 },
+		{ 9665.000000, -1270.000000, 0 },
+		{ 10600.000000, -1960.000000, 0 },
+		{ 13880.000000, -2370.000000, 0 },
+		{ 13910.000000, -2120.000000, 0 },
+		{ 13385.000000, -1745.000000, 0 },
+		{ 13550.000000, -2660.000000, 0 }
+	};
+	SetupCheeringSounds(cheeringSoundPos);
+
 	PlayCountdown(Vector3(1235.0f, -780.0f, 200.0f));
 	PlayerController::lapCount = 1;
 	//Create the players
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(1225.0f, -900.0f));
 
+	//engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(13515.000000, -2225.000000));
 	SetupGameMusic();
 }
 
@@ -1214,7 +1256,7 @@ int main()
 
 	//Object placement editor
 	engine::ecs::Entity placementEditor = ecs::NewEntity();
-	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(1375.000000, -950.000000, 166), .scale = 20 });
+	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(13515.000000, -2225.000000, 166), .scale = 20 });
 	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Buoy.obj"] });
 	ecs::AddTag(placementEditor, "persistent");
 
