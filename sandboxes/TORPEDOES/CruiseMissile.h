@@ -23,7 +23,7 @@ class CruiseMissileSystem : public ecs::System
 {
 private:
 	float speed = 800;
-	float rotationSpeed = 10; 
+	float rotationSpeed = 10;
 
 public:
 	void Update()
@@ -34,9 +34,9 @@ public:
 			CruiseMissile& missile = ecs::GetComponent<CruiseMissile>(entity);
 			Transform& missileTransform = ecs::GetComponent<Transform>(entity);
 			Vector3 targetPos = ecs::GetComponent<Transform>(missile.target).position;
-			TransformSystem::SetPosition(missile.renderTargetIconi,targetPos);
+			TransformSystem::SetPosition(missile.renderTargetIconi, targetPos);
 			TransformSystem::Rotate(missile.renderTargetIconi, Vector3(0, 0, cappedDeltaTime * 200.5));
-			TransformSystem::Scale(missile.renderTargetIconi, (sin(engine::programTime*6)*0.5));
+			TransformSystem::Scale(missile.renderTargetIconi, (sin(engine::programTime * 6) * 0.5));
 			//Move only forward for a time
 			if (missile.targetDelay > 0)
 			{
@@ -89,14 +89,17 @@ public:
 	static void CreateMissile(ecs::Entity owner, ecs::Entity target, float rotation)
 	{
 		ecs::Entity missile = ecs::NewEntity();
-		ecs::Entity renderTargetIconi = ecs::NewEntity();
+		ecs::Entity targetIndicator = ecs::NewEntity();
 
-		ecs::AddComponent(missile, Transform{ .position = ecs::GetComponent<Transform>(owner).position, .rotation = {0, -90, rotation}, .scale = {10, 10, 10} , .rotationOrder = ZYX});
+		Audio* launchSound = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.15f, DistanceModel::LINEAR);
+		launchSound->play();
+
+		ecs::AddComponent(missile, Transform{ .position = ecs::GetComponent<Transform>(owner).position, .rotation = {0, -90, rotation}, .scale = {10, 10, 10} , .rotationOrder = ZYX });
 		ecs::AddComponent(missile, ModelRenderer{ .model = resources::models["Weapon_CruiseMissile.obj"] });
-		ecs::AddComponent(missile, CruiseMissile{ .owner = owner, .target = target, .renderTargetIconi = renderTargetIconi });
-		ecs::AddComponent(renderTargetIconi, Transform{ .scale = Vector3(40) });
-		ecs::AddComponent(renderTargetIconi, SpriteRenderer{ .texture = resources::uiTextures["crosshair.png"] });
-
+		ecs::AddComponent(missile, CruiseMissile{ .owner = owner, .target = target, .renderTargetIconi = targetIndicator });
+		ecs::AddComponent(missile, SoundComponent{ .Sounds = {{"Launch", launchSound}} });
+		ecs::AddComponent(targetIndicator, Transform{ .scale = Vector3(40) });
+		ecs::AddComponent(targetIndicator, SpriteRenderer{ .texture = resources::uiTextures["crosshair.png"] });
 	}
 
 	//Make the cruie missile explosion animation and hitbox
