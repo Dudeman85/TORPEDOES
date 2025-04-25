@@ -92,7 +92,7 @@ void SetupCheeringSounds(const std::vector<Vector3>& positions)
 		engine::ecs::Entity cheerEntity = engine::ecs::NewEntity();
 		engine::ecs::AddComponent(cheerEntity, engine::Transform{ .position = pos });
 
-		Audio* cheerSound = engine::AddAudio("Gameplay", "audio/cheering.wav", true, 0.1f, DistanceModel::LINEAR);
+		Audio* cheerSound = engine::AddAudio("Gameplay", "audio/cheering.wav", true, 0.05f, DistanceModel::LINEAR);
 
 
 		cheerSound->setAbsoluteDirection(pos);
@@ -116,7 +116,7 @@ void SetupGameMusic()
 {
 	engine::ecs::Entity musicEntity = engine::ecs::NewEntity();
 	engine::ecs::AddComponent(musicEntity, engine::Transform{});
-	Audio* gameMusic = engine::AddAudio("Music", "audio/TheStruggleLoop1.wav", true, 0.03f, DistanceModel::NONE);
+	Audio* gameMusic = engine::AddAudio("Music", "audio/TheStruggleLoop1.wav", true, 0.05f, DistanceModel::NONE);
 	
 	engine::ecs::AddComponent(musicEntity, engine::SoundComponent{ .Sounds =
 			{

@@ -485,9 +485,9 @@ public:
 			engine::ecs::AddComponent(selectionWindow, PlayerSelection{ .playerID = i, .arrowUp = arrowUp, .arrowDown = arrowDown, .shipModel = shipModel, .readyText = readyText, .playerWindow = selectionWindow, .shipInfo = shipInfo,.shipNameEntity = shipNameEntity,.baseSpeedEntity = baseSpeedEntity,.maneuvarabilityEntity = maneuvarabilityEntity,.boostEntity = boostEntity ,.specialEntity = specialEntity, .backgroundImage = backgroundImage });
 
 			PlayerSelection& playerselection = ecs::GetComponent<PlayerSelection>(selectionWindow);
-			playerselection.playerSelectAudio = engine::AddAudio("Background", "audio/leftright.wav", false, 0.005f, DistanceModel::LINEAR);
+			playerselection.playerSelectAudio = engine::AddAudio("Background", "audio/leftright.wav", false, 0.00f, DistanceModel::LINEAR);
 			playerselection.playerSelectAudio->pause();
-			playerselection.playerReadyAudio = engine::AddAudio("Background", "audio/select.wav", false, 0.005f, DistanceModel::LINEAR);
+			playerselection.playerReadyAudio = engine::AddAudio("Background", "audio/select.wav", false, 0.00f, DistanceModel::LINEAR);
 			playerselection.playerReadyAudio->pause();
 			engine::ecs::AddComponent(selectionWindow, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(0, 0.15f, 0), .uiElement = true });
 
