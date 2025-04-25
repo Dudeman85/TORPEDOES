@@ -82,9 +82,7 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 	engine::ecs::AddComponent(hedgehogExplosion, engine::PolygonCollider{ .vertices = explosionverts, .trigger = true, .visualise = true });
 	engine::ecs::AddComponent(hedgehogExplosion, Projectile{ .owner = projectile.owner, .hitType = HitStates::Stop, .hitSpeedFactor = 0.5, .hitTime = 1, .canHitSubmerged = true, .deleteAffterHit = false, .hitAnimation = "" });
 
-	// Crashes for some reason
-
-	//Disable the hedgehog collider after .5 seconds
+	//Disable the hedgehog collider after .4 seconds
 	engine::TimerSystem::ScheduleFunction([hedgehogExplosion]()
 		{
 			if (engine::ecs::EntityExists(hedgehogExplosion))
@@ -94,7 +92,7 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 					engine::ecs::RemoveComponent<engine::PolygonCollider>(hedgehogExplosion);
 				}
 			}
-		}, 0.5);
+		}, 0.4);
 
 	// check tilemap collision and activate explosion animation
 	engine::collisionSystem->UpdateAABB(hedgehogExplosion);
@@ -114,15 +112,17 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 	{
 		engine::AnimationSystem::AddAnimation(hedgehogExplosion, resources::explosionAnimation, "explosion");
 		engine::AnimationSystem::PlayAnimation(hedgehogExplosion, "explosion", false);
-
-		//soundComponent.Sounds["Explosion"]->play();
+		Audio* explosionSound = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 0.15f, DistanceModel::LINEAR);
+		explosionSound->play();
+		ecs::AddComponent(hedgehogExplosion, SoundComponent{ .Sounds = {{"Explosion", explosionSound}} });
 	}
 	else
 	{
 		engine::AnimationSystem::AddAnimation(hedgehogExplosion, resources::WaterexplosionAnimation, "Hedgehog_Explosion.png");
 		engine::AnimationSystem::PlayAnimation(hedgehogExplosion, "Hedgehog_Explosion.png", false);
-
-		//soundComponent.Sounds["ExplosionWater"]->play();
+		Audio* explosionSound = engine::AddAudio("Gameplay", "audio/submerge_01.wav", false, 0.15f, DistanceModel::LINEAR);
+		explosionSound->play();
+		ecs::AddComponent(hedgehogExplosion, SoundComponent{ .Sounds = {{"Explosion", explosionSound}} });
 	}
 };
 

@@ -56,8 +56,6 @@ namespace engine
 
 				for (auto& sound : soundComponent.Sounds)
 				{
-					
-
 					//calculate distance between listener and audio source
 					float distance = (ListeningPosition - soundTransform.position).Length();
 
@@ -86,15 +84,12 @@ namespace engine
 							break;
 						}
 					}
+
 					// Set the audio volume based on the calculated attenuation
 					float attenuatedVolume = (soundComponent.baseVolume * sound.second->Volume * attenuation);
 					sound.second->absoluteVolume(std::clamp(attenuatedVolume, 0.0f, soundComponent.baseVolume));
-
 					sound.second->setAbsoluteDirection(soundTransform.position - ListeningPosition);
-
-
 				}
-				
 			}
 		}
 

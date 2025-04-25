@@ -1094,6 +1094,7 @@ static void SetupInput()
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "Boost" + std::to_string(i) });
 
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_START, { "Pause" + std::to_string(i) });
+		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_START, { "Pause" });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_A, { "MenuConfirm" });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_B, { "MenuBack" });
 		input::bindDigitalControllerInput(i, GLFW_GAMEPAD_BUTTON_DPAD_UP, { "MenuDpadUp" });
@@ -1226,6 +1227,8 @@ int main()
 	soundSystem->AddSoundEngine("Music");
 	soundSystem->SetGlobalVolume(1);
 	ecs::SetComponentDestructor<engine::SoundComponent>(OnSoundComponentDestroyed);
+	Vector3 newListenerPosition(2200.000000, -1075.000000, 0.00000);
+	soundSystem->SetListeningPosition(newListenerPosition);
 
 	//Loads all globally used resources
 	resources::LoadResources(cam);
@@ -1244,9 +1247,6 @@ int main()
 	std::shared_ptr<CruiseMissileSystem> cruiseMissileSystem = engine::ecs::GetSystem<CruiseMissileSystem>();
 	std::shared_ptr<LevelSelectionSystem> levelSelectionSystem = engine::ecs::GetSystem<LevelSelectionSystem>();
 	std::shared_ptr<PlayerSelectSystem> playerSelectionSystem = engine::ecs::GetSystem<PlayerSelectSystem>();
-
-	Vector3 newListenerPosition(2200.000000, -1075.000000, 0.00000);
-	soundSystem->SetListeningPosition(newListenerPosition);
 
 	GameState currentGameState = mainMenuState;
 

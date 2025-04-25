@@ -1317,6 +1317,9 @@ public:
 	ecs::Entity resume;
 	ecs::Entity fullscreen;
 
+	Audio* confirmSound;
+	Audio* moveSound;
+
 	//Make and show the main menu
 	void Init()
 	{
@@ -1387,6 +1390,18 @@ public:
 		ecs::AddComponent(creditsScreen, SpriteRenderer{ .texture = resources::menuTextures["UI_Credits_Screen.png"], .uiElement = true });
 		ecs::AddComponent(creditsScreen, MainMenuComponent{ .showInStates = {MainMenuState::Credits} });
 
+		//Sfx
+		confirmSound = engine::AddAudio("Background", "audio/select.wav", false, 0.00f, DistanceModel::NONE);
+		moveSound = engine::AddAudio("Background", "audio/leftright.wav", false, 0.00f, DistanceModel::NONE);
+		ecs::AddComponent(startText, SoundComponent{ .Sounds = {{"Confirm", confirmSound}, {"MoveSelection", moveSound}}, .baseVolume = 0.00 });
+		confirmSound->pause();
+		moveSound->pause();
+		//For some reason sfx have to be loaded twice to work
+		confirmSound = engine::AddAudio("Background", "audio/select.wav", false, 0.00f, DistanceModel::NONE);
+		moveSound = engine::AddAudio("Background", "audio/leftright.wav", false, 0.00f, DistanceModel::NONE);
+		confirmSound->pause();
+		moveSound->pause();
+		
 		//Setup the state
 		gameState = mainMenuState;
 		ChangeState(MainMenuState::Splash, 0);
@@ -1433,6 +1448,7 @@ public:
 			//Go to Main selection
 			if (confirmInput || pauseInput)
 			{
+				confirmSound->play();
 				ChangeState(MainMenuState::Main, startGame);
 			}
 			break;
@@ -1533,11 +1549,16 @@ public:
 	{
 		MainMenuComponent& mmc = ecs::GetComponent<MainMenuComponent>(currentSelection);
 		if (mmc.operation)
+		{
+			confirmSound->play();
 			mmc.operation();
+		}
 	}
 
 	void MoveSelection(bool up)
 	{
+		moveSound->play();
+
 		//Old selection
 		MainMenuComponent& oldMMC = ecs::GetComponent<MainMenuComponent>(currentSelection);
 		SpriteRenderer& oldSR = ecs::GetComponent<SpriteRenderer>(currentSelection);
