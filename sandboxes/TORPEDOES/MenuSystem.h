@@ -554,7 +554,15 @@ public:
 			return;
 		}
 
-		if (startLevelTimer >= (startLevelTime + startLevelLoadingTime) || input::GetNewPress("Pause"))
+		bool pressedStart = false;
+		for (engine::ecs::Entity entity : entities)
+		{
+			PlayerSelection& playerSelection = engine::ecs::GetComponent<PlayerSelection>(entity);
+			if(playerSelection.ready)
+				pressedStart |= input::GetNewPress("Pause" + std::to_string(playerSelection.playerID));
+		}
+
+		if (startLevelTimer >= (startLevelTime + startLevelLoadingTime) || pressedStart)
 		{
 			auto& firstPlayer = ecs::GetSystem<LevelSelectionSystem>()->firstPlayer;
 			firstPlayer = 5;
