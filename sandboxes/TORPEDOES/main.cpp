@@ -810,7 +810,7 @@ static void LoadLevel5(engine::Camera* cam)
 	SetupCheeringSounds(cheeringSoundPos);
 
 	PlayCountdown(Vector3(3300.0f, -4000.0f, 200.0f));
-	PlayerController::lapCount = 2;
+	PlayerController::lapCount = 1;
 	//Create the players
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(3390.0f, -4055.0f));
 	SetupGameMusic();
@@ -1254,11 +1254,11 @@ int main()
 	SetupInput();
 
 
-	//Object placement editor
-	engine::ecs::Entity placementEditor = ecs::NewEntity();
-	ecs::AddComponent(placementEditor, Transform{ .position = Vector3(13515.000000, -2225.000000, 166), .scale = 20 });
-	ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Buoy.obj"] });
-	ecs::AddTag(placementEditor, "persistent");
+	////Object placement editor
+	//engine::ecs::Entity placementEditor = ecs::NewEntity();
+	//ecs::AddComponent(placementEditor, Transform{ .position = Vector3(13515.000000, -2225.000000, 166), .scale = 20 });
+	//ecs::AddComponent(placementEditor, ModelRenderer{ .model = resources::models["Prop_Buoy.obj"] });
+	//ecs::AddTag(placementEditor, "persistent");
 
 
 	//Collision layer matrix setup
@@ -1284,56 +1284,56 @@ int main()
 			glfwSetWindowShouldClose(window, true);
 
 
-		//Object editor
-		{
-			const float editorSpeed = 0.5;
-			//Hold numpad 0 to toggle rotate
-			if (glfwGetKey(window, GLFW_KEY_KP_0))
-			{
-				//Numpad 8456 move
-				if (glfwGetKey(window, GLFW_KEY_KP_4))
-					TransformSystem::Rotate(placementEditor, Vector3(0, 0, 5) * editorSpeed);
-				if (glfwGetKey(window, GLFW_KEY_KP_6))
-					TransformSystem::Rotate(placementEditor, Vector3(0, 0, -5) * editorSpeed);
-				if (glfwGetKey(window, GLFW_KEY_KP_8))
-					TransformSystem::Rotate(placementEditor, Vector3(-5, 0, 0) * editorSpeed);
-				if (glfwGetKey(window, GLFW_KEY_KP_5))
-					TransformSystem::Rotate(placementEditor, Vector3(5, 0, 0) * editorSpeed);
-				if (glfwGetKey(window, GLFW_KEY_KP_7))
-					TransformSystem::Rotate(placementEditor, Vector3(0, 5, 0) * editorSpeed);
-				if (glfwGetKey(window, GLFW_KEY_KP_9))
-					TransformSystem::Rotate(placementEditor, Vector3(0, -5, 0) * editorSpeed);
-			}
-			else
-			{
-				//Numpad 8456 move
-				if (glfwGetKey(window, GLFW_KEY_KP_8))
-					TransformSystem::Translate(placementEditor, Vector3(0, 10, 0) * editorSpeed);
-				if (glfwGetKey(window, GLFW_KEY_KP_4))
-					TransformSystem::Translate(placementEditor, Vector3(-10, 0, 0) * editorSpeed);
-				if (glfwGetKey(window, GLFW_KEY_KP_5))
-					TransformSystem::Translate(placementEditor, Vector3(0, -10, 0) * editorSpeed);
-				if (glfwGetKey(window, GLFW_KEY_KP_6))
-					TransformSystem::Translate(placementEditor, Vector3(10, 0, 0) * editorSpeed);
-			}
-			//+- scale
-			if (glfwGetKey(window, GLFW_KEY_KP_ADD))
-				TransformSystem::Scale(placementEditor, 1 * editorSpeed);
-			if (glfwGetKey(window, GLFW_KEY_KP_SUBTRACT))
-				TransformSystem::Scale(placementEditor, -1 * editorSpeed);
-			//Print spawn Function
-			if (glfwGetKey(window, GLFW_KEY_KP_ENTER))
-			{
-				auto& et = ecs::GetComponent<Transform>(placementEditor);
-				std::cout << et.position.ToString() << ", " << et.rotation.ToString() << ", " << et.scale.ToString() << std::endl;
-			}
-			//Reset Transforms
-			if (glfwGetKey(window, GLFW_KEY_KP_DECIMAL))
-			{
-				TransformSystem::SetRotation(placementEditor, 0);
-				TransformSystem::SetScale(placementEditor, 20);
-			}
-		}
+		////Object editor
+		//{
+		//	const float editorSpeed = 0.5;
+		//	//Hold numpad 0 to toggle rotate
+		//	if (glfwGetKey(window, GLFW_KEY_KP_0))
+		//	{
+		//		//Numpad 8456 move
+		//		if (glfwGetKey(window, GLFW_KEY_KP_4))
+		//			TransformSystem::Rotate(placementEditor, Vector3(0, 0, 5) * editorSpeed);
+		//		if (glfwGetKey(window, GLFW_KEY_KP_6))
+		//			TransformSystem::Rotate(placementEditor, Vector3(0, 0, -5) * editorSpeed);
+		//		if (glfwGetKey(window, GLFW_KEY_KP_8))
+		//			TransformSystem::Rotate(placementEditor, Vector3(-5, 0, 0) * editorSpeed);
+		//		if (glfwGetKey(window, GLFW_KEY_KP_5))
+		//			TransformSystem::Rotate(placementEditor, Vector3(5, 0, 0) * editorSpeed);
+		//		if (glfwGetKey(window, GLFW_KEY_KP_7))
+		//			TransformSystem::Rotate(placementEditor, Vector3(0, 5, 0) * editorSpeed);
+		//		if (glfwGetKey(window, GLFW_KEY_KP_9))
+		//			TransformSystem::Rotate(placementEditor, Vector3(0, -5, 0) * editorSpeed);
+		//	}
+		//	else
+		//	{
+		//		//Numpad 8456 move
+		//		if (glfwGetKey(window, GLFW_KEY_KP_8))
+		//			TransformSystem::Translate(placementEditor, Vector3(0, 10, 0) * editorSpeed);
+		//		if (glfwGetKey(window, GLFW_KEY_KP_4))
+		//			TransformSystem::Translate(placementEditor, Vector3(-10, 0, 0) * editorSpeed);
+		//		if (glfwGetKey(window, GLFW_KEY_KP_5))
+		//			TransformSystem::Translate(placementEditor, Vector3(0, -10, 0) * editorSpeed);
+		//		if (glfwGetKey(window, GLFW_KEY_KP_6))
+		//			TransformSystem::Translate(placementEditor, Vector3(10, 0, 0) * editorSpeed);
+		//	}
+		//	//+- scale
+		//	if (glfwGetKey(window, GLFW_KEY_KP_ADD))
+		//		TransformSystem::Scale(placementEditor, 1 * editorSpeed);
+		//	if (glfwGetKey(window, GLFW_KEY_KP_SUBTRACT))
+		//		TransformSystem::Scale(placementEditor, -1 * editorSpeed);
+		//	//Print spawn Function
+		//	if (glfwGetKey(window, GLFW_KEY_KP_ENTER))
+		//	{
+		//		auto& et = ecs::GetComponent<Transform>(placementEditor);
+		//		std::cout << et.position.ToString() << ", " << et.rotation.ToString() << ", " << et.scale.ToString() << std::endl;
+		//	}
+		//	//Reset Transforms
+		//	if (glfwGetKey(window, GLFW_KEY_KP_DECIMAL))
+		//	{
+		//		TransformSystem::SetRotation(placementEditor, 0);
+		//		TransformSystem::SetScale(placementEditor, 20);
+		//	}
+		//}
 
 		if (glfwGetKey(window, GLFW_KEY_0))
 		{
