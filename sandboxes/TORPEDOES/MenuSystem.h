@@ -174,7 +174,7 @@ public:
 			ecs::GetComponent<SpriteRenderer>(currentSelectedLevel).texture = mapImages[mapLevelIndex];
 		}
 
-		if (input::GetNewPress("Shoot" + std::to_string(firstPlayer)) || input::GetNewPress("Pause" + std::to_string(firstPlayer)) || input::GetNewPress("Pause"))
+		if (input::GetNewPress("Shoot" + std::to_string(firstPlayer)) || input::GetNewPress("Pause" + std::to_string(firstPlayer)))
 		{
 			LoadThisLevel(mapLevelIndex);
 		}
@@ -568,11 +568,9 @@ public:
 			firstPlayer = 5;
 			for (auto player : selectedShipsAtTheFrame)
 			{
-
 				if (player.first < firstPlayer)
 				{
 					firstPlayer = player.first;
-
 				}
 			}
 			printf("============= GAME STARTING ==========\n");
