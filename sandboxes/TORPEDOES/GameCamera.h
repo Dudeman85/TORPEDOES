@@ -3,6 +3,8 @@
 #include "PlayerController.h"
 #include "Globals.h"
 
+static float purgeDelay = 1;
+
 static void UpdateCam(engine::Camera* cam, Tilemap* map, bool isRiver = false)
 {
 	const float maxZoomSpeed = 30;
@@ -83,17 +85,13 @@ static void UpdateCam(engine::Camera* cam, Tilemap* map, bool isRiver = false)
 	//Special case for river map
 	if (isRiver)
 	{
-		float rightEdgeDistance = cam->width / 2;
-		float rightPlayerDistance = playerBounds[1] - playersCenter.x;
-
 		//If fully zoomed out
-		if (camHeight == map->bounds.height && rightPlayerDistance + zoomOutThreshold - rightEdgeDistance > 0)
+		if (camHeight == map->bounds.height && purgeDelay <= 0)
 		{
-			//Move the camera center so that it never lets the first player out of screen
-			playersCenter.x += rightPlayerDistance + zoomOutThreshold - rightEdgeDistance;
-
-			playerController->PurgeSlowPlayers(camBounds[3] - 50);
+			playerController->PurgeSlowPlayers();
+			purgeDelay = 1;
 		}
+		purgeDelay -= engine::cappedDeltaTime;
 	}
 
 	//Set the camera to the center of the player box

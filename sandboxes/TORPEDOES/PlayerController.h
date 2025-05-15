@@ -764,15 +764,23 @@ public:
 	}
 
 	//Kill the players who fell behind on the river map
-	void PurgeSlowPlayers(float killZone)
+	void PurgeSlowPlayers()
 	{
-		for (engine::ecs::Entity entity : entities)
+		ecs::Entity lastPlayer = 0;
+		int lastCheckpoint = 100000;
+		for (ecs::Entity entity : entities)
 		{
-			engine::Transform& transform = engine::ecs::GetComponent<engine::Transform>(entity);
+			Player& pc = ecs::GetComponent<Player>(entity);
 
-			if (transform.position.x < killZone)
-				ecs::DestroyEntity(entity);
+			if (pc.previousCheckpoint <= lastCheckpoint)
+			{
+				lastPlayer = entity;
+				lastCheckpoint = pc.previousCheckpoint;
+			}
 		}
+
+		if (ecs::EntityExists(lastPlayer))
+			ecs::DestroyEntity(lastPlayer);
 	}
 
 	//Get the min and max bounds of every player
@@ -1197,7 +1205,7 @@ public:
 		engine::ecs::Entity shootIndicator = engine::ecs::NewEntity();
 
 		engine::ecs::AddComponent(shootIndicator, engine::SpriteRenderer{ .texture = resources::uiTextures[textureNames[0]] });
-		engine::ecs::AddComponent(shootIndicator, engine::Transform{ .position = pos + Vector3(0, 0, 50 + ((double)rand() / RAND_MAX)), .scale = scale });
+		engine::ecs::AddComponent(shootIndicator, engine::Transform{ .position = pos + Vector3(0, 0, 60 + ((double)rand() / RAND_MAX)), .scale = scale });
 		engine::TransformSystem::AddParent(shootIndicator, entity);
 
 		std::vector<engine::Texture*> textures;
@@ -1271,7 +1279,7 @@ public:
 			engine::ecs::AddComponent(playerEntity, engine::Transform{ .position = Vector3(startPos - offset * playerShip.first, 150), .rotation = Vector3(0, 0, 0), .scale = Vector3(7) });
 			engine::ecs::AddComponent(playerEntity, engine::Rigidbody{ .drag = 1.5 });
 			vector<Vector2> colliderVerts{ Vector2(3, 1), Vector2(3, -1), Vector2(-3, -1), Vector2(-3, 1) };
-			engine::ecs::AddComponent(playerEntity, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .trigger = false, .layer = 1, .visualise = true });
+			engine::ecs::AddComponent(playerEntity, engine::PolygonCollider{ .vertices = colliderVerts, .callback = PlayerController::OnCollision, .trigger = true, .layer = 1, .visualise = true });
 
 			//Create the player's rendered entity
 			engine::ecs::AddComponent(playerRender, engine::Transform{ .rotation = Vector3(45, 0, 0), .scale = Vector3(1.5) });
