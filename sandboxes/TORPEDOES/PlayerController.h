@@ -780,7 +780,26 @@ public:
 		}
 
 		if (ecs::EntityExists(lastPlayer))
+		{
+			engine::ecs::Entity torpedoAnim = engine::ecs::NewEntity();
+			engine::ecs::AddComponent(torpedoAnim, engine::Animator{ .onAnimationEnd = ecs::DestroyEntity });
+			engine::ecs::AddComponent(torpedoAnim, engine::Transform{ .position = ecs::GetComponent<Transform>(lastPlayer).position + Vector3(0, 0, 100 + ((double)rand() / (double)RAND_MAX) + 2), .scale = Vector3(60)});
+			engine::ecs::AddComponent(torpedoAnim, engine::SpriteRenderer{ });
+			engine::ecs::AddComponent(torpedoAnim, engine::SoundComponent{ .Sounds = {{"Explosion", resources::explosion.back()}} });
+			resources::explosion.back()->play();
+
+			//Play explosion animation
+			engine::AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, "hit");
+			engine::AnimationSystem::PlayAnimation(torpedoAnim, "hit", false);
+
+			Player& pc = ecs::GetComponent<Player>(lastPlayer);
+			ecs::DestroyEntity(pc.specialIndicators.front().entity);
+			ecs::DestroyEntity(pc.shootIndicators.front().entity);
+			ecs::DestroyEntity(pc.shootIndicators.back().entity);
+			ecs::DestroyEntity(pc.checkpointIndicatorEntity);
+
 			ecs::DestroyEntity(lastPlayer);
+		}
 	}
 
 	//Get the min and max bounds of every player
@@ -886,10 +905,10 @@ public:
 
 					// Do animation projectile impact animation
 					Vector3 pos = engine::ecs::GetComponent<engine::Transform>(collision.b).position;
-					if(ecs::HasComponent<Rigidbody>(collision.b))
-						if(ecs::GetComponent<Projectile>(collision.b).hitType != HitStates::Additive)
+					if (ecs::HasComponent<Rigidbody>(collision.b))
+						if (ecs::GetComponent<Projectile>(collision.b).hitType != HitStates::Additive)
 							pos += engine::ecs::GetComponent<Rigidbody>(collision.b).velocity.Normalize() * 20;
-					
+
 					//Destroy projectile at end of frame
 					if (projectile.deleteAffterHit == true)
 					{

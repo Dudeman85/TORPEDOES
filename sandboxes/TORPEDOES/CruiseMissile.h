@@ -91,13 +91,12 @@ public:
 		ecs::Entity missile = ecs::NewEntity();
 		ecs::Entity targetIndicator = ecs::NewEntity();
 
-		Audio* launchSound = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.15f, DistanceModel::LINEAR);
-		launchSound->play();
+		resources::torpedoLaunch.back()->play();
 
 		ecs::AddComponent(missile, Transform{ .position = ecs::GetComponent<Transform>(owner).position, .rotation = {0, -90, rotation}, .scale = {10, 10, 10} , .rotationOrder = ZYX });
 		ecs::AddComponent(missile, ModelRenderer{ .model = resources::models["Weapon_CruiseMissile.obj"] });
 		ecs::AddComponent(missile, CruiseMissile{ .owner = owner, .target = target, .renderTargetIconi = targetIndicator });
-		ecs::AddComponent(missile, SoundComponent{ .Sounds = {{"Launch", launchSound}} });
+		ecs::AddComponent(missile, SoundComponent{ .Sounds = {{"Launch", resources::torpedoLaunch.back()}}});
 		ecs::AddComponent(targetIndicator, Transform{ .scale = Vector3(40) });
 		ecs::AddComponent(targetIndicator, SpriteRenderer{ .texture = resources::uiTextures["crosshair.png"] });
 	}

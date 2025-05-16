@@ -79,10 +79,12 @@ std::vector<Vector3> cheeringSoundPos;
 
 void OnSoundComponentDestroyed(ecs::Entity e, engine::SoundComponent c)
 {
+	/*
 	for (auto sound : c.Sounds)
 	{
 		sound.second->stop();
 	}
+	*/
 }
 
 void SetupCheeringSounds(const std::vector<Vector3>& positions)

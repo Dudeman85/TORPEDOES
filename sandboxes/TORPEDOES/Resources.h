@@ -32,6 +32,9 @@ namespace resources
 
 	std::vector<Texture*> playerIdToTexture;
 
+	std::vector<Audio*> explosion;
+	std::vector<Audio*> torpedoLaunch;
+
 	//Load all the global resources here
 	//Stuff that is only used in one system can be loaded there 
 	void LoadResources(Camera* cam)
@@ -73,6 +76,19 @@ namespace resources
 		divingAnim = AnimationsFromSpritesheet("/spritesheets/Diving_Sheet.png", 8, 1, vector<int>(8, 100))[0];
 		continuousDivingAnim = AnimationsFromSpritesheet("/spritesheets/Underwater_Sheet.png", 4, 1, vector<int>(4, 50))[0];
 		wakeAnims = AnimationsFromSpritesheet("/spritesheets/Booster_Sheet.png", 4, 2, vector<int>(8, 70));
+
+		explosion.push_back(engine::AddAudio("Gameplay", "audio/explosion.wav", false, 0.2f, DistanceModel::LINEAR));
+		explosion.back()->pause();
+		torpedoLaunch.push_back(engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.15f, DistanceModel::LINEAR));
+		torpedoLaunch.back()->pause();
+	}
+
+	Audio* NextAudio(std::vector<Audio*>* list) 
+	{
+		for (size_t i = 0; i < list->size(); i++)
+		{
+			return resources::explosion.back();
+		}
 	}
 
 	void UnloadResources()
