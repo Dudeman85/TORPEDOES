@@ -1405,7 +1405,7 @@ public:
 				{"ShootTorpedo", shootTorpedo},
 				{"boostAudio", boostAudio},
 				{"submergeAudio", submergeAudio}
-			} , .maxDistance = 1500 });
+			} , .maxDistance = 1500, .deleteSounds = true });
 		}
 	}
 };

@@ -22,6 +22,8 @@ namespace engine
 
 		std::unordered_map<std::string, float> startDelays; // Delay in milliseconds for each sound
 		std::unordered_map<std::string, float> stopDelays;  // Stop time in milliseconds for each sound
+
+		bool deleteSounds = false;
 	};
 
 	// we only have 1 position to listen from
@@ -153,6 +155,7 @@ namespace engine
 
 		if (audio) 
 		{
+			audio->pause();
 			audio->setVolume(volume);
 			audio->setDistanceModel(model);
 			audio->setMaxDistance(maxDist);

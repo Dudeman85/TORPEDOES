@@ -34,6 +34,11 @@ namespace resources
 
 	std::vector<Audio*> explosion;
 	std::vector<Audio*> torpedoLaunch;
+	std::vector<Audio*> submerge; 
+	Audio* gameMusic;
+	Audio* countdownSound;
+	Audio* confirmSound;
+	Audio* moveSound;
 
 	//Load all the global resources here
 	//Stuff that is only used in one system can be loaded there 
@@ -77,18 +82,29 @@ namespace resources
 		continuousDivingAnim = AnimationsFromSpritesheet("/spritesheets/Underwater_Sheet.png", 4, 1, vector<int>(4, 50))[0];
 		wakeAnims = AnimationsFromSpritesheet("/spritesheets/Booster_Sheet.png", 4, 2, vector<int>(8, 70));
 
-		explosion.push_back(engine::AddAudio("Gameplay", "audio/explosion.wav", false, 0.2f, DistanceModel::LINEAR));
-		explosion.back()->pause();
-		torpedoLaunch.push_back(engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.15f, DistanceModel::LINEAR));
-		torpedoLaunch.back()->pause();
+		for (size_t i = 0; i < 4; i++)
+		{
+			explosion.push_back(engine::AddAudio("Gameplay", "audio/explosion.wav", false, 0.2f, DistanceModel::LINEAR));
+			torpedoLaunch.push_back(engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.15f, DistanceModel::LINEAR));
+			submerge.push_back(engine::AddAudio("Gameplay", "audio/submerge_01.wav", false, 0.15f, DistanceModel::LINEAR));
+		}
+		gameMusic = engine::AddAudio("Music", "audio/TheStruggleLoop1.wav", true, 0.05f, DistanceModel::NONE);
+		countdownSound = engine::AddAudio("Gameplay", "audio/CountdownSound.wav", false, 0.2f, DistanceModel::NONE, 5000.0f, 1.0f, 0.0f);
+		confirmSound = engine::AddAudio("Gameplay", "audio/select.wav", false, 0.4f, DistanceModel::NONE, 5000.0f, 1.0f, 0.0f);
+		moveSound = engine::AddAudio("Gameplay", "audio/leftright.wav", false, 0.4f, DistanceModel::NONE, 5000.0f, 1.0f, 0.0f);
 	}
 
-	Audio* NextAudio(std::vector<Audio*>* list) 
+	Audio* NextAvailableAudio(std::vector<Audio*>& list)
 	{
-		for (size_t i = 0; i < list->size(); i++)
+		for (size_t i = 0; i < list.size(); i++)
 		{
-			return resources::explosion.back();
+			if (!list[i]->getPlaying())
+			{
+				list[i]->play();
+				return list[i];
+			}
 		}
+		return list.front();
 	}
 
 	void UnloadResources()

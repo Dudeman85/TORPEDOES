@@ -91,12 +91,10 @@ public:
 		ecs::Entity missile = ecs::NewEntity();
 		ecs::Entity targetIndicator = ecs::NewEntity();
 
-		resources::torpedoLaunch.back()->play();
-
 		ecs::AddComponent(missile, Transform{ .position = ecs::GetComponent<Transform>(owner).position, .rotation = {0, -90, rotation}, .scale = {10, 10, 10} , .rotationOrder = ZYX });
 		ecs::AddComponent(missile, ModelRenderer{ .model = resources::models["Weapon_CruiseMissile.obj"] });
 		ecs::AddComponent(missile, CruiseMissile{ .owner = owner, .target = target, .renderTargetIconi = targetIndicator });
-		ecs::AddComponent(missile, SoundComponent{ .Sounds = {{"Launch", resources::torpedoLaunch.back()}}});
+		ecs::AddComponent(missile, SoundComponent{ .Sounds = {{"Launch", resources::NextAvailableAudio(resources::torpedoLaunch)}}});
 		ecs::AddComponent(targetIndicator, Transform{ .scale = Vector3(40) });
 		ecs::AddComponent(targetIndicator, SpriteRenderer{ .texture = resources::uiTextures["crosshair.png"] });
 	}
@@ -107,14 +105,11 @@ public:
 		Vector3 position = ecs::GetComponent<Transform>(projectile).position;
 		position.z += 500 + ((double)rand() / (double)RAND_MAX);
 
-		Audio* explosionSound = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 0.2f, DistanceModel::LINEAR);
-		explosionSound->play();
-
 		engine::ecs::Entity explosion = engine::ecs::NewEntity();
 		engine::ecs::AddComponent(explosion, engine::Transform{ .position = position, .scale = Vector3(70) });
 		engine::ecs::AddComponent(explosion, engine::SpriteRenderer{ });
 		engine::ecs::AddComponent(explosion, engine::Animator{ .onAnimationEnd = ecs::DestroyEntity });
-		engine::ecs::AddComponent(explosion, engine::SoundComponent{ .Sounds = {{"Explosion", explosionSound}} });
+		engine::ecs::AddComponent(explosion, engine::SoundComponent{ .Sounds = {{"Explosion", resources::NextAvailableAudio(resources::explosion)}} });
 		Vector2 explosionSize = Vector2(0.7, -0.7);
 		std::vector<Vector2> explosionverts{ Vector2(explosionSize.x, explosionSize.x), Vector2(explosionSize.x, explosionSize.y), Vector2(explosionSize.y, explosionSize.y), Vector2(explosionSize.y, explosionSize.x) };
 		engine::ecs::AddComponent(explosion, engine::PolygonCollider{ .vertices = explosionverts, .trigger = true, .visualise = true });
