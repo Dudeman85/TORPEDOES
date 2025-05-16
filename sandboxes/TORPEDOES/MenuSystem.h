@@ -42,9 +42,6 @@ class LevelSelectionSystem : public engine::ecs::System
 	engine::ecs::Entity mapName;
 	engine::ecs::Entity mapSelectText;
 
-	// Testi teksti
-	engine::ecs::Entity Teksti;
-
 	int mapLevelIndex = 0;
 
 	//REFERENCE TO CAMRA TO CALL LEVEL METHOD 
@@ -215,12 +212,6 @@ struct PlayerSelection
 
 	float throttleCurrentWaitedTimeUp = 0;
 	float throttleCurrentWaitedTimeDown = 0;
-
-
-	Audio* playerSelectAudio;
-
-	Audio* playerReadyAudio;
-
 };
 
 ECS_REGISTER_SYSTEM(PlayerSelectSystem, PlayerSelection)
@@ -485,10 +476,6 @@ public:
 			engine::ecs::AddComponent(selectionWindow, PlayerSelection{ .playerID = i, .arrowUp = arrowUp, .arrowDown = arrowDown, .shipModel = shipModel, .readyText = readyText, .playerWindow = selectionWindow, .shipInfo = shipInfo,.shipNameEntity = shipNameEntity,.baseSpeedEntity = baseSpeedEntity,.maneuvarabilityEntity = maneuvarabilityEntity,.boostEntity = boostEntity ,.specialEntity = specialEntity, .backgroundImage = backgroundImage });
 
 			PlayerSelection& playerselection = ecs::GetComponent<PlayerSelection>(selectionWindow);
-			playerselection.playerSelectAudio = engine::AddAudio("Background", "audio/leftright.wav", false, 0.00f, DistanceModel::LINEAR);
-			playerselection.playerSelectAudio->pause();
-			playerselection.playerReadyAudio = engine::AddAudio("Background", "audio/select.wav", false, 0.00f, DistanceModel::LINEAR);
-			playerselection.playerReadyAudio->pause();
 			engine::ecs::AddComponent(selectionWindow, engine::TextRenderer{ .font = resources::niagaraFont, .text = "", .offset = Vector3(0, 0.15f, 0), .uiElement = true });
 
 			engine::TextRenderer& selectWin = engine::ecs::GetComponent<engine::TextRenderer>(selectionWindow);
@@ -637,7 +624,7 @@ public:
 					// Ready player with a
 					if (aPressed)
 					{
-						playerSelection.playerReadyAudio->play();
+						resources::confirmSound->play();
 						playerReadyText = "   Ready";
 						playerSelection.ready = true;
 
@@ -722,7 +709,7 @@ public:
 							// Next ship
 							playerSelection.throttleCurrentWaitedTimeUp -= throttleMoveWaitTime;
 
-							playerSelection.playerSelectAudio->play();
+							resources::moveSound->play();
 							playerSelection.selection++;
 							if (playerSelection.selection >= shipModels.size())
 							{
@@ -750,7 +737,7 @@ public:
 							// Previous ship
 							playerSelection.throttleCurrentWaitedTimeDown -= throttleMoveWaitTime;
 
-							playerSelection.playerSelectAudio->play();
+							resources::moveSound->play();
 							playerSelection.selection--;
 							if (playerSelection.selection < 0)
 							{
@@ -1323,9 +1310,6 @@ public:
 	ecs::Entity resume;
 	ecs::Entity fullscreen;
 
-	Audio* confirmSound;
-	Audio* moveSound;
-
 	//Make and show the main menu
 	void Init()
 	{
@@ -1339,6 +1323,7 @@ public:
 		ecs::AddComponent(startText, Transform{ .position = { -0.5, 0.2, -0.1 }, .rotation = { 0, 0, 15 }, .scale = { .45, .1, 0 } });
 		ecs::AddComponent(startText, SpriteRenderer{ .texture = resources::menuTextures["UI_PressStart.png"], .uiElement = true });
 		ecs::AddComponent(startText, MainMenuComponent{ .showInStates = {MainMenuState::Splash} });
+		ecs::AddComponent(startText, SoundComponent{ .Sounds = {{"Confirm", resources::confirmSound}, {"MoveSelection", resources::moveSound}}, .maxDistance = 200000, .referenceDistance = 200000, .rolloffFactor = 0 });
 
 		//Main menu entities
 		startGame = ecs::NewEntity();
@@ -1395,19 +1380,7 @@ public:
 		ecs::AddComponent(creditsScreen, Transform{ .position = { 0, -0, 0.5 }, .scale = { 1, 1, 0 } });
 		ecs::AddComponent(creditsScreen, SpriteRenderer{ .texture = resources::menuTextures["UI_Credits_Screen.png"], .uiElement = true });
 		ecs::AddComponent(creditsScreen, MainMenuComponent{ .showInStates = {MainMenuState::Credits} });
-
-		//Sfx
-		confirmSound = engine::AddAudio("Background", "audio/select.wav", false, 0.00f, DistanceModel::NONE);
-		moveSound = engine::AddAudio("Background", "audio/leftright.wav", false, 0.00f, DistanceModel::NONE);
-		ecs::AddComponent(startText, SoundComponent{ .Sounds = {{"Confirm", confirmSound}, {"MoveSelection", moveSound}}, .baseVolume = 0.00 });
-		confirmSound->pause();
-		moveSound->pause();
-		//For some reason sfx have to be loaded twice to work
-		confirmSound = engine::AddAudio("Background", "audio/select.wav", false, 0.00f, DistanceModel::NONE);
-		moveSound = engine::AddAudio("Background", "audio/leftright.wav", false, 0.00f, DistanceModel::NONE);
-		confirmSound->pause();
-		moveSound->pause();
-		
+				
 		//Setup the state
 		gameState = mainMenuState;
 		ChangeState(MainMenuState::Splash, 0);
@@ -1454,7 +1427,7 @@ public:
 			//Go to Main selection
 			if (confirmInput || pauseInput)
 			{
-				confirmSound->play();
+				resources::confirmSound->play();
 				ChangeState(MainMenuState::Main, startGame);
 			}
 			break;
@@ -1556,14 +1529,14 @@ public:
 		MainMenuComponent& mmc = ecs::GetComponent<MainMenuComponent>(currentSelection);
 		if (mmc.operation)
 		{
-			confirmSound->play();
+			resources::confirmSound->play();
 			mmc.operation();
 		}
 	}
 
 	void MoveSelection(bool up)
 	{
-		moveSound->play();
+		resources::moveSound->play();
 
 		//Old selection
 		MainMenuComponent& oldMMC = ecs::GetComponent<MainMenuComponent>(currentSelection);

@@ -67,21 +67,30 @@ static void PlayCountdown(Vector3 pos)
 	engine::AnimationSystem::AddAnimation(countdown, resources::countdownAnim, "CountDown");
 	engine::AnimationSystem::PlayAnimation(countdown, "CountDown", false);
 	engine::ecs::GetSystem<PlayerController>()->countdownTimer = 3;
-	Audio* CountdownSound = engine::AddAudio("Gameplay", "audio/CountdownSound.wav", false, 0.2f, DistanceModel::LINEAR, 5000.0f, 1.0f, 0.0f);
 	engine::ecs::AddComponent(countdown, engine::SoundComponent{ .Sounds =
 	{
-		{"Countdown", CountdownSound}
+		{"Countdown", resources::countdownSound}
 	} , .maxDistance = 2000, .referenceDistance = 1, .rolloffFactor = 0 });
-	CountdownSound->play();
+	resources::countdownSound->play();
 }
 
 std::vector<Vector3> cheeringSoundPos;
 
 void OnSoundComponentDestroyed(ecs::Entity e, engine::SoundComponent c)
 {
-	for (auto sound : c.Sounds)
+	if (c.deleteSounds)
 	{
-		sound.second->stop();
+		for (auto sound : c.Sounds)
+		{
+			sound.second->stop();
+		}
+	}
+	else 
+	{
+		for (auto sound : c.Sounds)
+		{
+			sound.second->pause();
+		}
 	}
 }
 
@@ -107,7 +116,7 @@ void SetupCheeringSounds(const std::vector<Vector3>& positions)
 		engine::ecs::AddComponent(cheerEntity, engine::SoundComponent{ .Sounds =
 			{
 				{"CrowdCheer", cheerSound}
-			} , .maxDistance = 700, .referenceDistance = 200, .rolloffFactor = 1 });
+			} , .maxDistance = 700, .referenceDistance = 200, .rolloffFactor = 1, .deleteSounds = true });
 		cheerSound->play();
 	}
 }
@@ -116,14 +125,13 @@ void SetupGameMusic()
 {
 	engine::ecs::Entity musicEntity = engine::ecs::NewEntity();
 	engine::ecs::AddComponent(musicEntity, engine::Transform{});
-	Audio* gameMusic = engine::AddAudio("Music", "audio/TheStruggleLoop1.wav", true, 0.05f, DistanceModel::NONE);
 	
 	engine::ecs::AddComponent(musicEntity, engine::SoundComponent{ .Sounds =
 			{
-				{"Music", gameMusic}
+				{"Music", resources::gameMusic}
 			} , .maxDistance = 200000, .referenceDistance = 200000, .rolloffFactor = 0 });
-	
-	gameMusic->play();
+
+	resources::gameMusic->play();
 }
 
 // Create everything for level 1
@@ -1225,7 +1233,7 @@ int main()
 	soundSystem->AddSoundEngine("Boat");
 	soundSystem->AddSoundEngine("Background");
 	soundSystem->AddSoundEngine("Music");
-	soundSystem->SetGlobalVolume(1);
+	soundSystem->SetGlobalVolume(0.5);
 	ecs::SetComponentDestructor<engine::SoundComponent>(OnSoundComponentDestroyed);
 	Vector3 newListenerPosition(2200.000000, -1075.000000, 0.00000);
 	soundSystem->SetListeningPosition(newListenerPosition);

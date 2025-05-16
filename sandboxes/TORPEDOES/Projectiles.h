@@ -49,14 +49,12 @@ static void CreateExplosionAnimation(Vector3 animPosition)
 	animPosition.z += 500;
 
 	engine::ecs::Entity torpedoAnim = engine::ecs::NewEntity();
-	Audio* explosion = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 0.2f, DistanceModel::LINEAR);
 
-	explosion->play();
-	auto remover = [explosion, torpedoAnim](engine::ecs::Entity) { engine::ecs::DestroyEntity(torpedoAnim); };
+	auto remover = [torpedoAnim](engine::ecs::Entity) { engine::ecs::DestroyEntity(torpedoAnim); };
 	engine::ecs::AddComponent(torpedoAnim, engine::Animator{ .onAnimationEnd = remover });
 	engine::ecs::AddComponent(torpedoAnim, engine::Transform{ .position = animPosition + Vector3(0, 0, ((double)rand() / (double)RAND_MAX) + 2), .scale = Vector3(20) });
 	engine::ecs::AddComponent(torpedoAnim, engine::SpriteRenderer{ });
-	engine::ecs::AddComponent(torpedoAnim, engine::SoundComponent{ .Sounds = {{"Explosion", explosion}} });
+	engine::ecs::AddComponent(torpedoAnim, engine::SoundComponent{ .Sounds = {{"Explosion", resources::NextAvailableAudio(resources::explosion)}}});
 
 	//Play explosion animation
 	engine::AnimationSystem::AddAnimation(torpedoAnim, resources::explosionAnimation, "hit");
@@ -112,17 +110,13 @@ void CreateHedgehogExplosion(engine::ecs::Entity entity)
 	{
 		engine::AnimationSystem::AddAnimation(hedgehogExplosion, resources::explosionAnimation, "explosion");
 		engine::AnimationSystem::PlayAnimation(hedgehogExplosion, "explosion", false);
-		Audio* explosionSound = engine::AddAudio("Gameplay", "audio/explosion.wav", false, 0.15f, DistanceModel::LINEAR);
-		explosionSound->play();
-		ecs::AddComponent(hedgehogExplosion, SoundComponent{ .Sounds = {{"Explosion", explosionSound}} });
+		ecs::AddComponent(hedgehogExplosion, SoundComponent{ .Sounds = {{"Explosion", resources::NextAvailableAudio(resources::explosion)}} });
 	}
 	else
 	{
 		engine::AnimationSystem::AddAnimation(hedgehogExplosion, resources::WaterexplosionAnimation, "Hedgehog_Explosion.png");
 		engine::AnimationSystem::PlayAnimation(hedgehogExplosion, "Hedgehog_Explosion.png", false);
-		Audio* explosionSound = engine::AddAudio("Gameplay", "audio/submerge_01.wav", false, 0.15f, DistanceModel::LINEAR);
-		explosionSound->play();
-		ecs::AddComponent(hedgehogExplosion, SoundComponent{ .Sounds = {{"Explosion", explosionSound}} });
+		ecs::AddComponent(hedgehogExplosion, SoundComponent{ .Sounds = {{"Explosion", resources::NextAvailableAudio(resources::submerge)}} });
 	}
 };
 

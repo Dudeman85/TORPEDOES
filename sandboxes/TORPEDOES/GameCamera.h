@@ -85,8 +85,9 @@ static void UpdateCam(engine::Camera* cam, Tilemap* map, bool isRiver = false)
 	//Special case for river map
 	if (isRiver)
 	{
+		float maxZoom = map->bounds.height - 100;
 		//If fully zoomed out
-		if (camHeight == map->bounds.height && purgeDelay <= 0)
+		if (camHeight == maxZoom && purgeDelay <= 0)
 		{
 			playerController->PurgeSlowPlayers();
 			purgeDelay = 1;
