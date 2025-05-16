@@ -1135,8 +1135,6 @@ static void SetupInput()
 	input::bindAnalogInput(GLFW_KEY_RIGHT, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
 	input::bindAnalogInput(GLFW_KEY_LEFT, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer) });
 
-	input::bindAnalogInput(GLFW_KEY_X, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
-	input::bindAnalogInput(GLFW_KEY_Z, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
 	input::bindAnalogInput(GLFW_KEY_UP, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
 	input::bindAnalogInput(GLFW_KEY_DOWN, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Throttle" + std::to_string(KeyboardPlayer) });
 
@@ -1144,11 +1142,13 @@ static void SetupInput()
 	input::bindAnalogInput(GLFW_KEY_DOWN, { input::digitalPositiveInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "MenuVertical" });
 	input::bindAnalogInput(GLFW_KEY_LEFT, { input::digitalNegativeInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "MenuHorizontal" });
 	input::bindAnalogInput(GLFW_KEY_RIGHT, { input::digitalPositiveInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "MenuHorizontal" });
-	input::bindDigitalInput(GLFW_KEY_N, { "MenuConfirm" });
-	input::bindDigitalInput(GLFW_KEY_B, { "MenuBack" });
+	input::bindDigitalInput(GLFW_KEY_KP_1, { "MenuConfirm" });
+	input::bindDigitalInput(GLFW_KEY_KP_2, { "MenuBack" });
 
-	input::bindDigitalInput(GLFW_KEY_N, { "Shoot" + std::to_string(KeyboardPlayer) });
-	input::bindDigitalInput(GLFW_KEY_B, { "Boost" + std::to_string(KeyboardPlayer) });
+	input::bindDigitalInput(GLFW_KEY_KP_1, { "Shoot" + std::to_string(KeyboardPlayer) });
+	input::bindDigitalInput(GLFW_KEY_KP_2, { "Boost" + std::to_string(KeyboardPlayer) });
+
+	input::bindDigitalInput(GLFW_KEY_KP_5, { "Pause" });
 
 	int KeyboardPlayer2 = 1;
 	input::bindAnalogInput(GLFW_KEY_D, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer2) });
@@ -1161,13 +1161,13 @@ static void SetupInput()
 	input::bindAnalogInput(GLFW_KEY_S, { input::digitalPositiveInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "MenuVertical" });
 	input::bindAnalogInput(GLFW_KEY_A, { input::digitalNegativeInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "MenuHorizontal" });
 	input::bindAnalogInput(GLFW_KEY_D, { input::digitalPositiveInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "MenuHorizontal" });
-	input::bindDigitalInput(GLFW_KEY_H, { "MenuConfirm" });
-	input::bindDigitalInput(GLFW_KEY_J, { "MenuBack" });
+	input::bindDigitalInput(GLFW_KEY_N, { "MenuConfirm" });
+	input::bindDigitalInput(GLFW_KEY_M, { "MenuBack" });
 
-	input::bindDigitalInput(GLFW_KEY_H, { "Shoot" + std::to_string(KeyboardPlayer2) });
-	input::bindDigitalInput(GLFW_KEY_J, { "Boost" + std::to_string(KeyboardPlayer2) });
+	input::bindDigitalInput(GLFW_KEY_N, { "Shoot" + std::to_string(KeyboardPlayer2) });
+	input::bindDigitalInput(GLFW_KEY_M, { "Boost" + std::to_string(KeyboardPlayer2) });
 
-	input::bindDigitalInput(GLFW_KEY_G, { "Pause" });
+	input::bindDigitalInput(GLFW_KEY_J, { "Pause" });
 }
 
 engine::Camera* cam;
