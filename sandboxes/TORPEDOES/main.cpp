@@ -1150,7 +1150,7 @@ static void SetupInput()
 
 	input::bindDigitalInput(GLFW_KEY_KP_5, { "Pause" });
 
-	int KeyboardPlayer2 = 1;
+	int KeyboardPlayer2 = 2;
 	input::bindAnalogInput(GLFW_KEY_D, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer2) });
 	input::bindAnalogInput(GLFW_KEY_A, { input::digitalNegativeInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer2) });
 

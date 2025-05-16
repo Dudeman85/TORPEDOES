@@ -513,7 +513,7 @@ public:
 
 		//Temporary control scheme display for playtesting
 		controlScheme = ecs::NewEntity();
-		engine::ecs::AddComponent(controlScheme, engine::Transform{ .position = Vector3(0.015, -0.09, 0.5), .scale = Vector3(1.4, 1.1, 0) * 0.2 });
+		engine::ecs::AddComponent(controlScheme, engine::Transform{ .position = Vector3(0.02, 0.11, 0.5), .scale = Vector3(1.5, 1.9, 0) * 0.2 });
 		resources::menuTextures["UI_Controls.png"]->SetScalingFilter(GL_LINEAR);
 		engine::ecs::AddComponent(controlScheme, engine::SpriteRenderer{ .texture = resources::menuTextures["UI_Controls.png"], .uiElement = true });
 	}
