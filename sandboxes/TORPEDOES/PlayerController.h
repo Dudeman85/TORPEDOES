@@ -1324,7 +1324,7 @@ public:
 			float nextCheckpointAngle = atan2(nextCheckpointPosition.y, nextCheckpointPosition.x);
 			TransformSystem::SetRotation(playerComponent.checkpointIndicatorEntity, Vector3(0, 0, Degrees(nextCheckpointAngle) - 90));
 
-
+			
 			// Create shoot indicators
 			float rangeEnd = -3.2;
 			float rangeStart = -4.5;
@@ -1386,7 +1386,7 @@ public:
 
 			playerComponent.shootIndicatorUpdate(playerEntity);
 			playerComponent.specialIndicatorUpdate(playerEntity);
-
+			
 			Audio* engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", false, 0.1f, DistanceModel::LINEAR);
 			Audio* shootShell = engine::AddAudio("Gameplay", "audio/bang_05.wav", false, 0.3f, DistanceModel::LINEAR);
 			Audio* shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.3f, DistanceModel::LINEAR);
