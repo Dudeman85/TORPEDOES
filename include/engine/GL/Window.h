@@ -73,7 +73,9 @@ namespace engine
 		mainWindow = glfwCreateWindow(width, height, name, NULL, NULL);
 		if (mainWindow == NULL)
 		{
-			std::cout << "Failed to create GLFW window" << std::endl;
+			const char* desc;
+			glfwGetError(&desc);
+			std::cout << "Failed to create GLFW window: " << desc << std::endl;
 			glfwTerminate();
 		}
 		glfwMakeContextCurrent(mainWindow);
