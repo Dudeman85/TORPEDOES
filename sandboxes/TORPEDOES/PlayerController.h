@@ -126,7 +126,10 @@ void CreateTorpedo(engine::ecs::Entity entity)
 	ecs::Entity torpedo = ecs::NewEntity();
 
 	engine::SoundComponent& sound = ecs::GetComponent<engine::SoundComponent>(entity);
-	sound.Sounds["ShootTorpedo"]->play();
+	if(!sound.Sounds["ShootTorpedo"]->getPlaying())
+		sound.Sounds["ShootTorpedo"]->play();
+	else
+		sound.Sounds["ShootTorpedo2"]->play();
 
 	// Torpedo shoot sound 
 
@@ -1321,7 +1324,7 @@ public:
 			float nextCheckpointAngle = atan2(nextCheckpointPosition.y, nextCheckpointPosition.x);
 			TransformSystem::SetRotation(playerComponent.checkpointIndicatorEntity, Vector3(0, 0, Degrees(nextCheckpointAngle) - 90));
 
-
+			
 			// Create shoot indicators
 			float rangeEnd = -3.2;
 			float rangeStart = -4.5;
@@ -1383,17 +1386,13 @@ public:
 
 			playerComponent.shootIndicatorUpdate(playerEntity);
 			playerComponent.specialIndicatorUpdate(playerEntity);
-
+			
 			Audio* engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", false, 0.1f, DistanceModel::LINEAR);
-			engineAudio->play();
 			Audio* shootShell = engine::AddAudio("Gameplay", "audio/bang_05.wav", false, 0.3f, DistanceModel::LINEAR);
-			shootShell->pause();
 			Audio* shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.3f, DistanceModel::LINEAR);
-			shootTorpedo->pause();
+			Audio* shootTorpedo2 = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.3f, DistanceModel::LINEAR);
 			Audio* boostAudio = engine::AddAudio("Gameplay", "audio/boost_01.wav", false, 0.3f, DistanceModel::LINEAR);
-			boostAudio->pause();
 			Audio* submergeAudio = engine::AddAudio("Gameplay", "audio/submerge_01.wav", false, 0.3f, DistanceModel::LINEAR);
-			submergeAudio->pause();
 			float startDelay = Random(0.0f, 100.0f); // Start delay between 0-100ms
 			engineAudio->setStartTimeMilliseconds(startDelay);
 
@@ -1403,6 +1402,7 @@ public:
 				{"Engine", engineAudio},
 				{"ShootShell", shootShell},
 				{"ShootTorpedo", shootTorpedo},
+				{"ShootTorpedo2", shootTorpedo2},
 				{"boostAudio", boostAudio},
 				{"submergeAudio", submergeAudio}
 			} , .maxDistance = 1500, .deleteSounds = true });

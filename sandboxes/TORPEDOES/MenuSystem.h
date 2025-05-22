@@ -129,7 +129,7 @@ class LevelSelectionSystem : public engine::ecs::System
 
 public:
 	engine::ecs::Entity arrowLeft;
-	int firstPlayer;
+	int firstPlayer = 0;
 
 	void Init()
 	{
@@ -164,7 +164,7 @@ public:
 		engine::ecs::AddComponent(mapSelectText, engine::TextRenderer
 			{
 				.font = resources::niagaraFont,
-					.text = "Press Start to Play!", .offset = Vector3(0, 0, 0), .scale = Vector3(0.003f), .color = playTextColor, .uiElement = true }
+					.text = "Player " + to_string(firstPlayer + 1) + " select level!", .offset = Vector3(0, 0, 0), .scale = Vector3(0.003f), .color = playTextColor, .uiElement = true}
 					);
 
 		engine::ecs::AddComponent(levelSelectionBackground, engine::Transform{ .position = Vector3(0, 0, -0.5f), .scale = Vector3(1) });

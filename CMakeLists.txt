@@ -10,6 +10,8 @@ include_directories("include")
 include_directories("ext/STB")
 include_directories("ext/libsndfile-master/include")
 
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
 # enet-1.3.17 library
 add_subdirectory("ext/enet-1.3.17")
 include_directories("ext/enet-1.3.17/include")

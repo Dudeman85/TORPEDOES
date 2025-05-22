@@ -139,6 +139,7 @@ static void LoadLevel1(engine::Camera* cam)
 {
 	currentLevel = 1;
 	engine::collisionSystem->cam = cam;
+	camHeight = 1;
 
 	// Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level1Map);
@@ -214,6 +215,7 @@ static void LoadLevel2(engine::Camera* cam)
 {
 	currentLevel = 2;
 	engine::collisionSystem->cam = cam;
+	camHeight = 1;
 
 	// Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level2Map);
@@ -305,6 +307,7 @@ static void LoadLevel3(engine::Camera* cam)
 {
 	currentLevel = 3;
 	engine::collisionSystem->cam = cam;
+	camHeight = 1;
 
 	//Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level3Map);
@@ -428,6 +431,7 @@ static void LoadLevel4(engine::Camera* cam)
 {
 	currentLevel = 4;
 	engine::collisionSystem->cam = cam;
+	camHeight = 1;
 
 	//set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level4Map);
@@ -659,6 +663,7 @@ static void LoadLevel5(engine::Camera* cam)
 {
 	currentLevel = 5;
 	engine::collisionSystem->cam = cam;
+	camHeight = 1;
 
 	// Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level5Map);
@@ -828,6 +833,7 @@ static void LoadLevel6(engine::Camera* cam)
 {
 	currentLevel = 6;
 	engine::collisionSystem->cam = cam;
+	camHeight = 1;
 
 	// Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level6Map);
@@ -847,7 +853,7 @@ static void LoadLevel6(engine::Camera* cam)
 	CreateCheckpoint(Vector3(6680.000000, -895.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(22.f), resources::models["Prop_Buoy.obj"], 0.f);
 	CreateCheckpoint(Vector3(8035.000000, -2715.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(30.f), resources::models["Prop_Buoy.obj"], 145.f);
 	CreateCheckpoint(Vector3(9555.000000, -2360.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 90.f);
-	CreateCheckpoint(Vector3(8840.000000, -1050.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(25.f), resources::models["Prop_Buoy.obj"], 45.f);
+	CreateCheckpoint(Vector3(8840.000000, -1050.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(30.f), resources::models["Prop_Buoy.obj"], 45.f);
 	CreateCheckpoint(Vector3(10240.000000, -1170.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(16.f), resources::models["Prop_Buoy.obj"], 90.f);
 	CreateCheckpoint(Vector3(10155.000000, -2885.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(21.f), resources::models["Prop_Buoy.obj"], 90.f);
 	CreateCheckpoint(Vector3(11575.000000, -2820.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 90.f);
@@ -862,7 +868,7 @@ static void LoadLevel6(engine::Camera* cam)
 	CreateCheckpoint(Vector3(11575.000000, -2820.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 90.f);
 	CreateCheckpoint(Vector3(10155.000000, -2885.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(21.f), resources::models["Prop_Buoy.obj"], 90.f);
 	CreateCheckpoint(Vector3(10240.000000, -1170.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(16.f), resources::models["Prop_Buoy.obj"], 90.f);
-	CreateCheckpoint(Vector3(8840.000000, -1050.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(25.f), resources::models["Prop_Buoy.obj"], 45.f);
+	CreateCheckpoint(Vector3(8840.000000, -1050.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(30.f), resources::models["Prop_Buoy.obj"], 45.f);
 	CreateCheckpoint(Vector3(9555.000000, -2360.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(18.f), resources::models["Prop_Buoy.obj"], 90.f);
 	CreateCheckpoint(Vector3(8035.000000, -2715.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(30.f), resources::models["Prop_Buoy.obj"], 145.f);
 	CreateCheckpoint(Vector3(6680.000000, -895.000000, -1660.000000), Vector3(22.500000, 82.500000, 27.500000), Vector3(22.f), resources::models["Prop_Buoy.obj"], 0.f);
@@ -1150,13 +1156,14 @@ static void SetupInput()
 	input::bindAnalogInput(GLFW_KEY_DOWN, { input::digitalPositiveInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "MenuVertical" });
 	input::bindAnalogInput(GLFW_KEY_LEFT, { input::digitalNegativeInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "MenuHorizontal" });
 	input::bindAnalogInput(GLFW_KEY_RIGHT, { input::digitalPositiveInput, AnalogNegativeMinDeadZone, AnalogNegativeMaxDeadZone }, { "MenuHorizontal" });
-	input::bindDigitalInput(GLFW_KEY_KP_1, { "MenuConfirm" });
-	input::bindDigitalInput(GLFW_KEY_KP_2, { "MenuBack" });
+	input::bindDigitalInput(GLFW_KEY_KP_2, { "MenuConfirm" });
+	input::bindDigitalInput(GLFW_KEY_KP_3, { "MenuBack" });
 
-	input::bindDigitalInput(GLFW_KEY_KP_1, { "Shoot" + std::to_string(KeyboardPlayer) });
-	input::bindDigitalInput(GLFW_KEY_KP_2, { "Boost" + std::to_string(KeyboardPlayer) });
+	input::bindDigitalInput(GLFW_KEY_KP_2, { "Shoot" + std::to_string(KeyboardPlayer) });
+	input::bindDigitalInput(GLFW_KEY_KP_3, { "Boost" + std::to_string(KeyboardPlayer) });
 
-	input::bindDigitalInput(GLFW_KEY_KP_5, { "Pause" });
+	input::bindDigitalInput(GLFW_KEY_KP_6, { "Pause" });
+	input::bindDigitalInput(GLFW_KEY_KP_6, { "Pause" + std::to_string(KeyboardPlayer) });
 
 	int KeyboardPlayer2 = 2;
 	input::bindAnalogInput(GLFW_KEY_D, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer2) });
@@ -1176,6 +1183,7 @@ static void SetupInput()
 	input::bindDigitalInput(GLFW_KEY_M, { "Boost" + std::to_string(KeyboardPlayer2) });
 
 	input::bindDigitalInput(GLFW_KEY_J, { "Pause" });
+	input::bindDigitalInput(GLFW_KEY_J, { "Pause" + std::to_string(KeyboardPlayer2) });
 }
 
 engine::Camera* cam;
