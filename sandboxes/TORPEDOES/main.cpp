@@ -139,6 +139,7 @@ static void LoadLevel1(engine::Camera* cam)
 {
 	currentLevel = 1;
 	engine::collisionSystem->cam = cam;
+	camHeight = 1;
 
 	// Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level1Map);
@@ -214,6 +215,7 @@ static void LoadLevel2(engine::Camera* cam)
 {
 	currentLevel = 2;
 	engine::collisionSystem->cam = cam;
+	camHeight = 1;
 
 	// Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level2Map);
@@ -305,6 +307,7 @@ static void LoadLevel3(engine::Camera* cam)
 {
 	currentLevel = 3;
 	engine::collisionSystem->cam = cam;
+	camHeight = 1;
 
 	//Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level3Map);
@@ -428,6 +431,7 @@ static void LoadLevel4(engine::Camera* cam)
 {
 	currentLevel = 4;
 	engine::collisionSystem->cam = cam;
+	camHeight = 1;
 
 	//set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level4Map);
@@ -659,6 +663,7 @@ static void LoadLevel5(engine::Camera* cam)
 {
 	currentLevel = 5;
 	engine::collisionSystem->cam = cam;
+	camHeight = 1;
 
 	// Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level5Map);
@@ -828,6 +833,7 @@ static void LoadLevel6(engine::Camera* cam)
 {
 	currentLevel = 6;
 	engine::collisionSystem->cam = cam;
+	camHeight = 1;
 
 	// Set this level's tilemap
 	engine::spriteRenderSystem->SetTilemap(resources::level6Map);

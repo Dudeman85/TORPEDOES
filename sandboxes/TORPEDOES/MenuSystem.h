@@ -30,6 +30,10 @@ void SaveSettings(){
 	std::ofstream outf{ "assets\\Settings.txt" };
 	if (outf.is_open()) {
 		outf << "volume=" << volume << "\n";
+		outf << "mainWindowWidth=" << mainWindowWidth << "\n";
+		outf << "mainWindowHeight=" << mainWindowHeight << "\n";
+		outf << "mainWindowX=" << mainWindowX << "\n";
+		outf << "mainWindowY=" << mainWindowY << "\n";
 		outf << "fullscreen=" << engine::mainWindowFullscreen << "\n";
 		outf.close();
 		std::cout << "Settings saved.\n";
@@ -51,7 +55,24 @@ void LoadSettings() {
 				if (key == "volume") {
 					volume = std::stof(value);
 				}
+				if (key == "mainWindowWidth"){
+					printf("mainWindowWidth=%s\n", value);
+					mainWindowWidth = std::stoi(value);
+				}
+				if (key == "mainWindowHeight") {
+					printf("mainWindowHeight=%s\n", value);
+					mainWindowHeight = std::stoi(value);
+				}
+				if (key == "mainWindowX") {
+					printf("mainWindowX=%s\n", value);
+					mainWindowX = std::stoi(value);
+				}
+				if (key == "mainWindowY") {
+					printf("mainWindowY=%s\n" , value);
+					mainWindowY = std::stoi(value);
+				}
 				else if (key == "fullscreen" ) {
+					SetWindowed();
 					if(value == "1"){
 						SetFullscreen();
 					}
@@ -1138,13 +1159,14 @@ public:
 		}
 	}
 
-	static void BackToUIMenu()
-	{
+	static void BackToUIMenu(){
+		SaveSettings();
 		engine::ecs::GetSystem<PauseSystem>()->pauseMenuAt = main;
 		engine::ecs::GetSystem<PauseSystem>()->ToggleShowUIMenu();
 	}
 	static void OnResumePressed()
 	{
+		
 		engine::ecs::GetSystem<PauseSystem>()->isGamePause = !engine::ecs::GetSystem<PauseSystem>()->isGamePause;
 		engine::ecs::GetSystem<PauseSystem>()->ToggleShowUIMenu();
 
