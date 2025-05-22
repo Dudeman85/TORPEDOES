@@ -1205,7 +1205,7 @@ int main()
 	ShowWindow(GetConsoleWindow(), SW_SHOW);
 #else
 	//Disable console in release mode
-	ShowWindow(GetConsoleWindow(), SW_SHOW);
+	ShowWindow(GetConsoleWindow(), SW_HIDE);
 #endif
 
 	GLFWwindow* window = engine::CreateGLWindow(1920, 1080, "Window", false);
@@ -1290,8 +1290,8 @@ int main()
 		glfwPollEvents();
 
 		//Close window when Esc is pressed
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-			glfwSetWindowShouldClose(window, true);
+		/*if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+			glfwSetWindowShouldClose(window, true);*/
 
 
 		////Object editor
