@@ -6,6 +6,8 @@
 #include "engine/Timing.h"
 #include <functional>
 #include "engine/SoundComponent.h"
+#include <iostream>
+#include <fstream>
 
 using namespace engine;
 
@@ -14,7 +16,7 @@ static GameState gameState = mainMenuState;
 static bool canStartLoadingMap;
 static bool isSceneloaded;
 static float volume = 0.5f;
-std::unordered_map<int, ShipType> playerShips;
+std::unordered_map<int,ShipType> playerShips;
 static void LoadLevel6(engine::Camera* cam);
 static void LoadLevel5(engine::Camera* cam);
 static void LoadLevel4(engine::Camera* cam);
@@ -23,6 +25,46 @@ static void LoadLevel2(engine::Camera* cam);
 static void LoadLevel1(engine::Camera* cam);
 void ToggleShipSelectMenu();
 static void ReturnToMainMenu();
+
+void SaveSettings(){
+	std::ofstream outf{ "assets\\Settings.txt" };
+	if (outf.is_open()) {
+		outf << "volume=" << volume << "\n";
+		outf << "fullscreen=" << engine::mainWindowFullscreen << "\n";
+		outf.close();
+		std::cout << "Settings saved.\n";
+	} 
+	else {
+	  std::cerr << "Error saving settings.\n";
+	}
+
+}
+void LoadSettings() {
+	std::ifstream inFile("assets\\Settings.txt");
+	if (inFile.is_open()) {
+		std::string line;
+		while (std::getline(inFile, line)) {
+			size_t delimiterPos = line.find('=');
+			if (delimiterPos != std::string::npos) {
+				std::string key = line.substr(0, delimiterPos);
+				std::string value = line.substr(delimiterPos + 1);
+				if (key == "volume") {
+					volume = std::stof(value);
+				}
+				else if (key == "fullscreen" ) {
+					if(value == "1"){
+						SetFullscreen();
+					}
+				}
+			}
+		}
+		inFile.close();
+		std::cout << "Settings loaded.\n";
+	}
+	else {
+		std::cout << "No settings file found. Using defaults.\n";
+	}
+}
 
 class PlayerSelectSystem;
 ECS_REGISTER_COMPONENT(Level)
@@ -73,6 +115,7 @@ public:
 
 	void Init()
 	{
+		
 		//Init variables
 		mapLevelIndex = 0;
 		readyToMoveLeft = true;
@@ -1329,6 +1372,7 @@ public:
 	//Make and show the main menu
 	void Init()
 	{
+		LoadSettings();
 		//Splash screen entities
 		ecs::Entity splashScreen = ecs::NewEntity();
 		ecs::AddComponent(splashScreen, Transform{ .position = {0, 0, -0.5}, .scale = {1, 1, 0} });
@@ -1655,6 +1699,7 @@ public:
 	{
 		auto mms = ecs::GetSystem<MainMenuSystem>();
 		mms->ChangeState(MainMenuState::Main, mms->startGame);
+		SaveSettings();
 	}
 
 	static void OnFullScreenPressed()
