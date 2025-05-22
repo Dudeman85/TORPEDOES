@@ -1351,10 +1351,6 @@ int main()
 		//	}
 		//}
 
-		if (glfwGetKey(window, GLFW_KEY_0))
-		{
-			ReturnToMainMenu();
-		}
 		if (glfwGetKey(window, GLFW_KEY_ENTER) && glfwGetKey(window, GLFW_KEY_LEFT_ALT))
 		{
 			if (!altDown)
@@ -1395,7 +1391,7 @@ int main()
 			engine::enablePhysics = true;
 			engine::enableAnimation = true;
 			//Check for pause has to be done here unfortunately
-			if (input::GetNewPress("Pause") && playerController->countdownTimer <= 0)
+			if (input::GetNewPress("Pause") && playerController->countdownTimer <= 0 && PlayerController::hasWon <= 0)
 			{
 				pauseSystem->ToggleShowUIMenu();
 				gameState = pauseMenuState;

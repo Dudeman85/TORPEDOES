@@ -685,8 +685,6 @@ class PlayerController : public engine::ecs::System
 {
 	static engine::ecs::Entity winScreen;
 	static engine::ecs::Entity winTimer;
-	//Timer to return to main menu
-	static float hasWon;
 
 	//A map from a ship type to a pre-initialized Player component with the proper stats
 	std::unordered_map<ShipType, Player> shipComponents;
@@ -694,6 +692,8 @@ class PlayerController : public engine::ecs::System
 	std::unordered_map<ShipType, engine::Model*> shipModels;
 
 public:
+	//Timer to return to main menu
+	static float hasWon;
 	float countdownTimer = 0;
 	static int lapCount; // How many laps to race through
 
