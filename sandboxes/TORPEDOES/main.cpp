@@ -1157,6 +1157,7 @@ static void SetupInput()
 	input::bindDigitalInput(GLFW_KEY_KP_2, { "Boost" + std::to_string(KeyboardPlayer) });
 
 	input::bindDigitalInput(GLFW_KEY_KP_5, { "Pause" });
+	input::bindDigitalInput(GLFW_KEY_KP_5, { "Pause" + std::to_string(KeyboardPlayer) });
 
 	int KeyboardPlayer2 = 2;
 	input::bindAnalogInput(GLFW_KEY_D, { input::digitalPositiveInput, AnalogPositiveMinDeadZone, AnalogPositiveMaxDeadZone }, { "Turn" + std::to_string(KeyboardPlayer2) });
@@ -1176,6 +1177,7 @@ static void SetupInput()
 	input::bindDigitalInput(GLFW_KEY_M, { "Boost" + std::to_string(KeyboardPlayer2) });
 
 	input::bindDigitalInput(GLFW_KEY_J, { "Pause" });
+	input::bindDigitalInput(GLFW_KEY_J, { "Pause" + std::to_string(KeyboardPlayer2) });
 }
 
 engine::Camera* cam;
