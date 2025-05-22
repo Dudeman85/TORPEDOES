@@ -1214,7 +1214,7 @@ int main()
 	ShowWindow(GetConsoleWindow(), SW_HIDE);
 #endif
 
-	GLFWwindow* window = engine::CreateGLWindow(1920, 1080, "Window", false);
+	GLFWwindow* window = engine::CreateGLWindow(1920, 1080, "TORPEDOES", false);
 
 	engine::EngineInit();
 
@@ -1351,7 +1351,7 @@ int main()
 		//	}
 		//}
 
-		if (glfwGetKey(window, GLFW_KEY_ENTER) && glfwGetKey(window, GLFW_KEY_LEFT_ALT))
+		if (glfwGetKey(window, GLFW_KEY_ENTER) && (glfwGetKey(window, GLFW_KEY_LEFT_ALT) || glfwGetKey(window, GLFW_KEY_RIGHT_ALT)))
 		{
 			if (!altDown)
 			{
