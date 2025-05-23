@@ -1437,6 +1437,8 @@ int main()
 		glfwSwapBuffers(window);
 	}
 
+	SaveSettings();
+
 	//Unitialize and free everything
 	ecs::DestroyAllEntities(true);
 	engine::UninitializeTimers();
