@@ -89,7 +89,7 @@ namespace resources
 			submerge.push_back(engine::AddAudio("Gameplay", "audio/submerge_01.wav", false, 0.15f, DistanceModel::LINEAR));
 		}
 		gameMusic = engine::AddAudio("Music", "audio/TheStruggleLoop1.wav", true, 0.05f, DistanceModel::NONE);
-		countdownSound = engine::AddAudio("Gameplay", "audio/CountdownSound.wav", false, 0.2f, DistanceModel::NONE, 5000.0f, 1.0f, 0.0f);
+		countdownSound = engine::AddAudio("Gameplay", "audio/CountdownSound.wav", false, 0.13f, DistanceModel::NONE, 5000.0f, 1.0f, 0.0f);
 		confirmSound = engine::AddAudio("Gameplay", "audio/select.wav", false, 0.4f, DistanceModel::NONE, 5000.0f, 1.0f, 0.0f);
 		moveSound = engine::AddAudio("Gameplay", "audio/leftright.wav", false, 0.4f, DistanceModel::NONE, 5000.0f, 1.0f, 0.0f);
 	}

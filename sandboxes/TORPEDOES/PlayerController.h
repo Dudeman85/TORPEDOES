@@ -1387,7 +1387,8 @@ public:
 			playerComponent.shootIndicatorUpdate(playerEntity);
 			playerComponent.specialIndicatorUpdate(playerEntity);
 			
-			Audio* engineAudio = engine::AddAudio("Boat", "audio/enginemono.wav", false, 0.1f, DistanceModel::LINEAR);
+			Audio* engineAudio = engine::AddAudio("Gameplay", "audio/enginemono.wav", true, 0.2f, DistanceModel::LINEAR);
+			engineAudio->play();
 			Audio* shootShell = engine::AddAudio("Gameplay", "audio/bang_05.wav", false, 0.3f, DistanceModel::LINEAR);
 			Audio* shootTorpedo = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.3f, DistanceModel::LINEAR);
 			Audio* shootTorpedo2 = engine::AddAudio("Gameplay", "audio/torpedoshoot.wav", false, 0.3f, DistanceModel::LINEAR);

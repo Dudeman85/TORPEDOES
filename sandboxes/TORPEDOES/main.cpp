@@ -1163,6 +1163,7 @@ static void SetupInput()
 	input::bindDigitalInput(GLFW_KEY_KP_3, { "Boost" + std::to_string(KeyboardPlayer) });
 
 	input::bindDigitalInput(GLFW_KEY_KP_6, { "Pause" });
+	input::bindDigitalInput(GLFW_KEY_ESCAPE, { "Pause" });
 	input::bindDigitalInput(GLFW_KEY_KP_6, { "Pause" + std::to_string(KeyboardPlayer) });
 
 	int KeyboardPlayer2 = 2;
@@ -1216,7 +1217,7 @@ int main()
 
 	std::cout << "Started TORPEDOES!!!" << endl;
 
-	GLFWwindow* window = engine::CreateGLWindow(1920, 1080, "Window", false);
+	GLFWwindow* window = engine::CreateGLWindow(1920, 1080, "TORPEDOES", false);
 
 	std::cout << "Created GLFW Window" << endl;
 
