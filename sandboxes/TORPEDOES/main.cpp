@@ -1214,9 +1214,15 @@ int main()
 	ShowWindow(GetConsoleWindow(), SW_HIDE);
 #endif
 
+	std::cout << "Started TORPEDOES!!!" << endl;
+
 	GLFWwindow* window = engine::CreateGLWindow(1920, 1080, "Window", false);
 
+	std::cout << "Created GLFW Window" << endl;
+
 	engine::EngineInit();
+
+	std::cout << "Engine initialization done" << endl;
 
 	//Make the camera
 	cam = new engine::Camera(1920, 1080);
@@ -1234,6 +1240,7 @@ int main()
 	engine::Update(cam);
 	glfwSwapBuffers(window);
 
+	std::cout << "First render pass done" << endl;
 
 	//Init sound engine
 	std::shared_ptr<engine::SoundSystem> soundSystem = engine::ecs::GetSystem<engine::SoundSystem>();
@@ -1246,8 +1253,12 @@ int main()
 	Vector3 newListenerPosition(2200.000000, -1075.000000, 0.00000);
 	soundSystem->SetListeningPosition(newListenerPosition);
 
+	std::cout << "Audio engine initialized" << endl;
+
 	//Loads all globally used resources
 	resources::LoadResources(cam);
+	
+	std::cout << "Finished loading resources" << endl;
 
 	input::initialize(window);
 
@@ -1289,6 +1300,8 @@ int main()
 	delete loadingTexture;
 
 	bool altDown = false;
+
+	std::cout << "Initialization finished" << endl;
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
