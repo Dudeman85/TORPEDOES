@@ -36,10 +36,10 @@ void SaveSettings(){
 		outf << "mainWindowY=" << mainWindowY << "\n";
 		outf << "fullscreen=" << engine::mainWindowFullscreen << "\n";
 		outf.close();
-		std::cout << "Settings saved.\n";
+		std::cout << "Settings saved\n";
 	} 
 	else {
-	  std::cerr << "Error saving settings.\n";
+	  std::cerr << "Error saving settings\n";
 	}
 
 }
@@ -80,10 +80,10 @@ void LoadSettings() {
 			}
 		}
 		inFile.close();
-		std::cout << "Settings loaded.\n";
+		std::cout << "Settings loaded\n";
 	}
 	else {
-		std::cout << "No settings file found. Using defaults.\n";
+		std::cout << "No settings file found. Using defaults\n";
 	}
 }
 
@@ -1378,7 +1378,6 @@ public:
 	//Make and show the main menu
 	void Init()
 	{
-		LoadSettings();
 		//Splash screen entities
 		ecs::Entity splashScreen = ecs::NewEntity();
 		ecs::AddComponent(splashScreen, Transform{ .position = {0, 0, -0.5}, .scale = {1, 1, 0} });

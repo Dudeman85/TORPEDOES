@@ -1224,12 +1224,12 @@ int main()
 
 	std::cout << "Engine initialization done" << endl;
 
+	LoadSettings();
+
 	//Make the camera
 	cam = new engine::Camera(1920, 1080);
 	cam->SetPosition(Vector3(0, 0, 1500));
 	cam->SetRotation(Vector3(0, 0, 0));
-
-	//Display the loading screen
 
 	//Create the loading screen entity
 	ecs::Entity loadingScreen = engine::ecs::NewEntity();
