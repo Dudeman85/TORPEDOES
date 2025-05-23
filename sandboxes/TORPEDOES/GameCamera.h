@@ -73,7 +73,7 @@ static void UpdateCam(engine::Camera* cam, Tilemap* map, bool isRiver = false)
 	}
 
 	//Restrict camera to size of tilemap
-	camHeight = std::clamp(camHeight, minHeight, map->bounds.height);
+	camHeight = std::clamp(camHeight, minHeight, std::min(map->bounds.height, maxCamHeight));
 
 	//Calculate the camera's position
 	Vector2 playersCenter(playerBounds[3] + (playerBounds[1] - playerBounds[3]) / 2, playerBounds[2] + (playerBounds[0] - playerBounds[2]) / 2);
@@ -83,17 +83,13 @@ static void UpdateCam(engine::Camera* cam, Tilemap* map, bool isRiver = false)
 	const float positionYMin = map->position.y - map->bounds.height + camHeight / 2;
 
 	//Special case for river map
-	if (isRiver)
+	//If fully zoomed out
+	if (camHeight == maxCamHeight && purgeDelay <= 0)
 	{
-		float maxZoom = map->bounds.height - 100;
-		//If fully zoomed out
-		if (camHeight == maxZoom && purgeDelay <= 0)
-		{
-			playerController->PurgeSlowPlayers();
-			purgeDelay = 1;
-		}
-		purgeDelay -= engine::cappedDeltaTime;
+		playerController->PurgeSlowPlayers();
+		purgeDelay = 1;
 	}
+	purgeDelay -= engine::cappedDeltaTime;
 
 	//Set the camera to the center of the player box
 	Vector3 position;

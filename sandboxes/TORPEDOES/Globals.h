@@ -2,6 +2,7 @@
 
 //Current height of the camera, width is calculated automatically
 inline float camHeight = 1.f;
+inline float maxCamHeight = 3500.f;
 inline const float aspectRatio = 16.f / 9.f;
 //Maximum units a player can be from the camera's edge before zooming in
 inline const float zoomInThreshold = 350;
