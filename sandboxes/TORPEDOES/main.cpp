@@ -823,7 +823,7 @@ static void LoadLevel5(engine::Camera* cam)
 	SetupCheeringSounds(cheeringSoundPos);
 
 	PlayCountdown(Vector3(3300.0f, -4000.0f, 200.0f));
-	PlayerController::lapCount = 1;
+	PlayerController::lapCount = 2;
 	//Create the players
 	engine::ecs::GetSystem<PlayerController>()->CreatePlayers(playerShips, Vector2(3390.0f, -4055.0f));
 	SetupGameMusic();
@@ -910,7 +910,6 @@ static void LoadLevel6(engine::Camera* cam)
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5705.000000, -2420.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(5705.000000, -2475.000000, 0.300000));
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// boxes
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(6825.000000, -980.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(6825.000000, -923.000000, 0.300000));
@@ -926,13 +925,10 @@ static void LoadLevel6(engine::Camera* cam)
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(7575.000000, -2450.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(7530.000000, -2450.000000, 0.300000));
 
-
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(9090.000000, -1840.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(9140.000000, -1840.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(9190.000000, -1840.000000, 0.300000));
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(9240.000000, -1840.000000, 0.300000));
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// boxes
 	engine::ecs::GetSystem<PickupSystem>()->SpawnPickup(Vector3(10040.000000, -1180.000000, 0.300000));

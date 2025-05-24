@@ -125,7 +125,7 @@ class LevelSelectionSystem : public engine::ecs::System
 	float arrowPosHight = 0.88f;
 	float arrowsOffsetX = 0.6f;
 
-	std::vector<std::string> mapNames = { "Lake", "Caves", "Beach", "River", "Ocean", "River2" };
+	std::vector<std::string> mapNames = { "Lake", "Caves", "Beach", "Amazon", "Ocean", "Nile" };
 
 public:
 	engine::ecs::Entity arrowLeft;
